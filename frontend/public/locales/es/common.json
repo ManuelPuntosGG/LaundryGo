@@ -1,0 +1,155 @@
+{
+  "app": {
+    "name": "LaundryGo",
+    "tagline": "Servicio Premium de Recogida y Entrega de Lavandería en Denver"
+  },
+  "nav": {
+    "home": "Inicio",
+    "schedule": "Agendar Recogida",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "dashboard": "Mi Panel",
+    "logout": "Cerrar Sesión"
+  },
+  "home": {
+    "hero": {
+      "title": "Lavandería Fresca, Entregada en Tu Puerta",
+      "subtitle": "Servicio profesional de recogida y entrega de lavandería para hogares y negocios en Denver, Colorado.",
+      "cta": "Agendar una Recogida"
+    },
+    "howItWorks": {
+      "title": "Cómo Funciona",
+      "step1": {
+        "title": "Agenda",
+        "description": "Elige tu fecha y horario de recogida"
+      },
+      "step2": {
+        "title": "Recogemos",
+        "description": "Nuestro equipo recoge tu ropa en tu puerta"
+      },
+      "step3": {
+        "title": "Lavamos",
+        "description": "Limpieza profesional con cuidado premium"
+      },
+      "step4": {
+        "title": "Entregamos",
+        "description": "Tu ropa fresca y doblada, entregada a ti"
+      }
+    },
+    "pricing": {
+      "title": "Nuestros Servicios",
+      "standard": {
+        "name": "Estándar",
+        "price": "$2.25/lb",
+        "delivery": "Entrega en 2 días",
+        "description": "Servicio confiable para tus necesidades diarias"
+      },
+      "go": {
+        "name": "Go",
+        "price": "$2.65/lb",
+        "delivery": "Entrega al día siguiente",
+        "description": "¿Lo necesitas más rápido? Recibe tu ropa mañana"
+      },
+      "gofurther": {
+        "name": "GoFurther",
+        "price": "$3.85/lb",
+        "delivery": "Entrega el mismo día",
+        "description": "Pide antes de las 12PM para entrega el mismo día"
+      }
+    },
+    "serviceArea": {
+      "title": "Área de Servicio",
+      "description": "Servimos toda el área metropolitana de Denver"
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "address": "Denver, Colorado"
+    }
+  },
+  "schedule": {
+    "title": "Agendar una Recogida",
+    "date": "Seleccionar Fecha",
+    "timeSlot": "Seleccionar Horario",
+    "morning": "Mañana (8AM - 11AM)",
+    "afternoon": "Tarde (12PM - 4PM)",
+    "frequency": "Frecuencia de Recogida",
+    "oneTime": "Una vez",
+    "daily": "Diario",
+    "weekly": "Semanal",
+    "fortnightly": "Quincenal",
+    "monthly": "Mensual",
+    "yourInfo": "Tu Información",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "terms": "Acepto los Términos de Servicio y la Política de Privacidad",
+    "serviceType": "Tipo de Servicio",
+    "orderDetails": "Detalles del Pedido",
+    "orderDetailsPlaceholder": "Describe tu pedido de lavandería (prendas, instrucciones especiales, etc.)",
+    "pickupInstructions": "Instrucciones de Recogida (Opcional)",
+    "pickupInstructionsPlaceholder": "Código de portón, ubicación especial, etc.",
+    "reserve": "Reservar Recogida",
+    "loginPrompt": "¿Ya tienes una cuenta?",
+    "loginLink": "Inicia sesión para auto-completar tu información"
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de Nuevo",
+      "email": "Correo",
+      "password": "Contraseña",
+      "submit": "Iniciar Sesión",
+      "noAccount": "¿No tienes una cuenta?",
+      "registerLink": "Registrarse"
+    },
+    "register": {
+      "title": "Crear Cuenta",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo",
+      "phone": "Teléfono (Opcional)",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "submit": "Registrarse",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "loginLink": "Iniciar Sesión"
+    }
+  },
+  "dashboard": {
+    "title": "Mi Panel",
+    "welcome": "¡Bienvenido, {{name}}!",
+    "orderHistory": "Historial de Pedidos",
+    "recurringOrders": "Pedidos Recurrentes",
+    "noOrders": "Aún no hay pedidos",
+    "scheduleFirst": "Agenda tu primera recogida",
+    "viewDetails": "Ver Detalles",
+    "reorder": "Volver a Pedir",
+    "active": "Activo",
+    "paused": "Pausado",
+    "deactivate": "Desactivar",
+    "activate": "Activar",
+    "noRecurring": "No hay pedidos recurrentes",
+    "scheduleRecurring": "Agendar una recogida recurrente"
+  },
+  "footer": {
+    "description": "Servicio profesional de recogida y entrega de lavandería en Denver, Colorado.",
+    "quickLinks": "Enlaces Rápidos",
+    "services": "Servicios",
+    "contact": "Contacto",
+    "followUs": "Síguenos",
+    "rights": "Todos los derechos reservados."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "retry": "Intentar de Nuevo",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "required": "Requerido"
+  }
+}

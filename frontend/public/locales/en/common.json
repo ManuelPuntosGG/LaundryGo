@@ -1,0 +1,155 @@
+{
+  "app": {
+    "name": "LaundryGo",
+    "tagline": "Premium Laundry Pickup & Delivery in Denver"
+  },
+  "nav": {
+    "home": "Home",
+    "schedule": "Schedule Pickup",
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero": {
+      "title": "Fresh Laundry, Delivered to Your Door",
+      "subtitle": "Professional pickup and delivery laundry service for homes and businesses in Denver, Colorado.",
+      "cta": "Schedule a Pickup"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Schedule",
+        "description": "Choose your pickup date and time slot"
+      },
+      "step2": {
+        "title": "We Pick Up",
+        "description": "Our team collects your laundry at your doorstep"
+      },
+      "step3": {
+        "title": "We Clean",
+        "description": "Professional cleaning with premium care"
+      },
+      "step4": {
+        "title": "We Deliver",
+        "description": "Fresh, folded laundry delivered to you"
+      }
+    },
+    "pricing": {
+      "title": "Our Services",
+      "standard": {
+        "name": "Standard",
+        "price": "$2.25/lb",
+        "delivery": "2-day delivery",
+        "description": "Reliable service for your everyday laundry needs"
+      },
+      "go": {
+        "name": "Go",
+        "price": "$2.65/lb",
+        "delivery": "Next-day delivery",
+        "description": "Need it faster? Get your laundry tomorrow"
+      },
+      "gofurther": {
+        "name": "GoFurther",
+        "price": "$3.85/lb",
+        "delivery": "Same-day delivery",
+        "description": "Order before 12PM for same-day delivery"
+      }
+    },
+    "serviceArea": {
+      "title": "Service Area",
+      "description": "We serve the entire Denver metropolitan area"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Denver, Colorado"
+    }
+  },
+  "schedule": {
+    "title": "Schedule a Pickup",
+    "date": "Select Date",
+    "timeSlot": "Select Time Slot",
+    "morning": "Morning (8AM - 11AM)",
+    "afternoon": "Afternoon (12PM - 4PM)",
+    "frequency": "Pickup Frequency",
+    "oneTime": "One-time",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "fortnightly": "Fortnightly",
+    "monthly": "Monthly",
+    "yourInfo": "Your Information",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "email": "Email",
+    "terms": "I agree to the Terms of Service and Privacy Policy",
+    "serviceType": "Service Type",
+    "orderDetails": "Order Details",
+    "orderDetailsPlaceholder": "Describe your laundry order (items, special instructions, etc.)",
+    "pickupInstructions": "Pickup Instructions (Optional)",
+    "pickupInstructionsPlaceholder": "Gate code, special location, etc.",
+    "reserve": "Reserve Pickup",
+    "loginPrompt": "Already have an account?",
+    "loginLink": "Login to auto-fill your information"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register"
+    },
+    "register": {
+      "title": "Create Account",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone (Optional)",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Register",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Login"
+    }
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "welcome": "Welcome, {{name}}!",
+    "orderHistory": "Order History",
+    "recurringOrders": "Recurring Orders",
+    "noOrders": "No orders yet",
+    "scheduleFirst": "Schedule your first pickup",
+    "viewDetails": "View Details",
+    "reorder": "Reorder",
+    "active": "Active",
+    "paused": "Paused",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "noRecurring": "No recurring orders",
+    "scheduleRecurring": "Schedule a recurring pickup"
+  },
+  "footer": {
+    "description": "Professional laundry pickup and delivery service in Denver, Colorado.",
+    "quickLinks": "Quick Links",
+    "services": "Services",
+    "contact": "Contact",
+    "followUs": "Follow Us",
+    "rights": "All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "required": "Required"
+  }
+}
