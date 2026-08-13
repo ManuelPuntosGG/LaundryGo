@@ -41,6 +41,11 @@ class Order(TimeStampedModel):
         ('afternoon', 'Afternoon (12PM - 4PM)'),
     ]
 
+    ZONE_CHOICES = [
+        ('inner', 'Downtown Denver Zone (FREE)'),
+        ('outer', 'Outer Zone ($25 Fee)'),
+    ]
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -52,6 +57,12 @@ class Order(TimeStampedModel):
     guest_first_name = models.CharField(max_length=100, blank=True)
     guest_last_name = models.CharField(max_length=100, blank=True)
     guest_phone = models.CharField(max_length=20, blank=True)
+
+    street_address = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, default='Denver')
+    zip_code = models.CharField(max_length=20, blank=True)
+    delivery_zone = models.CharField(max_length=20, choices=ZONE_CHOICES, default='inner')
+    delivery_fee = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
 
     service_rate = models.ForeignKey(ServiceRate, on_delete=models.PROTECT, related_name='orders')
     pickup_date = models.DateField()

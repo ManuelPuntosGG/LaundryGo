@@ -37,6 +37,9 @@ export const useAuth = () => {
     first_name: string;
     last_name: string;
     phone?: string;
+    street_address?: string;
+    city?: string;
+    zip_code?: string;
     password: string;
     password_confirm: string;
   }) => {
@@ -55,8 +58,10 @@ export const useAuth = () => {
     try {
       const refreshToken = localStorage.getItem('refresh_token');
       if (refreshToken) {
-        await api.post('/auth/token/blacklist/', { refresh: refreshToken });
+        await api.post('/auth/token/blacklist/', { refresh: refreshToken }).catch(() => {});
       }
+    } catch {
+      // Ignore potential errors during logout token blacklist
     } finally {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');

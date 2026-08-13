@@ -46,13 +46,13 @@
       },
       "go": {
         "name": "Go",
-        "price": "$2.65/lb",
+        "price": "$2.75/lb",
         "delivery": "Entrega al día siguiente",
         "description": "¿Lo necesitas más rápido? Recibe tu ropa mañana"
       },
       "gofurther": {
         "name": "GoFurther",
-        "price": "$3.85/lb",
+        "price": "$3.50/lb",
         "delivery": "Entrega el mismo día",
         "description": "Pide antes de las 12PM para entrega el mismo día"
       }
@@ -92,6 +92,11 @@
     "pickupInstructions": "Instrucciones de Recogida (Opcional)",
     "pickupInstructionsPlaceholder": "Código de portón, ubicación especial, etc.",
     "reserve": "Reservar Recogida",
+    "reviewTitle": "Revisar y Confirmar",
+    "pickupDateLabel": "Fecha de Recogida",
+    "timeSlotLabel": "Horario",
+    "serviceLabel": "Servicio",
+    "orderDetailsSummary": "Detalles del Pedido",
     "loginPrompt": "¿Ya tienes una cuenta?",
     "loginLink": "Inicia sesión para auto-completar tu información"
   },

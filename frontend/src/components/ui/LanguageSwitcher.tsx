@@ -8,23 +8,33 @@ const languages = [
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
+  const currentLang = i18n.language?.substring(0, 2) || 'en';
 
   return (
-    <div className="flex items-center gap-1 bg-glass-white-10 backdrop-blur-sm border border-white/20 rounded-xl px-2 py-1">
-      <Globe className="w-4 h-4 text-white/70" />
-      {languages.map((lang) => (
-        <button
-          key={lang.code}
-          onClick={() => i18n.changeLanguage(lang.code)}
-          className={`px-2 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
-            i18n.language === lang.code
-              ? 'bg-primary-500 text-white'
-              : 'text-white/70 hover:text-white hover:bg-white/10'
-          }`}
-        >
-          {lang.label}
-        </button>
-      ))}
+    <div className="inline-flex items-center gap-1.5 p-1 bg-slate-100/90 border border-slate-200/80 rounded-xl shrink-0">
+      <div className="pl-2 pr-0.5 text-slate-500 shrink-0 flex items-center justify-center">
+        <Globe className="w-4 h-4 text-slate-500" />
+      </div>
+      <div className="flex items-center gap-1">
+        {languages.map((lang) => {
+          const isSelected = currentLang === lang.code;
+
+          return (
+            <button
+              key={lang.code}
+              type="button"
+              onClick={() => i18n.changeLanguage(lang.code)}
+              className={`w-10 h-7 text-xs sm:text-sm font-extrabold rounded-lg transition-colors duration-200 ease-in-out flex items-center justify-center cursor-pointer select-none ${
+                isSelected
+                  ? 'bg-white text-blue-600 shadow-2xs border border-slate-200/80'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+              }`}
+            >
+              {lang.code.toUpperCase()}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

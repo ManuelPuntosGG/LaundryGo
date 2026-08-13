@@ -7,6 +7,9 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    street_address = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, default='Denver', blank=True)
+    zip_code = models.CharField(max_length=20, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username']

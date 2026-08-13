@@ -46,13 +46,13 @@
       },
       "go": {
         "name": "Go",
-        "price": "$2.65/lb",
+        "price": "$2.75/lb",
         "delivery": "Next-day delivery",
         "description": "Need it faster? Get your laundry tomorrow"
       },
       "gofurther": {
         "name": "GoFurther",
-        "price": "$3.85/lb",
+        "price": "$3.50/lb",
         "delivery": "Same-day delivery",
         "description": "Order before 12PM for same-day delivery"
       }
@@ -92,6 +92,11 @@
     "pickupInstructions": "Pickup Instructions (Optional)",
     "pickupInstructionsPlaceholder": "Gate code, special location, etc.",
     "reserve": "Reserve Pickup",
+    "reviewTitle": "Review & Confirm",
+    "pickupDateLabel": "Pickup Date",
+    "timeSlotLabel": "Time Slot",
+    "serviceLabel": "Service",
+    "orderDetailsSummary": "Order Details",
     "loginPrompt": "Already have an account?",
     "loginLink": "Login to auto-fill your information"
   },

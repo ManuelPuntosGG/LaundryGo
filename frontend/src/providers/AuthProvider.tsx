@@ -12,6 +12,9 @@ interface AuthContextType {
     first_name: string;
     last_name: string;
     phone?: string;
+    street_address?: string;
+    city?: string;
+    zip_code?: string;
     password: string;
     password_confirm: string;
   }) => Promise<User>;

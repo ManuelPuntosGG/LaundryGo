@@ -4,6 +4,9 @@ export interface User {
   first_name: string;
   last_name: string;
   phone: string;
+  street_address?: string;
+  city?: string;
+  zip_code?: string;
 }
 
 export interface AuthResponse {
@@ -28,6 +31,11 @@ export interface Order {
   guest_first_name: string;
   guest_last_name: string;
   guest_phone: string;
+  street_address?: string;
+  city?: string;
+  zip_code?: string;
+  delivery_zone?: string;
+  delivery_fee?: number;
   service_rate: number;
   service_name: string;
   service_type: string;
@@ -55,6 +63,8 @@ export interface RecurringSchedule {
 
 export interface AvailableDate {
   date: string;
-  goavailable: boolean;
+  goavailable?: boolean;
   gofurther_available: boolean;
+  day_name?: string;
+  formatted_date?: string;
 }
