@@ -106,7 +106,7 @@ export function Home() {
       <section className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-5 w-full pt-4 sm:pt-8 lg:pt-12 pb-2">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50/90 border border-blue-200/80 text-blue-700 text-xs sm:text-sm font-semibold shadow-2xs hover:scale-102 transition-transform">
           <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
-          <span>Doorstep Pickup & Delivery in Denver, Colorado</span>
+          <span>{t('home.badge')}</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.15] tracking-tight w-full">
@@ -139,7 +139,7 @@ export function Home() {
             {t('home.howItWorks.title')}
           </h2>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            A simple 4-step process to get your laundry fresh, folded, and back to you.
+            {t('home.howItWorks.subtitle')}
           </p>
         </div>
 
@@ -168,7 +168,7 @@ export function Home() {
             {t('home.pricing.title')}
           </h2>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Transparent pricing based on weight and turnaround time. No surprises.
+            {t('home.pricing.subtitle')}
           </p>
         </div>
 

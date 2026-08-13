@@ -43,12 +43,19 @@ export function Navbar() {
               )}
             </Link>
 
-            <a
-              href="/#services"
-              className="text-sm font-bold text-slate-600 hover:text-slate-900 transition-all relative py-1.5 whitespace-nowrap hover:scale-105"
+            <Link
+              to="/schedule"
+              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+                isActive('/schedule')
+                  ? 'text-blue-600'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
             >
-              {t('footer.services')}
-            </a>
+              {t('nav.schedule')}
+              {isActive('/schedule') && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full animate-fade-in" />
+              )}
+            </Link>
           </div>
 
           <div className="h-5 w-px bg-slate-200" />
@@ -113,7 +120,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu — Reordered per user request */}
+      {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="max-w-7xl mx-auto mt-2 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl shadow-xl animate-fade-in">
           <div className="flex flex-col items-center justify-center text-center space-y-4 py-6 px-6 max-w-sm mx-auto">
@@ -128,14 +135,16 @@ export function Navbar() {
               {t('nav.home')}
             </Link>
 
-            {/* 2. Services */}
-            <a
-              href="/#services"
+            {/* 2. Schedule */}
+            <Link
+              to="/schedule"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="text-center text-lg font-extrabold text-slate-800 hover:text-blue-600 transition-colors py-1"
+              className={`text-center text-lg font-extrabold transition-colors py-1 ${
+                isActive('/schedule') ? 'text-blue-600' : 'text-slate-800 hover:text-blue-600'
+              }`}
             >
-              {t('footer.services')}
-            </a>
+              {t('nav.schedule')}
+            </Link>
 
             {/* 3. Primary CTA: Schedule Pickup directly under Services */}
             <div className="w-full pt-1">

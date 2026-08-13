@@ -1,31 +1,33 @@
 {
   "app": {
     "name": "LaundryGo",
-    "tagline": "Servicio Premium de Recogida y Entrega de Lavandería en Denver"
+    "tagline": "Servicio Premium de Recolección y Entrega de Lavandería en Denver"
   },
   "nav": {
     "home": "Inicio",
-    "schedule": "Agendar Recogida",
+    "schedule": "Agendar Recolección",
     "login": "Iniciar Sesión",
     "register": "Registrarse",
     "dashboard": "Mi Panel",
     "logout": "Cerrar Sesión"
   },
   "home": {
+    "badge": "Recolección y Entrega a Domicilio en Denver, Colorado",
     "hero": {
-      "title": "Lavandería Fresca, Entregada en Tu Puerta",
-      "subtitle": "Servicio profesional de recogida y entrega de lavandería para hogares y negocios en Denver, Colorado.",
-      "cta": "Agendar una Recogida"
+      "title": "Ropa Limpia y Fresca, Entregada a Tu Puerta",
+      "subtitle": "Servicio profesional de recolección y entrega de lavandería para hogares y negocios en Denver, Colorado.",
+      "cta": "Agendar Recolección"
     },
     "howItWorks": {
       "title": "Cómo Funciona",
+      "subtitle": "Un proceso simple en 4 pasos para tener tu ropa limpia, doblada y de vuelta contigo.",
       "step1": {
         "title": "Agenda",
-        "description": "Elige tu fecha y horario de recogida"
+        "description": "Elige tu fecha y horario de recolección"
       },
       "step2": {
-        "title": "Recogemos",
-        "description": "Nuestro equipo recoge tu ropa en tu puerta"
+        "title": "Recolectamos",
+        "description": "Nuestro equipo recolecta tu ropa en tu puerta"
       },
       "step3": {
         "title": "Lavamos",
@@ -38,6 +40,7 @@
     },
     "pricing": {
       "title": "Nuestros Servicios",
+      "subtitle": "Precios transparentes basados en peso y tiempo de entrega. Sin sorpresas.",
       "standard": {
         "name": "Estándar",
         "price": "$2.25/lb",
@@ -54,12 +57,12 @@
         "name": "GoFurther",
         "price": "$3.50/lb",
         "delivery": "Entrega el mismo día",
-        "description": "Pide antes de las 12PM para entrega el mismo día"
+        "description": "Solicita antes de las 12:00 PM para entrega hoy mismo"
       }
     },
     "serviceArea": {
       "title": "Área de Servicio",
-      "description": "Servimos toda el área metropolitana de Denver"
+      "description": "Servimos a toda el área metropolitana de Denver"
     },
     "contact": {
       "title": "Contáctanos",
@@ -69,40 +72,78 @@
     }
   },
   "schedule": {
-    "title": "Agendar una Recogida",
+    "title": "Programar Recolección",
+    "subtitle": "Elige tu fecha de recolección, velocidad de servicio y dirección de entrega",
+    "step1": "Fecha y Hora",
+    "step2": "Ubicación y Datos",
+    "step3": "Servicio y Detalles",
+    "step4": "Revisar y Confirmar",
+    "selectDateTime": "Seleccionar Fecha y Hora",
+    "selectDate": "Seleccionar Fecha de Recolección",
     "date": "Seleccionar Fecha",
     "timeSlot": "Seleccionar Horario",
-    "morning": "Mañana (8AM - 11AM)",
-    "afternoon": "Tarde (12PM - 4PM)",
-    "frequency": "Frecuencia de Recogida",
-    "oneTime": "Una vez",
+    "morning": "Mañana",
+    "afternoon": "Tarde",
+    "morningToggle": "Mañana (8-11)",
+    "afternoonToggle": "Tarde (12-4)",
+    "morningSlot": "8:00 AM – 11:00 AM",
+    "afternoonSlot": "12:00 PM – 4:00 PM",
+    "frequency": "Frecuencia de Recolección",
+    "oneTime": "Servicio Único",
+    "oneTimeOnly": "Una sola recolección",
+    "recurring": "Recurrente",
     "daily": "Diario",
     "weekly": "Semanal",
     "fortnightly": "Quincenal",
     "monthly": "Mensual",
+    "recurringActive": "Suscripción Recurrente Activa",
+    "oneTimeDefault": "Servicio Único (Sin recurrencia)",
+    "recurringTip": "💡 Haz clic nuevamente en la frecuencia para volver a servicio único puntual.",
+    "oneTimeTip": "ℹ️ De forma predeterminada es una recolección única. Si deseas programar recolecciones periódicas, elige una opción arriba.",
     "yourInfo": "Tu Información",
     "firstName": "Nombre",
     "lastName": "Apellido",
     "phone": "Teléfono",
     "email": "Correo",
+    "deliveryAddress": "Dirección y Zona de Recolección en Denver",
+    "streetAddress": "Dirección de Calle",
+    "cityLocation": "Zona en Área de Denver",
+    "zipCode": "Código Postal",
+    "freeDelivery": "Envío GRATUITO Incluido (Zona Central de Denver)",
+    "outerZoneFee": "+$25.00 Tarifa de Envío Zona Exterior",
     "terms": "Acepto los Términos de Servicio y la Política de Privacidad",
     "serviceType": "Tipo de Servicio",
+    "selectServiceSpeed": "Seleccionar Velocidad del Servicio",
+    "cutoffNotice": "Límite 12PM",
     "orderDetails": "Detalles del Pedido",
-    "orderDetailsPlaceholder": "Describe tu pedido de lavandería (prendas, instrucciones especiales, etc.)",
-    "pickupInstructions": "Instrucciones de Recogida (Opcional)",
-    "pickupInstructionsPlaceholder": "Código de portón, ubicación especial, etc.",
-    "reserve": "Reservar Recogida",
+    "orderDetailsPlaceholder": "Ej. 2 bolsas de ropa clara y oscura, 1 edredón. Lavado delicado en frío.",
+    "pickupInstructions": "Instrucciones de Recolección (Opcional)",
+    "pickupInstructionsPlaceholder": "Ej. Dejar bolsas en el porch delantero o código de portón #1234.",
+    "reserve": "Confirmar Recolección",
     "reviewTitle": "Revisar y Confirmar",
-    "pickupDateLabel": "Fecha de Recogida",
+    "pickupDate": "Fecha de Recolección",
+    "pickupDateLabel": "Fecha de Recolección",
     "timeSlotLabel": "Horario",
     "serviceLabel": "Servicio",
+    "customerDetails": "Datos del Cliente y Dirección",
+    "deliveryFeeLabel": "Tarifa de Envío",
+    "freeFee": "GRATIS ($0.00)",
+    "outerFee": "$25.00 (Tarifa Zona Exterior)",
     "orderDetailsSummary": "Detalles del Pedido",
-    "loginPrompt": "¿Ya tienes una cuenta?",
-    "loginLink": "Inicia sesión para auto-completar tu información"
+    "loginPrompt": "¿Haciendo pedido como invitado? ¿Quieres guardar tus datos?",
+    "loginLink": "Iniciar Sesión",
+    "loggedInAs": "Sesión iniciada como",
+    "success": {
+      "title": "¡Solicitud de Recolección Enviada con Éxito!",
+      "message": "Hemos recibido tu pedido correctamente. Nuestro equipo procesará los detalles y pronto se pondrá en contacto contigo para gestionar la recolección de tu ropa.",
+      "emailNotice": "Se ha enviado una notificación de confirmación a tu correo electrónico.",
+      "returnDashboard": "Volver al Panel de Control"
+    }
   },
   "auth": {
     "login": {
       "title": "Bienvenido de Nuevo",
+      "subheader": "Inicia sesión para ver tus pedidos y agendar rápidamente.",
       "email": "Correo",
       "password": "Contraseña",
       "submit": "Iniciar Sesión",
@@ -111,10 +152,14 @@
     },
     "register": {
       "title": "Crear Cuenta",
+      "subheader": "Crea tu cuenta con tu dirección para agendar recolecciones automáticas.",
       "firstName": "Nombre",
       "lastName": "Apellido",
       "email": "Correo",
-      "phone": "Teléfono (Opcional)",
+      "phone": "Teléfono",
+      "streetAddress": "Dirección de Calle",
+      "cityLocation": "Zona en Área de Denver",
+      "zipCode": "Código Postal",
       "password": "Contraseña",
       "confirmPassword": "Confirmar Contraseña",
       "submit": "Registrarse",
@@ -125,10 +170,15 @@
   "dashboard": {
     "title": "Mi Panel",
     "welcome": "¡Bienvenido, {{name}}!",
+    "subheader": "Gestiona tus pedidos pasados, recolecciones recurrentes y reordenes en un solo lugar.",
+    "totalOrders": "Total de Pedidos",
+    "activeRecurring": "Recurrentes Activos",
+    "needAnother": "¿Necesitas otra recolección?",
+    "rebookSubheader": "Vuelve a pedir pedidos pasados con un solo clic.",
     "orderHistory": "Historial de Pedidos",
     "recurringOrders": "Pedidos Recurrentes",
     "noOrders": "Aún no hay pedidos",
-    "scheduleFirst": "Agenda tu primera recogida",
+    "scheduleFirst": "Agenda tu primera recolección",
     "viewDetails": "Ver Detalles",
     "reorder": "Volver a Pedir",
     "active": "Activo",
@@ -136,10 +186,13 @@
     "deactivate": "Desactivar",
     "activate": "Activar",
     "noRecurring": "No hay pedidos recurrentes",
-    "scheduleRecurring": "Agendar una recogida recurrente"
+    "scheduleRecurring": "Agendar una recolección recurrente",
+    "orderNumber": "Pedido #{{id}}",
+    "service": "Servicio",
+    "nextPickup": "Siguiente Recolección"
   },
   "footer": {
-    "description": "Servicio profesional de recogida y entrega de lavandería en Denver, Colorado.",
+    "description": "Servicio profesional de recolección y entrega de lavandería en Denver, Colorado.",
     "quickLinks": "Enlaces Rápidos",
     "services": "Servicios",
     "contact": "Contacto",
@@ -155,6 +208,16 @@
     "confirm": "Confirmar",
     "back": "Atrás",
     "next": "Siguiente",
-    "required": "Requerido"
+    "required": "Requerido",
+    "yes": "Sí",
+    "no": "No",
+    "details": "Detalles",
+    "status": "Estado",
+    "date": "Fecha",
+    "total": "Total",
+    "price": "Precio",
+    "description": "Descripción",
+    "submit": "Enviar",
+    "close": "Cerrar"
   }
 }

@@ -128,10 +128,10 @@ export function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200/80">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1">
-            {t('dashboard.welcome', { name: user?.first_name || 'Customer' })}
+            {t('dashboard.welcome', { name: user?.first_name || user?.email?.split('@')[0] || 'Customer' })}
           </h1>
           <p className="text-slate-600 text-sm sm:text-base">
-            Manage your past orders, recurring pickups, and reorders in one place.
+            {t('dashboard.subheader')}
           </p>
         </div>
         <Link to="/schedule">
@@ -149,7 +149,7 @@ export function Dashboard() {
             <Package className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-0.5">Total Orders</p>
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-0.5">{t('dashboard.totalOrders')}</p>
             <p className="text-3xl font-extrabold text-slate-900">{orders.length}</p>
           </div>
         </Card>
@@ -159,7 +159,7 @@ export function Dashboard() {
             <RefreshCw className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-0.5">Active Recurring</p>
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-0.5">{t('dashboard.activeRecurring')}</p>
             <p className="text-3xl font-extrabold text-slate-900">
               {recurring.filter((r) => r.is_active).length}
             </p>
@@ -168,11 +168,11 @@ export function Dashboard() {
 
         <Card variant="flat" className="flex items-center justify-between gap-4 sm:col-span-2 lg:col-span-1">
           <div>
-            <p className="text-slate-900 font-bold text-base mb-1">Need another pickup?</p>
-            <p className="text-slate-500 text-xs">Rebook past orders with one click.</p>
+            <p className="text-slate-900 font-bold text-base mb-1">{t('dashboard.needAnother')}</p>
+            <p className="text-slate-500 text-xs">{t('dashboard.rebookSubheader')}</p>
           </div>
           <Link to="/schedule">
-            <Button variant="outline" size="sm">Schedule</Button>
+            <Button variant="outline" size="sm">{t('nav.schedule')}</Button>
           </Link>
         </Card>
       </div>
@@ -200,11 +200,11 @@ export function Dashboard() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-100">
                     <div>
                       <div className="flex items-center gap-3">
-                        <span className="text-slate-900 font-bold text-base">Order #{order.id}</span>
+                        <span className="text-slate-900 font-bold text-base">{t('dashboard.orderNumber', { id: order.id })}</span>
                         {getStatusBadge(order.status)}
                       </div>
                       <p className="text-slate-500 text-xs mt-1">
-                        Service: <strong className="text-slate-700">{order.service_name || 'Laundry Service'}</strong>
+                        {t('dashboard.service')}: <strong className="text-slate-700">{order.service_name || 'Laundry Service'}</strong>
                       </p>
                     </div>
 
@@ -226,7 +226,7 @@ export function Dashboard() {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-4 h-4 text-blue-600" />
-                      <span className="capitalize">{order.pickup_time_slot}</span>
+                      <span className="capitalize">{order.pickup_time_slot === 'morning' ? t('schedule.morningSlot') : t('schedule.afternoonSlot')}</span>
                     </div>
                   </div>
                   {order.order_details && (
@@ -261,7 +261,9 @@ export function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-slate-900 font-bold text-base capitalize">{schedule.frequency} Pickup</span>
+                        <span className="text-slate-900 font-bold text-base capitalize">
+                          {t(`schedule.${schedule.frequency}`, { defaultValue: schedule.frequency })}
+                        </span>
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                           schedule.is_active
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
@@ -272,7 +274,7 @@ export function Dashboard() {
                       </div>
                       <div className="flex items-center gap-2 text-slate-500 text-xs mt-2">
                         <Calendar className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Next Pickup: <strong className="text-slate-800">{schedule.next_pickup_date}</strong></span>
+                        <span>{t('dashboard.nextPickup')}: <strong className="text-slate-800">{schedule.next_pickup_date}</strong></span>
                       </div>
                     </div>
 

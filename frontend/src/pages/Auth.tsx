@@ -197,7 +197,7 @@ export function Auth() {
         {tab === 'login' ? (
           <form key="login-form" onSubmit={handleLogin} className="space-y-4 animate-fade-in">
             <h2 className="text-2xl font-extrabold text-slate-900 mb-1">{t('auth.login.title')}</h2>
-            <p className="text-slate-500 text-xs sm:text-sm mb-4">Log in to view your orders and quick schedule.</p>
+            <p className="text-slate-500 text-xs sm:text-sm mb-4">{t('auth.login.subheader')}</p>
             <Input
               label={t('auth.login.email')}
               type="email"
@@ -229,11 +229,11 @@ export function Auth() {
             </p>
           </form>
         ) : (
-          <form key="register-form" onSubmit={handleRegister} className="space-y-4 animate-fade-in">
+          <form key="register-form" onSubmit={handleRegister} className="space-y-3 animate-fade-in">
             <h2 className="text-2xl font-extrabold text-slate-900 mb-1">{t('auth.register.title')}</h2>
-            <p className="text-slate-500 text-xs sm:text-sm mb-4">Create your account with address for auto-scheduled pickups.</p>
+            <p className="text-slate-500 text-xs sm:text-sm mb-3">{t('auth.register.subheader')}</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
               <Input
                 label={t('auth.register.firstName')}
                 placeholder="John"
@@ -242,7 +242,7 @@ export function Auth() {
                 onBlur={() => markTouched('first_name')}
                 error={
                   touchedFields.first_name && !isFirstNameValid(registerData.first_name)
-                    ? 'First letter must be capitalized (min 2 chars).'
+                    ? 'Min 2 chars'
                     : undefined
                 }
                 required
@@ -255,14 +255,14 @@ export function Auth() {
                 onBlur={() => markTouched('last_name')}
                 error={
                   touchedFields.last_name && !isLastNameValid(registerData.last_name)
-                    ? 'First letter must be capitalized (min 2 chars).'
+                    ? 'Min 2 chars'
                     : undefined
                 }
                 required
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
               <Input
                 label={t('auth.register.email')}
                 type="email"
@@ -272,7 +272,7 @@ export function Auth() {
                 onBlur={() => markTouched('email')}
                 error={
                   touchedFields.email && !isEmailValid(registerData.email)
-                    ? 'Enter a valid email address.'
+                    ? 'Invalid email'
                     : undefined
                 }
                 required
@@ -286,7 +286,7 @@ export function Auth() {
                 onBlur={() => markTouched('phone')}
                 error={
                   touchedFields.phone && !isPhoneValid(registerData.phone)
-                    ? 'Valid 10-digit phone required e.g. (303) 555-0123.'
+                    ? 'Invalid phone'
                     : undefined
                 }
                 required
@@ -294,54 +294,56 @@ export function Auth() {
             </div>
 
             {/* Address Information Section */}
-            <div className="pt-2 space-y-3 border-t border-slate-200">
+            <div className="pt-2 space-y-2.5 border-t border-slate-200">
               <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                <span>Delivery Address (Denver Metro Area)</span>
+                <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                <span>{t('schedule.deliveryAddress')}</span>
               </h3>
 
               <Input
-                label="Street Address *"
+                label={`${t('auth.register.streetAddress')} *`}
                 placeholder="1234 Blake St, Apt 4B"
                 value={registerData.street_address}
                 onChange={(e) => setRegisterData({ ...registerData, street_address: e.target.value })}
                 onBlur={() => markTouched('street_address')}
                 error={
                   touchedFields.street_address && !isAddressValid(registerData.street_address)
-                    ? 'Please enter a complete street address e.g. 1234 Blake St.'
+                    ? 'Min 5 chars'
                     : undefined
                 }
                 required
               />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Denver Metro Area *
+              <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                <div className="col-span-2">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1 truncate">
+                    {t('auth.register.cityLocation')} *
                   </label>
                   <select
                     value={registerData.city}
                     onChange={(e) => setRegisterData({ ...registerData, city: e.target.value })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-xs sm:text-sm shadow-2xs"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-xs sm:text-sm shadow-2xs truncate"
                   >
                     {DENVER_LOCATIONS.map((loc) => (
                       <option key={loc.name} value={loc.name}>
-                        {loc.name} ({loc.fee === 0 ? 'FREE Delivery' : '+$25 Fee'})
+                        {loc.name} ({loc.fee === 0 ? 'FREE' : '+$25'})
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <Input
-                  label="Zip Code"
-                  placeholder="80202"
-                  value={registerData.zip_code}
-                  onChange={(e) => setRegisterData({ ...registerData, zip_code: e.target.value })}
-                />
+                <div className="col-span-1">
+                  <Input
+                    label={t('auth.register.zipCode')}
+                    placeholder="80202"
+                    value={registerData.zip_code}
+                    onChange={(e) => setRegisterData({ ...registerData, zip_code: e.target.value })}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-200">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3 pt-1 border-t border-slate-200">
               <Input
                 label={t('auth.register.password')}
                 type="password"
@@ -351,7 +353,7 @@ export function Auth() {
                 onBlur={() => markTouched('password')}
                 error={
                   touchedFields.password && !isPasswordValid(registerData.password)
-                    ? 'Min 8 characters required.'
+                    ? 'Min 8 chars'
                     : undefined
                 }
                 required
@@ -365,7 +367,7 @@ export function Auth() {
                 onBlur={() => markTouched('password_confirm')}
                 error={
                   touchedFields.password_confirm && !isPasswordConfirmValid(registerData.password, registerData.password_confirm)
-                    ? 'Passwords do not match.'
+                    ? 'Passwords mismatch'
                     : undefined
                 }
                 required
@@ -379,7 +381,7 @@ export function Auth() {
               {t('auth.register.hasAccount')}{' '}
               <button
                 type="button"
-                onClick={() => setTab('register')}
+                onClick={() => setTab('login')}
                 className="text-blue-600 font-bold hover:underline"
               >
                 {t('auth.register.loginLink')}

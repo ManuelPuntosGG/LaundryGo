@@ -27,7 +27,7 @@ import { DENVER_LOCATIONS } from '@/constants/locations';
 type Step = 1 | 2 | 3 | 4;
 
 export function Schedule() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const { user, isAuthenticated } = useAuthContext();
 
@@ -36,6 +36,7 @@ export function Schedule() {
   const [availableDates, setAvailableDates] = useState<AvailableDate[]>([]);
 
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [viewMonthDate, setViewMonthDate] = useState<Date>(() => new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<'morning' | 'afternoon'>('morning');
   const [selectedFrequency, setSelectedFrequency] = useState<string>('oneTime');
   const [selectedRate, setSelectedRate] = useState<number | null>(null);
@@ -152,6 +153,48 @@ export function Schedule() {
 
   const safeRates = Array.isArray(rates) ? rates : [];
   const safeDates = Array.isArray(availableDates) ? availableDates : [];
+
+  const availableDateSet = new Set(safeDates.map((d) => d.date));
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  const year = viewMonthDate.getFullYear();
+  const month = viewMonthDate.getMonth();
+
+  const firstDayOfWeek = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const handlePrevMonth = () => {
+    setViewMonthDate(new Date(year, month - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setViewMonthDate(new Date(year, month + 1, 1));
+  };
+
+  const isPrevMonthDisabled = () => {
+    const now = new Date();
+    return year < now.getFullYear() || (year === now.getFullYear() && month <= now.getMonth());
+  };
+
+  const monthYearLabel = viewMonthDate.toLocaleDateString(
+    i18n.language?.startsWith('es') ? 'es-ES' : 'en-US',
+    { month: 'long', year: 'numeric' }
+  );
+  const capitalizedMonthYear = monthYearLabel.charAt(0).toUpperCase() + monthYearLabel.slice(1);
+
+  const weekDays = i18n.language?.startsWith('es')
+    ? ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const calendarCells: ({ day: number; dateStr: string } | null)[] = [];
+  for (let i = 0; i < firstDayOfWeek; i++) {
+    calendarCells.push(null);
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const mm = String(month + 1).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    calendarCells.push({ day, dateStr: `${year}-${mm}-${dd}` });
+  }
 
   const canSelectGoFurther = (date: string) => {
     if (!date || safeDates.length === 0) return true;
@@ -303,43 +346,48 @@ export function Schedule() {
 
           <div className="space-y-3">
             <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold uppercase tracking-wider">
-              {createdOrderId ? `Pedido #${createdOrderId}` : 'Solicitud Recibida'}
+              {createdOrderId ? t('dashboard.orderNumber', { id: createdOrderId }) : t('schedule.reviewTitle')}
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
-              ¡Solicitud de Recolección Enviada con Éxito!
+              {t('schedule.success.title')}
             </h2>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
-              Hemos recibido tu pedido correctamente. Nuestro equipo procesará los detalles y pronto se pondrá en contacto contigo para gestionar la recolección de tu ropa.
+              {t('schedule.success.message')}
             </p>
           </div>
 
           {/* Details Box */}
           <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 text-left text-xs sm:text-sm space-y-2">
             <div className="flex justify-between items-center pb-2 border-b border-slate-200">
-              <span className="text-slate-500 font-semibold">Fecha de Recolección:</span>
-              <span className="font-bold text-slate-900">{selectedDate} ({selectedTimeSlot === 'morning' ? '8AM - 11AM' : '12PM - 4PM'})</span>
+              <span className="text-slate-500 font-semibold">{t('schedule.pickupDate')}:</span>
+              <span className="font-bold text-slate-900">
+                {selectedDate} ({selectedTimeSlot === 'morning' ? t('schedule.morningSlot') : t('schedule.afternoonSlot')})
+              </span>
             </div>
             <div className="flex justify-between items-center pb-2 border-b border-slate-200">
-              <span className="text-slate-500 font-semibold">Dirección:</span>
+              <span className="text-slate-500 font-semibold">{t('auth.register.streetAddress')}:</span>
               <span className="font-bold text-slate-900">{formData.street_address}, {formData.city}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-semibold">Tarifa de Envío:</span>
+              <span className="text-slate-500 font-semibold">{t('schedule.deliveryFeeLabel')}:</span>
               <span className="font-bold text-blue-700">
-                {selectedLocation.fee === 0 ? 'GRATIS ($0.00)' : '$25.00 (Zona Exterior)'}
+                {selectedLocation.fee === 0 ? t('schedule.freeFee') : t('schedule.outerFee')}
               </span>
             </div>
           </div>
 
           <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs sm:text-sm flex items-center gap-3 text-left">
             <PhoneCall className="w-5 h-5 text-blue-600 shrink-0" />
-            <span>Se ha enviado una notificación de confirmación al correo <strong>manuelpuntosss@gmail.com</strong>.</span>
+            <span>
+              {t('schedule.success.emailNotice')}{' '}
+              <strong className="text-slate-900">{formData.email}</strong>.
+            </span>
           </div>
 
           <div className="pt-2">
             <Link to="/dashboard">
               <Button className="w-full sm:w-auto">
-                Volver al Panel de Control
+                {t('schedule.success.returnDashboard')}
               </Button>
             </Link>
           </div>
@@ -363,7 +411,7 @@ export function Schedule() {
       </div>
 
       {/* Progress Steps Bar */}
-      <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-2xl mx-auto">
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-4 max-w-2xl mx-auto">
         {[
           { num: 1, label: t('schedule.step1') },
           { num: 2, label: t('schedule.step2') },
@@ -376,7 +424,7 @@ export function Schedule() {
             onClick={() => {
               if (s.num < step) setStep(s.num as Step);
             }}
-            className={`flex flex-col items-center p-2 rounded-xl transition-all border text-center ${
+            className={`flex flex-col items-center justify-center py-2 px-1 sm:p-3 rounded-xl transition-all border text-center ${
               step === s.num
                 ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
                 : step > s.num
@@ -385,13 +433,15 @@ export function Schedule() {
             }`}
           >
             <span className="text-xs sm:text-sm font-extrabold">{s.num}</span>
-            <span className="text-[10px] sm:text-xs font-semibold truncate w-full">{s.label}</span>
+            <span className="text-[10px] sm:text-xs font-semibold leading-tight mt-0.5 line-clamp-1 sm:line-clamp-none text-center">
+              {s.label}
+            </span>
           </button>
         ))}
       </div>
 
       {/* Main Form Card */}
-      <Card variant="default" className="p-6 sm:p-8 shadow-sm">
+      <Card variant="default" className="p-4 sm:p-8 shadow-sm">
         {stepError && (
           <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-medium flex items-center gap-3 animate-fade-in">
             <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
@@ -414,111 +464,180 @@ export function Schedule() {
               <span>{t('schedule.selectDateTime')}</span>
             </h2>
 
-            {/* Available Pickup Dates horizontal selector */}
+            {/* Classic Selectable Calendar View with Integrated Time Slot Toggle */}
             <div className="space-y-3">
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
                 {t('schedule.selectDate')}
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-60 overflow-y-auto p-1 border border-slate-200 rounded-xl bg-slate-50/50">
-                {safeDates.map((d) => {
-                  const isSelected = selectedDate === d.date;
-                  const dateObj = new Date(d.date + 'T00:00:00');
-                  const dayName = d.day_name || dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-                  const monthName = d.formatted_date ? d.formatted_date.split(',')[0] : dateObj.toLocaleDateString('en-US', { month: 'short' });
 
-                  return (
+              <div className="bg-slate-50/70 border border-slate-200 rounded-2xl p-3 sm:p-5 space-y-4 shadow-2xs">
+                {/* Header: Month & Navigation (Left) + Integrated Time Slot Toggle (Right) */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+                  {/* Month & Nav Controls */}
+                  <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5 text-blue-600 shrink-0" />
+                      <h3 className="text-base sm:text-lg font-extrabold text-slate-900 capitalize">
+                        {capitalizedMonthYear}
+                      </h3>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        disabled={isPrevMonthDisabled()}
+                        onClick={handlePrevMonth}
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                        title="Previous Month"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleNextMonth}
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 transition-all"
+                        title="Next Month"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Compact Time Slot Toggle */}
+                  <div className="bg-slate-200/70 p-1 rounded-xl border border-slate-200/80 grid grid-cols-2 gap-1 w-full sm:w-auto">
                     <button
-                      key={d.date}
                       type="button"
-                      onClick={() => setSelectedDate(d.date)}
-                      className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-1 ${
-                        isSelected
-                          ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                          : 'bg-white text-slate-800 border-slate-200 hover:border-blue-300'
+                      onClick={() => setSelectedTimeSlot('morning')}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 ${
+                        selectedTimeSlot === 'morning'
+                          ? 'bg-blue-600 text-white shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                       }`}
                     >
-                      <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
-                        {dayName}
-                      </span>
-                      <span className="text-base font-extrabold">{d.date.split('-')[2]}</span>
-                      <span className="text-[10px] font-semibold opacity-75">{monthName}</span>
+                      <Clock className={`w-3.5 h-3.5 ${selectedTimeSlot === 'morning' ? 'text-white' : 'text-slate-400'}`} />
+                      <span>{t('schedule.morningToggle')}</span>
                     </button>
-                  );
-                })}
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTimeSlot('afternoon')}
+                      className={`py-1.5 px-3 rounded-lg text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 ${
+                        selectedTimeSlot === 'afternoon'
+                          ? 'bg-blue-600 text-white shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Clock className={`w-3.5 h-3.5 ${selectedTimeSlot === 'afternoon' ? 'text-white' : 'text-slate-400'}`} />
+                      <span>{t('schedule.afternoonToggle')}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Days of Week Header */}
+                <div className="grid grid-cols-7 gap-1 text-center text-xs font-extrabold text-slate-400 uppercase tracking-wider py-1 border-b border-slate-200/80">
+                  {weekDays.map((dayName, idx) => (
+                    <div key={idx} className="py-0.5">{dayName}</div>
+                  ))}
+                </div>
+
+                {/* Days Grid */}
+                <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center items-center justify-items-center">
+                  {calendarCells.map((cell, idx) => {
+                    if (!cell) {
+                      return <div key={`empty-${idx}`} className="h-8 w-8 sm:h-10 sm:w-10" />;
+                    }
+
+                    const isAvailable = availableDateSet.has(cell.dateStr);
+                    const isSelected = selectedDate === cell.dateStr;
+                    const isToday = cell.dateStr === todayStr;
+
+                    return (
+                      <button
+                        key={cell.dateStr}
+                        type="button"
+                        disabled={!isAvailable}
+                        onClick={() => setSelectedDate(cell.dateStr)}
+                        className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full text-xs sm:text-sm font-extrabold transition-all flex flex-col items-center justify-center relative mx-auto ${
+                          isSelected
+                            ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-2'
+                            : isAvailable
+                            ? 'bg-white text-slate-900 border border-slate-200/80 hover:border-blue-400 hover:bg-blue-50/80 cursor-pointer'
+                            : 'bg-slate-100/50 text-slate-300 cursor-not-allowed opacity-40 border border-transparent'
+                        } ${isToday && !isSelected ? 'ring-2 ring-blue-500/40 ring-offset-1' : ''}`}
+                      >
+                        <span>{cell.day}</span>
+                        {isToday && (
+                          <span className={`text-[7px] font-bold leading-none absolute bottom-1 ${isSelected ? 'text-blue-100' : 'text-blue-600'}`}>
+                            •
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Selected Date Summary Banner */}
+                {selectedDate && (
+                  <div className="pt-3 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs sm:text-sm">
+                    <span className="text-slate-500 font-semibold">{t('schedule.pickupDate')}:</span>
+                    <span className="font-extrabold text-blue-700 bg-blue-50 border border-blue-200/80 px-3.5 py-1.5 rounded-xl text-center sm:text-right text-xs sm:text-sm leading-snug">
+                      {new Date(selectedDate + 'T00:00:00').toLocaleDateString(
+                        i18n.language?.startsWith('es') ? 'es-ES' : 'en-US',
+                        { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+                      )} • ({selectedTimeSlot === 'morning' ? '8:00 AM – 11:00 AM' : '12:00 PM – 4:00 PM'})
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Time Slot Selection */}
+            {/* Frequency Selection (Default One-Time, Optional Recurring) */}
             <div className="space-y-3">
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                {t('schedule.timeSlot')}
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setSelectedTimeSlot('morning')}
-                  className={`p-5 rounded-xl border text-left transition-all flex items-start gap-4 ${
-                    selectedTimeSlot === 'morning'
-                      ? 'bg-blue-50/80 border-2 border-blue-600 shadow-2xs'
-                      : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900 text-base">{t('schedule.morning')}</p>
-                    <p className="text-slate-500 text-xs mt-0.5">8:00 AM - 11:00 AM</p>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedTimeSlot('afternoon')}
-                  className={`p-5 rounded-xl border text-left transition-all flex items-start gap-4 ${
-                    selectedTimeSlot === 'afternoon'
-                      ? 'bg-blue-50/80 border-2 border-blue-600 shadow-2xs'
-                      : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900 text-base">{t('schedule.afternoon')}</p>
-                    <p className="text-slate-500 text-xs mt-0.5">12:00 PM - 4:00 PM</p>
-                  </div>
-                </button>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t('schedule.frequency')}
+                </label>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full border transition-all ${
+                  selectedFrequency !== 'oneTime' && selectedFrequency !== ''
+                    ? 'bg-blue-100 text-blue-800 border-blue-200 shadow-2xs'
+                    : 'bg-slate-100 text-slate-600 border-slate-200'
+                }`}>
+                  {selectedFrequency !== 'oneTime' && selectedFrequency !== ''
+                    ? `🔄 ${t('schedule.recurringActive')}`
+                    : `📦 ${t('schedule.oneTimeDefault')}`}
+                </span>
               </div>
-            </div>
 
-            {/* Frequency Selection */}
-            <div className="space-y-3">
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                {t('schedule.frequency')}
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {[
-                  { value: 'oneTime', label: t('schedule.oneTime') },
                   { value: 'daily', label: t('schedule.daily') },
                   { value: 'weekly', label: t('schedule.weekly') },
                   { value: 'fortnightly', label: t('schedule.fortnightly') },
                   { value: 'monthly', label: t('schedule.monthly') },
-                ].map((freq) => (
-                  <button
-                    key={freq.value}
-                    type="button"
-                    onClick={() => setSelectedFrequency(freq.value)}
-                    className={`py-2.5 px-2 rounded-xl text-xs sm:text-sm font-semibold transition-all border ${
-                      selectedFrequency === freq.value
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    {freq.label}
-                  </button>
-                ))}
+                ].map((freq) => {
+                  const isSelected = selectedFrequency === freq.value;
+                  return (
+                    <button
+                      key={freq.value}
+                      type="button"
+                      onClick={() => setSelectedFrequency(isSelected ? 'oneTime' : freq.value)}
+                      className={`py-3 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all border flex items-center justify-center gap-1.5 ${
+                        isSelected
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-600/20'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-blue-400 hover:bg-blue-50/50'
+                      }`}
+                    >
+                      <span>{freq.label}</span>
+                    </button>
+                  );
+                })}
               </div>
+
+              <p className="text-xs text-slate-500 font-medium pt-0.5">
+                {selectedFrequency !== 'oneTime' && selectedFrequency !== ''
+                  ? t('schedule.recurringTip')
+                  : t('schedule.oneTimeTip')}
+              </p>
             </div>
 
             {!isAuthenticated && (
@@ -537,46 +656,47 @@ export function Schedule() {
 
         {/* STEP 2: Customer Information & Location */}
         {step === 2 && (
-          <div className="flex flex-col gap-6 animate-in fade-in duration-200 w-full">
-            <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5 pb-4 border-b border-slate-200/80">
+          <div className="flex flex-col gap-4 animate-in fade-in duration-200 w-full">
+            <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5 pb-3 border-b border-slate-200/80">
               <UserIcon className="w-5 h-5 text-blue-600 shrink-0" />
               <span>{t('schedule.yourInfo')} & Delivery Location</span>
             </h2>
 
             {/* Profile Pre-fill Banner */}
             {isAuthenticated ? (
-              <div className="space-y-3">
-                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between text-xs sm:text-sm gap-2">
-                  <div className="flex items-center gap-2.5 font-semibold">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                    <span>Logged in as <strong>{user?.first_name || user?.email}</strong> ({user?.email}) — Info pre-filled.</span>
+              <div className="space-y-2">
+                <div className="p-2.5 px-3.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-900 flex items-center justify-between text-xs gap-2 font-medium">
+                  <div className="flex items-center gap-2 truncate">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="truncate">Logged in as <strong>{user?.first_name || user?.email}</strong></span>
                   </div>
-                  <Link to="/dashboard" className="text-emerald-700 font-bold hover:underline shrink-0">
+                  <Link to="/dashboard" className="text-emerald-700 font-bold hover:underline shrink-0 text-[11px]">
                     Dashboard &rarr;
                   </Link>
                 </div>
 
                 {isProfileIncomplete && (
-                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm flex items-center gap-2.5 font-medium">
-                    <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
-                    <span>Please complete your street address and phone number below for pickup delivery.</span>
+                  <div className="p-2.5 px-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 font-medium">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Please complete your street address and phone number for pickup delivery.</span>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 flex items-center justify-between text-xs sm:text-sm gap-2">
-                <div className="flex items-center gap-2.5 font-semibold">
-                  <Sparkles className="w-5 h-5 text-blue-600 shrink-0" />
-                  <span>Ordering as Guest. Want to save your address & track orders in a dashboard?</span>
+              <div className="p-2.5 px-3.5 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-900 flex items-center justify-between text-xs gap-2 font-medium">
+                <div className="flex items-center gap-2 truncate">
+                  <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span className="truncate">Ordering as Guest. Want to save your info?</span>
                 </div>
-                <Link to="/login" className="text-blue-700 font-bold hover:underline shrink-0">
-                  Log In / Register &rarr;
+                <Link to="/login" className="text-blue-700 font-bold hover:underline shrink-0 text-[11px]">
+                  Log In &rarr;
                 </Link>
               </div>
             )}
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2.5">
+              {/* First Name & Last Name in 2-columns on mobile and desktop */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                 <Input
                   label={t('schedule.firstName')}
                   value={formData.first_name}
@@ -584,7 +704,7 @@ export function Schedule() {
                   onBlur={() => markTouched('first_name')}
                   error={
                     touchedFields.first_name && !isFirstNameValid(formData.first_name)
-                      ? 'Must start with a capital letter and be at least 2 characters.'
+                      ? 'Invalid name'
                       : undefined
                   }
                   required
@@ -596,14 +716,15 @@ export function Schedule() {
                   onBlur={() => markTouched('last_name')}
                   error={
                     touchedFields.last_name && !isLastNameValid(formData.last_name)
-                      ? 'Must start with a capital letter and be at least 2 characters.'
+                      ? 'Invalid name'
                       : undefined
                   }
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Phone & Email in 2-columns on mobile and desktop */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                 <Input
                   label={t('schedule.phone')}
                   type="tel"
@@ -613,7 +734,7 @@ export function Schedule() {
                   onBlur={() => markTouched('phone')}
                   error={
                     touchedFields.phone && !isPhoneValid(formData.phone)
-                      ? 'Please enter a valid 10-digit phone number e.g. (303) 555-0123.'
+                      ? 'Invalid phone'
                       : undefined
                   }
                   required
@@ -627,7 +748,7 @@ export function Schedule() {
                   onBlur={() => markTouched('email')}
                   error={
                     touchedFields.email && !isEmailValid(formData.email)
-                      ? 'Please enter a valid email address e.g. name@domain.com.'
+                      ? 'Invalid email'
                       : undefined
                   }
                   required
@@ -635,9 +756,9 @@ export function Schedule() {
               </div>
 
               {/* Denver Address & Zone Selector */}
-              <div className="pt-2 space-y-4 border-t border-slate-100">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-blue-600" />
+              <div className="pt-2 space-y-2.5 border-t border-slate-100">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                   <span>Denver Delivery Address & Zone</span>
                 </h3>
 
@@ -649,73 +770,70 @@ export function Schedule() {
                   onBlur={() => markTouched('street_address')}
                   error={
                     touchedFields.street_address && !isAddressValid(formData.street_address)
-                      ? 'Please enter a complete street address e.g. 1234 Blake St.'
+                      ? 'Min 5 chars'
                       : undefined
                   }
                   required
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 truncate">
                       Denver Area Location *
                     </label>
                     <select
                       value={formData.city}
                       onChange={(e) => handleLocationChange(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-sm shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-xs sm:text-sm shadow-2xs truncate"
                     >
                       {DENVER_LOCATIONS.map((loc) => (
                         <option key={loc.name} value={loc.name}>
-                          {loc.name} ({loc.fee === 0 ? 'FREE Delivery' : '+$25 Fee'})
+                          {loc.name} ({loc.fee === 0 ? 'FREE' : '+$25'})
                         </option>
                       ))}
                     </select>
                   </div>
 
-                  <Input
-                    label="Zip Code"
-                    placeholder="80202"
-                    value={formData.zip_code}
-                    onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
-                  />
+                  <div className="col-span-1">
+                    <Input
+                      label="Zip Code"
+                      placeholder="80202"
+                      value={formData.zip_code}
+                      onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
+                    />
+                  </div>
                 </div>
 
-                {/* Delivery Fee Notice Box */}
+                {/* Compact Delivery Fee Notice Badge */}
                 <div
-                  className={`p-4 rounded-xl border flex items-start gap-3 text-xs sm:text-sm transition-all ${
+                  className={`p-2 px-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
                     selectedLocation.fee === 0
-                      ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900'
-                      : 'bg-amber-50/80 border-amber-200 text-amber-900'
+                      ? 'bg-emerald-50/90 border-emerald-200 text-emerald-900'
+                      : 'bg-amber-50/90 border-amber-200 text-amber-900'
                   }`}
                 >
                   <DollarSign
-                    className={`w-5 h-5 shrink-0 mt-0.5 ${
+                    className={`w-3.5 h-3.5 shrink-0 ${
                       selectedLocation.fee === 0 ? 'text-emerald-600' : 'text-amber-600'
                     }`}
                   />
-                  <div className="space-y-0.5">
-                    <p className="font-bold text-sm">
-                      {selectedLocation.fee === 0 ? 'FREE Delivery Included!' : '+$25.00 Outer Zone Service Fee'}
-                    </p>
-                    <p className="text-xs leading-relaxed opacity-90">
-                      {selectedLocation.fee === 0
-                        ? 'We offer FREE delivery within roughly 8 miles of Downtown Denver.'
-                        : 'Locations outside 8 miles of Downtown Denver incur a $25 service fee.'}
-                    </p>
-                  </div>
+                  <span className="truncate text-[11px] sm:text-xs">
+                    {selectedLocation.fee === 0
+                      ? 'FREE Delivery Included (Central Denver)'
+                      : '+$25.00 Outer Zone Delivery Fee'}
+                  </span>
                 </div>
               </div>
 
-              <div className="pt-2">
-                <label className="flex items-start gap-3 cursor-pointer group">
+              <div className="pt-1">
+                <label className="flex items-start gap-2.5 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={agreedToTerms}
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    className="mt-1 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0"
+                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0"
                   />
-                  <span className="text-slate-600 text-xs sm:text-sm leading-relaxed group-hover:text-slate-900 transition-colors">
+                  <span className="text-slate-600 text-xs sm:text-sm leading-tight group-hover:text-slate-900 transition-colors">
                     {t('schedule.terms')}
                   </span>
                 </label>
@@ -726,17 +844,19 @@ export function Schedule() {
 
         {/* STEP 3: Service Tier & Details */}
         {step === 3 && (
-          <div className="flex flex-col gap-6 animate-in fade-in duration-200 w-full">
-            <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5 pb-4 border-b border-slate-200/80">
+          <div className="flex flex-col gap-4 animate-in fade-in duration-200 w-full">
+            <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5 pb-3 border-b border-slate-200/80">
               <Truck className="w-5 h-5 text-blue-600 shrink-0" />
               <span>{t('schedule.serviceType')} & Details</span>
             </h2>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Select Service Speed
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+              {/* Compact Service Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {safeRates.map((rate) => {
                   const isGoFurtherDisabled = rate.service_type === 'gofurther' && !canSelectGoFurther(selectedDate);
                   const isSelected = selectedRate === rate.id;
@@ -747,30 +867,30 @@ export function Schedule() {
                       type="button"
                       disabled={isGoFurtherDisabled}
                       onClick={() => setSelectedRate(rate.id)}
-                      className={`p-5 rounded-xl border text-left transition-all flex flex-col justify-between gap-4 relative ${
+                      className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between sm:flex-col sm:items-start sm:justify-between gap-2 relative ${
                         isGoFurtherDisabled
-                          ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-65'
+                          ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-60'
                           : isSelected
-                          ? 'bg-blue-50/90 border-2 border-blue-600 shadow-xs'
-                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                          ? 'bg-blue-50/90 border-2 border-blue-600 shadow-2xs ring-2 ring-blue-600/10'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-blue-300'
                       }`}
                     >
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-extrabold text-slate-900 text-lg">{rate.name}</h3>
-                          {isSelected && <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0" />}
+                      <div className="space-y-0.5 min-w-0 pr-2 sm:pr-0">
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">{rate.name}</h3>
+                          {isSelected && <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />}
                         </div>
-                        <p className="text-slate-500 text-xs leading-relaxed">{rate.description}</p>
+                        <p className="text-slate-500 text-[11px] leading-snug">{rate.description}</p>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-200/80 flex items-baseline justify-between">
-                        <span className="text-2xl font-black text-blue-600">${rate.rate_per_lb}</span>
-                        <span className="text-xs text-slate-500 font-semibold">/ lb</span>
+                      <div className="flex items-baseline gap-1 shrink-0 sm:pt-2 sm:w-full sm:border-t sm:border-slate-200/60 sm:justify-between">
+                        <span className="text-lg sm:text-xl font-black text-blue-600">${rate.rate_per_lb}</span>
+                        <span className="text-[10px] sm:text-xs text-slate-500 font-semibold">/ lb</span>
                       </div>
 
                       {isGoFurtherDisabled && (
-                        <div className="absolute top-2 right-2 bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">
-                          Unavailable after 12PM
+                        <div className="absolute -top-2 right-2 bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded-full border border-amber-200 shadow-2xs">
+                          Cutoff 12PM
                         </div>
                       )}
                     </button>
@@ -779,31 +899,31 @@ export function Schedule() {
               </div>
             </div>
 
-            <div className="space-y-4 pt-2">
+            <div className="space-y-3 pt-1">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                   {t('schedule.orderDetails')} *
                 </label>
                 <textarea
-                  rows={3}
-                  placeholder="e.g. 2 bags of darks & lights, 1 comforter. Delicate wash cold."
+                  rows={2}
+                  placeholder="e.g. 2 bags of darks & lights, 1 comforter. Cold wash."
                   value={orderDetails}
                   onChange={(e) => setOrderDetails(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-xl p-3.5 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm shadow-2xs"
+                  className="w-full bg-white border border-slate-300 rounded-xl p-2.5 px-3 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-xs sm:text-sm shadow-2xs"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                   {t('schedule.pickupInstructions')}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Leave bags by the front porch or gate code #1234."
+                  placeholder="e.g. Leave bags by front porch or gate code #1234."
                   value={pickupInstructions}
                   onChange={(e) => setPickupInstructions(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-xl p-3.5 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm shadow-2xs"
+                  className="w-full bg-white border border-slate-300 rounded-xl p-2.5 px-3 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-xs sm:text-sm shadow-2xs"
                 />
               </div>
             </div>
@@ -812,49 +932,61 @@ export function Schedule() {
 
         {/* STEP 4: Review & Order Confirmation */}
         {step === 4 && (
-          <div className="flex flex-col gap-6 animate-in fade-in duration-200 w-full">
-            <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5 pb-4 border-b border-slate-200/80">
+          <div className="flex flex-col gap-4 animate-in fade-in duration-200 w-full">
+            <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5 pb-3 border-b border-slate-200/80">
               <FileText className="w-5 h-5 text-blue-600 shrink-0" />
               <span>{t('schedule.reviewTitle')}</span>
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                <p className="text-slate-500 text-xs font-semibold uppercase mb-1">{t('schedule.pickupDate')}</p>
-                <p className="text-slate-900 font-bold text-base">{selectedDate}</p>
-                <p className="text-slate-500 text-xs capitalize">Slot: {selectedTimeSlot}</p>
-              </div>
-
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                <p className="text-slate-500 text-xs font-semibold uppercase mb-1">{t('schedule.serviceLabel')}</p>
-                <p className="text-slate-900 font-bold text-base">
-                  {safeRates.find((r) => r.id === selectedRate)?.name} — ${safeRates.find((r) => r.id === selectedRate)?.rate_per_lb}/lb
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="bg-slate-50/90 rounded-xl p-3 border border-slate-200/80">
+                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('schedule.pickupDate')}</p>
+                <p className="text-slate-900 font-extrabold text-sm sm:text-base">{selectedDate}</p>
+                <p className="text-slate-500 text-xs capitalize font-medium">
+                  {selectedTimeSlot === 'morning' ? t('schedule.morningSlot') : t('schedule.afternoonSlot')}
                 </p>
               </div>
 
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                <p className="text-slate-500 text-xs font-semibold uppercase mb-1">{t('schedule.frequency')}</p>
-                <p className="text-slate-900 font-bold text-base capitalize">{selectedFrequency}</p>
+              <div className="bg-slate-50/90 rounded-xl p-3 border border-slate-200/80">
+                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('schedule.serviceLabel')}</p>
+                <p className="text-slate-900 font-extrabold text-sm sm:text-base">
+                  {safeRates.find((r) => r.id === selectedRate)?.name}
+                </p>
+                <p className="text-blue-600 font-bold text-xs">
+                  ${safeRates.find((r) => r.id === selectedRate)?.rate_per_lb}/lb
+                </p>
+              </div>
+
+              <div className="bg-slate-50/90 rounded-xl p-3 border border-slate-200/80">
+                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('schedule.frequency')}</p>
+                <p className="text-slate-900 font-extrabold text-sm sm:text-base">
+                  {selectedFrequency && selectedFrequency !== 'oneTime'
+                    ? t(`schedule.${selectedFrequency}`, { defaultValue: selectedFrequency })
+                    : t('schedule.oneTime')}
+                </p>
+                <p className="text-slate-500 text-xs font-medium">
+                  {selectedFrequency && selectedFrequency !== 'oneTime' ? t('schedule.recurring') : t('schedule.oneTimeOnly')}
+                </p>
               </div>
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-1">
-              <p className="text-slate-500 text-xs font-semibold uppercase mb-1">Customer & Address Details</p>
-              <p className="text-slate-900 font-bold">{formData.first_name} {formData.last_name}</p>
-              <p className="text-slate-600 text-sm">{formData.email} • {formData.phone}</p>
-              <p className="text-slate-800 text-sm font-medium pt-1">
+            <div className="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 space-y-1 text-xs sm:text-sm">
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">{t('schedule.customerDetails')}</p>
+              <p className="text-slate-900 font-extrabold">{formData.first_name} {formData.last_name}</p>
+              <p className="text-slate-600">{formData.email} • {formData.phone}</p>
+              <p className="text-slate-800 font-medium pt-0.5">
                 📍 {formData.street_address}, {formData.city} {formData.zip_code}
               </p>
               <p className="text-xs font-bold text-blue-700 mt-1">
-                Delivery Fee: {selectedLocation.fee === 0 ? 'FREE ($0.00)' : '$25.00 (Outer Zone Service Fee)'}
+                {t('schedule.deliveryFeeLabel')}: {selectedLocation.fee === 0 ? t('schedule.freeFee') : t('schedule.outerFee')}
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-              <p className="text-slate-500 text-xs font-semibold uppercase mb-1">{t('schedule.orderDetailsSummary')}</p>
-              <p className="text-slate-800 text-sm whitespace-pre-wrap">{orderDetails}</p>
+            <div className="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 text-xs sm:text-sm">
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">{t('schedule.orderDetailsSummary')}</p>
+              <p className="text-slate-800 font-medium whitespace-pre-wrap">{orderDetails}</p>
               {pickupInstructions && (
-                <p className="text-slate-500 text-xs mt-2 italic">Instructions: {pickupInstructions}</p>
+                <p className="text-slate-500 text-xs mt-1.5 italic">Instructions: {pickupInstructions}</p>
               )}
             </div>
           </div>
