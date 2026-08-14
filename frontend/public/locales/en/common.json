@@ -137,7 +137,9 @@
       "title": "Pickup Request Submitted Successfully!",
       "message": "We have received your order. Our team will process the details and contact you shortly to coordinate your pickup.",
       "emailNotice": "A confirmation notice has been sent to your email.",
-      "returnDashboard": "Return to Dashboard"
+      "returnDashboard": "Return to Dashboard",
+      "returnHome": "Return to Home",
+      "createAccount": "Create an Account"
     }
   },
   "auth": {

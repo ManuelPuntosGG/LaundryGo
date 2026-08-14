@@ -137,7 +137,9 @@
       "title": "¡Solicitud de Recolección Enviada con Éxito!",
       "message": "Hemos recibido tu pedido correctamente. Nuestro equipo procesará los detalles y pronto se pondrá en contacto contigo para gestionar la recolección de tu ropa.",
       "emailNotice": "Se ha enviado una notificación de confirmación a tu correo electrónico.",
-      "returnDashboard": "Volver al Panel de Control"
+      "returnDashboard": "Volver al Panel de Control",
+      "returnHome": "Volver al Inicio",
+      "createAccount": "Crear una Cuenta"
     }
   },
   "auth": {

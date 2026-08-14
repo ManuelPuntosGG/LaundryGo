@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, Sparkles, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { useAuthContext } from '@/providers/AuthProvider';
 
@@ -18,9 +18,11 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-sm px-4 sm:px-8 h-16 sm:h-18 flex items-center justify-between transition-all">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0 py-1 transition-transform active:scale-95">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm group-hover:bg-blue-700 transition-all group-hover:scale-105 shrink-0">
-            <Sparkles className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="LaundryGo"
+            className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-xs group-hover:scale-105 transition-transform shrink-0"
+          />
           <span className="text-slate-900 font-extrabold text-lg sm:text-xl tracking-tight whitespace-nowrap group-hover:text-blue-600 transition-colors">
             {t('app.name')}
           </span>

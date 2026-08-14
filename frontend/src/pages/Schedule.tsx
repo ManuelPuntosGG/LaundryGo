@@ -340,8 +340,15 @@ export function Schedule() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center w-full animate-fade-in py-6">
         <Card variant="default" className="max-w-xl w-full text-center p-8 sm:p-12 space-y-6 shadow-md border-slate-200">
-          <div className="w-20 h-20 rounded-full bg-emerald-100 border-2 border-emerald-300 text-emerald-600 flex items-center justify-center mx-auto shrink-0 shadow-xs">
-            <CheckCircle2 className="w-10 h-10" />
+          <div className="flex flex-col items-center justify-center mx-auto gap-3">
+            <img
+              src="/logo.png"
+              alt="LaundryGo"
+              className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-md"
+            />
+            <div className="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-300 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -384,12 +391,27 @@ export function Schedule() {
             </span>
           </div>
 
-          <div className="pt-2">
-            <Link to="/dashboard">
-              <Button className="w-full sm:w-auto">
-                {t('schedule.success.returnDashboard')}
-              </Button>
-            </Link>
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            {isAuthenticated ? (
+              <Link to="/dashboard" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto font-bold">
+                  {t('schedule.success.returnDashboard')}
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto font-bold">
+                    {t('schedule.success.returnHome')}
+                  </Button>
+                </Link>
+                <Link to="/login" className="w-full sm:w-auto">
+                  <Button variant="outline" className="w-full sm:w-auto font-bold">
+                    {t('schedule.success.createAccount')}
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </Card>
       </div>

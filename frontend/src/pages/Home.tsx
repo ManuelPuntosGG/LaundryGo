@@ -104,6 +104,16 @@ export function Home() {
     <div className="w-full flex flex-col gap-10 sm:gap-14 lg:gap-18 animate-fade-in">
       {/* Hero Section */}
       <section className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-5 w-full pt-4 sm:pt-8 lg:pt-12 pb-2">
+        {/* Brand Logo Emblem */}
+        <div className="relative group">
+          <div className="absolute -inset-3 bg-gradient-to-r from-blue-500/20 via-sky-400/20 to-blue-600/20 rounded-full blur-xl group-hover:blur-2xl transition-all opacity-80" />
+          <img
+            src="/logo.png"
+            alt="LaundryGo Logo"
+            className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain relative z-10 drop-shadow-md group-hover:scale-105 transition-transform duration-300 mx-auto"
+          />
+        </div>
+
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50/90 border border-blue-200/80 text-blue-700 text-xs sm:text-sm font-semibold shadow-2xs hover:scale-102 transition-transform">
           <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
           <span>{t('home.badge')}</span>

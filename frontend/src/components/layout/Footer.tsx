@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, Mail, Phone, MapPin, Globe, MessageCircle, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, MessageCircle, Send } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 export function Footer() {
@@ -13,9 +13,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12">
           <div className="col-span-1 md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 transition-transform">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="LaundryGo"
+                className="w-9 h-9 sm:w-10 sm:h-10 object-contain drop-shadow-xs group-hover:scale-105 transition-transform shrink-0"
+              />
               <span className="text-slate-900 font-extrabold text-xl tracking-tight">
                 {t('app.name')}
               </span>

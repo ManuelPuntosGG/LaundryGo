@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LogIn, UserPlus, MapPin } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
@@ -58,20 +58,24 @@ export function Auth() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!loginData.email || !loginData.password) {
+      setError(t('common.error'));
+      return;
+    }
+
     setIsLoading(true);
     setError('');
+
     try {
       await login(loginData.email, loginData.password);
       navigate('/dashboard');
     } catch (err: any) {
+      console.error('Login failed:', err.response?.data || err);
       const data = err.response?.data;
-      if (data && typeof data === 'object') {
-        const errorMessages = Object.entries(data)
-          .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
-          .join(' | ');
-        setError(errorMessages || 'Invalid email or password.');
+      if (data?.detail) {
+        setError(data.detail);
       } else {
-        setError('Invalid email or password.');
+        setError('Invalid email or password. Please try again.');
       }
     } finally {
       setIsLoading(false);
@@ -159,7 +163,23 @@ export function Auth() {
   };
 
   return (
-    <div className="max-w-lg mx-auto w-full py-6 flex flex-col justify-center animate-fade-in">
+    <div className="max-w-lg mx-auto w-full py-4 sm:py-6 flex flex-col justify-center animate-fade-in">
+      <div className="flex flex-col items-center text-center mb-6">
+        <Link to="/" className="inline-block group mb-2 transition-transform active:scale-95">
+          <div className="relative">
+            <div className="absolute -inset-2 bg-blue-500/20 rounded-full blur-lg group-hover:blur-xl transition-all" />
+            <img
+              src="/logo.png"
+              alt="LaundryGo"
+              className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-md group-hover:scale-105 transition-transform relative z-10 mx-auto"
+            />
+          </div>
+        </Link>
+        <span className="text-slate-900 font-extrabold text-xl sm:text-2xl tracking-tight">
+          {t('app.name')}
+        </span>
+      </div>
+
       <Card variant="default" className="p-6 sm:p-8 shadow-sm w-full transition-all duration-300">
         <div className="flex mb-6 bg-slate-100 border border-slate-200 rounded-xl p-1">
           <button
