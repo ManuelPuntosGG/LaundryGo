@@ -111,7 +111,7 @@ export function Auth() {
       return;
     }
     if (!isPhoneValid(registerData.phone)) {
-      setError('Please enter a valid 10-digit phone number e.g. (303) 555-0123.');
+      setError('Please enter a valid 10-digit phone number e.g. (720) 590-8632.');
       return;
     }
     if (!isAddressValid(registerData.street_address)) {
@@ -300,7 +300,7 @@ export function Auth() {
               <Input
                 label={t('auth.register.phone')}
                 type="tel"
-                placeholder="(303) 555-0123"
+                placeholder="(720) 590-8632"
                 value={registerData.phone}
                 onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
                 onBlur={() => markTouched('phone')}

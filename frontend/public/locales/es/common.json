@@ -41,6 +41,10 @@
     "pricing": {
       "title": "Nuestros Servicios",
       "subtitle": "Precios transparentes basados en peso y tiempo de entrega. Sin sorpresas.",
+      "recurringDiscountBadge": "7.5% DTO. Recurrente",
+      "recurringDiscountNotice": "¡Ahorra un 7.5% en todas las tarifas a partir de tu 2da recolección recurrente!",
+      "minimumOrderBadge": "Orden Mínima de $40",
+      "minimumOrderNotice": "* Aplica una orden mínima de $40 en servicios de lavado de ropa.",
       "standard": {
         "name": "Estándar",
         "price": "$2.25/lb",
@@ -49,13 +53,13 @@
       },
       "go": {
         "name": "Go",
-        "price": "$2.75/lb",
+        "price": "$2.45/lb",
         "delivery": "Entrega al día siguiente",
         "description": "¿Lo necesitas más rápido? Recibe tu ropa mañana"
       },
       "gofurther": {
         "name": "GoFurther",
-        "price": "$3.50/lb",
+        "price": "$3.85/lb",
         "delivery": "Entrega el mismo día",
         "description": "Solicita antes de las 12:00 PM para entrega hoy mismo"
       }
@@ -96,10 +100,12 @@
     "weekly": "Semanal",
     "fortnightly": "Quincenal",
     "monthly": "Mensual",
-    "recurringActive": "Suscripción Recurrente Activa",
+    "recurringActive": "Suscripción Recurrente Activa (7.5% Dto.)",
     "oneTimeDefault": "Servicio Único (Sin recurrencia)",
     "recurringTip": "💡 Haz clic nuevamente en la frecuencia para volver a servicio único puntual.",
     "oneTimeTip": "ℹ️ De forma predeterminada es una recolección única. Si deseas programar recolecciones periódicas, elige una opción arriba.",
+    "recurringDiscountBenefit": "🔥 ¡El 7.5% de descuento aplica automáticamente a partir de tu 2da recolección recurrente!",
+    "minimumOrderNotice": "Nota: Aplica una orden mínima de $40 para el servicio de lavado por libra.",
     "yourInfo": "Tu Información",
     "firstName": "Nombre",
     "lastName": "Apellido",
@@ -115,8 +121,33 @@
     "serviceType": "Tipo de Servicio",
     "selectServiceSpeed": "Seleccionar Velocidad del Servicio",
     "cutoffNotice": "Límite 12PM",
-    "orderDetails": "Detalles del Pedido",
-    "orderDetailsPlaceholder": "Ej. 2 bolsas de ropa clara y oscura, 1 edredón. Lavado delicado en frío.",
+    "addonsTitle": "Tratamientos Especiales y Ropa de Cama",
+    "addonsSubtitle": "Añade potenciadores de aroma, desmanchado o piezas voluminosas de cama",
+    "treatmentsCategory": "Tratamientos Especiales",
+    "beddingCategory": "Ropa de Cama y Artículos Voluminosos",
+    "addonsSubtotal": "Subtotal de Add-ons",
+    "noAddonsSelected": "Sin add-ons adicionales seleccionados",
+    "perOrder": "/orden",
+    "each": "c/u",
+    "addons": {
+      "scentBeads": {
+        "name": "Perlas Aromáticas Downy",
+        "description": "Potenciador de aroma de larga duración para prendas extra frescas"
+      },
+      "stainTreatment": {
+        "name": "Tratamiento Antimanchas",
+        "description": "Pre-tratamiento enzimático localizado para manchas difíciles"
+      },
+      "bedding": {
+        "comforterTwinFull": "Edredón (Twin - Full)",
+        "comforterQueenKing": "Edredón (Queen - King)",
+        "pillow": "Almohada",
+        "mattressCoverTwinFull": "Cubrecolchón (Twin - Full)",
+        "mattressCoverQueenKing": "Cubrecolchón (Queen - King)"
+      }
+    },
+    "orderDetails": "Detalles del Pedido y Solicitudes Especiales",
+    "orderDetailsPlaceholder": "Ej. 2 bolsas de ropa clara y oscura. Lavado delicado en frío.",
     "pickupInstructions": "Instrucciones de Recolección (Opcional)",
     "pickupInstructionsPlaceholder": "Ej. Dejar bolsas en el porch delantero o código de portón #1234.",
     "reserve": "Confirmar Recolección",

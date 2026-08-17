@@ -28,7 +28,7 @@ class OrderManagementTests(TestCase):
         self.go_rate = ServiceRate.objects.create(
             name='Go (Next day)',
             service_type='go',
-            rate_per_lb=2.95,
+            rate_per_lb=2.45,
             delivery_days=1,
             description='Fast next-day delivery'
         )

@@ -41,6 +41,10 @@
     "pricing": {
       "title": "Our Services",
       "subtitle": "Transparent pricing based on weight and turnaround time. No surprises.",
+      "recurringDiscountBadge": "7.5% OFF Recurring",
+      "recurringDiscountNotice": "Save 7.5% on all service rates starting from your 2nd recurring pickup!",
+      "minimumOrderBadge": "$40 Minimum Order",
+      "minimumOrderNotice": "* $40 minimum order applies to laundry wash services.",
       "standard": {
         "name": "Standard",
         "price": "$2.25/lb",
@@ -49,13 +53,13 @@
       },
       "go": {
         "name": "Go",
-        "price": "$2.75/lb",
+        "price": "$2.45/lb",
         "delivery": "Next-day delivery",
         "description": "Need it faster? Get your laundry tomorrow"
       },
       "gofurther": {
         "name": "GoFurther",
-        "price": "$3.50/lb",
+        "price": "$3.85/lb",
         "delivery": "Same-day delivery",
         "description": "Order before 12PM for same-day delivery"
       }
@@ -96,10 +100,12 @@
     "weekly": "Weekly",
     "fortnightly": "Fortnightly",
     "monthly": "Monthly",
-    "recurringActive": "Active Recurring Subscription",
+    "recurringActive": "Active Recurring Subscription (7.5% Discount)",
     "oneTimeDefault": "One-time Service (No recurrence)",
     "recurringTip": "💡 Click frequency again to revert to a single one-time pickup.",
     "oneTimeTip": "ℹ️ By default this is a single one-time pickup. Select an option above for recurring service.",
+    "recurringDiscountBenefit": "🔥 7.5% discount applies automatically starting from your 2nd recurring pickup!",
+    "minimumOrderNotice": "Note: $40 minimum order applies to laundry wash services.",
     "yourInfo": "Your Information",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -115,8 +121,33 @@
     "serviceType": "Service Type",
     "selectServiceSpeed": "Select Service Speed",
     "cutoffNotice": "Cutoff 12PM",
-    "orderDetails": "Order Details",
-    "orderDetailsPlaceholder": "e.g. 2 bags of darks & lights, 1 comforter. Cold wash.",
+    "addonsTitle": "Custom Add-ons & Bedding Items",
+    "addonsSubtitle": "Select optional scent boosts, stain treatments, or bulky bedding pieces",
+    "treatmentsCategory": "Special Wash Treatments",
+    "beddingCategory": "Bedding & Bulky Pieces",
+    "addonsSubtotal": "Add-ons Subtotal",
+    "noAddonsSelected": "No extra add-ons selected",
+    "perOrder": "/order",
+    "each": "each",
+    "addons": {
+      "scentBeads": {
+        "name": "Downy Scent Beads",
+        "description": "Long-lasting in-wash scent boost for fresh smelling clothes"
+      },
+      "stainTreatment": {
+        "name": "Stain Treatment",
+        "description": "Targeted pre-treatment spray for stubborn stains and spots"
+      },
+      "bedding": {
+        "comforterTwinFull": "Comforter (Twin - Full)",
+        "comforterQueenKing": "Comforter (Queen - King)",
+        "pillow": "Pillow",
+        "mattressCoverTwinFull": "Mattress Cover (Twin - Full)",
+        "mattressCoverQueenKing": "Mattress Cover (Queen - King)"
+      }
+    },
+    "orderDetails": "Order Details & Specific Requests",
+    "orderDetailsPlaceholder": "e.g. 2 bags of darks & lights. Cold wash, delicate cycle.",
     "pickupInstructions": "Pickup Instructions (Optional)",
     "pickupInstructionsPlaceholder": "e.g. Leave bags by front porch or gate code #1234.",
     "reserve": "Reserve Pickup",

@@ -174,6 +174,17 @@ export function Home() {
       {/* Pricing Tiers / Services */}
       <section id="services" className="flex flex-col gap-8 w-full scroll-mt-24">
         <div className="text-center max-w-xl mx-auto space-y-2">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5" />
+              {t('home.pricing.recurringDiscountBadge')}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold shadow-2xs">
+              <Package className="w-3.5 h-3.5" />
+              {t('home.pricing.minimumOrderBadge')}
+            </span>
+          </div>
+
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
             {t('home.pricing.title')}
           </h2>
@@ -211,7 +222,7 @@ export function Home() {
                 <p className="text-slate-600 text-sm leading-relaxed">{service.description}</p>
               </div>
 
-              <div className="pt-2 w-full">
+              <div className="pt-2 w-full space-y-2">
                 <Link to="/schedule" className="block w-full">
                   <Button
                     variant={service.popular ? 'primary' : 'outline'}
@@ -223,6 +234,18 @@ export function Home() {
               </div>
             </Card>
           ))}
+        </div>
+
+        {/* Pricing Policies Bar */}
+        <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-slate-600 text-center sm:text-left">
+          <div className="flex items-center gap-2 text-emerald-700 font-semibold">
+            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{t('home.pricing.recurringDiscountNotice')}</span>
+          </div>
+          <span className="text-slate-400 hidden sm:inline">•</span>
+          <div className="text-slate-500 font-medium">
+            {t('home.pricing.minimumOrderNotice')}
+          </div>
         </div>
       </section>
 
@@ -257,26 +280,26 @@ export function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 w-full items-stretch">
-          <a href="mailto:hello@laundrygo.com" className="block group">
+          <a href="mailto:info@thelaundrygo.com" className="block group">
             <Card variant="interactive" className="flex items-center gap-4 p-5 h-full">
               <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                 <Mail className="w-6 h-6" />
               </div>
               <div className="min-w-0">
                 <p className="text-slate-500 text-xs font-semibold uppercase mb-0.5">{t('home.contact.email')}</p>
-                <p className="text-slate-900 font-bold text-sm sm:text-base truncate group-hover:text-blue-600 transition-colors">hello@laundrygo.com</p>
+                <p className="text-slate-900 font-bold text-sm sm:text-base truncate group-hover:text-blue-600 transition-colors">info@thelaundrygo.com</p>
               </div>
             </Card>
           </a>
 
-          <a href="tel:3035550123" className="block group">
+          <a href="tel:7205908632" className="block group">
             <Card variant="interactive" className="flex items-center gap-4 p-5 h-full">
               <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                 <Phone className="w-6 h-6" />
               </div>
               <div className="min-w-0">
                 <p className="text-slate-500 text-xs font-semibold uppercase mb-0.5">{t('home.contact.phone')}</p>
-                <p className="text-slate-900 font-bold text-sm sm:text-base truncate group-hover:text-blue-600 transition-colors">(303) 555-0123</p>
+                <p className="text-slate-900 font-bold text-sm sm:text-base truncate group-hover:text-blue-600 transition-colors">(720) 590-8632</p>
               </div>
             </Card>
           </a>

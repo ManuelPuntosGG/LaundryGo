@@ -17,7 +17,7 @@ class Command(BaseCommand):
             {
                 'name': 'Go',
                 'service_type': 'go',
-                'rate_per_lb': 2.65,
+                'rate_per_lb': 2.45,
                 'delivery_days': 1,
                 'description': 'Next day delivery.',
             },

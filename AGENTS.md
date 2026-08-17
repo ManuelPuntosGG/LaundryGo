@@ -77,13 +77,13 @@ LaundryGo/
 
 ### Gestión de Órdenes y Tarifas (`apps.orders`)
 - **Modelos**:
-  1. `ServiceRate`: Tarifas de servicio por libra (`standard` - 2 días a $2.25/lb, `go` - siguiente día a $2.75/lb, `gofurther` - mismo día a $3.50/lb).
+  1. `ServiceRate`: Tarifas de servicio por libra (`standard` - 2 días a $2.25/lb, `go` - siguiente día a $2.45/lb, `gofurther` - mismo día a $3.85/lb).
   2. `Order`: Registro de pedidos. Soporta tanto usuarios autenticados (`user`) como invitados (`guest_email`, `guest_first_name`, `guest_last_name`, `guest_phone`). Incluye dirección, zona de entrega (`inner` tarifa $0 / `outer` tarifa $25), `pickup_date`, `pickup_time_slot` (`morning` 8-11 AM / `afternoon` 12-4 PM), estado de la orden (`pending`, `confirmed`, `processing`, `ready`, `delivered`, `cancelled`).
   3. `RecurringSchedule`: Suscripciones asociadas a órdenes (`daily`, `weekly`, `fortnightly`, `monthly`) con fecha calculada del siguiente pedido.
 - **Lógica de Negocio Destacada**:
   - **Límite de Hora Express**: El servicio mismo día (`gofurther`) sólo está disponible para el día de hoy si la orden se realiza antes de las 12:00 PM.
   - **Validación de Fechas**: No se permiten recolecciones en fechas pasadas.
-  - **Notificaciones por Email**: Al crear una orden, Django envía automáticamente una notificación por email en HTML/Texto al `ADMIN_EMAIL` y al correo del cliente (`fail_silently=True`).
+  - **Notificaciones por Email**: Al crear una orden, Django envía automáticamente una notificación por email en HTML/Texto al `ADMIN_EMAIL` (`info@thelaundrygo.com`) y al correo del cliente (`fail_silently=True`).
 - **Endpoints de Órdenes y Servicios** (`/api/v1/`):
   - `GET /services/rates/`: Lista pública de tarifas activas.
   - `GET|POST /orders/`: Lista de órdenes del usuario autenticado / Creación de orden (pública para invitados o autenticados).
@@ -92,7 +92,7 @@ LaundryGo/
   - `GET|PUT|PATCH|DELETE /recurring/<id>/`: Gestión de suscripción recurrente.
   - `GET /schedule/available-dates/`: Calendario dinámico de los próximos 30 días calculando disponibilidad del servicio express según la hora actual.
 - **Comando Custom de Gestión**:
-  - `python manage.py seed_service_rates`: Pobla la base de datos con las tres tarifas de servicio por defecto.
+  - `python manage.py seed_service_rates`: Pobla la base de datos con las tres tarifas de servicio por defecto ($2.25, $2.45, $3.85).
 
 ---
 
@@ -115,12 +115,12 @@ LaundryGo/
   - Proporciona el estado del usuario actual, comprobación de token al cargar la aplicación y métodos de `login`, `register` y `logout`.
 
 ### Páginas Principales (`src/pages/`)
-1. **`Home.tsx` (`/`)**: Landing page informativa con sección Hero, explicación del proceso en 4 pasos, tarjetas de precios comparativas, mapa de cobertura en Denver y tarjeta de contacto.
+1. **`Home.tsx` (`/`)**: Landing page informativa con sección Hero, explicación del proceso en 4 pasos, tarjetas de precios comparativas ($2.25, $2.45, $3.85), mapa de cobertura en Denver, avisos de orden mínima de $40 y 7.5% de descuento recurrente, y tarjetas de contacto oficial (`info@thelaundrygo.com`, `(720) 590-8632`).
 2. **`Schedule.tsx` (`/schedule`)**: Flujo interactivo de reserva de lavandería organizado en 4 pasos:
-   - *Paso 1*: Selección de servicio, fecha (extraída dinámicamente de `/schedule/available-dates/`), franja horaria y frecuencia.
+   - *Paso 1*: Selección de servicio, fecha (extraída dinámicamente de `/schedule/available-dates/`), franja horaria y frecuencia con aviso de descuento del 7.5%.
    - *Paso 2*: Selección de ciudad/zona en Denver (Inner gratis vs Outer $25), dirección y datos de contacto (auto-completados si está autenticado).
-   - *Paso 3*: Detalles del pedido de ropa e instrucciones especiales de recolección.
-   - *Paso 4*: Resumen final de la orden, aceptación de términos y confirmación con ID de orden generada. Soporta la opción "Reordenar" desde el Dashboard.
+   - *Paso 3*: Selección de servicio y **Sistema de Add-ons** (Downy Scent Beads $3.50, Stain Treatment $3.50, Comforter Twin-Full $24.99, Comforter Queen-King $29.99, Pillow $6.99, Mattress cover Twin-Full $11.99, Mattress cover Queen-King $14.99) con cálculo de subtotal en vivo y solicitudes especiales.
+   - *Paso 4*: Resumen final de la orden, desglose de tarifas y add-ons, aceptación de términos y confirmación con ID de orden generada. Soporta la opción "Reordenar" desde el Dashboard.
 3. **`Auth.tsx` (`/login`)**: Formulario unificado de inicio de sesión y registro con validaciones dinámicas y gestión de errores.
 4. **`Dashboard.tsx` (`/dashboard`)**: Panel del usuario autenticado dividido en pestañas:
    - *Historial de Órdenes*: Muestra las órdenes activas y pasadas con estado en vivo y botón para "Volver a pedir" (*Reorder*).
@@ -136,7 +136,11 @@ LaundryGo/
    - **Zona Outer (Recargo - $25.00)**: Aurora, Thornton, Westminster, Centennial, Highlands Ranch, Broomfield.
 2. **Restricción de Horario Cutoff (Mismo Día)**:
    - Si la hora local del servidor sobrepasa las 12:00 PM, el servicio express `gofurther` no estará disponible para la fecha de hoy.
-3. **Checkout Flexible (Usuario vs Guest)**:
+3. **Descuento Recurrente (7.5%)**:
+   - Aplica a todas las tarifas de servicio en pedidos recurrentes a partir del segundo servicio/cobro.
+4. **Orden Mínima**:
+   - Aplica una orden mínima de $40.00 en servicios de lavado de ropa.
+5. **Checkout Flexible (Usuario vs Guest)**:
    - Si el cliente está autenticado, la orden se vincula a su `user_id`.
    - Si el cliente no está autenticado, se validan y guardan sus datos en campos `guest_*` (`guest_email`, `guest_first_name`, etc.).
 

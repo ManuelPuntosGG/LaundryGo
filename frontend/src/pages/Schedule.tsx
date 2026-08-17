@@ -15,6 +15,9 @@ import {
   MapPin,
   DollarSign,
   PhoneCall,
+  Plus,
+  Minus,
+  Layers,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -23,6 +26,12 @@ import { useAuthContext } from '@/providers/AuthProvider';
 import api from '@/api';
 import type { ServiceRate, AvailableDate } from '@/types';
 import { DENVER_LOCATIONS } from '@/constants/locations';
+import {
+  CHECKBOX_ADDONS,
+  BEDDING_ADDONS,
+  calculateAddonsTotal,
+  formatAddonsSummary,
+} from '@/constants/addons';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -40,6 +49,18 @@ export function Schedule() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<'morning' | 'afternoon'>('morning');
   const [selectedFrequency, setSelectedFrequency] = useState<string>('oneTime');
   const [selectedRate, setSelectedRate] = useState<number | null>(null);
+
+  const [selectedCheckboxAddons, setSelectedCheckboxAddons] = useState<Record<string, boolean>>({
+    scent_beads: false,
+    stain_treatment: false,
+  });
+  const [selectedBeddingQuantities, setSelectedBeddingQuantities] = useState<Record<string, number>>({
+    comforter_twin_full: 0,
+    comforter_queen_king: 0,
+    pillow: 0,
+    mattress_cover_twin_full: 0,
+    mattress_cover_queen_king: 0,
+  });
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -196,6 +217,20 @@ export function Schedule() {
     calendarCells.push({ day, dateStr: `${year}-${mm}-${dd}` });
   }
 
+  const handleToggleCheckboxAddon = (id: string) => {
+    setSelectedCheckboxAddons((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleBeddingQtyChange = (id: string, delta: number) => {
+    setSelectedBeddingQuantities((prev) => {
+      const current = prev[id] || 0;
+      const next = Math.max(0, current + delta);
+      return { ...prev, [id]: next };
+    });
+  };
+
+  const addonsSubtotal = calculateAddonsTotal(selectedCheckboxAddons, selectedBeddingQuantities);
+
   const canSelectGoFurther = (date: string) => {
     if (!date || safeDates.length === 0) return true;
     const dateData = safeDates.find((d) => d.date === date);
@@ -233,7 +268,7 @@ export function Schedule() {
         return false;
       }
       if (!isPhoneValid(formData.phone)) {
-        setStepError('Please enter a valid 10-digit phone number e.g. (303) 555-0123.');
+        setStepError('Please enter a valid 10-digit phone number e.g. (720) 590-8632.');
         return false;
       }
       if (!isEmailValid(formData.email)) {
@@ -260,8 +295,8 @@ export function Schedule() {
         setStepError('Please select a service speed tier.');
         return false;
       }
-      if (!orderDetails.trim()) {
-        setStepError('Please enter details about your laundry items.');
+      if (!orderDetails.trim() && addonsSubtotal === 0) {
+        setStepError('Please enter details about your laundry or select add-on items.');
         return false;
       }
       return true;
@@ -299,12 +334,18 @@ export function Schedule() {
         }
       }
 
+      const formattedDetails = formatAddonsSummary(
+        selectedCheckboxAddons,
+        selectedBeddingQuantities,
+        orderDetails
+      );
+
       const res = await api.post('/orders/', {
         service_rate: selectedRate,
         pickup_date: selectedDate,
         pickup_time_slot: selectedTimeSlot,
         frequency: selectedFrequency,
-        order_details: orderDetails,
+        order_details: formattedDetails || orderDetails || 'Standard laundry wash request',
         pickup_instructions: pickupInstructions,
         guest_email: formData.email.trim(),
         guest_first_name: formData.first_name.trim(),
@@ -375,6 +416,12 @@ export function Schedule() {
               <span className="text-slate-500 font-semibold">{t('auth.register.streetAddress')}:</span>
               <span className="font-bold text-slate-900">{formData.street_address}, {formData.city}</span>
             </div>
+            {addonsSubtotal > 0 && (
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200">
+                <span className="text-slate-500 font-semibold">{t('schedule.addonsSubtotal')}:</span>
+                <span className="font-bold text-blue-700">${addonsSubtotal.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center">
               <span className="text-slate-500 font-semibold">{t('schedule.deliveryFeeLabel')}:</span>
               <span className="font-bold text-blue-700">
@@ -660,6 +707,13 @@ export function Schedule() {
                   ? t('schedule.recurringTip')
                   : t('schedule.oneTimeTip')}
               </p>
+
+              {selectedFrequency !== 'oneTime' && selectedFrequency !== '' && (
+                <div className="p-3 rounded-xl bg-emerald-50/90 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-fade-in shadow-2xs">
+                  <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className="font-semibold">{t('schedule.recurringDiscountBenefit')}</span>
+                </div>
+              )}
             </div>
 
             {!isAuthenticated && (
@@ -750,7 +804,7 @@ export function Schedule() {
                 <Input
                   label={t('schedule.phone')}
                   type="tel"
-                  placeholder="(303) 555-0123"
+                  placeholder="(720) 590-8632"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   onBlur={() => markTouched('phone')}
@@ -864,18 +918,23 @@ export function Schedule() {
           </div>
         )}
 
-        {/* STEP 3: Service Tier & Details */}
+        {/* STEP 3: Service Tier & Add-ons */}
         {step === 3 && (
           <div className="flex flex-col gap-4 animate-in fade-in duration-200 w-full">
             <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5 pb-3 border-b border-slate-200/80">
               <Truck className="w-5 h-5 text-blue-600 shrink-0" />
-              <span>{t('schedule.serviceType')} & Details</span>
+              <span>{t('schedule.serviceType')} & {t('schedule.addonsTitle')}</span>
             </h2>
 
             <div className="space-y-2.5">
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Select Service Speed
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t('schedule.selectServiceSpeed')}
+                </label>
+                <span className="text-[11px] text-slate-500 font-medium">
+                  {t('schedule.minimumOrderNotice')}
+                </span>
+              </div>
 
               {/* Compact Service Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -912,7 +971,7 @@ export function Schedule() {
 
                       {isGoFurtherDisabled && (
                         <div className="absolute -top-2 right-2 bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded-full border border-amber-200 shadow-2xs">
-                          Cutoff 12PM
+                          {t('schedule.cutoffNotice')}
                         </div>
                       )}
                     </button>
@@ -921,18 +980,146 @@ export function Schedule() {
               </div>
             </div>
 
-            <div className="space-y-3 pt-1">
+            {/* Custom Add-ons Section */}
+            <div className="space-y-4 pt-2 border-t border-slate-200/80">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-blue-600" />
+                    <span>{t('schedule.addonsTitle')}</span>
+                  </h3>
+                  <p className="text-slate-500 text-xs">
+                    {t('schedule.addonsSubtitle')}
+                  </p>
+                </div>
+                {addonsSubtotal > 0 && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold self-start sm:self-auto">
+                    {t('schedule.addonsSubtotal')}: ${addonsSubtotal.toFixed(2)}
+                  </span>
+                )}
+              </div>
+
+              {/* 1. Checkbox Wash Treatments */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
+                  {t('schedule.treatmentsCategory')}
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {CHECKBOX_ADDONS.map((addon) => {
+                    const isChecked = !!selectedCheckboxAddons[addon.id];
+                    return (
+                      <label
+                        key={addon.id}
+                        className={`p-3 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
+                          isChecked
+                            ? 'bg-blue-50/90 border-blue-600 shadow-2xs ring-1 ring-blue-600/20'
+                            : 'bg-white border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleToggleCheckboxAddon(addon.id)}
+                          className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-bold text-xs sm:text-sm text-slate-900">
+                              {t(addon.i18nKey, { defaultValue: addon.name })}
+                            </span>
+                            <span className="text-xs font-extrabold text-blue-600 shrink-0">
+                              +${addon.price.toFixed(2)}{t('schedule.perOrder')}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">
+                            {t(addon.descriptionKey, { defaultValue: addon.name })}
+                          </p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. Incremental Bedding & Bulky Items */}
+              <div className="space-y-2 pt-1">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                  <span>{t('schedule.beddingCategory')}</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {BEDDING_ADDONS.map((item) => {
+                    const qty = selectedBeddingQuantities[item.id] || 0;
+                    return (
+                      <div
+                        key={item.id}
+                        className={`p-2.5 sm:p-3 rounded-xl border flex items-center justify-between gap-2 transition-all ${
+                          qty > 0
+                            ? 'bg-blue-50/90 border-blue-600 shadow-2xs'
+                            : 'bg-white border-slate-200'
+                        }`}
+                      >
+                        <div className="min-w-0 pr-1">
+                          <p className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                            {t(item.i18nKey, { defaultValue: item.name })}
+                          </p>
+                          <p className="text-xs font-extrabold text-blue-600 mt-0.5">
+                            ${item.price.toFixed(2)} <span className="text-[10px] text-slate-500 font-normal">{t('schedule.each')}</span>
+                          </p>
+                        </div>
+
+                        {/* Stepper Controls */}
+                        <div className="flex items-center gap-1 shrink-0 bg-white border border-slate-200 rounded-lg p-1 shadow-2xs">
+                          <button
+                            type="button"
+                            disabled={qty === 0}
+                            onClick={() => handleBeddingQtyChange(item.id, -1)}
+                            className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${
+                              qty === 0
+                                ? 'text-slate-300 cursor-not-allowed'
+                                : 'text-slate-700 hover:bg-slate-100 active:scale-95'
+                            }`}
+                          >
+                            <Minus className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="w-6 text-center font-extrabold text-xs sm:text-sm text-slate-900">
+                            {qty}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleBeddingQtyChange(item.id, 1)}
+                            className="w-7 h-7 rounded-md flex items-center justify-center text-blue-600 hover:bg-blue-50 active:scale-95 transition-all"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Subtotal bar */}
+              <div className="p-3 rounded-xl bg-slate-50/90 border border-slate-200 flex items-center justify-between text-xs sm:text-sm">
+                <span className="font-semibold text-slate-600">{t('schedule.addonsSubtotal')}:</span>
+                <span className={`font-extrabold ${addonsSubtotal > 0 ? 'text-blue-700 text-sm sm:text-base' : 'text-slate-500'}`}>
+                  ${addonsSubtotal.toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            {/* Laundry Specific Requests & Pickup Instructions */}
+            <div className="space-y-3 pt-2 border-t border-slate-200/80">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                  {t('schedule.orderDetails')} *
+                  {t('schedule.orderDetails')}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. 2 bags of darks & lights, 1 comforter. Cold wash."
+                  placeholder={t('schedule.orderDetailsPlaceholder')}
                   value={orderDetails}
                   onChange={(e) => setOrderDetails(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded-xl p-2.5 px-3 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-xs sm:text-sm shadow-2xs"
-                  required
                 />
               </div>
 
@@ -942,7 +1129,7 @@ export function Schedule() {
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Leave bags by front porch or gate code #1234."
+                  placeholder={t('schedule.pickupInstructionsPlaceholder')}
                   value={pickupInstructions}
                   onChange={(e) => setPickupInstructions(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded-xl p-2.5 px-3 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-xs sm:text-sm shadow-2xs"
@@ -992,6 +1179,44 @@ export function Schedule() {
               </div>
             </div>
 
+            {/* Recurring 7.5% Discount Banner in Review */}
+            {selectedFrequency && selectedFrequency !== 'oneTime' && (
+              <div className="p-3 rounded-xl bg-emerald-50/90 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="font-semibold">{t('schedule.recurringDiscountBenefit')}</span>
+              </div>
+            )}
+
+            {/* Add-ons Itemized Breakdown */}
+            {addonsSubtotal > 0 && (
+              <div className="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 space-y-2 text-xs sm:text-sm">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-200/80">
+                  <p className="text-slate-700 font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    <span>{t('schedule.addonsTitle')}</span>
+                  </p>
+                  <span className="font-extrabold text-blue-700">${addonsSubtotal.toFixed(2)}</span>
+                </div>
+                <div className="space-y-1 pt-0.5">
+                  {CHECKBOX_ADDONS.filter((a) => selectedCheckboxAddons[a.id]).map((a) => (
+                    <div key={a.id} className="flex items-center justify-between text-slate-700 text-xs">
+                      <span>• {t(a.i18nKey, { defaultValue: a.name })}</span>
+                      <span className="font-bold">+${a.price.toFixed(2)}</span>
+                    </div>
+                  ))}
+                  {BEDDING_ADDONS.filter((b) => (selectedBeddingQuantities[b.id] || 0) > 0).map((b) => {
+                    const qty = selectedBeddingQuantities[b.id];
+                    return (
+                      <div key={b.id} className="flex items-center justify-between text-slate-700 text-xs">
+                        <span>• {qty}x {t(b.i18nKey, { defaultValue: b.name })}</span>
+                        <span className="font-bold">+${(b.price * qty).toFixed(2)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 space-y-1 text-xs sm:text-sm">
               <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">{t('schedule.customerDetails')}</p>
               <p className="text-slate-900 font-extrabold">{formData.first_name} {formData.last_name}</p>
@@ -999,18 +1224,25 @@ export function Schedule() {
               <p className="text-slate-800 font-medium pt-0.5">
                 📍 {formData.street_address}, {formData.city} {formData.zip_code}
               </p>
-              <p className="text-xs font-bold text-blue-700 mt-1">
-                {t('schedule.deliveryFeeLabel')}: {selectedLocation.fee === 0 ? t('schedule.freeFee') : t('schedule.outerFee')}
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-1 border-t border-slate-200/60 mt-1">
+                <span className="text-xs font-bold text-blue-700">
+                  {t('schedule.deliveryFeeLabel')}: {selectedLocation.fee === 0 ? t('schedule.freeFee') : t('schedule.outerFee')}
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  {t('schedule.minimumOrderNotice')}
+                </span>
+              </div>
             </div>
 
-            <div className="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 text-xs sm:text-sm">
-              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">{t('schedule.orderDetailsSummary')}</p>
-              <p className="text-slate-800 font-medium whitespace-pre-wrap">{orderDetails}</p>
-              {pickupInstructions && (
-                <p className="text-slate-500 text-xs mt-1.5 italic">Instructions: {pickupInstructions}</p>
-              )}
-            </div>
+            {orderDetails && (
+              <div className="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 text-xs sm:text-sm">
+                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">{t('schedule.orderDetailsSummary')}</p>
+                <p className="text-slate-800 font-medium whitespace-pre-wrap">{orderDetails}</p>
+                {pickupInstructions && (
+                  <p className="text-slate-500 text-xs mt-1.5 italic">Instructions: {pickupInstructions}</p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
