@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -42,6 +41,12 @@ html, body {
   background-attachment: fixed;
 }
 
+/* Accessible interactive focus */
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -72,3 +77,10 @@ html, body {
 .animate-fade-in {
   animation: fadeIn 0.35s ease-out forwards;
 }
+
+/* Touch targets helper */
+.touch-target-44 {
+  min-height: 44px;
+  min-width: 44px;
+}
+

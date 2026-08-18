@@ -10,6 +10,9 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -158,3 +161,75 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='LaundryGo <info@thela
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@thelaundrygo.com')
 
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
+
+# Django Unfold Configuration
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
+UNFOLD = {
+    "SITE_TITLE": "LaundryGo Admin",
+    "SITE_HEADER": "LaundryGo Operations",
+    "SITE_SUBHEADER": "Pickup & Delivery Operations Panel",
+    "SITE_URL": "/",
+    "THEME": "light",
+    "BORDER_RADIUS": "12px",
+    "COLORS": {
+        "primary": {
+            "50": "239 246 255",
+            "100": "219 234 254",
+            "200": "191 219 254",
+            "300": "147 197 253",
+            "400": "96 165 250",
+            "500": "59 130 246",
+            "600": "37 99 235",
+            "700": "29 78 216",
+            "800": "30 64 175",
+            "900": "30 58 138",
+            "950": "23 37 84",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": _("Operations & Logistics"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Orders"),
+                        "icon": "local_laundry_service",
+                        "link": reverse_lazy("admin:orders_order_changelist"),
+                    },
+                    {
+                        "title": _("Recurring Schedules"),
+                        "icon": "event_repeat",
+                        "link": reverse_lazy("admin:orders_recurringschedule_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Catalog & Pricing"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Service Rates"),
+                        "icon": "sell",
+                        "link": reverse_lazy("admin:orders_servicerate_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("User Management"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Customers & Staff"),
+                        "icon": "group",
+                        "link": reverse_lazy("admin:users_user_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
+}

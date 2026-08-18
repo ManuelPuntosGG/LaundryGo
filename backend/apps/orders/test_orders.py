@@ -193,3 +193,126 @@ class OrderManagementTests(TestCase):
         response = self.client.delete(detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(RecurringSchedule.objects.filter(id=schedule.id).count(), 0)
+
+    def test_cancel_pending_order_success(self):
+        """Test user can cancel their own pending order."""
+        self.client.force_authenticate(user=self.user)
+        today = timezone.localtime(timezone.now()).date()
+
+        order = Order.objects.create(
+            user=self.user,
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='morning',
+            order_details='Pending order to cancel',
+            status='pending'
+        )
+
+        schedule = RecurringSchedule.objects.create(
+            user=self.user,
+            order=order,
+            frequency='weekly',
+            is_active=True,
+            next_pickup_date=today + timedelta(days=7)
+        )
+
+        cancel_url = f'/api/v1/orders/{order.id}/cancel/'
+        response = self.client.post(cancel_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        order.refresh_from_db()
+        self.assertEqual(order.status, 'cancelled')
+        
+        schedule.refresh_from_db()
+        self.assertFalse(schedule.is_active)
+
+    def test_cancel_processing_order_rejected(self):
+        """Test user cannot cancel an order in processing status."""
+        self.client.force_authenticate(user=self.user)
+        today = timezone.localtime(timezone.now()).date()
+
+        order = Order.objects.create(
+            user=self.user,
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='morning',
+            order_details='Processing order',
+            status='processing'
+        )
+
+        cancel_url = f'/api/v1/orders/{order.id}/cancel/'
+        response = self.client.post(cancel_url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('detail', response.data)
+
+        order.refresh_from_db()
+        self.assertEqual(order.status, 'processing')
+
+    def test_cancel_other_user_order_forbidden(self):
+        """Test user cannot cancel another user's order."""
+        other_user = User.objects.create_user(
+            username='other@example.com',
+            email='other@example.com',
+            password='Password123!'
+        )
+        today = timezone.localtime(timezone.now()).date()
+
+        order = Order.objects.create(
+            user=other_user,
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='morning',
+            order_details='Other user order',
+            status='pending'
+        )
+
+        self.client.force_authenticate(user=self.user)
+        cancel_url = f'/api/v1/orders/{order.id}/cancel/'
+        response = self.client.post(cancel_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        order.refresh_from_db()
+        self.assertEqual(order.status, 'pending')
+
+    def test_guest_orders_auto_linked_on_registration(self):
+        """Test past orders made with a guest email are automatically linked when user registers."""
+        guest_email = 'new.registered@example.com'
+        today = timezone.localtime(timezone.now()).date()
+
+        # Guest creates an order
+        guest_order = Order.objects.create(
+            user=None,
+            guest_email=guest_email,
+            guest_first_name='Laura',
+            guest_last_name='Perez',
+            guest_phone='3035559999',
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='morning',
+            order_details='Guest towels',
+            status='pending'
+        )
+
+        self.assertIsNone(guest_order.user)
+
+        # Now Laura registers with that email
+        register_url = '/api/v1/auth/register/'
+        reg_payload = {
+            'email': guest_email,
+            'password': 'StrongPassword123!',
+            'password_confirm': 'StrongPassword123!',
+            'first_name': 'Laura',
+            'last_name': 'Perez',
+            'phone': '3035559999',
+            'street_address': '800 18th St',
+            'city': 'Denver',
+            'zip_code': '80202',
+        }
+
+        response = self.client.post(register_url, reg_payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        guest_order.refresh_from_db()
+        self.assertIsNotNone(guest_order.user)
+        self.assertEqual(guest_order.user.email, guest_email)
+

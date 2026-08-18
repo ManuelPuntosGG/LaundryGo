@@ -16,6 +16,15 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+
+        # Automatically link past guest orders matching user's email
+        try:
+            from apps.orders.models import Order
+            Order.objects.filter(user__isnull=True, guest_email__iexact=user.email).update(user=user)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Could not link past guest orders for {user.email}: {e}")
+
         tokens = serializer.to_tokens(user)
         return Response({
             'user': UserSerializer(user).data,

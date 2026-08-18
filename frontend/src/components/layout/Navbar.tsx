@@ -124,79 +124,88 @@ export function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="max-w-7xl mx-auto mt-2 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl shadow-xl animate-fade-in">
-          <div className="flex flex-col items-center justify-center text-center space-y-4 py-6 px-6 max-w-sm mx-auto">
-            {/* 1. Home */}
-            <Link
-              to="/"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={`text-center text-lg font-extrabold transition-colors py-1 ${
-                isActive('/') ? 'text-blue-600' : 'text-slate-800 hover:text-blue-600'
-              }`}
-            >
-              {t('nav.home')}
-            </Link>
+        <div className="max-w-7xl mx-auto mt-2 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl shadow-xl animate-fade-in p-4 sm:p-5">
+          <div className="flex flex-col gap-3 max-w-sm mx-auto">
+            {/* Primary Navigation Links */}
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                to="/"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center justify-center h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
+                  isActive('/')
+                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                }`}
+              >
+                {t('nav.home')}
+              </Link>
 
-            {/* 2. Schedule */}
+              {isAuthenticated ? (
+                <Link
+                  to="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
+                    isActive('/dashboard')
+                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span>{t('nav.dashboard')}</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
+                    isActive('/login')
+                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                  }`}
+                >
+                  <User className="w-4 h-4 text-slate-500 shrink-0" />
+                  <span>{t('nav.login')}</span>
+                </Link>
+              )}
+            </div>
+
+            {/* Single Primary Action: Schedule Pickup */}
             <Link
               to="/schedule"
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`text-center text-lg font-extrabold transition-colors py-1 ${
-                isActive('/schedule') ? 'text-blue-600' : 'text-slate-800 hover:text-blue-600'
-              }`}
+              className="w-full text-center inline-flex items-center justify-center h-11 px-6 text-sm font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-all active:scale-98"
             >
               {t('nav.schedule')}
             </Link>
 
-            {/* 3. Primary CTA: Schedule Pickup directly under Services */}
-            <div className="w-full pt-1">
-              <Link
-                to="/schedule"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full max-w-xs text-center inline-flex items-center justify-center h-12 px-6 text-base font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-all active:scale-98"
-              >
-                {t('nav.schedule')}
-              </Link>
-            </div>
+            {/* Bottom Utilities: User / Logout & Language Switcher */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 gap-2">
+              {isAuthenticated ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-600 text-white text-xs font-extrabold flex items-center justify-center shrink-0">
+                    {user?.first_name?.[0] || 'U'}
+                  </div>
+                  <span className="text-xs font-bold text-slate-800 truncate max-w-[120px]">
+                    {user?.first_name || user?.email?.split('@')[0]}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    title={t('nav.logout')}
+                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="text-xs text-slate-500 font-semibold">
+                  LaundryGo Denver
+                </div>
+              )}
 
-            <div className="h-px bg-slate-200/80 w-full my-2" />
-
-            {/* 4. Login / Dashboard */}
-            {isAuthenticated ? (
-              <div className="flex flex-col items-center gap-3 w-full">
-                <Link
-                  to="/dashboard"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full max-w-xs text-center inline-flex items-center justify-center gap-2 h-11 px-6 text-sm font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
-                >
-                  <LayoutDashboard className="w-4.5 h-4.5 text-blue-600 shrink-0" />
-                  {t('nav.dashboard')}
-                </Link>
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full max-w-xs text-center inline-flex items-center justify-center gap-2 h-11 px-6 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all"
-                >
-                  <LogOut className="w-4.5 h-4.5 shrink-0" />
-                  {t('nav.logout')}
-                </button>
-              </div>
-            ) : (
-              <div className="w-full flex justify-center">
-                <Link
-                  to="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full max-w-xs text-center inline-flex items-center justify-center h-11 px-6 text-sm font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
-                >
-                  {t('nav.login')}
-                </Link>
-              </div>
-            )}
-
-            {/* 5. Language Switcher directly under Login */}
-            <div className="pt-2">
               <LanguageSwitcher />
             </div>
           </div>

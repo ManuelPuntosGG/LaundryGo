@@ -13,10 +13,30 @@
   },
   "home": {
     "badge": "Doorstep Pickup & Delivery in Denver, Colorado",
+    "socialProof": {
+      "rating": "4.9/5 Rating in Denver",
+      "delivered": "+1,200 Orders Delivered",
+      "eco": "Eco-Friendly & Gentle Care",
+      "guarantee": "100% Clean Guarantee"
+    },
     "hero": {
       "title": "Fresh Laundry, Delivered to Your Door",
       "subtitle": "Professional pickup and delivery laundry service for homes and businesses in Denver, Colorado.",
-      "cta": "Schedule a Pickup"
+      "cta": "Schedule Free Pickup",
+      "secondaryCta": "Estimate Price & Speeds"
+    },
+    "estimator": {
+      "title": "Interactive Cost Estimator",
+      "subtitle": "Select your estimated laundry volume to preview pricing across delivery speeds.",
+      "small": "1 Bag (~15 lbs)",
+      "smallDesc": "Ideal for 1 person / 1 week",
+      "medium": "2 Bags (~30 lbs)",
+      "mediumDesc": "Ideal for couples / busy weeks",
+      "large": "3+ Bags (~45 lbs)",
+      "largeDesc": "Family laundry & bedsheets",
+      "weightLabel": "Weight",
+      "estTotal": "Estimated Cost",
+      "minOrderNotice": "Note: A $40 minimum order applies to laundry wash services."
     },
     "howItWorks": {
       "title": "How It Works",
@@ -66,7 +86,9 @@
     },
     "serviceArea": {
       "title": "Service Area",
-      "description": "We serve the entire Denver metropolitan area"
+      "description": "We serve the entire Denver metropolitan area",
+      "innerBadge": "Free Delivery (Central Denver)",
+      "outerBadge": "Outer Metro ($25 Fee)"
     },
     "contact": {
       "title": "Contact Us",
@@ -148,9 +170,12 @@
     },
     "orderDetails": "Order Details & Specific Requests",
     "orderDetailsPlaceholder": "e.g. 2 bags of darks & lights. Cold wash, delicate cycle.",
+    "liveSummaryTitle": "Live Order Summary",
+    "payUponWeight": "Pay upon exact weighing. No upfront credit card required.",
+    "freeCancel": "Free cancellation up to 2 hours before pickup window.",
     "pickupInstructions": "Pickup Instructions (Optional)",
     "pickupInstructionsPlaceholder": "e.g. Leave bags by front porch or gate code #1234.",
-    "reserve": "Reserve Pickup",
+    "reserve": "Confirm Free Pickup",
     "reviewTitle": "Review & Confirm",
     "pickupDate": "Pickup Date",
     "pickupDateLabel": "Pickup Date",
@@ -171,6 +196,20 @@
       "returnDashboard": "Return to Dashboard",
       "returnHome": "Return to Home",
       "createAccount": "Create an Account"
+    },
+    "errors": {
+      "selectDate": "Please select a pickup date from the calendar.",
+      "selectTimeSlot": "Please select a pickup time slot (Morning or Afternoon).",
+      "firstName": "First name must contain at least 2 characters.",
+      "lastName": "Last name must contain at least 2 characters.",
+      "phone": "Please enter a valid 10-digit phone number e.g. (720) 590-8632.",
+      "email": "Please enter a valid email address e.g. name@domain.com.",
+      "address": "Please enter a complete street address (minimum 5 characters).",
+      "zipCode": "Please enter a valid 5-digit zip code.",
+      "location": "Please select a valid Denver area location.",
+      "terms": "You must agree to the Service Terms & Conditions to proceed.",
+      "selectRate": "Please select a service speed tier.",
+      "cutoffNotice": "Same-day express service is not available after 12:00 PM for today. Please choose Standard or Next-day service."
     }
   },
   "auth": {
@@ -214,10 +253,34 @@
     "scheduleFirst": "Schedule your first pickup",
     "viewDetails": "View Details",
     "reorder": "Reorder",
+    "cancelOrder": "Cancel Order",
+    "cancelOrderTitle": "Cancel Order #{{id}}",
+    "cancelOrderConfirm": "Are you sure you want to cancel your laundry pickup scheduled for {{date}}? This action cannot be undone.",
+    "confirmCancel": "Yes, Cancel Order",
+    "keepOrder": "Keep Order",
+    "cancelSuccess": "Order #{{id}} has been cancelled successfully.",
+    "cancelError": "Failed to cancel order: {{message}}",
+    "cannotCancelNotice": "Only pending or confirmed orders can be cancelled online. If your order is in progress, please call support at (720) 590-8632.",
+    "deleteRecurring": "Delete Plan",
+    "deleteRecurringTitle": "Delete Recurring Schedule",
+    "deleteRecurringConfirm": "Are you sure you want to permanently delete this recurring pickup schedule?",
+    "confirmDelete": "Yes, Delete",
+    "deleteSuccess": "Recurring plan deleted successfully.",
+    "deleteError": "Failed to delete recurring schedule.",
+    "statusUpdated": "Recurring subscription status updated.",
+    "orderDetailsTitle": "Order #{{id}} Details",
+    "pickupAddress": "Pickup & Delivery Address",
+    "serviceSpeed": "Service Speed",
+    "deliveryFee": "Delivery Zone Fee",
+    "itemsAndAddons": "Items & Add-ons Details",
+    "pickupInstructions": "Special Instructions",
+    "noneSpecified": "None specified",
+    "customerInfo": "Customer Contact Info",
+    "timeline": "Order Status Timeline",
     "active": "Active",
     "paused": "Paused",
-    "deactivate": "Deactivate",
-    "activate": "Activate",
+    "deactivate": "Pause Plan",
+    "activate": "Resume Plan",
     "noRecurring": "No recurring orders",
     "scheduleRecurring": "Schedule a recurring pickup",
     "orderNumber": "Order #{{id}}",

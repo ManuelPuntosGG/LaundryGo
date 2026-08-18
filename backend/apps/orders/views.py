@@ -91,6 +91,82 @@ class OrderDetailView(generics.RetrieveUpdateAPIView):
         return Order.objects.none()
 
 
+class OrderCancelView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, pk):
+        try:
+            if request.user.is_staff:
+                order = Order.objects.get(pk=pk)
+            else:
+                order = Order.objects.get(pk=pk, user=request.user)
+        except Order.DoesNotExist:
+            return Response(
+                {'detail': 'Order not found or you do not have permission to cancel it.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if order.status == 'cancelled':
+            return Response(
+                {'detail': 'This order has already been cancelled.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if order.status not in ['pending', 'confirmed']:
+            return Response(
+                {
+                    'detail': (
+                        f'Cannot cancel order in "{order.get_status_display()}" status. '
+                        'Orders in progress or delivered cannot be cancelled online. '
+                        'Please call LaundryGo support at (720) 590-8632.'
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        order.status = 'cancelled'
+        order.save()
+
+        # If order has an active recurring schedule, pause it
+        if hasattr(order, 'recurring_schedule') and order.recurring_schedule:
+            order.recurring_schedule.is_active = False
+            order.recurring_schedule.save()
+
+        # Send cancellation notification email
+        try:
+            from django.core.mail import send_mail
+            from django.conf import settings
+
+            subject = f"❌ Cancelación de Orden LaundryGo #{order.id}"
+            message = (
+                f"La orden #{order.id} ha sido cancelada por el cliente.\n\n"
+                f"----------------------------------------\n"
+                f"DATOS DE LA ORDEN CANCELADA\n"
+                f"----------------------------------------\n"
+                f"• Cliente: {order.customer_name}\n"
+                f"• Correo: {order.customer_email}\n"
+                f"• Servicio: {order.service_rate.name}\n"
+                f"• Fecha programada: {order.pickup_date} ({order.get_pickup_time_slot_display()})\n"
+                f"• Estado actual: Cancelada\n"
+            )
+            recipients = [settings.ADMIN_EMAIL]
+            if order.customer_email:
+                recipients.append(order.customer_email)
+
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=recipients,
+                fail_silently=True,
+            )
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send cancellation email: {e}")
+
+        return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
+
+
 class RecurringScheduleListView(generics.ListAPIView):
     serializer_class = RecurringScheduleSerializer
 
@@ -115,17 +191,11 @@ class AvailableDatesView(APIView):
         dates = []
         for i in range(30):
             date = today + timedelta(days=i)
-            if i == 0 and current_hour >= 12:
-                dates.append({
-                    'date': date.isoformat(),
-                    'goavailable': False,
-                    'gofurther_available': False,
-                })
-            else:
-                dates.append({
-                    'date': date.isoformat(),
-                    'goavailable': True,
-                    'gofurther_available': current_hour < 12 if i == 0 else True,
-                })
+            is_same_day_available = current_hour < 12 if i == 0 else True
+            dates.append({
+                'date': date.isoformat(),
+                'goavailable': True,
+                'gofurther_available': is_same_day_available,
+            })
 
         return Response(dates)

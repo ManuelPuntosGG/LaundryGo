@@ -13,10 +13,30 @@
   },
   "home": {
     "badge": "Recolección y Entrega a Domicilio en Denver, Colorado",
+    "socialProof": {
+      "rating": "★ 4.9/5 en Denver",
+      "delivered": "+1,200 Pedidos Entregados",
+      "eco": "Cuidado Delicado y Detergentes Eco",
+      "guarantee": "Garantía de Satisfacción 100%"
+    },
     "hero": {
       "title": "Ropa Limpia y Fresca, Entregada a Tu Puerta",
       "subtitle": "Servicio profesional de recolección y entrega de lavandería para hogares y negocios en Denver, Colorado.",
-      "cta": "Agendar Recolección"
+      "cta": "Agendar Recolección Gratis",
+      "secondaryCta": "Calcular Precio y Tiempos"
+    },
+    "estimator": {
+      "title": "Calculadora Interactiva de Carga y Costo",
+      "subtitle": "Selecciona tu volumen estimado de ropa para previsualizar el precio en los distintos tiempos de entrega.",
+      "small": "1 Bolsa (~15 lbs)",
+      "smallDesc": "Ideal para 1 persona / 1 semana",
+      "medium": "2 Bolsas (~30 lbs)",
+      "mediumDesc": "Ideal para parejas / semanas ocupadas",
+      "large": "3+ Bolsas (~45 lbs)",
+      "largeDesc": "Ropa familiar y sábanas",
+      "weightLabel": "Peso Estimado",
+      "estTotal": "Costo Estimado",
+      "minOrderNotice": "Nota: Aplica una orden mínima de $40 en servicios de lavado por libra."
     },
     "howItWorks": {
       "title": "Cómo Funciona",
@@ -66,7 +86,9 @@
     },
     "serviceArea": {
       "title": "Área de Servicio",
-      "description": "Servimos a toda el área metropolitana de Denver"
+      "description": "Servimos a toda el área metropolitana de Denver",
+      "innerBadge": "Envío Gratis (Zona Central de Denver)",
+      "outerBadge": "Zona Exterior (Tarifa de $25)"
     },
     "contact": {
       "title": "Contáctanos",
@@ -148,9 +170,12 @@
     },
     "orderDetails": "Detalles del Pedido y Solicitudes Especiales",
     "orderDetailsPlaceholder": "Ej. 2 bolsas de ropa clara y oscura. Lavado delicado en frío.",
+    "liveSummaryTitle": "Resumen en Vivo del Pedido",
+    "payUponWeight": "Pagas al momento del pesaje exacto. No requiere tarjeta de crédito por adelantado.",
+    "freeCancel": "Cancelación o reprogramación gratuita hasta 2 horas antes de la recolección.",
     "pickupInstructions": "Instrucciones de Recolección (Opcional)",
     "pickupInstructionsPlaceholder": "Ej. Dejar bolsas en el porch delantero o código de portón #1234.",
-    "reserve": "Confirmar Recolección",
+    "reserve": "Confirmar Recolección Gratis",
     "reviewTitle": "Revisar y Confirmar",
     "pickupDate": "Fecha de Recolección",
     "pickupDateLabel": "Fecha de Recolección",
@@ -171,6 +196,20 @@
       "returnDashboard": "Volver al Panel de Control",
       "returnHome": "Volver al Inicio",
       "createAccount": "Crear una Cuenta"
+    },
+    "errors": {
+      "selectDate": "Por favor selecciona una fecha de recolección en el calendario.",
+      "selectTimeSlot": "Por favor selecciona un horario de recolección (Mañana o Tarde).",
+      "firstName": "El nombre debe contener al menos 2 letras.",
+      "lastName": "El apellido debe contener al menos 2 letras.",
+      "phone": "Por favor ingresa un número de teléfono válido de 10 dígitos (ej. (720) 590-8632).",
+      "email": "Por favor ingresa un correo electrónico válido (ej. nombre@correo.com).",
+      "address": "Por favor ingresa una dirección completa (mínimo 5 caracteres).",
+      "zipCode": "Por favor ingresa un código postal válido de 5 dígitos.",
+      "location": "Por favor selecciona una ubicación válida en Denver.",
+      "terms": "Debes aceptar los Términos y Condiciones del Servicio para continuar.",
+      "selectRate": "Por favor selecciona una velocidad de servicio.",
+      "cutoffNotice": "El servicio express mismo día no está disponible después de las 12:00 PM para hoy. Por favor selecciona Estándar o Día Siguiente."
     }
   },
   "auth": {
@@ -214,10 +253,34 @@
     "scheduleFirst": "Agenda tu primera recolección",
     "viewDetails": "Ver Detalles",
     "reorder": "Volver a Pedir",
+    "cancelOrder": "Cancelar Pedido",
+    "cancelOrderTitle": "Cancelar Pedido #{{id}}",
+    "cancelOrderConfirm": "¿Estás seguro de que deseas cancelar la recolección de lavandería agendada para el {{date}}? Esta acción no se puede deshacer.",
+    "confirmCancel": "Sí, Cancelar Pedido",
+    "keepOrder": "Mantener Pedido",
+    "cancelSuccess": "El pedido #{{id}} ha sido cancelado con éxito.",
+    "cancelError": "Error al cancelar el pedido: {{message}}",
+    "cannotCancelNotice": "Solo los pedidos pendientes o confirmados pueden cancelarse en línea. Si tu pedido ya está en proceso, llámanos al (720) 590-8632.",
+    "deleteRecurring": "Eliminar Plan",
+    "deleteRecurringTitle": "Eliminar Plan Recurrente",
+    "deleteRecurringConfirm": "¿Estás seguro de que deseas eliminar permanentemente este plan de recolección recurrente?",
+    "confirmDelete": "Sí, Eliminar",
+    "deleteSuccess": "Plan recurrente eliminado correctamente.",
+    "deleteError": "Error al eliminar el plan recurrente.",
+    "statusUpdated": "Estado de la suscripción actualizado.",
+    "orderDetailsTitle": "Detalles del Pedido #{{id}}",
+    "pickupAddress": "Dirección de Recolección y Entrega",
+    "serviceSpeed": "Velocidad de Servicio",
+    "deliveryFee": "Tarifa de Zona de Entrega",
+    "itemsAndAddons": "Prendas y Add-ons Detallados",
+    "pickupInstructions": "Instrucciones Especiales",
+    "noneSpecified": "Ninguna especificada",
+    "customerInfo": "Información de Contacto",
+    "timeline": "Línea de Tiempo del Pedido",
     "active": "Activo",
     "paused": "Pausado",
-    "deactivate": "Desactivar",
-    "activate": "Activar",
+    "deactivate": "Pausar Plan",
+    "activate": "Reanudar Plan",
     "noRecurring": "No hay pedidos recurrentes",
     "scheduleRecurring": "Agendar una recolección recurrente",
     "orderNumber": "Pedido #{{id}}",
