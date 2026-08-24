@@ -5,6 +5,7 @@
   },
   "nav": {
     "home": "Home",
+    "about": "About Us",
     "schedule": "Schedule Pickup",
     "login": "Login",
     "register": "Register",
@@ -56,7 +57,8 @@
       "step4": {
         "title": "We Deliver",
         "description": "Fresh, folded laundry delivered to you"
-      }
+      },
+      "learnMore": "Learn how we care for your fabrics & see our full process →"
     },
     "pricing": {
       "title": "Our Services",
@@ -286,6 +288,116 @@
     "orderNumber": "Order #{{id}}",
     "service": "Service",
     "nextPickup": "Next Pickup"
+  },
+  "about": {
+    "badge": "Our Story & Method in Denver, CO",
+    "hero": {
+      "title": "We Treat Your Laundry Like It’s Our Own",
+      "subtitle": "LaundryGo is Denver's dedicated pickup & delivery laundry service. We turn the weekly chore into effortless freshness with transparent per-pound pricing, eco-friendly care, and door-to-door convenience.",
+      "cta": "Schedule Free Pickup",
+      "secondaryCta": "Explore How It Works"
+    },
+    "mission": {
+      "badge": "Our Purpose",
+      "title": "More Free Time, Zero Laundry Stress",
+      "p1": "Founded in Denver, LaundryGo was born out of a simple conviction: laundry shouldn't consume your precious evenings and weekends.",
+      "p2": "Whether you are a busy parent, a working professional, or a local business, we manage your wash-and-fold routine with high-efficiency eco washers, gentle fabrics care, and dependable doorstep delivery.",
+      "stat1Value": "+1,200",
+      "stat1Label": "Denver Orders Delivered",
+      "stat2Value": "4.9 ★",
+      "stat2Label": "Customer Satisfaction",
+      "stat3Value": "100%",
+      "stat3Label": "Gentle & Eco Detergents",
+      "stat4Value": "$0 Upfront",
+      "stat4Label": "Pay After Exact Weighing"
+    },
+    "process": {
+      "badge": "Our 5-Step Business Flow",
+      "title": "The LaundryGo Process, Explained",
+      "subtitle": "From your doorstep to our washing facilities and back in pristine condition — here is how we handle every load.",
+      "step1": {
+        "step": "01",
+        "tag": "Step 01",
+        "title": "Easy Online Scheduling & Doorstep Pickup",
+        "description": "Select your pickup date and choose between Morning (8:00 AM – 11:00 AM) or Afternoon (12:00 PM – 4:00 PM) slots. Place your bags outside or hand them directly to our friendly driver. No credit card is charged upfront.",
+        "highlight": "Morning & Afternoon windows with $0 delivery in Central Denver."
+      },
+      "step2": {
+        "step": "02",
+        "tag": "Step 02",
+        "title": "Precision Weighing & Fabric Sorting",
+        "description": "At our facility, every bag is weighed on calibrated commercial scales so you only pay for your exact poundage. We meticulously sort garments by colors, whites, darks, and delicate fabrics.",
+        "highlight": "Transparent per-pound pricing with expert color separation."
+      },
+      "step3": {
+        "step": "03",
+        "tag": "Step 03",
+        "title": "Eco-Friendly Cleaning & Custom Care",
+        "description": "We wash using biodegradable, hypoallergenic detergents and high-efficiency machines. We apply optional treatments such as Downy scent beads, targeted stain removal, and special cycles for comforters and bedding.",
+        "highlight": "Eco detergents with optional scent boosts and stain treatments."
+      },
+      "step4": {
+        "step": "04",
+        "tag": "Step 04",
+        "title": "Fiber-Safe Drying & Boutique Folding",
+        "description": "Clothes are dried at carefully regulated temperatures to preserve elasticity and prevent shrinkage. Next, our team hand-folds each item into crisp stacks, packaged in weather-safe protective packaging.",
+        "highlight": "Temperature-controlled drying and neat, ready-for-the-closet folding."
+      },
+      "step5": {
+        "step": "05",
+        "tag": "Step 05",
+        "title": "Fast Return Straight to Your Door",
+        "description": "Your clean, fresh-smelling laundry is delivered back to your home or business right on time based on your speed: Standard (2 days), Go (Next-day), or GoFurther (Same-day express if ordered before 12 PM).",
+        "highlight": "Punctual delivery with real-time status updates in your dashboard."
+      }
+    },
+    "businessRules": {
+      "badge": "Transparent Rules",
+      "title": "Our Core Business Model & Commitments",
+      "subtitle": "Clear guidelines and honest pricing that make LaundryGo simple, reliable, and fair.",
+      "rule1": {
+        "title": "Fair Per-Pound Rates & $40 Min.",
+        "description": "We bill by actual weight ($2.25/lb Standard, $2.45/lb Go next-day, $3.85/lb Same-day express). A $40 minimum order applies to laundry services."
+      },
+      "rule2": {
+        "title": "Same-Day Cutoff at 12:00 PM",
+        "description": "Need same-day turnaround? Book before 12:00 PM with 'GoFurther' and receive your fresh clothes back the very same day."
+      },
+      "rule3": {
+        "title": "7.5% Recurring Savings",
+        "description": "Set up a daily, weekly, fortnightly, or monthly recurring pickup and get an automatic 7.5% discount on all service rates from your 2nd pickup."
+      },
+      "rule4": {
+        "title": "Denver Metro Coverage",
+        "description": "Free $0 delivery in Central Denver, Lakewood, Englewood, Wheat Ridge, and Arvada. Outer metro areas (Aurora, Thornton, etc.) have a $25 delivery fee."
+      }
+    },
+    "values": {
+      "title": "Why Denver Trusts LaundryGo",
+      "subtitle": "We blend modern convenience with old-fashioned personal care.",
+      "item1": {
+        "title": "Zero Hidden Fees",
+        "description": "Transparent pricing with no surprises. You pay only after your laundry is weighed."
+      },
+      "item2": {
+        "title": "100% Clean Guarantee",
+        "description": "If any item isn't cleaned to your standards, we'll re-wash it immediately at no cost."
+      },
+      "item3": {
+        "title": "Hypoallergenic & Eco-Safe",
+        "description": "We use dermatologically-tested, biodegradable detergents safe for all skin types and fabrics."
+      },
+      "item4": {
+        "title": "Personalized Preferences",
+        "description": "Custom wash temperatures, fragrance options, and special requests honored on every order."
+      }
+    },
+    "cta": {
+      "title": "Ready for Effortless, Fresh Laundry?",
+      "subtitle": "Schedule your pickup in under 60 seconds and let LaundryGo take care of the rest.",
+      "primaryBtn": "Schedule Free Pickup",
+      "secondaryBtn": "View Price Estimator"
+    }
   },
   "footer": {
     "description": "Professional laundry pickup and delivery service in Denver, Colorado.",

@@ -46,6 +46,20 @@ export function Navbar() {
             </Link>
 
             <Link
+              to="/about"
+              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+                isActive('/about')
+                  ? 'text-blue-600'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {t('nav.about')}
+              {isActive('/about') && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full animate-fade-in" />
+              )}
+            </Link>
+
+            <Link
               to="/schedule"
               className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
                 isActive('/schedule')
@@ -131,7 +145,7 @@ export function Navbar() {
               <Link
                 to="/"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center justify-center h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
+                className={`flex items-center justify-center h-10 px-3 rounded-xl text-sm font-bold transition-colors ${
                   isActive('/')
                     ? 'bg-blue-50 text-blue-600 border border-blue-200'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
@@ -140,34 +154,46 @@ export function Navbar() {
                 {t('nav.home')}
               </Link>
 
-              {isAuthenticated ? (
-                <Link
-                  to="/dashboard"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
-                    isActive('/dashboard')
-                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
-                  }`}
-                >
-                  <LayoutDashboard className="w-4 h-4 text-blue-600 shrink-0" />
-                  <span>{t('nav.dashboard')}</span>
-                </Link>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
-                    isActive('/login')
-                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
-                  }`}
-                >
-                  <User className="w-4 h-4 text-slate-500 shrink-0" />
-                  <span>{t('nav.login')}</span>
-                </Link>
-              )}
+              <Link
+                to="/about"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center justify-center h-10 px-3 rounded-xl text-sm font-bold transition-colors ${
+                  isActive('/about')
+                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                }`}
+              >
+                {t('nav.about')}
+              </Link>
             </div>
+
+            {isAuthenticated ? (
+              <Link
+                to="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
+                  isActive('/dashboard')
+                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4 text-blue-600 shrink-0" />
+                <span>{t('nav.dashboard')}</span>
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
+                  isActive('/login')
+                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                }`}
+              >
+                <User className="w-4 h-4 text-slate-500 shrink-0" />
+                <span>{t('nav.login')}</span>
+              </Link>
+            )}
 
             {/* Single Primary Action: Schedule Pickup */}
             <Link

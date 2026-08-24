@@ -5,6 +5,7 @@
   },
   "nav": {
     "home": "Inicio",
+    "about": "Sobre Nosotros",
     "schedule": "Agendar Recolección",
     "login": "Iniciar Sesión",
     "register": "Registrarse",
@@ -56,7 +57,8 @@
       "step4": {
         "title": "Entregamos",
         "description": "Tu ropa fresca y doblada, entregada a ti"
-      }
+      },
+      "learnMore": "Conoce a fondo cómo cuidamos tus prendas y nuestro proceso →"
     },
     "pricing": {
       "title": "Nuestros Servicios",
@@ -286,6 +288,116 @@
     "orderNumber": "Pedido #{{id}}",
     "service": "Servicio",
     "nextPickup": "Siguiente Recolección"
+  },
+  "about": {
+    "badge": "Nuestra Historia y Método en Denver, CO",
+    "hero": {
+      "title": "Cuidamos tu ropa como si fuera nuestra",
+      "subtitle": "LaundryGo es el servicio líder de recolección y entrega de lavandería a domicilio en Denver, Colorado. Transformamos la tediosa tarea del lavado en una experiencia fácil y fresca con cobro por libra, cuidado ecológico y máxima puntualidad.",
+      "cta": "Agendar Recolección Gratis",
+      "secondaryCta": "Conocer Nuestro Proceso"
+    },
+    "mission": {
+      "badge": "Nuestro Propósito",
+      "title": "Más Tiempo Libre, Cero Estrés de Lavandería",
+      "p1": "Nacidos en Denver, creamos LaundryGo con una convicción clara: lavar ropa no debería consumir tus tardes ni tus fines de semana.",
+      "p2": "Ya seas un padre de familia ocupado, un profesional o un negocio local, nos encargamos de todo tu ciclo de lavado y doblado con maquinaria ecológica de alta eficiencia, detergentes biodegradables y recolección y entrega puntual hasta tu puerta.",
+      "stat1Value": "+1,200",
+      "stat1Label": "Pedidos Entregados en Denver",
+      "stat2Value": "4.9 ★",
+      "stat2Label": "Satisfacción de Clientes",
+      "stat3Value": "100%",
+      "stat3Label": "Detergentes Eco y Seguros",
+      "stat4Value": "$0 Inicial",
+      "stat4Label": "Pagas Tras el Pesaje Exacto"
+    },
+    "process": {
+      "badge": "Flujo de Negocio en 5 Pasos",
+      "title": "El Proceso LaundryGo, Paso a Paso",
+      "subtitle": "Desde la puerta de tu casa hasta nuestras instalaciones de lavado ecológico y de vuelta en condiciones impecables.",
+      "step1": {
+        "step": "01",
+        "tag": "Paso 01",
+        "title": "Agendamiento en Línea y Recolección en Puerta",
+        "description": "Elige tu fecha de recolección y selecciona entre la franja de la Mañana (8:00 AM – 11:00 AM) o de la Tarde (12:00 PM – 4:00 PM). Coloca tus bolsas de ropa afuera o entrégaselas a nuestro repartidor. No se requiere pago por adelantado.",
+        "highlight": "Horarios de Mañana y Tarde con envío gratis en la zona central de Denver."
+      },
+      "step2": {
+        "step": "02",
+        "tag": "Paso 02",
+        "title": "Pesaje Transparente y Clasificación Experta",
+        "description": "Al llegar a nuestro centro, cada bolsa es pesada en básculas comerciales calibradas para que solo pagues por el peso exacto de tus prendas. Clasificamos minuciosamente por colores claros, oscuros, blancos y telas delicadas.",
+        "highlight": "Cobro transparente por libra con separación especializada de prendas."
+      },
+      "step3": {
+        "step": "03",
+        "tag": "Paso 03",
+        "title": "Lavado Ecológico y Tratamientos a Medida",
+        "description": "Utilizamos detergentes biodegradables e hipoalergénicos en lavadoras de alta eficiencia. Aplicamos tratamientos opcionales como perlas aromáticas Downy, desmanchado puntual y ciclos especiales para edredones y ropa de cama.",
+        "highlight": "Detergentes eco con potenciadores de aroma y desmanchado opcional."
+      },
+      "step4": {
+        "step": "04",
+        "tag": "Paso 04",
+        "title": "Secado Controlado y Doblado Impecable",
+        "description": "Secamos las prendas con regulación térmica para proteger las fibras y evitar que se encojan. Posteriormente, nuestro equipo dobla cada pieza a mano al estilo boutique y la empaca en empaques protectores higiénicos.",
+        "highlight": "Secado protector y doblado listo para guardar en tu armario."
+      },
+      "step5": {
+        "step": "05",
+        "tag": "Paso 05",
+        "title": "Entrega Puntual de Vuelta en tu Puerta",
+        "description": "Tu ropa limpia, fresca y ordenada se entrega de vuelta en tu domicilio según la velocidad seleccionada: Estándar (2 días), Go (Día siguiente) o GoFurther (Mismo día express si pides antes de las 12:00 PM).",
+        "highlight": "Entrega puntual con seguimiento de estado en tu panel de control."
+      }
+    },
+    "businessRules": {
+      "badge": "Transparencia Total",
+      "title": "Modelo de Negocio y Reglas Clave",
+      "subtitle": "Directrices claras y tarifas honestas para una experiencia simple, justa y predecible.",
+      "rule1": {
+        "title": "Tarifa por Libra y Mínimo de $40",
+        "description": "Cobramos únicamente por el peso de tu ropa ($2.25/lb Estándar, $2.45/lb Go día siguiente, $3.85/lb Mismo día). Aplica una orden mínima de $40 en servicios de lavado."
+      },
+      "rule2": {
+        "title": "Límite de Mismo Día (12:00 PM)",
+        "description": "¿Necesitas tu ropa hoy mismo? Solicita antes de las 12:00 PM con 'GoFurther' y recibe tu ropa limpia el mismo día."
+      },
+      "rule3": {
+        "title": "7.5% de Descuento Recurrente",
+        "description": "Programa recolecciones automáticas diarias, semanales, quincenales o mensuales y obtén un 7.5% de descuento en las tarifas a partir de tu 2da orden."
+      },
+      "rule4": {
+        "title": "Cobertura en Todo Denver Metro",
+        "description": "Envío gratis ($0) en Denver Central, Lakewood, Englewood, Wheat Ridge y Arvada. Ciudades exteriores (Aurora, Thornton, etc.) cuentan con tarifa fija de $25."
+      }
+    },
+    "values": {
+      "title": "¿Por qué Denver Elige LaundryGo?",
+      "subtitle": "Combinamos conveniencia digital con un trato humano y cuidado artesanal.",
+      "item1": {
+        "title": "Sin Cobros Ocultos",
+        "description": "Precios claros y sin sorpresas. Pagas únicamente cuando tu ropa ha sido pesada con precisión."
+      },
+      "item2": {
+        "title": "Garantía de Satisfacción 100%",
+        "description": "Si alguna prenda no queda lavada a tu entera satisfacción, la volvemos a lavar de inmediato sin costo adicional."
+      },
+      "item3": {
+        "title": "Detergentes Hipoalergénicos",
+        "description": "Fórmulas biodegradables y probadas dermatológicamente, seguras para pieles sensibles y bebés."
+      },
+      "item4": {
+        "title": "Preferencias Personalizadas",
+        "description": "Aceptamos notas de lavado especiales, temperaturas personalizadas y aromas a tu gusto en cada pedido."
+      }
+    },
+    "cta": {
+      "title": "¿Listo para Despedirte de Lavar Ropa?",
+      "subtitle": "Programa tu recolección en menos de 60 segundos y deja tu colada en manos de expertos.",
+      "primaryBtn": "Agendar Recolección Gratis",
+      "secondaryBtn": "Calcular Precio de Mi Ropa"
+    }
   },
   "footer": {
     "description": "Servicio profesional de recolección y entrega de lavandería en Denver, Colorado.",

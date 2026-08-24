@@ -108,7 +108,7 @@ LaundryGo/
 ### Arquitectura y Estado
 - **Enrutamiento y Proxy**:
   - `vite.config.ts`: Configura el alias `@` a `./src` y redirige solicitudes `/api` al backend Django (`http://localhost:8000`).
-  - `App.tsx`: Rutas públicas (`/`, `/schedule`, `/login`) y ruta protegida (`/dashboard` envuelta en `ProtectedRoute`).
+  - `App.tsx`: Rutas públicas (`/`, `/about`, `/schedule`, `/login`) y ruta protegida (`/dashboard` envuelta en `ProtectedRoute`).
 - **Cliente API (`src/api/index.ts`)**:
   - Instancia de Axios con interceptores que inyectan el encabezado `Authorization: Bearer <access_token>` almacenado en `localStorage`.
   - Captura errores HTTP 401 para intentar renovar el token transparentemente vía `/auth/token/refresh/`. Si falla la renovación, limpia la sesión y redirige a `/login`.
@@ -116,14 +116,15 @@ LaundryGo/
   - Proporciona el estado del usuario actual, comprobación de token al cargar la aplicación y métodos de `login`, `register` y `logout`.
 
 ### Páginas Principales (`src/pages/`)
-1. **`Home.tsx` (`/`)**: Landing page informativa con sección Hero, explicación del proceso en 4 pasos, tarjetas de precios comparativas ($2.25, $2.45, $3.85), mapa de cobertura en Denver, avisos de orden mínima de $40 y 7.5% de descuento recurrente, y tarjetas de contacto oficial (`info@thelaundrygo.com`, `(720) 590-8632`).
-2. **`Schedule.tsx` (`/schedule`)**: Flujo interactivo de reserva de lavandería organizado en 4 pasos:
+1. **`Home.tsx` (`/`)**: Landing page informativa con sección Hero, resumen ágil del proceso de 4 pasos con enlace a Sobre Nosotros, tarjetas de precios comparativas ($2.25, $2.45, $3.85), calculadora de costos, mapa de cobertura en Denver, avisos de orden mínima de $40 y 7.5% de descuento recurrente, y tarjetas de contacto oficial (`info@thelaundrygo.com`, `(720) 590-8632`).
+2. **`About.tsx` (`/about`)**: Página "Sobre Nosotros" con explicación visual exhaustiva del proceso de negocio en 5 pasos (Agendamiento, Pesaje comercial por libra y clasificación, Lavado ecológico y add-ons, Secado y doblado boutique, Entrega en puerta), misión en Denver, reglas clave de negocio, estándares de calidad y galería con imágenes optimizadas.
+3. **`Schedule.tsx` (`/schedule`)**: Flujo interactivo de reserva de lavandería organizado en 4 pasos:
    - *Paso 1*: Selección de servicio, fecha (extraída dinámicamente de `/schedule/available-dates/`), franja horaria y frecuencia con aviso de descuento del 7.5%.
    - *Paso 2*: Selección de ciudad/zona en Denver (Inner gratis vs Outer $25), dirección y datos de contacto (auto-completados si está autenticado).
    - *Paso 3*: Selección de servicio y **Sistema de Add-ons** (Downy Scent Beads $3.50, Stain Treatment $3.50, Comforter Twin-Full $24.99, Comforter Queen-King $29.99, Pillow $6.99, Mattress cover Twin-Full $11.99, Mattress cover Queen-King $14.99) con cálculo de subtotal en vivo y solicitudes especiales.
    - *Paso 4*: Resumen final de la orden, desglose de tarifas y add-ons, aceptación de términos y confirmación con ID de orden generada. Soporta la opción "Reordenar" desde el Dashboard.
-3. **`Auth.tsx` (`/login`)**: Formulario unificado de inicio de sesión y registro con validaciones dinámicas y gestión de errores.
-4. **`Dashboard.tsx` (`/dashboard`)**: Panel del usuario autenticado dividido en pestañas:
+4. **`Auth.tsx` (`/login`)**: Formulario unificado de inicio de sesión y registro con validaciones dinámicas y gestión de errores.
+5. **`Dashboard.tsx` (`/dashboard`)**: Panel del usuario autenticado dividido en pestañas:
    - *Historial de Órdenes*: Muestra las órdenes activas y pasadas con estado en vivo y botón para "Volver a pedir" (*Reorder*).
    - *Suscripciones Recurrentes*: Administración de planes recurrentes activos.
    - *Perfil de Usuario*: Edición de nombre, teléfono y dirección predeterminada.

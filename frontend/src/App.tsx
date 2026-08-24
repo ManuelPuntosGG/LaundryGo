@@ -6,6 +6,7 @@ import { PageSkeleton } from '@/components/ui/PageSkeleton';
 
 // Code splitting / Lazy-loaded routes for instant initial page paint
 const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })));
+const About = lazy(() => import('@/pages/About').then((m) => ({ default: m.About })));
 const Schedule = lazy(() => import('@/pages/Schedule').then((m) => ({ default: m.Schedule })));
 const Auth = lazy(() => import('@/pages/Auth').then((m) => ({ default: m.Auth })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
@@ -29,6 +30,7 @@ function AppRoutes() {
     <Suspense fallback={<PageSkeleton />}>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/login" element={<Auth />} />
         <Route

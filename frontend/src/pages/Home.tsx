@@ -264,6 +264,16 @@ export function Home() {
             </Card>
           ))}
         </div>
+
+        <div className="flex justify-center pt-1">
+          <Link
+            to="/about"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 bg-blue-50/80 hover:bg-blue-100/80 border border-blue-200/70 px-4 py-2 rounded-xl transition-all hover:scale-102"
+          >
+            <span>{t('home.howItWorks.learnMore')}</span>
+            <ArrowRight className="w-4 h-4 shrink-0" />
+          </Link>
+        </div>
       </section>
 
       {/* 3. Pricing Tiers & Interactive Estimator */}
