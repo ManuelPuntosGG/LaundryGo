@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Exit on error
+set -o errexit
+
+# Install production dependencies
+pip install -r requirements/base.txt
+
+# Collect static files into STATIC_ROOT using WhiteNoise
+python manage.py collectstatic --no-input
+
+# Apply database migrations
+python manage.py migrate
+
+# Seed initial service rates (Standard, Go, GoFurther)
+python manage.py seed_service_rates

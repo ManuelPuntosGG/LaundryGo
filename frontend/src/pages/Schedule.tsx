@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -164,12 +164,12 @@ export function Schedule() {
 
         // Safely choose default rate: Prefer 'standard' ($2.25/lb), or first available
         const defaultRate = ratesList.find((r) => r.service_type === 'standard') || ratesList[0];
-        if (defaultRate && !selectedRate) {
-          setSelectedRate(defaultRate.id);
+        if (defaultRate) {
+          setSelectedRate((prev) => prev || defaultRate.id);
         }
 
-        if (datesList.length > 0 && !selectedDate) {
-          setSelectedDate(datesList[0].date);
+        if (datesList.length > 0) {
+          setSelectedDate((prev) => prev || datesList[0].date);
         }
       } catch (error) {
         console.error('Failed to fetch initial schedule data:', error);
@@ -191,11 +191,11 @@ export function Schedule() {
   const safeRates = Array.isArray(rates) ? rates : [];
   const safeDates = Array.isArray(availableDates) ? availableDates : [];
 
-  const canSelectGoFurther = (date: string) => {
+  const canSelectGoFurther = useCallback((date: string) => {
     if (!date || !Array.isArray(availableDates) || availableDates.length === 0) return true;
     const dateData = availableDates.find((d) => d.date === date);
     return dateData?.gofurther_available ?? true;
-  };
+  }, [availableDates]);
 
   // Keep selectedRate valid and auto-adjust if cutoff restriction is active for selected date
   useEffect(() => {
@@ -222,7 +222,7 @@ export function Schedule() {
         );
       }
     }
-  }, [selectedDate, selectedRate, rates, availableDates, i18n.language]);
+  }, [selectedDate, selectedRate, rates, canSelectGoFurther, i18n.language]);
 
   const availableDateSet = new Set(safeDates.map((d) => d.date));
   const todayStr = new Date().toISOString().split('T')[0];

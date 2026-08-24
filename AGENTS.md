@@ -185,10 +185,37 @@ npm run lint
 
 ---
 
-## 7. Gotchas y Notas para Agentes
+## 7. Despliegue en Producción (Render)
+
+El proyecto incluye soporte nativo para despliegue automatizado en **Render** mediante Infrastructure as Code (`render.yaml`).
+
+### Arquitectura en Render
+1. **PostgreSQL Database (`laundrygo-db`)**: Base de datos gestionada con PostgreSQL 16.
+2. **Backend Web Service (`laundrygo-api`)**: Ejecutado con `gunicorn config.wsgi:application`, WhiteNoise para compresión de estáticos, soporte `DATABASE_URL` y healthcheck en `/api/v1/health/`.
+3. **Frontend Static Site (`laundrygo-web`)**: Compilado con `npm run build`, publicado desde `dist`, con variable de entorno `VITE_API_URL` conectada a la API y regla de reescritura SPA (`/* -> /index.html`).
+
+### Comandos de Construcción
+- **Backend Build (`backend/build.sh`)**:
+  ```bash
+  pip install -r requirements/base.txt
+  python manage.py collectstatic --no-input
+  python manage.py migrate
+  python manage.py seed_service_rates
+  ```
+- **Frontend Build**:
+  ```bash
+  npm install && npm run build
+  ```
+
+---
+
+## 8. Gotchas y Notas para Agentes
 
 - **Archivo `.env` en Backend**: Es imprescindible contar con un archivo `.env` dentro de `backend/` para que Django funcione correctamente. Copiar desde `.env.example`.
 - **Modelo de Usuario Personalizado**: Siempre importar el modelo de usuario utilizando `django.contrib.auth.get_user_model()` o referenciar `settings.AUTH_USER_MODEL`. Nunca importar o usar `django.contrib.auth.models.User` directamente.
 - **Estructura de Apps Backend**: Las carpetas activas de Django están dentro de `backend/apps/`. Las carpetas raíz `backend/users`, `backend/orders` y `backend/core` contienen únicamente adaptadores stub.
 - **Tailwind CSS v4 en Frontend**: Utiliza el plugin `@tailwindcss/vite` y se configura directamente en `src/index.css`. No existe ni debe crearse `tailwind.config.js`.
 - **Traducciones i18n**: Al añadir o editar texto en las vistas, incluir las llaves correspondientes en `public/locales/en/common.json` y `public/locales/es/common.json` usando `useTranslation()`.
+- **Render Static Sites SPA**: Requiere regla de rewrite `/*` hacia `/index.html` para evitar errores 404 al recargar rutas en React Router.
+- **CORS y CSRF en Producción**: En producción, asegurar que `CORS_ALLOWED_ORIGINS` y `CSRF_TRUSTED_ORIGINS` contengan el dominio del frontend y el dominio del backend de Render.
+
