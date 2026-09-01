@@ -56,7 +56,7 @@ LaundryGo/
 ## 3. Backend (`/backend`)
 
 ### Tecnología
-- **Lenguaje / Framework**: Python 3.11+ / Django 5+ / Django REST Framework (DRF).
+- **Lenguaje / Framework**: Python 3.12+ / Django 5+ / Django REST Framework (DRF).
 - **Panel de Administración**: `django-unfold` (Diseño moderno, minimalista, optimizado para Tailwind CSS y responsivo a móviles).
 - **Autenticación**: JSON Web Tokens (JWT) mediante `djangorestframework-simplejwt`.
 - **Variables de Entorno**: Gestionadas con `python-decouple` desde `backend/.env`.
