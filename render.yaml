@@ -7,7 +7,7 @@ services:
     runtime: python
     rootDir: backend
     plan: free
-    buildCommand: "bash build.sh"
+    buildCommand: "./build.sh"
     startCommand: "gunicorn config.wsgi:application"
     healthCheckPath: /api/v1/health/
     envVars:
@@ -51,10 +51,10 @@ services:
   # ============================================================================
   # Frontend Static Site (React 19 + Vite + Tailwind CSS v4)
   # ============================================================================
-  - type: web
+  - type: static
     name: laundrygo-web
-    runtime: static
     rootDir: frontend
+    plan: free
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./dist"
     routes:
