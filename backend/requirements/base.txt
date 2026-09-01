@@ -1,5 +1,5 @@
 Django>=5.0,<7.0
-django-unfold>=0.104.0
+django-unfold>=0.40.0
 djangorestframework>=3.14
 djangorestframework-simplejwt>=5.3
 django-cors-headers>=4.3
