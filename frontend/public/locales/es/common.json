@@ -368,8 +368,8 @@
         "description": "Programa recolecciones automáticas diarias, semanales, quincenales o mensuales y obtén un 7.5% de descuento en las tarifas a partir de tu 2da orden."
       },
       "rule4": {
-        "title": "Cobertura en Todo Denver Metro",
-        "description": "Envío gratis ($0) en Denver Central, Lakewood, Englewood, Wheat Ridge y Arvada. Ciudades exteriores (Aurora, Thornton, etc.) cuentan con tarifa fija de $25."
+        "title": "Cobertura en Denver y Boulder Metro",
+        "description": "Envío gratis ($0) en Denver Central, Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder y Broomfield. Ciudades exteriores (Aurora, Thornton, Centennial, Highlands Ranch) cuentan con tarifa fija de $25."
       }
     },
     "values": {

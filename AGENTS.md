@@ -133,9 +133,9 @@ LaundryGo/
 
 ## 5. Reglas de Negocio Clave
 
-1. **Cálculo de Zonas de Cobertura en Denver**:
-   - **Zona Inner (Gratis - $0.00)**: Denver (Downtown / Central), Lakewood, Englewood, Wheat Ridge, Arvada.
-   - **Zona Outer (Recargo - $25.00)**: Aurora, Thornton, Westminster, Centennial, Highlands Ranch, Broomfield.
+1. **Cálculo de Zonas de Cobertura en Denver y Boulder**:
+   - **Zona Inner (Gratis - $0.00)**: Denver (Downtown / Central), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, Broomfield.
+   - **Zona Outer (Recargo - $25.00)**: Aurora, Thornton, Centennial, Highlands Ranch.
 2. **Restricción de Horario Cutoff (Mismo Día)**:
    - Si la hora local del servidor sobrepasa las 12:00 PM, el servicio express `gofurther` no estará disponible para la fecha de hoy.
 3. **Descuento Recurrente (7.5%)**:

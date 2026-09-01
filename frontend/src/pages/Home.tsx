@@ -443,7 +443,7 @@ export function Home() {
               </span>
             </div>
             <div className="flex flex-wrap gap-1.5 pt-1">
-              {['Denver (Downtown/Central)', 'Lakewood', 'Englewood', 'Wheat Ridge', 'Arvada'].map((area) => (
+              {['Denver (Downtown/Central)', 'Lakewood', 'Englewood', 'Wheat Ridge', 'Arvada', 'Westminster', 'Boulder', 'Broomfield'].map((area) => (
                 <span key={area} className="bg-white text-slate-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-emerald-100 shadow-2xs">
                   {area}
                 </span>
@@ -463,7 +463,7 @@ export function Home() {
               </span>
             </div>
             <div className="flex flex-wrap gap-1.5 pt-1">
-              {['Aurora', 'Thornton', 'Westminster', 'Centennial', 'Highlands Ranch', 'Broomfield'].map((area) => (
+              {['Aurora', 'Thornton', 'Centennial', 'Highlands Ranch'].map((area) => (
                 <span key={area} className="bg-white text-slate-700 text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
                   {area}
                 </span>

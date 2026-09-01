@@ -2,8 +2,10 @@
 # Exit on error
 set -o errexit
 
-# Upgrade pip and install production dependencies
+# Upgrade pip to ensure latest wheel & metadata compatibility
 pip install --upgrade pip
+
+# Install production dependencies
 pip install -r requirements/base.txt
 
 # Collect static files into STATIC_ROOT using WhiteNoise

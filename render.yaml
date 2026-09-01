@@ -51,10 +51,10 @@ services:
   # ============================================================================
   # Frontend Static Site (React 19 + Vite + Tailwind CSS v4)
   # ============================================================================
-  - type: static
+  - type: web
     name: laundrygo-web
+    runtime: static
     rootDir: frontend
-    plan: free
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./dist"
     routes:
@@ -67,7 +67,7 @@ services:
         fromService:
           type: web
           name: laundrygo-api
-          envVarKey: RENDER_EXTERNAL_URL
+          property: host
 
 # ==============================================================================
 # Managed PostgreSQL Database

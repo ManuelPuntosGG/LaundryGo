@@ -368,8 +368,8 @@
         "description": "Set up a daily, weekly, fortnightly, or monthly recurring pickup and get an automatic 7.5% discount on all service rates from your 2nd pickup."
       },
       "rule4": {
-        "title": "Denver Metro Coverage",
-        "description": "Free $0 delivery in Central Denver, Lakewood, Englewood, Wheat Ridge, and Arvada. Outer metro areas (Aurora, Thornton, etc.) have a $25 delivery fee."
+        "title": "Denver & Boulder Metro Coverage",
+        "description": "Free $0 delivery in Central Denver, Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, and Broomfield. Outer metro areas (Aurora, Thornton, Centennial, Highlands Ranch) have a $25 delivery fee."
       }
     },
     "values": {
