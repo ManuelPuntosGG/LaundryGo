@@ -22,6 +22,7 @@ export interface ServiceRate {
   rate_per_lb: string;
   delivery_days: number;
   description: string;
+  is_active?: boolean;
 }
 
 export interface Order {

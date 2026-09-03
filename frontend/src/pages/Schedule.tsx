@@ -37,20 +37,80 @@ import {
 
 type Step = 1 | 2 | 3 | 4;
 
+const DEFAULT_FALLBACK_RATES: ServiceRate[] = [
+  {
+    id: 1,
+    name: 'Standard',
+    service_type: 'standard',
+    rate_per_lb: '2.25',
+    delivery_days: 2,
+    description: 'Standard delivery in 2 business days.',
+    is_active: true,
+  },
+  {
+    id: 2,
+    name: 'Go',
+    service_type: 'go',
+    rate_per_lb: '2.45',
+    delivery_days: 1,
+    description: 'Next day delivery.',
+    is_active: true,
+  },
+  {
+    id: 3,
+    name: 'GoFurther',
+    service_type: 'gofurther',
+    rate_per_lb: '3.85',
+    delivery_days: 0,
+    description: 'Same day delivery for orders placed before 12PM.',
+    is_active: true,
+  },
+];
+
+const getLocalTodayStr = (): string => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getFallbackAvailableDates = (count = 60): AvailableDate[] => {
+  const today = new Date();
+  const currentHour = today.getHours();
+  const list: AvailableDate[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${day}`;
+
+    list.push({
+      date: dateStr,
+      goavailable: true,
+      gofurther_available: i === 0 ? currentHour < 12 : true,
+    });
+  }
+  return list;
+};
+
 export function Schedule() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const { user, isAuthenticated } = useAuthContext();
 
   const [step, setStep] = useState<Step>(1);
-  const [rates, setRates] = useState<ServiceRate[]>([]);
-  const [availableDates, setAvailableDates] = useState<AvailableDate[]>([]);
+  const [rates, setRates] = useState<ServiceRate[]>(DEFAULT_FALLBACK_RATES);
+  const [availableDates, setAvailableDates] = useState<AvailableDate[]>(() => getFallbackAvailableDates(60));
 
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>(() => getLocalTodayStr());
   const [viewMonthDate, setViewMonthDate] = useState<Date>(() => new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<'morning' | 'afternoon'>('morning');
   const [selectedFrequency, setSelectedFrequency] = useState<string>('oneTime');
-  const [selectedRate, setSelectedRate] = useState<number | null>(null);
+  const [selectedRate, setSelectedRate] = useState<number | null>(1);
 
   const [selectedCheckboxAddons, setSelectedCheckboxAddons] = useState<Record<string, boolean>>({
     scent_beads: false,
@@ -144,12 +204,15 @@ export function Schedule() {
 
   // Fetch rates & available dates with safe array extraction & auto-selected first rate
   useEffect(() => {
+    let isMounted = true;
     const fetchData = async () => {
       try {
         const [ratesRes, datesRes] = await Promise.all([
           api.get('/services/rates/'),
           api.get('/schedule/available-dates/'),
         ]);
+
+        if (!isMounted) return;
 
         const ratesList: ServiceRate[] = Array.isArray(ratesRes.data)
           ? ratesRes.data
@@ -159,23 +222,26 @@ export function Schedule() {
           ? datesRes.data
           : (datesRes.data as { results?: AvailableDate[] })?.results || [];
 
-        setRates(ratesList);
-        setAvailableDates(datesList);
-
-        // Safely choose default rate: Prefer 'standard' ($2.25/lb), or first available
-        const defaultRate = ratesList.find((r) => r.service_type === 'standard') || ratesList[0];
-        if (defaultRate) {
-          setSelectedRate((prev) => prev || defaultRate.id);
+        if (ratesList.length > 0) {
+          setRates(ratesList);
+          const defaultRate = ratesList.find((r) => r.service_type === 'standard') || ratesList[0];
+          if (defaultRate) {
+            setSelectedRate((prev) => prev || defaultRate.id);
+          }
         }
 
         if (datesList.length > 0) {
+          setAvailableDates(datesList);
           setSelectedDate((prev) => prev || datesList[0].date);
         }
       } catch (error) {
-        console.error('Failed to fetch initial schedule data:', error);
+        console.warn('Failed to fetch dynamic schedule data from API, using client fallback:', error);
       }
     };
     fetchData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleLocationChange = (cityName: string) => {
@@ -225,7 +291,7 @@ export function Schedule() {
   }, [selectedDate, selectedRate, rates, canSelectGoFurther, i18n.language]);
 
   const availableDateSet = new Set(safeDates.map((d) => d.date));
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getLocalTodayStr();
 
   const year = viewMonthDate.getFullYear();
   const month = viewMonthDate.getMonth();
@@ -703,7 +769,8 @@ export function Schedule() {
                           return <div key={`empty-${idx}`} className="h-10 w-10 sm:h-11 sm:w-11" />;
                         }
 
-                        const isAvailable = availableDateSet.has(cell.dateStr);
+                        const isPast = cell.dateStr < todayStr;
+                        const isAvailable = !isPast && (availableDateSet.size === 0 || availableDateSet.has(cell.dateStr));
                         const isSelected = selectedDate === cell.dateStr;
                         const isToday = cell.dateStr === todayStr;
 
