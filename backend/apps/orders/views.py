@@ -40,6 +40,7 @@ class OrderListCreateView(generics.ListCreateAPIView):
         try:
             from django.core.mail import send_mail
             from django.conf import settings
+            import threading
 
             delivery_fee_str = "FREE ($0.00)" if float(order.delivery_fee) == 0 else f"${order.delivery_fee}"
 
@@ -68,16 +69,23 @@ class OrderListCreateView(generics.ListCreateAPIView):
             if order.customer_email:
                 recipients.append(order.customer_email)
 
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=recipients,
-                fail_silently=True,
-            )
+            def _send_email():
+                try:
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=recipients,
+                        fail_silently=True,
+                    )
+                except Exception as ex:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Background email failed: {ex}")
+
+            threading.Thread(target=_send_email, daemon=True).start()
         except Exception as e:
             import logging
-            logging.getLogger(__name__).error(f"Failed to send email: {e}")
+            logging.getLogger(__name__).error(f"Failed to initiate order notification: {e}")
 
 
 class OrderDetailView(generics.RetrieveUpdateAPIView):
@@ -136,6 +144,7 @@ class OrderCancelView(APIView):
         try:
             from django.core.mail import send_mail
             from django.conf import settings
+            import threading
 
             subject = f"❌ Cancelación de Orden LaundryGo #{order.id}"
             message = (
@@ -153,16 +162,23 @@ class OrderCancelView(APIView):
             if order.customer_email:
                 recipients.append(order.customer_email)
 
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=recipients,
-                fail_silently=True,
-            )
+            def _send_cancel_email():
+                try:
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=recipients,
+                        fail_silently=True,
+                    )
+                except Exception as ex:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Background cancel email failed: {ex}")
+
+            threading.Thread(target=_send_cancel_email, daemon=True).start()
         except Exception as e:
             import logging
-            logging.getLogger(__name__).error(f"Failed to send cancellation email: {e}")
+            logging.getLogger(__name__).error(f"Failed to initiate cancellation email: {e}")
 
         return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
 
