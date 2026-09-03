@@ -132,7 +132,7 @@ class OrderAdmin(ModelAdmin):
         }),
     )
 
-    @display(description=_('Order ID'), header=True)
+    @display(description=_('Order ID'))
     def order_id_display(self, obj):
         return f'#{obj.id}'
 
@@ -152,12 +152,14 @@ class OrderAdmin(ModelAdmin):
 
     @display(description=_('Customer'))
     def customer_display(self, obj):
-        name = obj.customer_name.strip() or 'Guest'
+        name = (obj.customer_name or '').strip() or 'Guest'
         email = obj.customer_email or ''
-        return f'{name} ({email})'
+        return f'{name} ({email})' if email else name
 
     @display(description=_('Service Speed'))
     def service_rate_display(self, obj):
+        if not obj.service_rate:
+            return '—'
         return f'{obj.service_rate.name} (${obj.service_rate.rate_per_lb}/lb)'
 
     @display(description=_('Pickup Schedule'))
@@ -173,11 +175,14 @@ class OrderAdmin(ModelAdmin):
         }
     )
     def delivery_zone_badge(self, obj):
-        zone_label = 'Downtown (Free)' if obj.delivery_zone == 'inner' else f'Outer Zone (+${obj.delivery_fee:.2f})'
-        return obj.delivery_zone, zone_label
+        fee = float(obj.delivery_fee) if obj.delivery_fee is not None else 0.0
+        zone_label = 'Downtown (Free)' if obj.delivery_zone == 'inner' else f'Outer Zone (+${fee:.2f})'
+        return obj.delivery_zone or 'inner', zone_label
 
     @display(description=_('Created'))
     def created_at_display(self, obj):
+        if not obj.created_at:
+            return '—'
         return obj.created_at.strftime('%b %d, %Y %I:%M %p')
 
     # Bulk Actions
