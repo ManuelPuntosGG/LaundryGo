@@ -10,7 +10,12 @@ const getBaseUrl = (): string => {
 
   let clean = envUrl.trim();
 
-  // If host is provided without protocol (e.g. from Render property: host -> 'laundrygo-api-xxx.onrender.com')
+  // If Render internal service name was passed without domain (e.g. 'laundrygo-api')
+  if (clean === 'laundrygo-api' || (!clean.includes('.') && !clean.startsWith('/') && !clean.startsWith('http'))) {
+    clean = 'https://laundrygo-api.onrender.com';
+  }
+
+  // If host is provided without protocol (e.g. 'laundrygo-api.onrender.com')
   if (!clean.startsWith('http://') && !clean.startsWith('https://') && !clean.startsWith('/')) {
     clean = `https://${clean}`;
   }
@@ -53,6 +58,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
+    if (error.code === 'ERR_NETWORK' || !error.response) {
+      console.error(`[API Network Error] Failed to reach: ${error.config?.baseURL || ''}${error.config?.url || ''}`);
+    }
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };

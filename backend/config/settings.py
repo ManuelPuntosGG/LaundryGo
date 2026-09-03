@@ -201,6 +201,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http:\/\/127\.0\.0\.1:\d+$",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 csrf_origins_env = config('CSRF_TRUSTED_ORIGINS', default='')
