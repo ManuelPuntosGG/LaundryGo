@@ -16,3 +16,6 @@ python manage.py migrate
 
 # Seed initial service rates (Standard, Go, GoFurther)
 python manage.py seed_service_rates
+
+# Create default admin superuser if not exists
+python manage.py create_admin
