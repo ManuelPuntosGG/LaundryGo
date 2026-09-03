@@ -122,7 +122,8 @@
     "recurring": "Recurring",
     "daily": "Daily",
     "weekly": "Weekly",
-    "fortnightly": "Fortnightly",
+    "biweekly": "Biweekly",
+    "fortnightly": "Biweekly",
     "monthly": "Monthly",
     "recurringActive": "Active Recurring Subscription (7.5% Discount)",
     "oneTimeDefault": "One-time Service (No recurrence)",
@@ -365,7 +366,7 @@
       },
       "rule3": {
         "title": "7.5% Recurring Savings",
-        "description": "Set up a daily, weekly, fortnightly, or monthly recurring pickup and get an automatic 7.5% discount on all service rates from your 2nd pickup."
+        "description": "Set up a daily, weekly, biweekly, or monthly recurring pickup and get an automatic 7.5% discount on all service rates from your 2nd pickup."
       },
       "rule4": {
         "title": "Denver & Boulder Metro Coverage",

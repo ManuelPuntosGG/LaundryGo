@@ -149,6 +149,30 @@ class OrderManagementTests(TestCase):
         self.assertEqual(schedule.frequency, 'weekly')
         self.assertTrue(schedule.is_active)
 
+    def test_biweekly_recurring_schedule_creation(self):
+        """Test biweekly frequency schedules are created with a 14-day gap."""
+        self.client.force_authenticate(user=self.user)
+        today = timezone.localtime(timezone.now()).date()
+        tomorrow = today + timedelta(days=1)
+
+        payload = {
+            'service_rate': self.standard_rate.id,
+            'pickup_date': tomorrow.isoformat(),
+            'pickup_time_slot': 'morning',
+            'order_details': 'Biweekly towels service',
+            'street_address': self.user.street_address,
+            'city': self.user.city,
+            'zip_code': self.user.zip_code,
+            'frequency': 'biweekly',
+        }
+
+        response = self.client.post(self.orders_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        schedule = RecurringSchedule.objects.get(user=self.user)
+        self.assertEqual(schedule.frequency, 'biweekly')
+        self.assertEqual(schedule.next_pickup_date, tomorrow + timedelta(weeks=2))
+
     def test_past_date_order_rejection(self):
         """Test orders with past pickup dates are rejected."""
         past_date = (timezone.localtime(timezone.now()).date() - timedelta(days=1)).isoformat()

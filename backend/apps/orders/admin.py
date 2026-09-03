@@ -249,6 +249,7 @@ class RecurringScheduleAdmin(ModelAdmin):
         label={
             'daily': 'danger',
             'weekly': 'primary',
+            'biweekly': 'info',
             'fortnightly': 'info',
             'monthly': 'secondary',
         }

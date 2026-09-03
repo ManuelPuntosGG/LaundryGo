@@ -95,7 +95,7 @@ class RecurringSchedule(TimeStampedModel):
     FREQUENCY_CHOICES = [
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),
-        ('fortnightly', 'Fortnightly'),
+        ('biweekly', 'Biweekly'),
         ('monthly', 'Monthly'),
     ]
 

@@ -34,7 +34,8 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             ('oneTime', 'One-time'),
             ('daily', 'Daily'),
             ('weekly', 'Weekly'),
-            ('fortnightly', 'Fortnightly'),
+            ('biweekly', 'Biweekly'),
+            ('fortnightly', 'Biweekly'),
             ('monthly', 'Monthly'),
         ],
         required=False,
@@ -122,21 +123,22 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         if frequency and frequency != 'oneTime' and user.is_authenticated:
             from datetime import timedelta
             
+            normalized_frequency = 'biweekly' if frequency == 'fortnightly' else frequency
             pickup_date = order.pickup_date
             next_date = pickup_date
-            if frequency == 'daily':
+            if normalized_frequency == 'daily':
                 next_date += timedelta(days=1)
-            elif frequency == 'weekly':
+            elif normalized_frequency == 'weekly':
                 next_date += timedelta(weeks=1)
-            elif frequency == 'fortnightly':
+            elif normalized_frequency == 'biweekly':
                 next_date += timedelta(weeks=2)
-            elif frequency == 'monthly':
+            elif normalized_frequency == 'monthly':
                 next_date += timedelta(days=30)
 
             RecurringSchedule.objects.create(
                 user=user,
                 order=order,
-                frequency=frequency,
+                frequency=normalized_frequency,
                 is_active=True,
                 next_pickup_date=next_date
             )

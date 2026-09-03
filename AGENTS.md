@@ -80,7 +80,7 @@ LaundryGo/
 - **Modelos**:
   1. `ServiceRate`: Tarifas de servicio por libra (`standard` - 2 días a $2.25/lb, `go` - siguiente día a $2.45/lb, `gofurther` - mismo día a $3.85/lb).
   2. `Order`: Registro de pedidos. Soporta tanto usuarios autenticados (`user`) como invitados (`guest_email`, `guest_first_name`, `guest_last_name`, `guest_phone`). Incluye dirección, zona de entrega (`inner` tarifa $0 / `outer` tarifa $25), `pickup_date`, `pickup_time_slot` (`morning` 8-11 AM / `afternoon` 12-4 PM), estado de la orden (`pending`, `confirmed`, `processing`, `ready`, `delivered`, `cancelled`).
-  3. `RecurringSchedule`: Suscripciones asociadas a órdenes (`daily`, `weekly`, `fortnightly`, `monthly`) con fecha calculada del siguiente pedido.
+  3. `RecurringSchedule`: Suscripciones asociadas a órdenes (`daily`, `weekly`, `biweekly`, `monthly`) con fecha calculada del siguiente pedido.
 - **Lógica de Negocio Destacada**:
   - **Límite de Hora Express**: El servicio mismo día (`gofurther`) sólo está disponible para el día de hoy si la orden se realiza antes de las 12:00 PM.
   - **Validación de Fechas**: No se permiten recolecciones en fechas pasadas.

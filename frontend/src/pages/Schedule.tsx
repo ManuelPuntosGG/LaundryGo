@@ -836,7 +836,7 @@ export function Schedule() {
                     {[
                       { value: 'daily', label: t('schedule.daily') },
                       { value: 'weekly', label: t('schedule.weekly') },
-                      { value: 'fortnightly', label: t('schedule.fortnightly') },
+                      { value: 'biweekly', label: t('schedule.biweekly') },
                       { value: 'monthly', label: t('schedule.monthly') },
                     ].map((freq) => {
                       const isSelected = selectedFrequency === freq.value;

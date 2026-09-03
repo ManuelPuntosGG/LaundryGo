@@ -56,7 +56,7 @@ export interface RecurringSchedule {
   id: number;
   user: number;
   order: number;
-  frequency: 'daily' | 'weekly' | 'fortnightly' | 'monthly';
+  frequency: 'daily' | 'weekly' | 'biweekly' | 'fortnightly' | 'monthly';
   is_active: boolean;
   next_pickup_date: string;
   order_detail: Order;
