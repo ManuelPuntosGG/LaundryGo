@@ -487,10 +487,13 @@ export function Schedule() {
         delivery_zone: selectedLocation.zone,
         delivery_fee: selectedLocation.fee,
       });
-      if (res.data?.id) {
+
+      if (res.data && res.data.id) {
         setCreatedOrderId(res.data.id);
+        setIsSuccess(true);
+      } else {
+        throw new Error('Failed to obtain a valid order ID from server.');
       }
-      setIsSuccess(true);
     } catch (error: any) {
       console.error('Failed to submit order:', error.response?.data || error);
       const data = error.response?.data;

@@ -1,7 +1,34 @@
 import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
-const rawApiUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/+$/, '') : '';
-const API_BASE_URL = `${rawApiUrl}/api/v1`;
+// Safely normalize VITE_API_URL across local and production (Render) environments
+const getBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl || typeof envUrl !== 'string' || !envUrl.trim()) {
+    // In local development, use relative '/api/v1' which is proxied by Vite
+    return '/api/v1';
+  }
+
+  let clean = envUrl.trim();
+
+  // If host is provided without protocol (e.g. from Render property: host -> 'laundrygo-api-xxx.onrender.com')
+  if (!clean.startsWith('http://') && !clean.startsWith('https://') && !clean.startsWith('/')) {
+    clean = `https://${clean}`;
+  }
+
+  // Remove trailing slashes
+  clean = clean.replace(/\/+$/, '');
+
+  // Ensure /api/v1 suffix is present without duplication
+  if (clean.endsWith('/api/v1')) {
+    return clean;
+  }
+  if (clean.endsWith('/api')) {
+    return `${clean}/v1`;
+  }
+  return `${clean}/api/v1`;
+};
+
+const API_BASE_URL = getBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -57,11 +57,19 @@ export function Dashboard() {
     const fetchData = async () => {
       try {
         const [ordersRes, recurringRes] = await Promise.all([
-          api.get<PaginatedResponse<Order>>('/orders/'),
-          api.get<PaginatedResponse<RecurringSchedule>>('/recurring/'),
+          api.get<PaginatedResponse<Order> | Order[]>('/orders/'),
+          api.get<PaginatedResponse<RecurringSchedule> | RecurringSchedule[]>('/recurring/'),
         ]);
-        setOrders(ordersRes.data.results || []);
-        setRecurring(recurringRes.data.results || []);
+
+        const ordersData = Array.isArray(ordersRes.data)
+          ? ordersRes.data
+          : (ordersRes.data as PaginatedResponse<Order>)?.results || [];
+        const recurringData = Array.isArray(recurringRes.data)
+          ? recurringRes.data
+          : (recurringRes.data as PaginatedResponse<RecurringSchedule>)?.results || [];
+
+        setOrders(ordersData);
+        setRecurring(recurringData);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       } finally {
