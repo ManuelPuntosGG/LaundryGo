@@ -84,8 +84,7 @@ class Command(BaseCommand):
         # Fallback to SMTP
         if "console" in settings.EMAIL_BACKEND.lower():
             self.stdout.write(self.style.WARNING("[NOTICE] EMAIL_BACKEND is set to Console backend."))
-            self.stdout.write(self.style.WARNING("   Emails are printed to stdout, not delivered over the internet."))
-            self.stdout.write(self.style.WARNING("   To send real emails on Render, set RESEND_API_KEY in your environment."))
+            self.stdout.write(self.style.WARNING("   To send real emails, set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in your environment."))
 
         if "smtp" in settings.EMAIL_BACKEND.lower():
             self.stdout.write(f"1. Testing TCP socket connection to {settings.EMAIL_HOST}:{settings.EMAIL_PORT}...")
@@ -98,14 +97,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("   [OK] TCP socket connected successfully!"))
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"   [ERROR] TCP connection failed: {e}"))
-                if "101" in str(e) or "unreachable" in str(e).lower():
-                    self.stdout.write(self.style.WARNING("   " + "=" * 56))
-                    self.stdout.write(self.style.WARNING("   CRITICAL: Render Free Tier BLOCKS outbound SMTP ports 25, 465, 587!"))
-                    self.stdout.write(self.style.WARNING("   To fix this without paying for Render Starter:"))
-                    self.stdout.write(self.style.WARNING("   1. Create a free account at https://resend.com (3,000 emails/mo free)."))
-                    self.stdout.write(self.style.WARNING("   2. Add RESEND_API_KEY in your Render Dashboard Environment."))
-                    self.stdout.write(self.style.WARNING("   Resend uses HTTPS (Port 443) which Render never blocks."))
-                    self.stdout.write(self.style.WARNING("   " + "=" * 56))
                 return
 
             self.stdout.write("2. Testing SMTP connection & authentication handshake...")

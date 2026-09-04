@@ -1,8 +1,20 @@
 import os
+import socket
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
 import dj_database_url
+
+# Force IPv4 socket resolution globally on cloud containers (Render/Linux)
+# Prevents [Errno 101] Network is unreachable when DNS returns IPv6 addresses without IPv6 gateway route
+_orig_getaddrinfo = socket.getaddrinfo
+
+def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    if family == 0 or family == socket.AF_UNSPEC:
+        family = socket.AF_INET
+    return _orig_getaddrinfo(host, port, family, type, proto, flags)
+
+socket.getaddrinfo = _ipv4_only_getaddrinfo
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
