@@ -486,6 +486,7 @@ export function Schedule() {
         zip_code: formData.zip_code.trim(),
         delivery_zone: selectedLocation.zone,
         delivery_fee: selectedLocation.fee,
+        language: i18n.language?.startsWith('es') ? 'es' : 'en',
       });
 
       if (res.data && res.data.id) {

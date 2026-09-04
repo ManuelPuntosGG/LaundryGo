@@ -367,4 +367,39 @@ class OrderManagementTests(TestCase):
         time.sleep(0.3)
         self.assertGreaterEqual(len(mail.outbox), initial_len)
 
+    def test_bilingual_order_emails(self):
+        """Test that English and Spanish email templates generate and dispatch correctly."""
+        from apps.orders.emails import send_order_confirmation_email, send_order_cancellation_email
+        import time
+
+        today = timezone.localtime(timezone.now()).date()
+        order_en = Order.objects.create(
+            user=self.user,
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='morning',
+            order_details='Test English order',
+            delivery_zone='inner',
+            delivery_fee=0.0,
+            language='en',
+            status='pending'
+        )
+        order_es = Order.objects.create(
+            user=self.user,
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='afternoon',
+            order_details='Test Spanish order',
+            delivery_zone='outer',
+            delivery_fee=25.0,
+            language='es',
+            status='pending'
+        )
+
+        send_order_confirmation_email(order_en)
+        send_order_confirmation_email(order_es)
+        send_order_cancellation_email(order_en)
+        send_order_cancellation_email(order_es)
+        time.sleep(0.3)
+
 

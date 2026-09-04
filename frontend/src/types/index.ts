@@ -46,6 +46,7 @@ export interface Order {
   order_details: string;
   pickup_instructions: string;
   status: 'pending' | 'confirmed' | 'processing' | 'ready' | 'delivered' | 'cancelled';
+  language?: 'en' | 'es';
   customer_name: string;
   customer_email: string;
   created_at: string;

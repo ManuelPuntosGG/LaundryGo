@@ -64,12 +64,18 @@ class Order(TimeStampedModel):
     delivery_zone = models.CharField(max_length=20, choices=ZONE_CHOICES, default='inner')
     delivery_fee = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
 
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('es', 'Spanish'),
+    ]
+
     service_rate = models.ForeignKey(ServiceRate, on_delete=models.PROTECT, related_name='orders')
     pickup_date = models.DateField()
     pickup_time_slot = models.CharField(max_length=20, choices=TIME_SLOT_CHOICES)
     order_details = models.TextField(help_text='Details about the laundry order')
     pickup_instructions = models.TextField(blank=True, help_text='Special instructions for pickup')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='en', blank=True)
 
     class Meta:
         verbose_name = 'Order'

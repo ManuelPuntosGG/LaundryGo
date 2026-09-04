@@ -257,7 +257,7 @@ EMAIL_HOST_USER = raw_email_user
 EMAIL_HOST_PASSWORD = raw_email_pass
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=(EMAIL_PORT == 587), cast=bool)
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=(EMAIL_PORT == 465), cast=bool)
-EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=5, cast=int)
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=15, cast=int)
 
 # Default From: If using personal Gmail, From address should match authenticated user to avoid SMTP 550
 configured_from = config('DEFAULT_FROM_EMAIL', default='').strip().strip('\'"')

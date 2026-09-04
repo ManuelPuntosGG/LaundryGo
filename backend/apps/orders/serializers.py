@@ -23,7 +23,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'street_address', 'city', 'zip_code', 'delivery_zone', 'delivery_fee',
             'service_rate', 'service_name', 'service_type', 'rate_per_lb',
             'pickup_date', 'pickup_time_slot', 'order_details', 'pickup_instructions',
-            'status', 'customer_name', 'customer_email', 'created_at', 'updated_at'
+            'status', 'language', 'customer_name', 'customer_email', 'created_at', 'updated_at'
         )
         read_only_fields = ('id', 'user', 'status', 'created_at', 'updated_at')
 
@@ -53,6 +53,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     zip_code = serializers.CharField(required=False, allow_blank=True, default='')
     delivery_zone = serializers.CharField(required=False, allow_blank=True, default='inner')
     delivery_fee = serializers.DecimalField(max_digits=6, decimal_places=2, required=False, default=0.00)
+    language = serializers.CharField(required=False, default='en')
 
     class Meta:
         model = Order
@@ -61,7 +62,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'order_details', 'pickup_instructions',
             'guest_email', 'guest_first_name', 'guest_last_name', 'guest_phone',
             'street_address', 'city', 'zip_code', 'delivery_zone', 'delivery_fee',
-            'frequency'
+            'language', 'frequency'
         )
         read_only_fields = ('id',)
 
@@ -117,6 +118,15 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if user.is_authenticated:
             validated_data['user'] = user
+
+        # Normalize language preference (fallback to Accept-Language request header)
+        req = self.context.get('request')
+        lang = validated_data.get('language')
+        if not lang and req:
+            accept_lang = req.headers.get('Accept-Language', '').lower()
+            validated_data['language'] = 'es' if accept_lang.startswith('es') or 'es-' in accept_lang else 'en'
+        elif lang:
+            validated_data['language'] = 'es' if str(lang).lower().startswith('es') else 'en'
 
         order = super().create(validated_data)
 
