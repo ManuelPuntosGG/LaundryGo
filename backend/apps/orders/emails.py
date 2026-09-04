@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 import threading
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -6,10 +6,135 @@ from django.core.mail import EmailMultiAlternatives
 logger = logging.getLogger(__name__)
 
 
+def _send_via_resend(api_key, from_email, recipients, subject, html_content, text_content=None, reply_to=None):
+    import json
+    import urllib.request
+    import urllib.error
+
+    url = "https://api.resend.com/emails"
+    payload = {
+        "from": from_email or "LaundryGo <onboarding@resend.dev>",
+        "to": recipients if isinstance(recipients, list) else [recipients],
+        "subject": subject,
+        "html": html_content,
+    }
+    if text_content:
+        payload["text"] = text_content
+    if reply_to:
+        payload["reply_to"] = reply_to
+
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "LaundryGo-Backend/1.0",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        err_msg = e.read().decode("utf-8")
+        raise RuntimeError(f"Resend HTTP {e.code}: {err_msg}")
+
+
+def _send_via_sendgrid(api_key, from_email, recipients, subject, html_content, text_content=None, reply_to=None):
+    import json
+    import urllib.request
+    import urllib.error
+
+    url = "https://api.sendgrid.com/v3/mail/send"
+    sender_name = "LaundryGo"
+    sender_email = from_email or "info@thelaundrygo.com"
+    if "<" in sender_email and ">" in sender_email:
+        sender_name = sender_email.split("<")[0].strip() or "LaundryGo"
+        sender_email = sender_email.split("<")[1].split(">")[0].strip()
+
+    to_list = [{"email": r} for r in (recipients if isinstance(recipients, list) else [recipients])]
+    content = []
+    if text_content:
+        content.append({"type": "text/plain", "value": text_content})
+    if html_content:
+        content.append({"type": "text/html", "value": html_content})
+
+    payload = {
+        "personalizations": [{"to": to_list}],
+        "from": {"email": sender_email, "name": sender_name},
+        "subject": subject,
+        "content": content,
+    }
+    if reply_to:
+        payload["reply_to"] = {"email": reply_to}
+
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "LaundryGo-Backend/1.0",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return {"status": resp.status}
+    except urllib.error.HTTPError as e:
+        err_msg = e.read().decode("utf-8")
+        raise RuntimeError(f"SendGrid HTTP {e.code}: {err_msg}")
+
+
 def _send_mail_worker(subject, text_content, html_content, recipients, reply_to=None):
     """
-    Background worker that sends EmailMultiAlternatives with full error logging.
+    Background worker that sends emails via HTTPS API (Resend / SendGrid) if configured,
+    or falls back to Django EmailMultiAlternatives (SMTP / Console).
     """
+    # 1. Resend REST API (HTTPS Port 443 - Bypasses Render Free SMTP port blocks)
+    resend_api_key = getattr(settings, "RESEND_API_KEY", None)
+    if resend_api_key:
+        try:
+            from_email = settings.DEFAULT_FROM_EMAIL
+            result = _send_via_resend(
+                resend_api_key,
+                from_email,
+                recipients,
+                subject,
+                html_content,
+                text_content,
+                reply_to,
+            )
+            logger.info(f"[EMAIL SUCCESS - RESEND API] Sent '{subject}' to {recipients}: {result}")
+            return
+        except Exception as ex:
+            logger.error(f"[EMAIL FAILURE - RESEND API] Failed sending to {recipients}: {ex}", exc_info=True)
+            return
+
+    # 2. SendGrid REST API (HTTPS Port 443)
+    sendgrid_api_key = getattr(settings, "SENDGRID_API_KEY", None)
+    if sendgrid_api_key:
+        try:
+            from_email = settings.DEFAULT_FROM_EMAIL
+            result = _send_via_sendgrid(
+                sendgrid_api_key,
+                from_email,
+                recipients,
+                subject,
+                html_content,
+                text_content,
+                reply_to,
+            )
+            logger.info(f"[EMAIL SUCCESS - SENDGRID API] Sent '{subject}' to {recipients}: {result}")
+            return
+        except Exception as ex:
+            logger.error(f"[EMAIL FAILURE - SENDGRID API] Failed sending to {recipients}: {ex}", exc_info=True)
+            return
+
+    # 3. Fallback to standard Django Email Backend (SMTP or Console)
     try:
         from_email = settings.DEFAULT_FROM_EMAIL
         reply_to_list = [reply_to] if reply_to else [settings.ADMIN_EMAIL]
@@ -24,14 +149,13 @@ def _send_mail_worker(subject, text_content, html_content, recipients, reply_to=
         if html_content:
             msg.attach_alternative(html_content, "text/html")
 
-        # Set fail_silently=False so errors are caught by this try-except block
         sent_count = msg.send(fail_silently=False)
         logger.info(
-            f"[EMAIL SUCCESS] Successfully sent '{subject}' to {recipients} (delivered: {sent_count})"
+            f"[EMAIL SUCCESS - SMTP/CONSOLE] Successfully sent '{subject}' to {recipients} (delivered: {sent_count})"
         )
     except Exception as ex:
         logger.error(
-            f"[EMAIL FAILURE] Failed to send '{subject}' to {recipients}: {ex}",
+            f"[EMAIL FAILURE - SMTP/CONSOLE] Failed to send '{subject}' to {recipients}: {ex}",
             exc_info=True,
         )
 

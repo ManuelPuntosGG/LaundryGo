@@ -258,6 +258,10 @@ else:
 
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@thelaundrygo.com')
 
+# Transactional Email APIs (HTTPS Port 443 - Bypasses Render Free SMTP port blocks)
+RESEND_API_KEY = config('RESEND_API_KEY', default='').strip().strip('\'"')
+SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='').strip().strip('\'"')
+
 # Django Unfold Configuration
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _

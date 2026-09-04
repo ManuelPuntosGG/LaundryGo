@@ -1,4 +1,4 @@
-﻿import socket
+import socket
 from django.core.management.base import BaseCommand
 from django.core.mail import get_connection, send_mail
 from django.conf import settings
@@ -30,13 +30,62 @@ class Command(BaseCommand):
         self.stdout.write(f"- EMAIL_TIMEOUT:       {getattr(settings, 'EMAIL_TIMEOUT', 15)}s")
         self.stdout.write(f"- DEFAULT_FROM_EMAIL:  {settings.DEFAULT_FROM_EMAIL}")
         self.stdout.write(f"- ADMIN_EMAIL:         {settings.ADMIN_EMAIL}")
+        self.stdout.write(f"- RESEND_API_KEY:      {'*' * 8 if getattr(settings, 'RESEND_API_KEY', '') else '(Not set)'}")
+        self.stdout.write(f"- SENDGRID_API_KEY:    {'*' * 8 if getattr(settings, 'SENDGRID_API_KEY', '') else '(Not set)'}")
         self.stdout.write(f"- Target Recipient:    {recipient}")
         self.stdout.write(self.style.NOTICE("-" * 60))
 
+        # Check Resend API First (Primary for Render Cloud)
+        resend_key = getattr(settings, "RESEND_API_KEY", "")
+        if resend_key:
+            self.stdout.write("[MODE] Using Resend REST API over HTTPS (Port 443 - Fully compatible with Render Free Tier)")
+            self.stdout.write("1. Sending test email via https://api.resend.com/emails...")
+            from apps.orders.emails import _send_via_resend
+            try:
+                result = _send_via_resend(
+                    resend_key,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [recipient],
+                    "LaundryGo - Email System Diagnostic (Resend API)",
+                    "<h3>LaundryGo Diagnostic</h3><p>Your email system is 100% operational via Resend API!</p>",
+                    "LaundryGo Diagnostic: Your email system is operational via Resend API!",
+                    settings.ADMIN_EMAIL,
+                )
+                self.stdout.write(self.style.SUCCESS(f"   [SUCCESS] Resend accepted message: {result}"))
+                self.stdout.write(self.style.SUCCESS(f"   🎉 Check the inbox at {recipient}!"))
+                return
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"   [ERROR] Resend API failed: {e}"))
+                return
+
+        # Check SendGrid API
+        sendgrid_key = getattr(settings, "SENDGRID_API_KEY", "")
+        if sendgrid_key:
+            self.stdout.write("[MODE] Using SendGrid REST API over HTTPS (Port 443)")
+            self.stdout.write("1. Sending test email via https://api.sendgrid.com/v3/mail/send...")
+            from apps.orders.emails import _send_via_sendgrid
+            try:
+                result = _send_via_sendgrid(
+                    sendgrid_key,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [recipient],
+                    "LaundryGo - Email System Diagnostic (SendGrid API)",
+                    "<h3>LaundryGo Diagnostic</h3><p>Your email system is 100% operational via SendGrid API!</p>",
+                    "LaundryGo Diagnostic: Your email system is operational via SendGrid API!",
+                    settings.ADMIN_EMAIL,
+                )
+                self.stdout.write(self.style.SUCCESS(f"   [SUCCESS] SendGrid accepted message: {result}"))
+                self.stdout.write(self.style.SUCCESS(f"   🎉 Check the inbox at {recipient}!"))
+                return
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"   [ERROR] SendGrid API failed: {e}"))
+                return
+
+        # Fallback to SMTP
         if "console" in settings.EMAIL_BACKEND.lower():
             self.stdout.write(self.style.WARNING("[NOTICE] EMAIL_BACKEND is set to Console backend."))
             self.stdout.write(self.style.WARNING("   Emails are printed to stdout, not delivered over the internet."))
-            self.stdout.write(self.style.WARNING("   To send real emails, set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in your environment."))
+            self.stdout.write(self.style.WARNING("   To send real emails on Render, set RESEND_API_KEY in your environment."))
 
         if "smtp" in settings.EMAIL_BACKEND.lower():
             self.stdout.write(f"1. Testing TCP socket connection to {settings.EMAIL_HOST}:{settings.EMAIL_PORT}...")
@@ -49,7 +98,14 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("   [OK] TCP socket connected successfully!"))
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"   [ERROR] TCP connection failed: {e}"))
-                self.stdout.write(self.style.NOTICE("   Hint: Render free tier or hosting firewall may block outbound port."))
+                if "101" in str(e) or "unreachable" in str(e).lower():
+                    self.stdout.write(self.style.WARNING("   " + "=" * 56))
+                    self.stdout.write(self.style.WARNING("   CRITICAL: Render Free Tier BLOCKS outbound SMTP ports 25, 465, 587!"))
+                    self.stdout.write(self.style.WARNING("   To fix this without paying for Render Starter:"))
+                    self.stdout.write(self.style.WARNING("   1. Create a free account at https://resend.com (3,000 emails/mo free)."))
+                    self.stdout.write(self.style.WARNING("   2. Add RESEND_API_KEY in your Render Dashboard Environment."))
+                    self.stdout.write(self.style.WARNING("   Resend uses HTTPS (Port 443) which Render never blocks."))
+                    self.stdout.write(self.style.WARNING("   " + "=" * 56))
                 return
 
             self.stdout.write("2. Testing SMTP connection & authentication handshake...")
