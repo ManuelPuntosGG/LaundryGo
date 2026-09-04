@@ -35,53 +35,7 @@ class Command(BaseCommand):
         self.stdout.write(f"- Target Recipient:    {recipient}")
         self.stdout.write(self.style.NOTICE("-" * 60))
 
-        # Check Resend API First (Primary for Render Cloud)
-        resend_key = getattr(settings, "RESEND_API_KEY", "")
-        if resend_key:
-            self.stdout.write("[MODE] Using Resend REST API over HTTPS (Port 443 - Fully compatible with Render Free Tier)")
-            self.stdout.write("1. Sending test email via https://api.resend.com/emails...")
-            from apps.orders.emails import _send_via_resend
-            try:
-                result = _send_via_resend(
-                    resend_key,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [recipient],
-                    "LaundryGo - Email System Diagnostic (Resend API)",
-                    "<h3>LaundryGo Diagnostic</h3><p>Your email system is 100% operational via Resend API!</p>",
-                    "LaundryGo Diagnostic: Your email system is operational via Resend API!",
-                    settings.ADMIN_EMAIL,
-                )
-                self.stdout.write(self.style.SUCCESS(f"   [SUCCESS] Resend accepted message: {result}"))
-                self.stdout.write(self.style.SUCCESS(f"   🎉 Check the inbox at {recipient}!"))
-                return
-            except Exception as e:
-                self.stdout.write(self.style.ERROR(f"   [ERROR] Resend API failed: {e}"))
-                return
-
-        # Check SendGrid API
-        sendgrid_key = getattr(settings, "SENDGRID_API_KEY", "")
-        if sendgrid_key:
-            self.stdout.write("[MODE] Using SendGrid REST API over HTTPS (Port 443)")
-            self.stdout.write("1. Sending test email via https://api.sendgrid.com/v3/mail/send...")
-            from apps.orders.emails import _send_via_sendgrid
-            try:
-                result = _send_via_sendgrid(
-                    sendgrid_key,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [recipient],
-                    "LaundryGo - Email System Diagnostic (SendGrid API)",
-                    "<h3>LaundryGo Diagnostic</h3><p>Your email system is 100% operational via SendGrid API!</p>",
-                    "LaundryGo Diagnostic: Your email system is operational via SendGrid API!",
-                    settings.ADMIN_EMAIL,
-                )
-                self.stdout.write(self.style.SUCCESS(f"   [SUCCESS] SendGrid accepted message: {result}"))
-                self.stdout.write(self.style.SUCCESS(f"   🎉 Check the inbox at {recipient}!"))
-                return
-            except Exception as e:
-                self.stdout.write(self.style.ERROR(f"   [ERROR] SendGrid API failed: {e}"))
-                return
-
-        # Fallback to SMTP
+        # 1. Console Backend Notice
         if "console" in settings.EMAIL_BACKEND.lower():
             self.stdout.write(self.style.WARNING("[NOTICE] EMAIL_BACKEND is set to Console backend."))
             self.stdout.write(self.style.WARNING("   To send real emails, set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in your environment."))

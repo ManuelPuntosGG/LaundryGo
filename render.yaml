@@ -47,8 +47,6 @@ services:
         value: "LaundryGo <info@thelaundrygo.com>"
       - key: ADMIN_EMAIL
         value: "info@thelaundrygo.com"
-      - key: RESEND_API_KEY
-        sync: false
 
   # ============================================================================
   # Frontend Static Site (React 19 + Vite + Tailwind CSS v4)
