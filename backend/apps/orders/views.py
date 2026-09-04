@@ -36,56 +36,8 @@ class OrderListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         order = serializer.save()
-
-        try:
-            from django.core.mail import send_mail
-            from django.conf import settings
-            import threading
-
-            delivery_fee_str = "FREE ($0.00)" if float(order.delivery_fee) == 0 else f"${order.delivery_fee}"
-
-            subject = f"🔔 Nueva Solicitud de Recolección LaundryGo #{order.id}"
-            message = (
-                f"¡Se ha realizado un nuevo pedido de recolección en LaundryGo!\n\n"
-                f"----------------------------------------\n"
-                f"DATOS DE LA ORDEN #{order.id}\n"
-                f"----------------------------------------\n"
-                f"• Cliente: {order.customer_name}\n"
-                f"• Correo: {order.customer_email}\n"
-                f"• Teléfono: {order.guest_phone or (order.user.phone if order.user else 'N/A')}\n"
-                f"• Dirección: {order.street_address}, {order.city} {order.zip_code}\n"
-                f"• Tarifa de Envío: {delivery_fee_str} (Zona: {order.delivery_zone})\n\n"
-                f"----------------------------------------\n"
-                f"DETALLES DEL SERVICIO\n"
-                f"----------------------------------------\n"
-                f"• Servicio: {order.service_rate.name} (${order.service_rate.rate_per_lb}/lb)\n"
-                f"• Fecha de Recolección: {order.pickup_date}\n"
-                f"• Horario: {order.get_pickup_time_slot_display()}\n"
-                f"• Detalles del Pedido: {order.order_details}\n"
-                f"• Instrucciones Especiales: {order.pickup_instructions or 'Ninguna'}\n\n"
-                f"Por favor ponerse en contacto con el cliente para confirmar la recolección.\n"
-            )
-            recipients = [settings.ADMIN_EMAIL]
-            if order.customer_email:
-                recipients.append(order.customer_email)
-
-            def _send_email():
-                try:
-                    send_mail(
-                        subject=subject,
-                        message=message,
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=recipients,
-                        fail_silently=True,
-                    )
-                except Exception as ex:
-                    import logging
-                    logging.getLogger(__name__).warning(f"Background email failed: {ex}")
-
-            threading.Thread(target=_send_email, daemon=True).start()
-        except Exception as e:
-            import logging
-            logging.getLogger(__name__).error(f"Failed to initiate order notification: {e}")
+        from .emails import send_order_confirmation_email
+        send_order_confirmation_email(order)
 
 
 class OrderDetailView(generics.RetrieveUpdateAPIView):
@@ -141,44 +93,8 @@ class OrderCancelView(APIView):
             order.recurring_schedule.save()
 
         # Send cancellation notification email
-        try:
-            from django.core.mail import send_mail
-            from django.conf import settings
-            import threading
-
-            subject = f"❌ Cancelación de Orden LaundryGo #{order.id}"
-            message = (
-                f"La orden #{order.id} ha sido cancelada por el cliente.\n\n"
-                f"----------------------------------------\n"
-                f"DATOS DE LA ORDEN CANCELADA\n"
-                f"----------------------------------------\n"
-                f"• Cliente: {order.customer_name}\n"
-                f"• Correo: {order.customer_email}\n"
-                f"• Servicio: {order.service_rate.name}\n"
-                f"• Fecha programada: {order.pickup_date} ({order.get_pickup_time_slot_display()})\n"
-                f"• Estado actual: Cancelada\n"
-            )
-            recipients = [settings.ADMIN_EMAIL]
-            if order.customer_email:
-                recipients.append(order.customer_email)
-
-            def _send_cancel_email():
-                try:
-                    send_mail(
-                        subject=subject,
-                        message=message,
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=recipients,
-                        fail_silently=True,
-                    )
-                except Exception as ex:
-                    import logging
-                    logging.getLogger(__name__).warning(f"Background cancel email failed: {ex}")
-
-            threading.Thread(target=_send_cancel_email, daemon=True).start()
-        except Exception as e:
-            import logging
-            logging.getLogger(__name__).error(f"Failed to initiate cancellation email: {e}")
+        from .emails import send_order_cancellation_email
+        send_order_cancellation_email(order)
 
         return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
 

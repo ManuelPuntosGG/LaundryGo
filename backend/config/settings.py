@@ -230,22 +230,32 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Email Configuration
-email_user = config('EMAIL_HOST_USER', default='')
-email_pass = config('EMAIL_HOST_PASSWORD', default='')
+raw_email_user = config('EMAIL_HOST_USER', default='').strip().strip('\'"')
+raw_email_pass = config('EMAIL_HOST_PASSWORD', default='').strip().strip('\'"')
 
-if email_user and email_pass:
+if raw_email_user and raw_email_pass:
     EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 else:
     # If no SMTP credentials provided, log emails to console to prevent socket timeout hangs
-    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_HOST_USER = email_user
-EMAIL_HOST_PASSWORD = email_pass
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=5, cast=int)
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='LaundryGo <info@thelaundrygo.com>')
+EMAIL_HOST_USER = raw_email_user
+EMAIL_HOST_PASSWORD = raw_email_pass
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=(EMAIL_PORT == 587), cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=(EMAIL_PORT == 465), cast=bool)
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=15, cast=int)
+
+# Default From: If using personal Gmail, From address should match authenticated user to avoid SMTP 550
+configured_from = config('DEFAULT_FROM_EMAIL', default='').strip().strip('\'"')
+if configured_from:
+    DEFAULT_FROM_EMAIL = configured_from
+elif raw_email_user and '@' in raw_email_user:
+    DEFAULT_FROM_EMAIL = f'LaundryGo <{raw_email_user}>'
+else:
+    DEFAULT_FROM_EMAIL = 'LaundryGo <info@thelaundrygo.com>'
+
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@thelaundrygo.com')
 
 # Django Unfold Configuration

@@ -94,7 +94,7 @@ LaundryGo/
 - **Lógica de Negocio Destacada**:
   - **Límite de Hora Express (Cutoff)**: El servicio mismo día (`gofurther`) sólo está disponible para la fecha de hoy si la orden se realiza antes de las 12:00 PM.
   - **Validación de Fechas**: No se permiten recolecciones en fechas pasadas.
-  - **Notificaciones por Email**: Al crear o cancelar una orden, Django envía automáticamente una notificación por email en HTML/Texto al `ADMIN_EMAIL` (`info@thelaundrygo.com`) y al correo del cliente (`fail_silently=True`).
+  - **Notificaciones por Email (`apps.orders.emails`)**: Al crear o cancelar una orden, Django envía automáticamente una notificación responsive en HTML y Texto al `ADMIN_EMAIL` (`info@thelaundrygo.com`) y al correo del cliente. Se despacha de forma asíncrona en hilos secundarios (daemon threads) con logging exhaustivo para garantizar respuesta inmediata (< 50ms) y cero bloqueos de workers.
 - **Endpoints de Órdenes y Servicios** (`/api/v1/`):
   - `GET /health/`: Health check para monitoreo y Render (`HealthCheckView`).
   - `GET /services/rates/`: Lista pública de tarifas activas.
@@ -104,8 +104,9 @@ LaundryGo/
   - `GET /recurring/`: Suscripciones recurrentes del usuario.
   - `GET|PUT|PATCH|DELETE /recurring/<id>/`: Gestión de suscripción recurrente.
   - `GET /schedule/available-dates/`: Calendario dinámico de los próximos 30 días calculando disponibilidad del servicio express según la hora actual.
-- **Comando Custom de Gestión**:
+- **Comandos Custom de Gestión**:
   - `python manage.py seed_service_rates`: Pobla la base de datos con las tres tarifas de servicio por defecto ($2.25, $2.45, $3.85).
+  - `python manage.py test_email [correo]`: Diagnóstico de configuración SMTP, conectividad de sockets TCP, autenticación y envío de prueba.
 
 ---
 

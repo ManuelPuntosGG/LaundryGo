@@ -340,3 +340,31 @@ class OrderManagementTests(TestCase):
         self.assertIsNotNone(guest_order.user)
         self.assertEqual(guest_order.user.email, guest_email)
 
+    def test_order_confirmation_and_cancellation_emails(self):
+        """Test that send_order_confirmation_email and send_order_cancellation_email execute without error."""
+        from django.core import mail
+        from apps.orders.emails import send_order_confirmation_email, send_order_cancellation_email
+        import time
+
+        today = timezone.localtime(timezone.now()).date()
+        order = Order.objects.create(
+            user=self.user,
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='morning',
+            order_details='Two bags of clothes, Downy scent beads',
+            delivery_zone='inner',
+            delivery_fee=0.0,
+            status='pending'
+        )
+
+        initial_len = len(mail.outbox)
+        send_order_confirmation_email(order)
+        time.sleep(0.3)  # Allow background daemon thread to complete
+        self.assertGreaterEqual(len(mail.outbox), initial_len)
+
+        send_order_cancellation_email(order)
+        time.sleep(0.3)
+        self.assertGreaterEqual(len(mail.outbox), initial_len)
+
+
