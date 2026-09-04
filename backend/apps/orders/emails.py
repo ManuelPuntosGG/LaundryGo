@@ -92,10 +92,31 @@ def _send_via_sendgrid(api_key, from_email, recipients, subject, html_content, t
 def _send_mail_worker(subject, text_content, html_content, recipients, reply_to=None):
     """
     Background worker that dispatches emails.
-    Primary: Standard Django Email Backend (SMTP with IPv4 socket resolution).
-    Fallback: HTTPS APIs (Resend / SendGrid) if SMTP fails.
+    - If RESEND_API_KEY is configured: Uses Resend REST API over HTTPS (Port 443 - zero latency on Render Free).
+    - Fallback / Default: Standard Django Email Backend (SMTP with IPv4 socket resolution).
     """
-    # 1. Primary: Standard Django Email (SMTP / Console)
+    # 1. Resend REST API (HTTPS Port 443 - Fully supported on Render Free Tier)
+    resend_api_key = getattr(settings, "RESEND_API_KEY", None)
+    if resend_api_key:
+        try:
+            from_email = settings.DEFAULT_FROM_EMAIL
+            result = _send_via_resend(
+                resend_api_key,
+                from_email,
+                recipients,
+                subject,
+                html_content,
+                text_content,
+                reply_to,
+            )
+            logger.info(f"[EMAIL SUCCESS - RESEND API] Sent '{subject}' to {recipients}: {result}")
+            return
+        except Exception as resend_err:
+            logger.warning(
+                f"[EMAIL WARNING - RESEND API] Resend attempt failed: {resend_err}. Attempting SMTP fallback..."
+            )
+
+    # 2. Standard Django Email (SMTP / Console)
     try:
         from_email = settings.DEFAULT_FROM_EMAIL
         reply_to_list = [reply_to] if reply_to else [settings.ADMIN_EMAIL]
@@ -116,47 +137,9 @@ def _send_mail_worker(subject, text_content, html_content, recipients, reply_to=
         )
         return
     except Exception as smtp_err:
-        logger.warning(
-            f"[EMAIL WARNING - SMTP] Primary SMTP delivery failed for '{subject}' to {recipients}: {smtp_err}. Checking fallback APIs..."
+        logger.error(
+            f"[EMAIL FAILURE - SMTP] SMTP delivery failed for '{subject}' to {recipients}: {smtp_err}"
         )
-
-    # 2. Fallback: Resend REST API (if key is configured and SMTP failed)
-    resend_api_key = getattr(settings, "RESEND_API_KEY", None)
-    if resend_api_key:
-        try:
-            from_email = settings.DEFAULT_FROM_EMAIL
-            result = _send_via_resend(
-                resend_api_key,
-                from_email,
-                recipients,
-                subject,
-                html_content,
-                text_content,
-                reply_to,
-            )
-            logger.info(f"[EMAIL SUCCESS - RESEND FALLBACK] Sent '{subject}' to {recipients}: {result}")
-            return
-        except Exception as ex:
-            logger.error(f"[EMAIL FAILURE - RESEND FALLBACK] Failed sending to {recipients}: {ex}")
-
-    # 3. Fallback: SendGrid REST API (if key is configured)
-    sendgrid_api_key = getattr(settings, "SENDGRID_API_KEY", None)
-    if sendgrid_api_key:
-        try:
-            from_email = settings.DEFAULT_FROM_EMAIL
-            result = _send_via_sendgrid(
-                sendgrid_api_key,
-                from_email,
-                recipients,
-                subject,
-                html_content,
-                text_content,
-                reply_to,
-            )
-            logger.info(f"[EMAIL SUCCESS - SENDGRID FALLBACK] Sent '{subject}' to {recipients}: {result}")
-            return
-        except Exception as ex:
-            logger.error(f"[EMAIL FAILURE - SENDGRID FALLBACK] Failed sending to {recipients}: {ex}")
 
 
 def send_order_confirmation_email(order):
