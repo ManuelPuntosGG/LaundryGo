@@ -42,11 +42,11 @@ class CleaningServiceRateAdmin(ModelAdmin):
 
     @display(description=_('Rate per Sq Ft'))
     def rate_display(self, obj):
-        return f'${obj.rate_per_sqft} / sq ft'
+        return f'${obj.rate_per_sqft:.2f} / sq ft'
 
     @display(description=_('Min. Order'))
     def min_order_display(self, obj):
-        return f'${obj.min_order_amount}'
+        return f'${obj.min_order_amount:.2f}'
 
     @display(
         description=_('Status'),
@@ -72,7 +72,7 @@ class CleaningAddonAdmin(ModelAdmin):
 
     @display(description=_('Surcharge'))
     def price_display(self, obj):
-        return f'+${obj.price}'
+        return f'+${obj.price:.2f}'
 
     @display(
         description=_('Status'),

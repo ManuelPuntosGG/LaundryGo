@@ -107,11 +107,11 @@ LaundryGo/
 
 ### Módulo de Limpieza GoPropertyCare (`apps.cleaning`)
 - **Modelos**:
-  1. `CleaningServiceRate`: Tarifas dinámicas por pie cuadrado:
-     - `regular`: Limpieza Regular a **$0.1000/sqft** (mantenimiento estándar residencial y comercial).
-     - `deep`: Limpieza Profunda - GoFurther a **$0.1600/sqft** (suciedad pesada, zócalos, desincrustación).
-     - `move_in_out`: Limpieza Move-In / Move-Out a **$0.2000/sqft** (preparación integral para mudanzas).
-     - `post_construction`: Limpieza Post-Construcción a **$0.2600/sqft** (aspirado industrial HEPA, yeso, pintura).
+  1. `CleaningServiceRate`: Tarifas dinámicas por pie cuadrado (estandarizadas a 2 decimales):
+     - `regular`: Limpieza Regular a **$0.10/sqft** (mantenimiento estándar residencial y comercial).
+     - `deep`: Limpieza Profunda - GoFurther a **$0.16/sqft** (suciedad pesada, zócalos, desincrustación).
+     - `move_in_out`: Limpieza Move-In / Move-Out a **$0.20/sqft** (preparación integral para mudanzas).
+     - `post_construction`: Limpieza Post-Construcción a **$0.26/sqft** (aspirado industrial HEPA, yeso, pintura).
      - Campo `min_order_amount`: Umbral mínimo de **$99.00**.
   2. `CleaningAddon`: Recargos por dificultad o áreas adicionales:
      - `pets_presence`: Presencia de Mascotas (+$35.00)

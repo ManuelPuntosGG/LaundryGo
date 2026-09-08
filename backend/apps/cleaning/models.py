@@ -15,8 +15,8 @@ class CleaningServiceRate(TimeStampedModel):
     service_type = models.CharField(max_length=30, choices=SERVICE_TYPES, unique=True)
     rate_per_sqft = models.DecimalField(
         max_digits=6,
-        decimal_places=4,
-        help_text='Rate per square foot (e.g. 0.1000 for $0.10/sqft)'
+        decimal_places=2,
+        help_text='Rate per square foot (e.g. 0.10 for $0.10/sqft)'
     )
     min_order_amount = models.DecimalField(
         max_digits=6,
@@ -33,7 +33,7 @@ class CleaningServiceRate(TimeStampedModel):
         ordering = ['rate_per_sqft']
 
     def __str__(self):
-        return f'{self.name} - ${self.rate_per_sqft}/sqft'
+        return f'{self.name} - ${self.rate_per_sqft:.2f}/sqft'
 
 
 class CleaningAddon(TimeStampedModel):

@@ -19,7 +19,7 @@ def regular_rate(db):
     return CleaningServiceRate.objects.create(
         name='Limpieza Regular',
         service_type='regular',
-        rate_per_sqft=Decimal('0.1000'),
+        rate_per_sqft=Decimal('0.10'),
         min_order_amount=Decimal('99.00'),
         description='Standard cleaning',
         is_active=True,

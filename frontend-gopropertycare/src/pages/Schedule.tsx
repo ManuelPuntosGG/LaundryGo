@@ -546,7 +546,7 @@ export function Schedule() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md">
-                          ${rate.rate_per_sqft} / sq ft
+                          ${Number(rate.rate_per_sqft).toFixed(2)} / sq ft
                         </span>
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
@@ -1000,7 +1000,7 @@ export function Schedule() {
               Cost Breakdown
             </h3>
             <div className="flex justify-between text-slate-700 text-xs font-medium">
-              <span>{t('schedule.basePrice')} ({sqft} sqft @ ${activeRate.rate_per_sqft}/sqft):</span>
+              <span>{t('schedule.basePrice')} ({sqft} sqft @ ${Number(activeRate.rate_per_sqft).toFixed(2)}/sqft):</span>
               <span className="font-bold text-slate-900">
                 ${basePrice.toFixed(2)} {isMinApplied && '(Min $99)'}
               </span>

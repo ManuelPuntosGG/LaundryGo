@@ -6,6 +6,9 @@ from .models import CleaningServiceRate, CleaningAddon, CleaningOrder
 
 
 class CleaningServiceRateSerializer(serializers.ModelSerializer):
+    rate_per_sqft = serializers.DecimalField(max_digits=6, decimal_places=2, coerce_to_string=True)
+    min_order_amount = serializers.DecimalField(max_digits=6, decimal_places=2, coerce_to_string=True)
+
     class Meta:
         model = CleaningServiceRate
         fields = (
@@ -20,6 +23,8 @@ class CleaningServiceRateSerializer(serializers.ModelSerializer):
 
 
 class CleaningAddonSerializer(serializers.ModelSerializer):
+    price = serializers.DecimalField(max_digits=6, decimal_places=2, coerce_to_string=True)
+
     class Meta:
         model = CleaningAddon
         fields = (
@@ -39,6 +44,10 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
         source='service_rate',
         write_only=True
     )
+    delivery_fee = serializers.DecimalField(max_digits=6, decimal_places=2, coerce_to_string=True)
+    base_price = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True)
+    addons_total = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True)
+    total_price = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True)
 
     class Meta:
         model = CleaningOrder
@@ -163,8 +172,8 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         delivery_fee = Decimal('25.00') if delivery_zone == 'outer' else Decimal('0.00')
 
         # Base price calculation (sqft * rate_per_sqft, with minimum order of $99)
-        raw_base = Decimal(str(square_feet)) * service_rate.rate_per_sqft
-        min_order = service_rate.min_order_amount
+        raw_base = round(Decimal(str(square_feet)) * service_rate.rate_per_sqft, 2)
+        min_order = round(service_rate.min_order_amount, 2)
         base_price = max(raw_base, min_order)
 
         # Addons total
@@ -177,7 +186,8 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
                     except Exception:
                         pass
 
-        total_price = base_price + addons_total + delivery_fee
+        addons_total = round(addons_total, 2)
+        total_price = round(base_price + addons_total + delivery_fee, 2)
 
         # Language detection fallback
         language = validated_data.pop('language', None)

@@ -266,7 +266,7 @@ export function Home() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black uppercase tracking-wider text-emerald-700 bg-emerald-50/80 px-2 py-0.5 rounded-md">
-                        ${rate.rate_per_sqft}/sqft
+                        ${Number(rate.rate_per_sqft).toFixed(2)}/sqft
                       </span>
                       {rate.service_type === 'deep' && (
                         <span className="text-[11px] bg-emerald-600 text-white px-2.5 py-0.5 rounded-full font-extrabold shadow-2xs animate-pulse-glow">
