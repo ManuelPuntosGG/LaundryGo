@@ -8,6 +8,7 @@ urlpatterns = [
     path('api/v1/', include('apps.core.urls')),
     path('api/v1/auth/', include('apps.users.urls')),
     path('api/v1/', include('apps.orders.urls')),
+    path('api/v1/cleaning/', include('apps.cleaning.urls')),
 ]
 
 if settings.DEBUG:

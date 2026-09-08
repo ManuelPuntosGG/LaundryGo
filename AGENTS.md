@@ -1,17 +1,22 @@
-# AGENTS.md — LaundryGo
+# AGENTS.md — LaundryGo & GoPropertyCare
 
-Guía completa de arquitectura, estructura y funcionamiento del proyecto **LaundryGo** para agentes de IA y desarrolladores.
+Guía completa de arquitectura, estructura, modelos de negocio y funcionamiento del monorepo **LaundryGo** y **GoPropertyCare** para agentes de IA y desarrolladores.
 
 ---
 
 ## 1. Visión General del Proyecto
 
-**LaundryGo** es una plataforma web para una empresa de servicios de lavandería a domicilio con recolección y entrega rápida en Denver, Colorado y sus zonas metropolitanas adyacentes (incluyendo Boulder, Lakewood, Aurora, etc.).
+Este repositorio aloja una arquitectura desacoplada y multi-tenant que sirve a **dos marcas comerciales independientes** operando en el área metropolitana de Denver y Boulder, Colorado, compartiendo un **único backend de Django REST Framework** y una **única base de datos PostgreSQL** en Render para maximizar la rentabilidad y mantener los costes de infraestructura adicionales en **\$0 USD/mes**:
 
-- **Modelo de Negocio**: Lavado de ropa cobrado por libra con opciones de entrega en 2 días (*Standard*), día siguiente (*Go*) o mismo día express (*GoFurther* antes de las 12:00 PM). Permite pedidos puntuales (*One-time*) o suscripciones recurrentes con 7.5% de descuento (*Daily*, *Weekly*, *Biweekly*, *Monthly*). Soporta compras de usuarios autenticados e invitados (*guest checkout*).
-- **Internacionalización Integral**: Plataforma totalmente bilingüe (Inglés y Español) tanto en la interfaz de usuario como en los correos transaccionales automatizados (confirmación y cancelación de órdenes).
-- **Arquitectura**: Desacoplada (Frontend Single Page Application en React 19 + Backend REST API en Django 5+).
-- **Infraestructura de Producción**: Totalmente automatizada para **Render** (PostgreSQL gestionado + Web Service Django con Gunicorn/WhiteNoise + Static Site React) sirviendo en el dominio oficial `thelaundrygo.com`.
+1. **LaundryGo (`thelaundrygo.com`)**:
+   - **Modelo de Negocio**: Lavado de ropa a domicilio cobrado por libra ($2.25, $2.45, $3.85/lb) con opciones de entrega en 2 días (*Standard*), día siguiente (*Go*) o mismo día express (*GoFurther* antes de las 12:00 PM). Permite pedidos puntuales o suscripciones recurrentes con 7.5% de descuento (*Daily*, *Weekly*, *Biweekly*, *Monthly*). Orden mínima de $40.00.
+   - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en azules y grises slate). Puerto local `5173`.
+2. **GoPropertyCare (`gopropertycare.com`)**:
+   - **Modelo de Negocio**: Servicios profesionales de limpieza y ordenanza a domicilios (residencial y comercial) cobrados por pie cuadrado (**\$/sq ft**), con un umbral de orden mínima de **\$99.00** y recargos por dificultad/cuidados especiales de la propiedad. Agendamiento con antelación (**sin disponibilidad para el mismo día**; citas habilitadas a partir de mañana).
+   - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en blanco y verdes bosque/esmeralda). Puerto local `5174`.
+
+- **Internacionalización Integral**: Ambas plataformas son 100% bilingües (Inglés y Español) en sus interfaces y correos transaccionales automatizados (confirmaciones y cancelaciones).
+- **Infraestructura de Producción**: Totalmente automatizada para **Render** mediante `render.yaml` (PostgreSQL gestionado + 1 Web Service Django Gunicorn/WhiteNoise + 2 Static Sites React gratuitos).
 
 ---
 
@@ -19,46 +24,45 @@ Guía completa de arquitectura, estructura y funcionamiento del proyecto **Laund
 
 ```text
 LaundryGo/
-├── AGENTS.md                  # Especificación e instrucciones del proyecto para agentes AI
+├── AGENTS.md                  # Guía y especificación integral para agentes AI y desarrolladores
 ├── .env.example               # Plantilla de variables de entorno globales / backend
-├── .python-version            # Versión de Python especificada para Render (3.12.8)
-├── render.yaml                # Blueprint Infrastructure as Code para Render
-├── backend/                   # Proyecto Backend Django 5+ REST API
+├── .python-version            # Versión de Python fijada para Render (3.12.8)
+├── render.yaml                # Blueprint Infrastructure as Code para Render (DB + API + 2 Frontends)
+├── backend/                   # Proyecto Backend Django 5+ REST API (Headless unificado)
 │   ├── .env.example           # Plantilla de variables de entorno para backend
-│   ├── .python-version        # Versión de Python local para backend (3.12.8)
-│   ├── build.sh               # Script de construcción y migración para Render
+│   ├── .python-version        # Versión de Python local (3.12.8)
+│   ├── build.sh               # Script de compilación, migración y seed data en Render
 │   ├── apps/                  # Aplicaciones modulares activas de Django
 │   │   ├── core/              # Modelos base abstractos (TimeStampedModel), HealthCheck y comandos CLI
-│   │   │   └── management/commands/test_email.py # Utilidad de diagnóstico SMTP y conectividad
-│   │   ├── users/             # Autenticación JWT, modelo de usuario personalizado y perfiles
-│   │   └── orders/            # Tarifas de servicio, órdenes, suscripciones, migraciones y emails bilingües
-│   │       ├── emails.py      # Notificaciones asíncronas bilingües (EN/ES) en HTML y texto plano
-│   │       └── migrations/    # Historial de esquemas (incluyendo 0005_order_language)
-│   ├── config/                # Configuración global del proyecto Django (settings, urls, wsgi)
+│   │   │   └── management/commands/test_email.py # Diagnóstico SMTP y conectividad en vivo
+│   │   ├── users/             # Autenticación JWT, modelo de usuario y autovinculación de pedidos
+│   │   ├── orders/            # Tarifas por libra, órdenes de lavandería, suscripciones y emails (LaundryGo)
+│   │   └── cleaning/          # Tarifas $/sqft, recargos de dificultad, órdenes y emails (GoPropertyCare)
+│   │       ├── models.py      # CleaningServiceRate, CleaningAddon, CleaningOrder
+│   │       ├── serializers.py # Cálculo en vivo de base ($99 min), addons y delivery fee
+│   │       ├── views.py       # Endpoints públicos y protegidos de limpieza
+│   │       ├── emails.py      # Notificaciones transaccionales bilingües (GoPropertyCare)
+│   │       ├── admin.py       # Integración con Django Unfold y badges de estado
+│   │       ├── urls.py        # Enrutador /api/v1/cleaning/...
+│   │       ├── test_cleaning.py # Suite de pruebas pytest para GoPropertyCare
+│   │       └── management/commands/seed_cleaning_rates.py # Pobla tarifas y add-ons iniciales
+│   ├── config/                # Configuración global Django (settings, urls, wsgi)
 │   ├── requirements/          # Dependencias (base.txt, development.txt)
 │   ├── db.sqlite3             # Base de datos SQLite local para desarrollo
-│   └── manage.py              # Script CLI de administración de Django
-├── frontend/                  # Proyecto Frontend React 19 + Vite 8
-│   ├── .env.example           # Plantilla de variables de entorno frontend (VITE_API_URL)
+│   └── manage.py              # CLI de administración de Django
+├── frontend/                  # Frontend 1: LaundryGo (React 19 + Vite 8 + Tailwind v4 - Puerto 5173)
+│   ├── .env.example           # Plantilla frontend (VITE_API_URL)
+│   ├── public/locales/        # Traducciones i18n (en/common.json, es/common.json)
+│   ├── src/                   # Código fuente LaundryGo (Hero azul, calculadora por lbs, 4 pasos)
+│   ├── package.json
+│   └── vite.config.ts
+├── frontend-gopropertycare/   # Frontend 2: GoPropertyCare (React 19 + Vite 8 + Tailwind v4 - Puerto 5174)
 │   ├── public/
-│   │   └── locales/           # Archivos de traducción i18n (en/common.json, es/common.json)
-│   ├── src/
-│   │   ├── api/               # Cliente Axios dinámico con interceptores JWT, auto-refresh y Accept-Language
-│   │   ├── components/        # Componentes UI reusables y estructura de Layout
-│   │   │   ├── layout/        # Navbar, Footer, Layout principal
-│   │   │   └── ui/            # Button, Card, Input, LanguageSwitcher, PageSkeleton
-│   │   ├── constants/         # Ubicaciones de Denver (locations.ts) y Add-ons (addons.ts)
-│   │   ├── hooks/             # Custom hooks (useAuth)
-│   │   ├── i18n/              # Configuración de i18next
-│   │   ├── pages/             # Páginas (Home, About, Schedule, Auth, Dashboard)
-│   │   ├── providers/         # Contexto de autenticación (AuthProvider, auth-context.ts)
-│   │   ├── types/             # Interfaces TypeScript (User, Order, ServiceRate, etc.)
-│   │   ├── App.tsx            # Enrutamiento React Router v7 y ProtectedRoute
-│   │   ├── index.css          # Configuración y tokens de Tailwind CSS v4
-│   │   └── main.tsx           # Punto de entrada de React
-│   ├── package.json           # Dependencias de Node.js y scripts
-│   ├── vite.config.ts         # Configuración de Vite, alias @ y proxy API
-│   └── .oxlintrc.json         # Configuración del linter Oxlint
+│   │   ├── logo.png           # Logotipo oficial (casa verde, escoba, cubeta con espuma y toallas)
+│   │   └── locales/           # Traducciones i18n bilingües de GoPropertyCare
+│   ├── src/                   # Código fuente GoPropertyCare (tokens verdes, calculadora sq ft, agendamiento)
+│   ├── package.json
+│   └── vite.config.ts
 └── design-plans/              # Documentos de auditoría de diseño y planes de i18n
 ```
 
@@ -81,100 +85,120 @@ LaundryGo/
 - **Configuración Django**: `AUTH_USER_MODEL = 'users.User'`.
 - **Identificador Principal**: El email es el `USERNAME_FIELD` (`email` único).
 - **Campos principales**: `email`, `phone`, `first_name`, `last_name`, `street_address`, `city` (default `'Denver'`), `zip_code`.
+- **Autovinculación de Huéspedes**: Al registrarse un nuevo usuario en `/api/v1/auth/register/`, el backend busca y vincula automáticamente órdenes previas realizadas como invitado tanto en LaundryGo (`Order`) como en GoPropertyCare (`CleaningOrder`).
 - **Endpoints de Autenticación** (`/api/v1/auth/`):
-  - `POST /register/`: Registro de usuario + retorno de tokens JWT y perfil. Vincula automáticamente pedidos pasados realizados como invitado con el mismo correo.
+  - `POST /register/`: Registro de usuario + retorno de tokens JWT y perfil.
   - `POST /login/`: Inicio de sesión mediante `email` y `password`.
   - `POST /token/refresh/`: Refresco de access token usando refresh token.
   - `POST /token/verify/`: Verificación de validez de token.
   - `POST /token/blacklist/`: Invalidación de token al cerrar sesión.
   - `GET|PUT|PATCH /me/`: Obtención y actualización del perfil del usuario autenticado.
-- **Comando Custom de Gestión**:
-  - `python manage.py create_admin`: Crea o actualiza un superusuario no-interactivamente usando variables del `.env`.
-
-### Gestión de Órdenes y Tarifas (`apps.orders`)
-- **Modelos**:
-  1. `ServiceRate`: Tarifas de servicio por libra (`standard` - 2 días a $2.25/lb, `go` - siguiente día a $2.45/lb, `gofurther` - mismo día a $3.85/lb).
-  2. `Order`: Registro de pedidos. Soporta usuarios autenticados (`user`) e invitados (`guest_email`, `guest_first_name`, `guest_last_name`, `guest_phone`). Incluye dirección, zona de entrega (`inner` tarifa $0 / `outer` tarifa $25), `pickup_date`, `pickup_time_slot` (`morning` 8-11 AM / `afternoon` 12-4 PM), `order_details`, `pickup_instructions`, `status` (`pending`, `confirmed`, `processing`, `ready`, `delivered`, `cancelled`) y **`language`** (`'en'` o `'es'`, default `'en'`).
-  3. `RecurringSchedule`: Suscripciones asociadas a órdenes (`daily`, `weekly`, `biweekly`, `monthly`) con fecha calculada del siguiente pedido (+1 día, +7 días, +14 días, +30 días).
-
-- **Sistema de Emails Bilingües y Transaccionales (`apps.orders.emails`)**:
-  - **Despacho Primario**: SMTP nativo de Gmail (`smtp.gmail.com:587`, TLS) mediante `django.core.mail.EmailMultiAlternatives`.
-  - **Fallback de APIs**: Soporte secundario transparente para APIs HTTPS (Resend / SendGrid) en caso de contingencia.
-  - **Ejecución Asíncrona**: Hilos secundarios daemon (`threading.Thread(daemon=True)`) con logging exhaustivo (`[EMAIL SUCCESS - SMTP]` / `[EMAIL FAILURE]`) para respuesta de API inmediata (< 50ms).
-  - **Soporte Bilingüe Completo**:
-    - `send_order_confirmation_email(order, language=None)`: Renderiza asunto, cuerpo en texto plano y plantilla HTML adaptable en inglés o español según `order.language`.
-    - `send_order_cancellation_email(order, language=None)`: Notificación de cancelación en el idioma del cliente con enlace para reprogramación.
-    - Notifica simultáneamente al cliente y al `ADMIN_EMAIL` (`info@thelaundrygo.com`) en el idioma seleccionado por el cliente.
-
-- **Endpoints de Órdenes y Servicios** (`/api/v1/`):
-  - `GET /health/`: Health check para monitoreo y Render (`HealthCheckView`).
-  - `GET /services/rates/`: Lista pública de tarifas activas.
-  - `GET|POST /orders/`: Lista de órdenes del usuario autenticado / Creación de orden (pública para invitados o autenticados, guarda `language` del payload o cabecera `Accept-Language`).
-  - `GET|PUT|PATCH /orders/<id>/`: Detalle y actualización de orden.
-  - `POST /orders/<id>/cancel/`: Cancelación de órdenes pendientes con notificación bilingüe por correo.
-  - `GET /recurring/`: Suscripciones recurrentes del usuario.
-  - `GET|PUT|PATCH|DELETE /recurring/<id>/`: Gestión de suscripción recurrente.
-  - `GET /schedule/available-dates/`: Calendario dinámico de los próximos 30 días calculando disponibilidad del servicio express según la hora actual.
-
-- **Comandos Custom de Gestión**:
-  - `python manage.py seed_service_rates`: Pobla la base de datos con las tres tarifas de servicio por defecto ($2.25, $2.45, $3.85).
-  - `python manage.py test_email [correo]`: Diagnóstico integral de socket TCP, autenticación SMTP de Gmail y envío de prueba en vivo.
 
 ---
 
-## 4. Frontend (`/frontend`)
+### Módulo de Limpieza GoPropertyCare (`apps.cleaning`)
+- **Modelos**:
+  1. `CleaningServiceRate`: Tarifas dinámicas por pie cuadrado:
+     - `regular`: Limpieza Regular a **$0.1000/sqft** (mantenimiento estándar residencial y comercial).
+     - `deep`: Limpieza Profunda - GoFurther a **$0.1600/sqft** (suciedad pesada, zócalos, desincrustación).
+     - `move_in_out`: Limpieza Move-In / Move-Out a **$0.2000/sqft** (preparación integral para mudanzas).
+     - `post_construction`: Limpieza Post-Construcción a **$0.2600/sqft** (aspirado industrial HEPA, yeso, pintura).
+     - Campo `min_order_amount`: Umbral mínimo de **$99.00**.
+  2. `CleaningAddon`: Recargos por dificultad o áreas adicionales:
+     - `pets_presence`: Presencia de Mascotas (+$35.00)
+     - `high_ceilings`: Techos Altos / Ventanales (+$30.00)
+     - `oven_fridge_interior`: Interior de Horno y Refrigerador (+$45.00)
+     - `cabinets_interior`: Interior de Alacenas y Gabinetes (+$35.00)
+     - `basement_attic`: Sótano Terminado / Ático (+$50.00)
+     - `patio_balcony`: Balcón o Patio Exterior (+$25.00)
+  3. `CleaningOrder`: Registro de servicio con `square_feet`, `service_rate`, `selected_addons` (JSON), `service_date`, `time_slot` (`morning` 8AM-12PM / `afternoon` 1PM-5PM), dirección en Denver/Boulder, zona (`inner` $0 / `outer` $25), `base_price` ($\max(\text{sqft} \times \text{rate}, \$99)$), `addons_total`, `delivery_fee`, `total_price`, `special_instructions`, `status` (`pending`, `confirmed`, `in_progress`, `completed`, `cancelled`) e idioma `language` (`'en'` o `'es'`).
 
-### Tecnología
-- **Stack**: React 19, Vite 8, TypeScript, Tailwind CSS v4.
-- **Linter**: `oxlint` (ejecutado con `npm run lint`).
-- **Estilos y Diseño**: Tailwind v4 (importado mediante `@import "tailwindcss"` en `src/index.css` y usando `@tailwindcss/vite`). Diseño con estética *Glassmorphism* fluida, tarjetas interactivas y paleta cromática profesional basada en azules y grises Slate.
-- **Internacionalización (i18n)**: Configurada con `react-i18next` e `i18next-browser-languagedetector`. Traducciones completas en español e inglés ubicadas en `public/locales/{es,en}/common.json`.
+- **Reglas de Agendamiento**:
+  - **Sin mismo día**: `service_date` debe ser estrictamente mañana o posterior. El endpoint `/api/v1/cleaning/schedule/available-dates/` genera los próximos 60 días iniciando en `today + 1 day`. Si se intenta enviar una orden para hoy, el serializador arroja un error 400.
 
-### Arquitectura y Estado
-- **Enrutamiento y Proxy**:
-  - `vite.config.ts`: Configura el alias `@` a `./src` y redirige solicitudes `/api` al backend Django (`http://localhost:8000`).
-  - `App.tsx`: Rutas públicas (`/`, `/about`, `/schedule`, `/login`) y ruta protegida (`/dashboard` envuelta en `ProtectedRoute`).
-- **Cliente API Dinámico (`src/api/index.ts`)**:
-  - Consume dinámicamente `import.meta.env.VITE_API_URL` en producción y usa el proxy local en desarrollo.
-  - Inyecta el encabezado `Authorization: Bearer <access_token>` almacenado en `localStorage`.
-  - Inyecta automáticamente el encabezado `Accept-Language: es` o `en` según el idioma seleccionado por el usuario.
-  - Captura errores HTTP 401 para intentar renovar el token transparentemente vía `/auth/token/refresh/`. Si falla la renovación, limpia la sesión y redirige a `/login`.
-- **Estado de Autenticación (`src/providers/AuthProvider.tsx` & `src/providers/auth-context.ts`)**:
-  - Proporciona el estado del usuario actual, comprobación de token al cargar la aplicación y métodos de `login`, `register` y `logout`.
+- **Emails Transaccionales Bilingües (`apps.cleaning.emails`)**:
+  - `send_cleaning_order_confirmation_email(order, language=None)`: Notificación inmediata de reserva con la marca GoPropertyCare (`info@gopropertycare.com` y `(720) 590-8632`), desglose de Sq Ft, add-ons y total estimado.
+  - `send_cleaning_order_cancellation_email(order, language=None)`: Notificación de cancelación de reserva.
+  - Ejecución en hilos secundarios desacoplados pre-extrayendo los atributos de base de datos para evitar bloqueos en SQLite/PostgreSQL.
 
-### Páginas Principales (`src/pages/`)
-1. **`Home.tsx` (`/`)**: Landing page informativa con sección Hero, resumen ágil del proceso de 4 pasos con enlace a Sobre Nosotros, tarjetas de precios comparativas ($2.25, $2.45, $3.85), calculadora de costos, mapa de cobertura en Denver y Boulder, avisos de orden mínima de $40 y 7.5% de descuento recurrente, y tarjetas de contacto oficial (`info@thelaundrygo.com`, `(720) 590-8632`).
-2. **`About.tsx` (`/about`)**: Página "Sobre Nosotros" con explicación visual exhaustiva del proceso de negocio en 5 pasos (Agendamiento, Pesaje comercial por libra y clasificación, Lavado ecológico y add-ons, Secado y doblado boutique, Entrega en puerta), misión en Denver, reglas clave de negocio, estándares de calidad y galería con imágenes optimizadas.
-3. **`Schedule.tsx` (`/schedule`)**: Flujo interactivo de reserva de lavandería organizado en 4 pasos con inicialización de fechas resiliente:
-   - *Paso 1*: Selección de servicio, fecha (inicializada de inmediato con los próximos 60 días locales mediante `getFallbackAvailableDates` y sincronizada con `/schedule/available-dates/`), franja horaria y frecuencia (*Daily*, *Weekly*, *Biweekly*, *Monthly*) con aviso de descuento del 7.5%.
-   - *Paso 2*: Selección de ciudad/zona en Denver (Inner gratis vs Outer $25), dirección y datos de contacto (auto-completados si está autenticado).
-   - *Paso 3*: Selección de servicio y **Sistema de Add-ons** (Downy Scent Beads $3.50, Stain Treatment $3.50, Comforter Twin-Full $24.99, Comforter Queen-King $29.99, Pillow $6.99, Mattress cover Twin-Full $11.99, Mattress cover Queen-King $14.99) con cálculo de subtotal en vivo y solicitudes especiales.
-   - *Paso 4*: Resumen final de la orden, desglose de tarifas y add-ons, aceptación de términos y confirmación con ID de orden generada. Envía automáticamente `language: i18n.language` para el despacho de correos en el idioma correspondiente.
-4. **`Auth.tsx` (`/login`)**: Formulario unificado de inicio de sesión y registro con validaciones dinámicas y gestión de errores.
-5. **`Dashboard.tsx` (`/dashboard`)**: Panel del usuario autenticado dividido en pestañas:
-   - *Historial de Órdenes*: Muestra las órdenes activas y pasadas con estado en vivo, botón para cancelar órdenes pendientes y botón para "Volver a pedir" (*Reorder*).
-   - *Suscripciones Recurrentes*: Administración de planes recurrentes activos.
-   - *Perfil de Usuario*: Edición de nombre, teléfono y dirección predeterminada.
+- **Endpoints de Limpieza** (`/api/v1/cleaning/`):
+  - `GET /rates/`: Lista pública de tarifas activas por sq ft.
+  - `GET /addons/`: Lista pública de recargos y extras.
+  - `GET|POST /orders/`: Lista de órdenes del usuario autenticado / Creación de orden (pública para invitados o autenticados).
+  - `GET|PUT|PATCH /orders/<id>/`: Detalle y actualización de reserva.
+  - `POST /orders/<id>/cancel/`: Cancelación de orden pendiente.
+  - `GET /schedule/available-dates/`: Calendario dinámico de fechas disponibles desde mañana.
+
+- **Comandos de Gestión**:
+  - `python manage.py seed_cleaning_rates`: Pobla las 4 tarifas ($0.10, $0.16, $0.20, $0.26, min $99) y los 6 add-ons de dificultad.
+
+---
+
+### Módulo de Lavandería LaundryGo (`apps.orders`)
+- **Modelos**:
+  1. `ServiceRate`: Tarifas por libra (`standard` - 2 días a $2.25/lb, `go` - siguiente día a $2.45/lb, `gofurther` - mismo día a $3.85/lb).
+  2. `Order`: Pedidos de lavado por libra con entrega puerta a puerta.
+  3. `RecurringSchedule`: Suscripciones recurrentes (*Daily*, *Weekly*, *Biweekly*, *Monthly*) con 7.5% de descuento.
+- **Emails Transaccionales Bilingües (`apps.orders.emails`)**:
+  - Despacho asíncrono con la marca LaundryGo (`info@thelaundrygo.com`).
+- **Endpoints de Lavandería** (`/api/v1/`):
+  - `GET /services/rates/`: Lista de tarifas por libra.
+  - `GET|POST /orders/`: Creación y listado de órdenes de lavado.
+  - `POST /orders/<id>/cancel/`: Cancelación de orden.
+  - `GET /schedule/available-dates/`: Fechas para recolección (soporta mismo día si es antes de las 12:00 PM).
+- **Comandos de Gestión**:
+  - `python manage.py seed_service_rates`: Pobla tarifas por libra ($2.25, $2.45, $3.85).
+
+---
+
+## 4. Frontends
+
+### Frontend 1: LaundryGo (`/frontend`)
+- **Tecnología**: React 19, Vite 8, TypeScript, Tailwind CSS v4.
+- **Puerto Local**: `5173`.
+- **Estética**: Azules vivos (`--color-brand-600: #2563eb`) y grises Slate con Glassmorphism.
+- **Páginas**:
+  - `Home.tsx`: Hero, calculadora de libras, 4 pasos de servicio, tarifas comparativas, cobertura Denver/Boulder.
+  - `About.tsx`: Proceso de 5 pasos (agendamiento, pesaje, lavado ecológico, secado/doblado, entrega).
+  - `Schedule.tsx`: Flujo de agendamiento en 4 pasos con add-ons de lavandería (scent beads, stain treatment, comforters, etc.).
+  - `Auth.tsx`: Inicio de sesión y registro.
+  - `Dashboard.tsx`: Historial de órdenes, suscripciones y perfil.
+
+### Frontend 2: GoPropertyCare (`/frontend-gopropertycare`)
+- **Tecnología**: React 19, Vite 8, TypeScript, Tailwind CSS v4.
+- **Puerto Local**: `5174` (evita colisiones con LaundryGo).
+- **Logotipo**: Casa verde con escoba, cubeta con espuma y toallas plegadas (`public/logo.png`).
+- **Estética**: Blanco y verdes bosque/esmeralda (`--color-brand-*` desde `#f0fdf4` hasta `#052e16`).
+- **Páginas**:
+  - `Home.tsx`: Hero con selector de Denver, **Calculadora interactiva por Sq Ft** (slider 300 a 5,000 sq ft con aviso de mínimo de $99), 4 pasos de servicio, comparativa de las 4 tarifas, cobertura y contacto.
+  - `About.tsx`: Misión, pilares de productos ecológicos no tóxicos, personal verificado y checklist de 50 puntos de inspección (cocina, baños, salas, pisos).
+  - `Schedule.tsx`: Flujo de reserva en 4 pasos:
+    - *Paso 1*: Selección de Sq Ft y nivel de servicio con desglose de precio base en vivo.
+    - *Paso 2*: Calendario de fechas (bloquea estrictamente el día de hoy) y franja horaria (Mañana 8AM-12PM / Tarde 1PM-5PM).
+    - *Paso 3*: Ubicación en Denver/Boulder (Inner $0 / Outer $25) y recargos de dificultad (mascotas, techos altos, electrodomésticos, etc.).
+    - *Paso 4*: Resumen final de cotización, aceptación de términos de orden mínima de $99 y confirmación con ID de orden (ej. `GPC-#12`).
+  - `Auth.tsx`: Inicio de sesión y registro (comparte base de usuarios con LaundryGo).
+  - `Dashboard.tsx`: Historial de reservas de limpieza, botón de volver a pedir (*Reorder*) y cancelación online de reservas pendientes.
 
 ---
 
 ## 5. Reglas de Negocio Clave
 
-1. **Cálculo de Zonas de Cobertura en Denver y Boulder**:
+1. **Zonas de Cobertura en Denver y Boulder (Compartidas por Ambas Marcas)**:
    - **Zona Inner (Gratis - $0.00)**: Denver (Downtown / Central), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, Broomfield.
    - **Zona Outer (Recargo - $25.00)**: Aurora, Thornton, Centennial, Highlands Ranch.
-2. **Restricción de Horario Cutoff (Mismo Día)**:
-   - Si la hora local del servidor sobrepasa las 12:00 PM, el servicio express `gofurther` no estará disponible para la fecha de hoy.
-3. **Descuento Recurrente (7.5%)**:
-   - Aplica a todas las tarifas de servicio en pedidos recurrentes (*Daily*, *Weekly*, *Biweekly*, *Monthly*) a partir del segundo servicio/cobro.
-4. **Orden Mínima**:
-   - Aplica una orden mínima de $40.00 en servicios de lavado de ropa.
-5. **Checkout Flexible (Usuario vs Guest)**:
-   - Si el cliente está autenticado, la orden se vincula a su `user_id`.
-   - Si el cliente no está autenticado, se validan y guardan sus datos en campos `guest_*` (`guest_email`, `guest_first_name`, etc.).
-6. **Internacionalización y Notificaciones Bilingües**:
-   - Toda orden almacena el idioma del cliente (`order.language`).
-   - Las confirmaciones y cancelaciones se emiten en el idioma correspondiente (*English* o *Español*).
+2. **Reglas Específicas de GoPropertyCare (Limpieza)**:
+   - **Sin Mismo Día**: Todas las citas deben agendarse al menos para el día siguiente (+1 día en adelante).
+   - **Orden Mínima de Limpieza**: **$99.00**. Si $\text{sqft} \times \text{tarifa} < \$99.00$, se cobra el piso de $99.00.
+   - **Medición de Precios**: Exclusivamente en **\$/square feet** (\$/sq ft) más recargos por dificultad.
+3. **Reglas Específicas de LaundryGo (Lavandería)**:
+   - **Cutoff de Mismo Día (GoFurther)**: Solo disponible para hoy si la hora local es anterior a las 12:00 PM.
+   - **Orden Mínima de Lavado**: **$40.00**.
+   - **Descuento Recurrente (7.5%)**: Aplica a partir del segundo cobro en suscripciones.
+4. **Checkout Flexible (Usuario vs Guest)**:
+   - Los pedidos pueden realizarse autenticado o como invitado (`guest_*`). Al registrarse posteriormente con el mismo correo, el sistema auto-vincula el historial de ambos servicios.
+5. **Notificaciones Bilingües**:
+   - Cada orden almacena `language: 'en' | 'es'`. Los correos se emiten en el idioma seleccionado por el cliente con el branding y contacto correspondiente a cada marca.
 
 ---
 
@@ -182,38 +206,53 @@ LaundryGo/
 
 ### Backend (`/backend`)
 ```bash
-# Activar entorno virtual (según OS)
-# Windows: venv\Scripts\activate
+# Activar entorno virtual
+# Windows: .\venv\Scripts\activate
 # Linux/macOS: source venv/bin/activate
 
-# Aplicar migraciones de base de datos
+# Aplicar migraciones
 python manage.py migrate
 
-# Poblar tarifas de servicio por defecto
+# Poblar tarifas de lavandería (LaundryGo)
 python manage.py seed_service_rates
 
-# Crear o actualizar superusuario no interactivo (usa credenciales del .env)
+# Poblar tarifas y add-ons de limpieza (GoPropertyCare)
+python manage.py seed_cleaning_rates
+
+# Crear superusuario no interactivo
 python manage.py create_admin
 
-# Probar conectividad y despacho SMTP de correos
+# Probar envío SMTP de correos
 python manage.py test_email [correo_destino]
 
-# Iniciar servidor de desarrollo (puerto 8000)
+# Servidor de desarrollo Django (puerto 8000)
 python manage.py runserver 8000
 
-# Ejecutar suite de pruebas completa con pytest (21 tests)
+# Ejecutar suite de pruebas completa con pytest (28 tests pasando)
 pytest
 ```
 
-### Frontend (`/frontend`)
+### Frontend 1 — LaundryGo (`/frontend`)
 ```bash
-# Iniciar servidor de desarrollo Vite (puerto 5173)
+# Iniciar servidor Vite (puerto 5173)
 npm run dev
 
-# Compilar proyecto para producción (TypeScript check + Vite build)
+# Compilar para producción
 npm run build
 
-# Ejecutar linter Oxlint
+# Linter Oxlint
+npm run lint
+```
+
+### Frontend 2 — GoPropertyCare (`/frontend-gopropertycare`)
+```bash
+# Iniciar servidor Vite (puerto 5174)
+npm run dev
+
+# Compilar para producción
+npm run build
+
+# Linter Oxlint
 npm run lint
 ```
 
@@ -221,59 +260,55 @@ npm run lint
 
 ## 7. Despliegue en Producción (Render)
 
-El proyecto incluye soporte nativo para despliegue automatizado en **Render** mediante Infrastructure as Code (`render.yaml`).
+El archivo `render.yaml` implementa la infraestructura completa en Render como código (IaC):
 
-### Arquitectura en Render
-1. **PostgreSQL Database (`laundrygo-db`)**: Base de datos gestionada con PostgreSQL 16.
+### Servicios en Render
+1. **Base de Datos PostgreSQL (`laundrygo-db`)**: Base de datos gestionada compartida por ambas plataformas (`plan: free`).
 2. **Backend Web Service (`laundrygo-api`)**:
-   - Ejecutado con `gunicorn config.wsgi:application`.
-   - Python `3.12.8` especificado vía `.python-version` y `render.yaml`.
-   - WhiteNoise para compresión y entrega de estáticos del panel Unfold.
-   - Soporte automático para `DATABASE_URL`.
-   - Healthcheck en `/api/v1/health/`.
-   - Variables de Correo SMTP configuradas:
-     - `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`
-     - `EMAIL_HOST=smtp.gmail.com`
-     - `EMAIL_PORT=587`
-     - `EMAIL_USE_TLS=True`
-     - `EMAIL_HOST_USER=info@thelaundrygo.com`
-     - `EMAIL_HOST_PASSWORD=<Google-App-Password-16-chars>`
-     - `DEFAULT_FROM_EMAIL=LaundryGo <info@thelaundrygo.com>`
-     - `ADMIN_EMAIL=info@thelaundrygo.com`
-3. **Frontend Static Site (`laundrygo-web`)**:
+   - Gunicorn en Python 3.12.8 con WhiteNoise para servir archivos estáticos del panel Django Unfold.
+   - Health check en `/api/v1/health/`.
+   - `build.sh` ejecuta:
+     ```bash
+     #!/usr/bin/env bash
+     set -o errexit
+     pip install --upgrade pip
+     pip install -r requirements/base.txt
+     python manage.py collectstatic --no-input
+     python manage.py migrate
+     python manage.py seed_service_rates
+     python manage.py seed_cleaning_rates
+     python manage.py create_admin
+     ```
+   - `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` y `CSRF_TRUSTED_ORIGINS` configurados para `thelaundrygo.com` y `gopropertycare.com`.
+   - Credenciales SMTP de Gmail configuradas para notificaciones bilingües.
+3. **Frontend Static Site — LaundryGo (`laundrygo-web`)**:
    - Dominio oficial: `https://thelaundrygo.com` y `https://www.thelaundrygo.com`.
-   - Compilado con `npm run build` y publicado desde `./dist`.
-   - Variable `VITE_API_URL` conectada al host de `laundrygo-api.onrender.com`.
-   - Regla de reescritura SPA (`/* -> /index.html`) para enrutamiento sin errores 404 en recargas.
-
-### Comandos de Construcción en Producción
-- **Backend Build (`backend/build.sh`)**:
-  ```bash
-  #!/usr/bin/env bash
-  set -o errexit
-  pip install --upgrade pip
-  pip install -r requirements/base.txt
-  python manage.py collectstatic --no-input
-  python manage.py migrate
-  python manage.py seed_service_rates
-  ```
-- **Frontend Build**:
-  ```bash
-  npm install && npm run build
-  ```
+   - Directorio raíz: `frontend`
+   - Build: `npm install && npm run build`
+   - Directorio de publicación: `./dist`
+   - Regla de reescritura SPA: `/* -> /index.html`.
+   - Variable de entorno: `VITE_API_URL=https://laundrygo-api.onrender.com`.
+4. **Frontend Static Site — GoPropertyCare (`gopropertycare-web`)**:
+   - Dominio oficial: `https://gopropertycare.com` y `https://www.gopropertycare.com` (o subdominio asignado por Render).
+   - Directorio raíz: `frontend-gopropertycare`
+   - Build: `npm install && npm run build`
+   - Directorio de publicación: `./dist`
+   - Regla de reescritura SPA: `/* -> /index.html`.
+   - Variable de entorno: `VITE_API_URL=https://laundrygo-api.onrender.com`.
 
 ---
 
 ## 8. Gotchas y Notas para Agentes
 
-- **Resolución de Red IPv4 en Contenedores Render**: En entornos cloud Linux (Render), el DNS de `smtp.gmail.com` retorna direcciones IPv6 antes de IPv4. Como los contenedores carecen de gateway IPv6 saliente, Python arroja `[Errno 101] Network is unreachable`. En `config/settings.py`, `socket.getaddrinfo` fuerza `AF_INET` para garantizar conexiones directas por IPv4.
-- **Contraseñas de Aplicación de Google (App Passwords)**: Si se usa Gmail o Google Workspace (`info@thelaundrygo.com`), la contraseña debe ser un *App Password* de 16 letras generado habiendo iniciado sesión directamente en esa cuenta de Google con 2FA activo.
-- **Plantillas de Email Bilingües**: Al editar o añadir notificaciones por correo en `apps/orders/emails.py`, mantener actualizadas ambas ramas (`is_spanish` y default en inglés) tanto para la versión texto plano como para el template HTML.
-- **Archivo `.env` en Backend**: Es imprescindible contar con un archivo `.env` dentro de `backend/` para que Django funcione correctamente. Copiar desde `.env.example`.
-- **Modelo de Usuario Personalizado**: Siempre importar el modelo de usuario utilizando `django.contrib.auth.get_user_model()` o referenciar `settings.AUTH_USER_MODEL`. Nunca importar o usar `django.contrib.auth.models.User` directamente.
-- **Estructura de Apps Backend**: Las carpetas activas de Django están dentro de `backend/apps/`. Las carpetas raíz `backend/users`, `backend/orders` y `backend/core` contienen únicamente adaptadores stub.
-- **Frecuencias de Recurrencia**: La terminología estándar es `daily`, `weekly`, `biweekly`, `monthly`.
-- **Traducciones i18n**: Al añadir o editar texto en las vistas, incluir las llaves correspondientes en `public/locales/en/common.json` y `public/locales/es/common.json` usando `useTranslation()`.
-- **Tailwind CSS v4 en Frontend**: Utiliza el plugin `@tailwindcss/vite` y se configura directamente en `src/index.css`. No existe ni debe crearse `tailwind.config.js`.
-- **Render Static Sites SPA**: Requiere regla de rewrite `/*` hacia `/index.html` para evitar errores 404 al recargar rutas en React Router.
-- **CORS y CSRF en Producción**: En producción, asegurar que `CORS_ALLOWED_ORIGINS` y `CSRF_TRUSTED_ORIGINS` contengan tanto los subdominios de Render como el dominio oficial `https://thelaundrygo.com` y `https://www.thelaundrygo.com`.
+- **Costes de Render (\$0 extra)**: Los Static Sites en Render son completamente gratuitos. Al agregar nuevas marcas o landings para el cliente, basta con crear una carpeta frontend adicional (`frontend-*`), un módulo en `apps/` en el backend existente, y un servicio `type: web, runtime: static` en `render.yaml`.
+- **Puertos de Desarrollo**: LaundryGo corre en `http://localhost:5173` y GoPropertyCare en `http://localhost:5174`. Ambos proxian sus solicitudes `/api` al backend Django en `http://localhost:8000` en entornos locales.
+- **Resolución de Red IPv4 en Render**: En `config/settings.py`, `socket.getaddrinfo` fuerza `AF_INET` para garantizar que los contenedores Linux de Render no intenten rutas IPv6 inalcanzables al conectar con `smtp.gmail.com:587`.
+- **Hilos de Email y Concurrencia ORM**: Al despachar correos asíncronos en segundo plano (`threading.Thread`), **siempre** extraer todos los campos del modelo (`order.id`, `recipient_email`, `total_price`, etc.) en variables locales *antes* de iniciar el hilo daemon. Acceder a relaciones ORM lazy dentro del hilo puede ocasionar bloqueos de base de datos (`database table is locked`).
+- **Control de Calidad y Pruebas**:
+  - Backend: 28 pruebas unitarias pasando con `pytest` (`apps/orders`, `apps/cleaning`, `apps/users`, `apps/core`).
+  - Frontends: Compilación estricta con TypeScript (`tsc -b && vite build`) y análisis de linter con `oxlint`.
+- **Tailwind CSS v4 en Frontend**: Ambos frontends usan `@tailwindcss/vite` e importación directa en `src/index.css`. No crear `tailwind.config.js`.
+- **Modelo de Usuario Personalizado**: Siempre importar el modelo de usuario utilizando `django.contrib.auth.get_user_model()` o referenciar `settings.AUTH_USER_MODEL`. Nunca importar `django.contrib.auth.models.User` directamente.
+- **Canales de Contacto Oficiales**:
+  - **LaundryGo**: `info@thelaundrygo.com` | `(720) 590-8632` | Denver & Boulder, CO.
+  - **GoPropertyCare**: `info@gopropertycare.com` | `(720) 590-8632` | Denver & Boulder, CO.

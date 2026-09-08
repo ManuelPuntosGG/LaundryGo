@@ -31,7 +31,7 @@ if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Ensure essential production domains are always included
-for default_host in ('.thelaundrygo.com', 'thelaundrygo.com', '.onrender.com'):
+for default_host in ('.thelaundrygo.com', 'thelaundrygo.com', '.gopropertycare.com', 'gopropertycare.com', '.onrender.com'):
     if default_host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(default_host)
 
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.users',
     'apps.orders',
+    'apps.cleaning',
 ]
 
 MIDDLEWARE = [
@@ -209,6 +210,8 @@ if FRONTEND_URL and FRONTEND_URL not in CORS_ALLOWED_ORIGINS:
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/.*\.thelaundrygo\.com$",
     r"^https:\/\/thelaundrygo\.com$",
+    r"^https:\/\/.*\.gopropertycare\.com$",
+    r"^https:\/\/gopropertycare\.com$",
     r"^https:\/\/.*\.onrender\.com$",
     r"^http:\/\/localhost:\d+$",
     r"^http:\/\/127\.0\.0\.1:\d+$",
@@ -227,9 +230,11 @@ if not CSRF_TRUSTED_ORIGINS:
         'https://*.onrender.com',
         'https://*.thelaundrygo.com',
         'https://thelaundrygo.com',
+        'https://*.gopropertycare.com',
+        'https://gopropertycare.com',
     ]
 
-for trusted_domain in ('https://*.onrender.com', 'https://*.thelaundrygo.com', 'https://thelaundrygo.com'):
+for trusted_domain in ('https://*.onrender.com', 'https://*.thelaundrygo.com', 'https://thelaundrygo.com', 'https://*.gopropertycare.com', 'https://gopropertycare.com'):
     if trusted_domain not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(trusted_domain)
 

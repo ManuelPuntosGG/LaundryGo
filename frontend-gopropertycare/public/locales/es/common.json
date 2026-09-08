@@ -1,0 +1,244 @@
+{
+  "app": {
+    "name": "GoPropertyCare",
+    "tagline": "Servicio Profesional de Limpieza y Cuidado de Propiedades en Denver y Boulder"
+  },
+  "nav": {
+    "home": "Inicio",
+    "about": "Sobre Nosotros",
+    "schedule": "Agendar Limpieza",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "dashboard": "Panel de Control",
+    "logout": "Cerrar Sesión"
+  },
+  "home": {
+    "badge": "Limpieza Profesional a Domicilio en Denver y Boulder, Colorado",
+    "socialProof": {
+      "rating": "4.9/5 Calificación en Denver y Boulder",
+      "properties": "+850 Propiedades Atendidas",
+      "eco": "Insumos Ecológicos y No Tóxicos",
+      "guarantee": "100% Garantía de Limpieza"
+    },
+    "hero": {
+      "title": "Espacios Impecables, Vida en Armonía",
+      "subtitle": "Servicio profesional de limpieza residencial y comercial con tarifas claras por pie cuadrado y personal asegurado en Denver y sus alrededores.",
+      "cta": "Agendar Limpieza",
+      "secondaryCta": "Calcular Precio"
+    },
+    "estimator": {
+      "title": "Calculadora Interactiva por Sq Ft",
+      "subtitle": "Desliza o escribe los metros o pies cuadrados de tu propiedad para ver el costo estimado instantáneo en cada nivel de servicio.",
+      "small": "Apartamento / Estudio (~800 sq ft)",
+      "smallDesc": "1-2 habitaciones, 1 baño",
+      "medium": "Casa Unifamiliar (~1,800 sq ft)",
+      "mediumDesc": "3 habitaciones, 2 baños",
+      "large": "Residencia Amplia (~3,000 sq ft)",
+      "largeDesc": "4+ habitaciones, varios niveles",
+      "sqftLabel": "Tamaño de Propiedad",
+      "estTotal": "Costo Estimado",
+      "minOrderNotice": "Nota: Aplica una orden mínima de $99 en todos los servicios de limpieza.",
+      "sqftUnit": "sq ft"
+    },
+    "howItWorks": {
+      "title": "¿Cómo Funciona?",
+      "subtitle": "Cuatro pasos sencillos para tener tu hogar o negocio impecable.",
+      "step1": {
+        "title": "Elige Tamaño y Servicio",
+        "description": "Selecciona el nivel de limpieza, indica los pies cuadrados y elige la fecha de tu preferencia."
+      },
+      "step2": {
+        "title": "Personaliza Detalles",
+        "description": "Indica si hay mascotas, techos altos o si requieres limpieza profunda de electrodomésticos."
+      },
+      "step3": {
+        "title": "Limpiamos con Cuidado",
+        "description": "Nuestro equipo asegurado y verificado llega puntual con equipos y productos profesionales."
+      },
+      "step4": {
+        "title": "Disfruta tus Espacios",
+        "description": "Inspecciona tu propiedad brillante y relájate con nuestra garantía de satisfacción."
+      }
+    },
+    "pricing": {
+      "title": "Tarifas Transparentes por Pie Cuadrado",
+      "subtitle": "Adaptadas a las medidas exactas de tu propiedad, sin sorpresas ni tarifas ocultas.",
+      "regular": {
+        "name": "Limpieza Regular",
+        "tagline": "Mantenimiento Continuo",
+        "rate": "$0.10 / sq ft",
+        "description": "Mantenimiento estándar para residencias y oficinas. Desempolvado, aspirado, trapeado, desinfección de baños y cocina.",
+        "features": [
+          "Desempolvado de superficies accesibles",
+          "Aspirado de alfombras y trapeado de pisos",
+          "Desinfección integral de baños y sanitarios",
+          "Encimeras, fregaderos y exterior de electrodomésticos",
+          "Retiro de basura y ordenamiento general"
+        ]
+      },
+      "deep": {
+        "name": "Limpieza Profunda (GoFurther)",
+        "tagline": "Detalle Intensivo",
+        "rate": "$0.16 / sq ft",
+        "description": "Limpieza a fondo para casas y negocios. Elimina suciedad pesada acumulada, zócalos, juntas de azulejo y áreas de difícil acceso.",
+        "features": [
+          "Todo lo incluido en Limpieza Regular",
+          "Limpieza manual de zócalos, puertas y marcos",
+          "Fregado profundo de juntas y remoción de sarro",
+          "Limpieza detallada exterior de gabinetes",
+          "Desinfección de suciedad pesada acumulada"
+        ]
+      },
+      "moveInOut": {
+        "name": "Limpieza Move-In / Move-Out",
+        "tagline": "Lista para Inspección",
+        "rate": "$0.20 / sq ft",
+        "description": "Restablecimiento total de la propiedad para inquilinos o propietarios entrantes o salientes. Ideal para recuperar el depósito.",
+        "features": [
+          "Todo lo incluido en Limpieza Profunda",
+          "Interior de armarios, clósets y repisas vacías",
+          "Rieles de ventanas, marcos y cristales interiores",
+          "Zócalos, interruptores e interiores desinfectados",
+          "Cumplimiento con estándares de mudanza"
+        ]
+      },
+      "postConstruction": {
+        "name": "Limpieza Post-Construcción",
+        "tagline": "Grado Industrial",
+        "rate": "$0.26 / sq ft",
+        "description": "Nivel máximo de profundidad con aspirado industrial HEPA. Remoción de polvo fino de yeso, cemento, restos de pintura y pegatinas.",
+        "features": [
+          "Aspirado HEPA para micro-partículas de polvo",
+          "Limpieza de residuos de yeso, cemento y masilla",
+          "Remoción de salpicaduras de pintura y etiquetas",
+          "Limpieza minuciosa de lámparas, rejillas y esquinas",
+          "Higienización y purificación de aire y superficies"
+        ]
+      },
+      "bookNow": "Reservar este Servicio",
+      "minNotice": "Aplica tarifa mínima de servicio de $99. El monto final se calcula con el tamaño verificado y recargos elegidos."
+    },
+    "coverage": {
+      "title": "Área de Cobertura en Denver y Boulder",
+      "subtitle": "Brindamos servicio a todo el corredor metropolitano de Denver con puntualidad y garantía.",
+      "innerBadge": "Zona Inner — Traslado GRATIS",
+      "outerBadge": "Zona Outer — Recargo de Traslado $25",
+      "innerDesc": "Denver (Centro y Central), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, Broomfield.",
+      "outerDesc": "Aurora, Thornton, Centennial, Highlands Ranch."
+    },
+    "contact": {
+      "title": "¿Tienes dudas o requieres una cotización especial?",
+      "subtitle": "Nuestros especialistas en limpieza en Denver están listos para ayudarte.",
+      "phone": "(720) 590-8632",
+      "email": "info@gopropertycare.com",
+      "hours": "Lunes a Sábado: 7:00 AM – 7:00 PM",
+      "location": "Área Metropolitana de Denver y Boulder, CO"
+    }
+  },
+  "about": {
+    "title": "Sobre GoPropertyCare",
+    "subtitle": "Especialistas en cuidado y limpieza de propiedades en Denver y Boulder.",
+    "mission": {
+      "title": "Nuestra Misión",
+      "description": "En GoPropertyCare creemos que un entorno limpio y ordenado brinda tranquilidad, salud y productividad. Llevamos estándares de limpieza hospitalaria con calidez y esmero profesional a hogares, propiedades en alquiler y comercios de Denver y Boulder."
+    },
+    "values": {
+      "ecoTitle": "Ecológico y No Tóxico",
+      "ecoDesc": "Utilizamos productos biodegradables seguros para mascotas y niños, cuidando la calidad del aire de tu hogar.",
+      "vettedTitle": "Personal Asegurado y Verificado",
+      "vettedDesc": "Cada limpiador cuenta con verificación de antecedentes, entrenamiento riguroso y póliza de seguro de responsabilidad.",
+      "standardTitle": "Estándar de Inspección de 50 Puntos",
+      "standardDesc": "Seguimos una lista de verificación exhaustiva para garantizar que ningún rincón quede sin atender.",
+      "pricingTitle": "Precios Justos por Sq Ft",
+      "pricingDesc": "Sin tarifas arbitrarias por hora. Pagas por la dimensión real de tu inmueble con absoluta transparencia."
+    },
+    "checklist": {
+      "title": "Nuestra Lista de Control de Limpieza",
+      "kitchen": "Cocina: Encimeras, estufa, exterior de electrodomésticos, fregadero, grifería desinfectada y frentes de gabinetes.",
+      "bathrooms": "Baños: Azulejos fregados, canceles abrillantados, inodoros y duchas desinfectadas, espejos relucientes.",
+      "living": "Salas y Recámaras: Desempolvado superior e inferior, cuadros, marcos y aspirado bajo muebles accesibles.",
+      "floors": "Pisos: Aspirado profundo de tapetes y trapeado húmedo de pisos duros con soluciones de pH neutro."
+    }
+  },
+  "schedule": {
+    "title": "Agenda tu Servicio de Limpieza",
+    "subtitle": "Completa tu reserva en 4 sencillos pasos.",
+    "step1": "Tamaño y Nivel",
+    "step2": "Fecha y Horario",
+    "step3": "Ubicación y Extras",
+    "step4": "Revisión y Confirmación",
+    "step1Title": "Selecciona el Tamaño y Nivel de Limpieza",
+    "sqftLabel": "Tamaño de la Propiedad (Pies Cuadrados / Sq Ft)",
+    "sqftHelp": "Estima los pies cuadrados totales a limpiar (mínimo 50 sq ft).",
+    "selectTier": "Elige el Tipo de Servicio",
+    "step2Title": "Elige la Fecha y Franja Horaria",
+    "dateNotice": "Nota: Los servicios de limpieza requieren agendamiento anticipado (disponibles a partir de mañana).",
+    "morningSlot": "Turno Mañana (8:00 AM – 12:00 PM)",
+    "afternoonSlot": "Turno Tarde (1:00 PM – 5:00 PM)",
+    "step3Title": "Ubicación y Recargos de Dificultad",
+    "citySelect": "Selecciona tu Ciudad / Zona",
+    "innerZone": "Denver y Boulder Central (Traslado GRATIS)",
+    "outerZone": "Zona Periférica de Denver (Recargo $25)",
+    "addressLabel": "Dirección",
+    "zipLabel": "Código Postal (ZIP Code)",
+    "addonsTitle": "Recargos de Dificultad / Cuidados Especiales",
+    "addonsSubtitle": "Selecciona si tu propiedad presenta alguno de estos factores para asignar el tiempo y equipo adecuado.",
+    "step4Title": "Resumen y Confirmación de Reserva",
+    "guestNotice": "Reservando como invitado. Puedes crear una cuenta en cualquier momento con tu correo.",
+    "basePrice": "Tarifa Base de Limpieza",
+    "addonsFee": "Recargos de Dificultad",
+    "travelFee": "Tarifa de Traslado de Zona",
+    "totalDue": "Total Estimado",
+    "specialInstructions": "Instrucciones de Acceso (Código de portón, llaves, mascotas, notas)",
+    "termsAgree": "Acepto los términos de servicio de GoPropertyCare y reconozco la política de orden mínima de $99.",
+    "submitOrder": "Confirmar Reserva de Limpieza",
+    "submitting": "Enviando tu Reserva...",
+    "successTitle": "¡Reserva Confirmada!",
+    "successSubtitle": "Tu cita de limpieza ha quedado agendada en nuestro sistema.",
+    "orderNumber": "Número de Orden",
+    "backHome": "Volver al Inicio",
+    "viewDashboard": "Ver en el Panel"
+  },
+  "auth": {
+    "loginTitle": "Bienvenido a GoPropertyCare",
+    "registerTitle": "Crea tu Cuenta en GoPropertyCare",
+    "emailLabel": "Correo Electrónico",
+    "passwordLabel": "Contraseña",
+    "confirmPasswordLabel": "Confirmar Contraseña",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Número de Teléfono",
+    "street": "Dirección",
+    "city": "Ciudad",
+    "zip": "Código Postal",
+    "signInBtn": "Iniciar Sesión",
+    "registerBtn": "Crear Cuenta",
+    "dontHaveAccount": "¿No tienes cuenta? Regístrate",
+    "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión",
+    "loginSuccess": "¡Sesión iniciada con éxito!",
+    "registerSuccess": "¡Cuenta creada exitosamente!"
+  },
+  "dashboard": {
+    "title": "Panel del Cliente",
+    "subtitle": "Consulta y administra tus reservas de limpieza pasadas y próximas.",
+    "myOrders": "Historial de Limpiezas",
+    "profile": "Perfil y Dirección",
+    "noOrders": "Aún no tienes reservas de limpieza registradas.",
+    "bookFirst": "Agendar mi Primera Limpieza",
+    "orderNum": "Orden #",
+    "status": "Estado",
+    "date": "Fecha",
+    "total": "Total",
+    "cancel": "Cancelar Reserva",
+    "cancelConfirm": "¿Estás seguro de que deseas cancelar esta reserva de limpieza?",
+    "cancelledSuccess": "Reserva cancelada exitosamente.",
+    "reorder": "Volver a Pedir"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error. Por favor intenta de nuevo.",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "required": "Requerido"
+  }
+}

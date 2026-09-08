@@ -20,7 +20,9 @@ class RegisterView(generics.CreateAPIView):
         # Automatically link past guest orders matching user's email
         try:
             from apps.orders.models import Order
+            from apps.cleaning.models import CleaningOrder
             Order.objects.filter(user__isnull=True, guest_email__iexact=user.email).update(user=user)
+            CleaningOrder.objects.filter(user__isnull=True, guest_email__iexact=user.email).update(user=user)
         except Exception as e:
             import logging
             logging.getLogger(__name__).warning(f"Could not link past guest orders for {user.email}: {e}")
