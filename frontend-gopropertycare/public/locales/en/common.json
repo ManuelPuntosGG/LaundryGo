@@ -9,126 +9,126 @@
     "schedule": "Schedule Cleaning",
     "login": "Login",
     "register": "Register",
-    "dashboard": "Dashboard",
+    "dashboard": "My Account",
     "logout": "Logout"
   },
   "home": {
-    "badge": "Professional Cleaning in Denver & Boulder, Colorado",
+    "badge": "Professional Cleaning at Your Doorstep • Denver & Boulder",
     "socialProof": {
-      "rating": "4.9/5 Rating in Denver & Boulder",
-      "properties": "+850 Properties Cleaned",
-      "eco": "Eco-Friendly & Non-Toxic Supplies",
-      "guarantee": "100% Clean Guarantee"
+      "rating": "4.9/5 Customer Rating",
+      "properties": "+850 Homes & Offices Cleaned",
+      "eco": "Eco-Friendly & Safe Supplies",
+      "guarantee": "100% Satisfaction Guarantee"
     },
     "hero": {
-      "title": "Spotless Spaces, Pristine Living",
-      "subtitle": "Trusted residential and commercial cleaning with transparent per-square-foot pricing and dedicated care teams in Denver and surrounding areas.",
-      "cta": "Schedule Cleaning",
+      "title": "Spotless Spaces, More Time for You",
+      "subtitle": "Enjoy a fresh, beautifully clean home without lifting a finger. Professional cleaning tailored to your space with upfront pricing and trusted local cleaners in Denver & Boulder.",
+      "cta": "Schedule My Cleaning",
       "secondaryCta": "Estimate Price"
     },
     "estimator": {
-      "title": "Interactive Sq Ft Cost Estimator",
-      "subtitle": "Select or input your property size to preview instant pricing across all service tiers.",
+      "title": "Instant Price Estimator",
+      "subtitle": "Slide to your property size for instant upfront pricing across all cleaning services.",
       "small": "Apartment / Studio (~800 sq ft)",
       "smallDesc": "1-2 bedrooms, 1 bathroom",
-      "medium": "Single Family Home (~1,800 sq ft)",
+      "medium": "Family Home (~1,800 sq ft)",
       "mediumDesc": "3 bedrooms, 2 bathrooms",
       "large": "Spacious Residence (~3,000 sq ft)",
-      "largeDesc": "4+ bedrooms, multi-level home",
+      "largeDesc": "4+ bedrooms or multi-level",
       "sqftLabel": "Property Size",
-      "estTotal": "Estimated Cost",
-      "minOrderNotice": "Note: A $99 minimum service order applies to all cleaning visits.",
+      "estTotal": "Estimated Price",
+      "minOrderNotice": "Fair pricing: $99 minimum visit charge to guarantee dedicated, top-tier service.",
       "sqftUnit": "sq ft"
     },
     "howItWorks": {
-      "title": "How It Works",
-      "subtitle": "Four easy steps to a pristine home or workplace.",
+      "title": "Your Cleaning in 4 Easy Steps",
+      "subtitle": "Simple, fast, and completely stress-free so you can enjoy your space.",
       "step1": {
-        "title": "Select Size & Tier",
-        "description": "Pick your cleaning tier, input your square footage, and choose your preferred day."
+        "title": "1. Tell Us About Your Space",
+        "description": "Share your approximate square footage, pick the ideal cleaning level, and choose your preferred date."
       },
       "step2": {
-        "title": "Add Property Details",
-        "description": "Select any difficulty factors like pets, high ceilings, or interior appliances."
+        "title": "2. Personalize Your Visit",
+        "description": "Add special care for friendly pets, high ceilings, or inside oven and refrigerator cleaning."
       },
       "step3": {
-        "title": "We Clean & Care",
-        "description": "Our insured, background-checked crew arrives fully equipped with commercial tools."
+        "title": "3. We Clean & Care",
+        "description": "Our vetted, insured cleaners arrive on time equipped with eco-friendly supplies safe for your family."
       },
       "step4": {
-        "title": "Pristine Results",
-        "description": "Enjoy your immaculate, fresh space with our 100% satisfaction guarantee."
+        "title": "4. Enjoy Your Spotless Home",
+        "description": "Walk into a fresh, immaculate space backed by our 100% clean satisfaction guarantee."
       }
     },
     "pricing": {
-      "title": "Transparent Pricing Per Square Foot",
-      "subtitle": "Customized to your exact property dimensions with no hidden surprises.",
+      "title": "Clear Pricing Per Square Foot",
+      "subtitle": "You only pay for the exact size of your space with zero hidden surprises.",
       "regular": {
         "name": "Regular Cleaning",
-        "tagline": "Routine Maintenance",
+        "tagline": "Weekly or Bi-Weekly Upkeep",
         "rate": "$0.10 / sq ft",
-        "description": "Standard upkeep for homes and offices. Dusting, mopping, wiping surfaces, sanitizing kitchens and bathrooms.",
+        "description": "Keep your home fresh, tidy, and sparkling every week. The effortless way to maintain a clean, healthy space.",
         "features": [
-          "Dusting all reachable surfaces",
-          "Vacuuming carpets & mopping hard floors",
-          "Complete bathroom cleaning & sanitizing",
-          "Kitchen countertops, sink & exterior appliances",
-          "Trash removal & tidy up"
+          "Thoroughly sanitized kitchen & bathrooms",
+          "Vacuumed carpets & freshly mopped hard floors",
+          "Dust-free furniture, counters & surfaces",
+          "Gleaming countertops, faucets & sinks",
+          "Trash removal & tidy up throughout"
         ]
       },
       "deep": {
         "name": "Deep Cleaning (GoFurther)",
-        "tagline": "Intensive Detail",
+        "tagline": "Complete Deep Reset",
         "rate": "$0.16 / sq ft",
-        "description": "Exhaustive deep clean for homes and businesses. Targets built-up grime, baseboards, grout lines, and behind appliances.",
+        "description": "A comprehensive refresh when your home needs extra care. We reach the hidden grime, baseboards, and forgotten corners.",
         "features": [
-          "Everything in Regular Cleaning",
-          "Hand-wiping baseboards, doors & doorframes",
-          "Deep tile grout scrubbing & lime scale removal",
-          "Detailed cabinet exterior cleaning",
-          "Heavy grime sanitization throughout"
+          "Everything included in Regular Cleaning",
+          "Hand-wiping of baseboards, door frames & trim",
+          "Deep scrubbing of tile grout & bathroom buildup",
+          "Exterior cabinet fronts degreased & polished",
+          "Intensive sanitization for high-touch areas"
         ]
       },
       "moveInOut": {
         "name": "Move-In / Move-Out",
-        "tagline": "Inspection Ready",
+        "tagline": "Inspection & Turnover Ready",
         "rate": "$0.20 / sq ft",
-        "description": "Complete top-to-bottom reset for incoming or departing tenants and homeowners. Designed for security deposit recovery.",
+        "description": "Move with total peace of mind. We make your new home move-in ready or your previous place spotless for deposit return.",
         "features": [
-          "Everything in Deep Cleaning",
-          "Inside all closets & built-in shelving",
-          "Window sills, tracks & interior glass touch-up",
-          "Baseboards, trim & switch plates disinfected",
-          "Move-in / move-out checklist compliance"
+          "Everything included in Deep Cleaning",
+          "Inside empty closets, drawers & built-in shelving",
+          "Window sills, tracks & interior glass wiped down",
+          "Disinfected baseboards, switches & doors",
+          "Guaranteed ready for landlord or buyer walkthrough"
         ]
       },
       "postConstruction": {
         "name": "Post-Construction",
-        "tagline": "Industrial Grade",
+        "tagline": "Renovation Cleanup & Dust Removal",
         "rate": "$0.26 / sq ft",
-        "description": "Maximum depth cleaning with industrial HEPA filtration. Clears drywall dust, fine plaster, tape residue, and paint specks.",
+        "description": "Turn your newly remodeled space into a clean, safe, and livable home. We eliminate fine drywall dust so you can move right in.",
         "features": [
-          "HEPA vacuuming for micro-dust particles",
-          "Drywall & plaster dust wipe down",
-          "Paint splatter & sticker residue removal",
-          "Deep fixture, vent & ledge cleaning",
-          "Industrial-grade air & surface sanitization"
+          "Specialized capture of fine dust, plaster & drywall powder",
+          "Removal of paint specks, tape & sticker residue",
+          "Detailed dusting of light fixtures, vents & ledges",
+          "Floors and tiles stripped of construction residue",
+          "Fresh, breathable air ready for you to enjoy"
         ]
       },
       "bookNow": "Book This Service",
-      "minNotice": "Minimum service charge is $99. Final invoice reflects verified square footage and selected add-ons."
+      "minNotice": "$99 minimum service fee per visit. Final price is calculated using verified dimensions and selected extras."
     },
     "coverage": {
-      "title": "Service Coverage in Denver & Boulder",
-      "subtitle": "Serving the entire Denver metro corridor with prompt, reliable service.",
-      "innerBadge": "Inner Zone — FREE Travel",
-      "outerBadge": "Outer Zone — $25 Travel Surcharge",
-      "innerDesc": "Denver (Downtown & Central), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, Broomfield.",
-      "outerDesc": "Aurora, Thornton, Centennial, Highlands Ranch."
+      "title": "Service Areas in Denver & Boulder",
+      "subtitle": "Prompt, reliable service delivered across the entire Denver metropolitan corridor.",
+      "innerBadge": "Core Zone — FREE Travel",
+      "outerBadge": "Outer Zone — $25 Travel Fee",
+      "innerDesc": "Denver (Downtown & surrounding neighborhoods), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, and Broomfield.",
+      "outerDesc": "Aurora, Thornton, Centennial, and Highlands Ranch."
     },
     "contact": {
-      "title": "Have Questions or Need a Custom Quote?",
-      "subtitle": "Our local Denver cleaning specialists are ready to assist you.",
+      "title": "Have Questions or Need Custom Care?",
+      "subtitle": "Our friendly Denver cleaning specialists are here to assist you.",
       "phone": "(720) 590-8632",
       "email": "info@gopropertycare.com",
       "hours": "Mon – Sat: 7:00 AM – 7:00 PM",
@@ -136,72 +136,112 @@
     }
   },
   "about": {
-    "title": "About GoPropertyCare",
-    "subtitle": "Denver's premier property care and residential cleaning specialists.",
+    "tagline": "Denver & Boulder Property Specialists",
+    "title": "Caring for Your Home as if It Were Our Own",
+    "subtitle": "Denver's trusted property care team dedicated to healthy spaces, reliable cleaners, and upfront pricing.",
+    "insuredBadge": "Fully Insured & Bonded",
+    "ecoBadge": "Safe for Families & Pets",
     "mission": {
       "title": "Our Mission",
-      "description": "At GoPropertyCare, we believe a spotless space fosters clarity, health, and peace of mind. We deliver hospital-grade cleanliness with white-glove hospitality to homes, rental properties, and commercial venues across Denver and Boulder."
+      "description": "We believe a clean, orderly home gives you back valuable time, better health, and true peace of mind. We combine hospital-grade standards with genuine hospitality to deliver sparkling spaces for families and businesses across Denver and Boulder."
     },
+    "pillarsTitle": "Our Operational Pillars",
     "values": {
-      "ecoTitle": "Eco-Friendly & Non-Toxic",
-      "ecoDesc": "We use sustainable, pet-safe, and child-safe cleaning agents that protect your indoor air quality.",
+      "ecoTitle": "Safe for Family & Pets",
+      "ecoDesc": "We strictly use non-toxic, biodegradable cleaning agents that protect your indoor air quality and loved ones.",
       "vettedTitle": "Insured & Background-Checked",
       "vettedDesc": "Every cleaner is thoroughly vetted, trained in modern techniques, and covered by comprehensive liability insurance.",
-      "standardTitle": "50-Point Inspection Standard",
-      "standardDesc": "We follow a meticulous checklist to ensure zero missed spots, from ceiling corners to floorboards.",
-      "pricingTitle": "Fair Per-Sq-Ft Pricing",
-      "pricingDesc": "No arbitrary hourly estimates. You pay for the actual size of your space with guaranteed transparent pricing."
+      "standardTitle": "50-Point Quality Inspection",
+      "standardDesc": "We follow a meticulous checklist to ensure zero missed spots, from high ceiling corners to clean floorboards.",
+      "pricingTitle": "Clear, Fair Pricing",
+      "pricingDesc": "No unpredictable hourly estimates. You pay for the exact size of your space with guaranteed transparency."
     },
     "checklist": {
-      "title": "Our Comprehensive Cleaning Checklist",
-      "kitchen": "Kitchen: Countertops, stovetop, exterior appliances, sinks, faucets sanitized, cabinet fronts wiped.",
-      "bathrooms": "Bathrooms: Tile scrubbed, glass polished, toilets & showers disinfected, mirrors shined.",
-      "living": "Living & Bedrooms: High/low dusting, mirrors, picture frames, vacuuming under accessible furniture.",
-      "floors": "Floors: Thorough vacuuming of carpets and damp-mopping of hard surfaces with pH-neutral solutions."
+      "title": "Our Signature Cleaning Checklist",
+      "subtitle": "A room-by-room procedure designed to leave every space immaculate.",
+      "kitchenTitle": "Kitchen Sanitization",
+      "kitchen": "Countertops, stovetop, exterior appliances, gleaming sink & sanitized cabinet fronts.",
+      "bathroomsTitle": "Bathrooms & Tiles",
+      "bathrooms": "Tile scrubbed, glass polished, toilets & showers disinfected, streak-free mirrors.",
+      "livingTitle": "Living Areas & Bedrooms",
+      "living": "High/low dusting, mirrors, picture frames, and vacuuming under accessible furniture.",
+      "floorsTitle": "Floor Care & Vacuuming",
+      "floors": "Thorough carpet vacuuming and damp-mopping of hard floors with gentle, fresh-scented cleaners."
+    },
+    "cta": {
+      "title": "Ready to Experience Impeccable Property Care?",
+      "subtitle": "Book your service online in minutes. Enjoy transparent $/sq ft rates and zero surprise travel fees in Denver & Boulder core.",
+      "scheduleBtn": "Schedule Online"
+    }
+  },
+  "cleaningAddons": {
+    "pets_presence": {
+      "name": "Home with Pets",
+      "description": "Special attention to remove stubborn pet hair and freshen up upholstery and floors."
+    },
+    "high_ceilings": {
+      "name": "High Ceilings or Tall Windows",
+      "description": "Safe, thorough dusting of high fixtures, chandeliers, and hard-to-reach windows."
+    },
+    "oven_fridge_interior": {
+      "name": "Oven & Fridge Interior",
+      "description": "Deep interior wipe-down and degreasing, clean and ready for your fresh groceries."
+    },
+    "cabinets_interior": {
+      "name": "Inside Cabinets & Drawers",
+      "description": "Internal cleaning and sanitizing of kitchen or bathroom cabinets and pantry shelves."
+    },
+    "basement_attic": {
+      "name": "Finished Basement or Attic",
+      "description": "Include complete cleaning for your finished lower-level suite or usable attic space."
+    },
+    "patio_balcony": {
+      "name": "Outdoor Balcony or Patio",
+      "description": "Sweeping and washing of your private patio or balcony so you can enjoy the fresh air."
     }
   },
   "schedule": {
-    "title": "Schedule Your Cleaning Service",
-    "subtitle": "Complete your booking in 4 easy steps.",
-    "step1": "Size & Tier",
-    "step2": "Date & Time",
-    "step3": "Location & Add-ons",
-    "step4": "Review & Confirm",
-    "step1Title": "Select Property Size & Cleaning Tier",
-    "sqftLabel": "Property Size (Square Feet)",
-    "sqftHelp": "Estimate the total square footage to be cleaned (minimum 50 sq ft).",
-    "selectTier": "Choose Your Cleaning Tier",
-    "step2Title": "Choose Service Date & Window",
-    "dateNotice": "Note: Cleaning services require advance scheduling (available starting tomorrow).",
+    "title": "Schedule Your Cleaning in Minutes",
+    "subtitle": "Customize your service in 4 easy steps and relax: we'll handle the rest.",
+    "step1": "Space & Tier",
+    "step2": "Date & Window",
+    "step3": "Location & Extras",
+    "step4": "Confirmation",
+    "step1Title": "Select Property Size & Cleaning Service",
+    "sqftLabel": "Property Size (Square Feet / Sq Ft)",
+    "sqftHelp": "Estimate the total area you would like cleaned (minimum 100 sq ft).",
+    "selectTier": "Choose Your Ideal Cleaning Tier",
+    "step2Title": "When Would You Like Us to Arrive?",
+    "dateNotice": "Appointments available starting tomorrow with punctual arrival in your selected window.",
     "morningSlot": "Morning Window (8:00 AM – 12:00 PM)",
     "afternoonSlot": "Afternoon Window (1:00 PM – 5:00 PM)",
-    "step3Title": "Location & Property Surcharges",
-    "citySelect": "Select Your City / Area",
-    "innerZone": "Denver/Boulder Core (FREE Travel)",
-    "outerZone": "Outer Denver Zone ($25 Travel Fee)",
+    "step3Title": "Address & Special Property Care",
+    "citySelect": "City or Neighborhood in Denver / Boulder",
+    "innerZone": "Denver & Boulder Core (FREE Travel)",
+    "outerZone": "Outer Denver Metro ($25 Travel Fee)",
     "addressLabel": "Street Address",
     "zipLabel": "ZIP Code",
-    "addonsTitle": "Property Difficulty Surcharges / Extras",
-    "addonsSubtitle": "Select any conditions that apply to ensure adequate time and equipment.",
-    "step4Title": "Order Summary & Confirmation",
-    "guestNotice": "Checking out as guest. You can create an account anytime with your email.",
-    "basePrice": "Base Cleaning Fee",
-    "addonsFee": "Difficulty Surcharges",
-    "travelFee": "Zone Travel Surcharge",
+    "addonsTitle": "Special Care & Add-ons",
+    "addonsSubtitle": "Select any conditions that apply so our team brings the exact right equipment.",
+    "step4Title": "Review Your Reservation",
+    "guestNotice": "Booking as a guest. You can create an account anytime with your email to view your history.",
+    "basePrice": "Base Cleaning Service",
+    "addonsFee": "Special Care / Add-ons",
+    "travelFee": "Travel Fee",
     "totalDue": "Total Estimated",
-    "specialInstructions": "Special Access Instructions (Gate code, key location, pets, etc.)",
-    "termsAgree": "I agree to the GoPropertyCare terms of service and acknowledge the $99 minimum charge policy.",
-    "submitOrder": "Confirm Cleaning Reservation",
-    "submitting": "Submitting Your Booking...",
-    "successTitle": "Booking Confirmed!",
-    "successSubtitle": "Your cleaning appointment has been scheduled.",
+    "specialInstructions": "Access Instructions & Notes (Gate code, key location, notes for cleaners)",
+    "termsAgree": "I agree to the GoPropertyCare service terms and understand the $99 minimum visit charge.",
+    "submitOrder": "Confirm My Cleaning",
+    "submitting": "Confirming your booking...",
+    "successTitle": "You're All Set! Cleaning Scheduled",
+    "successSubtitle": "We have received your reservation and dispatched full details to your email.",
     "orderNumber": "Order Number",
     "backHome": "Return Home",
-    "viewDashboard": "View in Dashboard"
+    "viewDashboard": "View in My Account"
   },
   "auth": {
-    "loginTitle": "Welcome Back to GoPropertyCare",
-    "registerTitle": "Create Your GoPropertyCare Account",
+    "loginTitle": "Welcome to GoPropertyCare",
+    "registerTitle": "Create Your Account",
     "emailLabel": "Email Address",
     "passwordLabel": "Password",
     "confirmPasswordLabel": "Confirm Password",
@@ -215,29 +255,57 @@
     "registerBtn": "Create Account",
     "dontHaveAccount": "Don't have an account? Sign up",
     "alreadyHaveAccount": "Already have an account? Sign in",
-    "loginSuccess": "Logged in successfully!",
+    "loginSuccess": "Signed in successfully!",
     "registerSuccess": "Account created successfully!"
   },
   "dashboard": {
-    "title": "Client Dashboard",
-    "subtitle": "Manage your past and upcoming cleaning reservations.",
-    "myOrders": "Cleaning History",
+    "title": "My Account",
+    "subtitle": "View your cleaning history and manage upcoming appointments.",
+    "welcome": "Welcome back",
+    "bookNew": "Book New Cleaning",
+    "myOrders": "My Cleanings",
     "profile": "Profile & Address",
+    "loadingOrders": "Loading your reservations...",
     "noOrders": "You don't have any cleaning reservations yet.",
-    "bookFirst": "Schedule Your First Cleaning",
-    "orderNum": "Order #",
+    "bookFirst": "Schedule My First Cleaning",
+    "orderNum": "Booking #",
     "status": "Status",
     "date": "Date",
+    "window": "Window",
+    "size": "Size",
     "total": "Total",
-    "cancel": "Cancel Reservation",
-    "cancelConfirm": "Are you sure you want to cancel this cleaning booking?",
-    "cancelledSuccess": "Reservation cancelled successfully.",
-    "reorder": "Book Again"
+    "cancel": "Cancel Visit",
+    "cancelConfirm": "Are you sure you want to cancel this cleaning appointment?",
+    "cancelledSuccess": "Your cleaning appointment has been cancelled.",
+    "cancelFailed": "Failed to cancel reservation.",
+    "reorder": "Book Again",
+    "profileUpdated": "Profile updated successfully!",
+    "profileFailed": "Failed to update profile.",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone Number",
+    "streetAddress": "Default Street Address",
+    "coverageZone": "City / Coverage Zone",
+    "zipCode": "ZIP Code",
+    "statusPending": "Pending",
+    "statusConfirmed": "Confirmed",
+    "statusInProgress": "In Progress",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Cancelled"
+  },
+  "footer": {
+    "description": "Caring for homes and spaces across Denver & Boulder with insured cleaners, safe products, and transparent pricing.",
+    "guarantee": "100% Satisfaction & Peace of Mind",
+    "quickLinks": "Quick Links",
+    "cleaningTiers": "Cleaning Tiers",
+    "contactArea": "Contact & Area",
+    "rights": "All rights reserved.",
+    "localNote": "Locally operated in Denver & Boulder, CO"
   },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred. Please try again.",
-    "save": "Save",
+    "save": "Save Changes",
     "cancel": "Cancel",
     "required": "Required"
   }

@@ -2,7 +2,7 @@ import logging
 import threading
 from decimal import Decimal
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
+from apps.core.emails import send_mail_worker
 
 logger = logging.getLogger(__name__)
 
@@ -57,26 +57,26 @@ def send_cleaning_order_confirmation_email(order, language=None):
                 addons_text = " None"
 
             if is_spanish:
-                subject = f"GoPropertyCare - Confirmación de Reserva de Limpieza #{order.id}"
+                subject = f"GoPropertyCare - Confirmación de Reserva de Limpieza #{order_id}"
                 body_text = f"""¡Hola {recipient_name}!
 
 Gracias por confiar en GoPropertyCare para el cuidado y limpieza de tu propiedad. Hemos recibido y confirmado tu solicitud de servicio.
 
 Detalles de tu Reserva:
 =========================================
-• Número de Orden: #{order.id}
+• Número de Orden: #{order_id}
 • Servicio: {service_name}
 • Tamaño de Propiedad: {sqft} sq ft
 • Fecha del Servicio: {date_str}
 • Franja Horaria: {time_slot_label}
-• Dirección: {order.street_address}, {order.city} {order.zip_code}
-• Zona: {zone_label} (Recargo: ${order.delivery_fee:.2f})
+• Dirección: {street_address}, {city} {zip_code}
+• Zona: {zone_label} (Recargo: ${delivery_fee:.2f})
 • Recargos / Add-ons:{addons_text}
-• Total Estimado: ${order.total_price:.2f}
+• Total Estimado: ${total_price:.2f}
 =========================================
 
 Instrucciones Especiales / Acceso:
-{order.special_instructions or 'Ninguna especificada.'}
+{special_instructions or 'Ninguna especificada.'}
 
 Nuestro equipo profesional llegará puntual en la franja acordada con todos los insumos y equipos necesarios.
 
@@ -100,26 +100,26 @@ Denver, Colorado
                 lbl_notes = "Instrucciones de Acceso"
                 lbl_footer = "¿Preguntas o cambios? Escríbenos a info@gopropertycare.com o llámanos al (720) 590-8632."
             else:
-                subject = f"GoPropertyCare - Cleaning Booking Confirmation #{order.id}"
+                subject = f"GoPropertyCare - Cleaning Booking Confirmation #{order_id}"
                 body_text = f"""Hello {recipient_name}!
 
 Thank you for choosing GoPropertyCare for your property cleaning and care needs. We have received and confirmed your service request.
 
 Booking Details:
 =========================================
-• Order Number: #{order.id}
+• Order Number: #{order_id}
 • Service: {service_name}
 • Property Size: {sqft} sq ft
 • Scheduled Date: {date_str}
 • Time Window: {time_slot_label}
-• Address: {order.street_address}, {order.city} {order.zip_code}
-• Zone: {zone_label} (Fee: ${order.delivery_fee:.2f})
+• Address: {street_address}, {city} {zip_code}
+• Zone: {zone_label} (Fee: ${delivery_fee:.2f})
 • Add-ons & Surcharges:{addons_text}
-• Estimated Total: ${order.total_price:.2f}
+• Estimated Total: ${total_price:.2f}
 =========================================
 
 Access & Special Instructions:
-{order.special_instructions or 'None provided.'}
+{special_instructions or 'None provided.'}
 
 Our cleaning crew will arrive punctually during the selected window with all required commercial equipment and eco-friendly supplies.
 
@@ -172,7 +172,7 @@ Denver, Colorado
               <table width="100%" style="margin: 24px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px;">
                 <tr>
                   <td style="padding: 8px 12px; color: #64748b; font-size: 13px; font-weight: 600;">{lbl_order}</td>
-                  <td style="padding: 8px 12px; color: #0f172a; font-size: 15px; font-weight: 700; text-align: right;">#{order.id}</td>
+                  <td style="padding: 8px 12px; color: #0f172a; font-size: 15px; font-weight: 700; text-align: right;">#{order_id}</td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 12px; color: #64748b; font-size: 13px; font-weight: 600;">{lbl_service}</td>
@@ -192,7 +192,7 @@ Denver, Colorado
                 </tr>
                 <tr>
                   <td style="padding: 8px 12px; color: #64748b; font-size: 13px; font-weight: 600;">{lbl_address}</td>
-                  <td style="padding: 8px 12px; color: #0f172a; font-size: 14px; font-weight: 500; text-align: right;">{order.street_address}, {order.city} {order.zip_code}</td>
+                  <td style="padding: 8px 12px; color: #0f172a; font-size: 14px; font-weight: 500; text-align: right;">{street_address}, {city} {zip_code}</td>
                 </tr>
                 <tr>
                   <td colspan="2" style="padding: 8px 12px;">
@@ -202,14 +202,14 @@ Denver, Colorado
                 </tr>
                 <tr style="border-top: 1px solid #cbd5e1;">
                   <td style="padding: 12px; color: #0f172a; font-size: 16px; font-weight: 700;">{lbl_total}</td>
-                  <td style="padding: 12px; color: #166534; font-size: 18px; font-weight: 800; text-align: right;">${order.total_price:.2f}</td>
+                  <td style="padding: 12px; color: #166534; font-size: 18px; font-weight: 800; text-align: right;">${total_price:.2f}</td>
                 </tr>
               </table>
 
               {f'''<div style="background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 12px 16px; margin-bottom: 24px; border-radius: 4px;">
                 <p style="margin: 0; font-size: 13px; color: #166534; font-weight: 600;">{lbl_notes}:</p>
-                <p style="margin: 4px 0 0; font-size: 14px; color: #374151;">{order.special_instructions}</p>
-              </div>''' if order.special_instructions else ''}
+                <p style="margin: 4px 0 0; font-size: 14px; color: #374151;">{special_instructions}</p>
+              </div>''' if special_instructions else ''}
 
               <p style="color: #6b7280; font-size: 13px; line-height: 1.5; text-align: center; margin-top: 24px;">{lbl_footer}</p>
             </td>
@@ -228,32 +228,28 @@ Denver, Colorado
 </html>
 """
 
-            # Send email
-            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'GoPropertyCare <info@gopropertycare.com>')
-            if 'LaundryGo' in from_email:
-                from_email = 'GoPropertyCare <info@gopropertycare.com>'
-
+            from_email = 'GoPropertyCare <info@gopropertycare.com>'
             admin_email = getattr(settings, 'ADMIN_EMAIL', 'info@gopropertycare.com')
             recipients = [recipient_email] if recipient_email else []
             if admin_email and admin_email not in recipients:
                 recipients.append(admin_email)
 
             if not recipients:
-                logger.warning(f"[EMAIL SKIP] No recipient found for CleaningOrder #{order.id}")
+                logger.warning(f"[EMAIL SKIP] No recipient found for CleaningOrder #{order_id}")
                 return
 
-            email_msg = EmailMultiAlternatives(
+            send_mail_worker(
                 subject=subject,
-                body=body_text,
+                text_content=body_text,
+                html_content=html_content,
+                recipients=recipients,
+                reply_to=admin_email,
                 from_email=from_email,
-                to=recipients,
             )
-            email_msg.attach_alternative(html_content, "text/html")
-            email_msg.send(fail_silently=False)
-            logger.info(f"[EMAIL SUCCESS - GoPropertyCare] Confirmation sent for CleaningOrder #{order.id} to {recipients}")
+            logger.info(f"[EMAIL SUCCESS - GoPropertyCare] Confirmation queued for CleaningOrder #{order_id} to {recipients}")
 
         except Exception as e:
-            logger.error(f"[EMAIL FAILURE - GoPropertyCare] Confirmation failed for CleaningOrder #{order.id}: {e}", exc_info=True)
+            logger.error(f"[EMAIL FAILURE - GoPropertyCare] Confirmation failed for CleaningOrder #{order_id}: {e}", exc_info=True)
 
     thread = threading.Thread(target=_send, daemon=True)
     thread.start()
@@ -267,6 +263,7 @@ def send_cleaning_order_cancellation_email(order, language=None):
     lang = language or getattr(order, 'language', 'en') or 'en'
     is_spanish = lang.lower().startswith('es')
     service_date_str = str(order.service_date)
+    service_name = getattr(order.service_rate, 'name', 'Cleaning Service')
 
     recipient_email = (order.user.email if order.user else None) or order.guest_email
     recipient_name = (
@@ -283,24 +280,63 @@ def send_cleaning_order_cancellation_email(order, language=None):
                 subject = f"GoPropertyCare - Cancelación de Reserva #{order_id}"
                 body_text = f"""Hola {recipient_name},
 
-Tu reserva de servicio de limpieza #{order_id} programada para {service_date_str} ha sido cancelada exitosamente.
+Tu reserva de servicio de limpieza #{order_id} ({service_name}) programada para {service_date_str} ha sido cancelada exitosamente.
 
 Si no solicitaste esta cancelación o deseas reprogramar, por favor contáctanos al (720) 590-8632 o a info@gopropertycare.com.
 
 Atentamente,
 El Equipo de GoPropertyCare
 """
+                html_title = f"Reserva #{order_id} Cancelada"
+                html_p1 = f"Hola <strong>{recipient_name}</strong>,"
+                html_p2 = f"Te confirmamos que tu reserva de servicio de limpieza <strong>#{order_id}</strong> ({service_name}) programada para el <strong>{service_date_str}</strong> ha sido cancelada."
+                html_p3 = "Si deseas programar una nueva cita, puedes hacerlo en cualquier momento desde <a href='https://gopropertycare.com/schedule' style='color: #166534; font-weight: 600;'>nuestra plataforma</a>."
             else:
                 subject = f"GoPropertyCare - Booking Cancellation #{order_id}"
                 body_text = f"""Hello {recipient_name},
 
-Your cleaning service booking #{order_id} scheduled for {service_date_str} has been cancelled successfully.
+Your cleaning service booking #{order_id} ({service_name}) scheduled for {service_date_str} has been cancelled successfully.
 
 If you did not request this cancellation or would like to reschedule, please contact us at (720) 590-8632 or info@gopropertycare.com.
 
 Best regards,
 The GoPropertyCare Team
 """
+                html_title = f"Booking #{order_id} Cancelled"
+                html_p1 = f"Hello <strong>{recipient_name}</strong>,"
+                html_p2 = f"We confirm that your cleaning booking <strong>#{order_id}</strong> ({service_name}) scheduled for <strong>{service_date_str}</strong> has been cancelled."
+                html_p3 = "If you'd like to book a new appointment, you can do so anytime at <a href='https://gopropertycare.com/schedule' style='color: #166534; font-weight: 600;'>our platform</a>."
+
+            html_content = f"""<!DOCTYPE html>
+<html lang="{lang}">
+<head><meta charset="utf-8"></head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0;">
+          <tr>
+            <td style="background-color: #dc2626; padding: 24px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 800;">GoPropertyCare</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px 24px;">
+              <h2 style="color: #dc2626; font-size: 18px; margin-top: 0;">{html_title}</h2>
+              <p style="color: #374151; font-size: 15px; line-height: 1.6;">{html_p1}</p>
+              <p style="color: #374151; font-size: 15px; line-height: 1.6;">{html_p2}</p>
+              <p style="color: #374151; font-size: 15px; line-height: 1.6;">{html_p3}</p>
+              <p style="color: #64748b; font-size: 13px; margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                Questions? Reach us at info@gopropertycare.com or (720) 590-8632.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
 
             from_email = 'GoPropertyCare <info@gopropertycare.com>'
             admin_email = getattr(settings, 'ADMIN_EMAIL', 'info@gopropertycare.com')
@@ -311,14 +347,15 @@ The GoPropertyCare Team
             if not recipients:
                 return
 
-            email_msg = EmailMultiAlternatives(
+            send_mail_worker(
                 subject=subject,
-                body=body_text,
+                text_content=body_text,
+                html_content=html_content,
+                recipients=recipients,
+                reply_to=admin_email,
                 from_email=from_email,
-                to=recipients,
             )
-            email_msg.send(fail_silently=False)
-            logger.info(f"[EMAIL SUCCESS - GoPropertyCare] Cancellation sent for CleaningOrder #{order_id} to {recipients}")
+            logger.info(f"[EMAIL SUCCESS - GoPropertyCare] Cancellation queued for CleaningOrder #{order_id} to {recipients}")
 
         except Exception as e:
             logger.error(f"[EMAIL FAILURE - GoPropertyCare] Cancellation failed for CleaningOrder #{order_id}: {e}", exc_info=True)

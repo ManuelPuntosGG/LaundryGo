@@ -1,7 +1,7 @@
 import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'white' | 'none';
   size?: 'sm' | 'md' | 'lg';
   children: ReactNode;
 }
@@ -21,6 +21,8 @@ export function Button({
     outline: 'bg-white border border-slate-300 text-slate-700 hover:bg-emerald-50/50 hover:border-emerald-400 active:bg-emerald-100/50 shadow-2xs active:scale-[0.98]',
     ghost: 'text-slate-600 hover:text-emerald-900 hover:bg-emerald-50/70 active:bg-emerald-100/70',
     danger: 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-sm hover:shadow-md hover:shadow-rose-500/20 active:scale-[0.98]',
+    white: 'bg-white hover:bg-emerald-50 active:bg-emerald-100 text-emerald-950 font-black border border-white shadow-md active:scale-[0.98]',
+    none: '',
   };
 
   const sizes = {
@@ -29,9 +31,23 @@ export function Button({
     lg: 'h-12 min-h-[48px] px-6 sm:px-8 text-base gap-2.5',
   };
 
+  let variantStyle = variants[variant];
+  // If consumer specifies custom background class, remove default variant bg
+  if (className.includes('bg-')) {
+    variantStyle = variantStyle.replace(/\bbg-\S+/g, '').replace(/\bhover:bg-\S+/g, '').replace(/\bactive:bg-\S+/g, '');
+  }
+  // If consumer specifies custom text class, remove default variant text
+  if (className.includes('text-')) {
+    variantStyle = variantStyle.replace(/\btext-\S+/g, '').replace(/\bhover:text-\S+/g, '').replace(/\bactive:text-\S+/g, '');
+  }
+  // If consumer specifies custom border, remove default variant border
+  if (className.includes('border-') || className.includes('border ')) {
+    variantStyle = variantStyle.replace(/\bborder-\S+/g, '').replace(/\bborder\b/g, '');
+  }
+
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`${baseStyles} ${variantStyle.trim()} ${sizes[size]} ${className}`.trim()}
       {...props}
     >
       {children}

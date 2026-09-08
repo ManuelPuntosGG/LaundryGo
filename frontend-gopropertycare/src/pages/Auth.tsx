@@ -100,16 +100,16 @@ export function Auth() {
   };
 
   return (
-    <div className="max-w-md mx-auto py-8 sm:py-12 animate-fade-in">
+    <div className="max-w-md mx-auto py-8 sm:py-12 animate-fade-in-up">
       <Card className="p-6 sm:p-8 border-emerald-100 shadow-xl space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
-            <Sparkles className="w-6 h-6" />
+            <Sparkles className="w-6 h-6 animate-float" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">
             {tab === 'login' ? t('auth.loginTitle') : t('auth.registerTitle')}
           </h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-600 font-medium">
             Unified access to your cleaning bookings across Denver & Boulder.
           </p>
         </div>
@@ -122,7 +122,7 @@ export function Auth() {
               setTab('login');
               setError('');
             }}
-            className={`py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`py-2 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
               tab === 'login'
                 ? 'bg-white text-emerald-800 shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -137,7 +137,7 @@ export function Auth() {
               setTab('register');
               setError('');
             }}
-            className={`py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`py-2 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
               tab === 'register'
                 ? 'bg-white text-emerald-800 shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -149,7 +149,7 @@ export function Auth() {
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 animate-fade-in">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -174,7 +174,7 @@ export function Auth() {
               placeholder="••••••••"
               required
             />
-            <Button size="lg" className="w-full" disabled={isLoading}>
+            <Button size="lg" className="w-full hover:scale-102 active:scale-98 transition-all duration-200" disabled={isLoading}>
               {isLoading ? t('common.loading') : t('auth.signInBtn')}
             </Button>
           </form>
@@ -255,7 +255,7 @@ export function Auth() {
               required
             />
 
-            <Button size="lg" className="w-full mt-2" disabled={isLoading}>
+            <Button size="lg" className="w-full mt-2 hover:scale-102 active:scale-98 transition-all duration-200" disabled={isLoading}>
               {isLoading ? t('common.loading') : t('auth.registerBtn')}
             </Button>
           </form>

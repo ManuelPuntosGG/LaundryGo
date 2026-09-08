@@ -33,7 +33,8 @@ LaundryGo/
 │   ├── .python-version        # Versión de Python local (3.12.8)
 │   ├── build.sh               # Script de compilación, migración y seed data en Render
 │   ├── apps/                  # Aplicaciones modulares activas de Django
-│   │   ├── core/              # Modelos base abstractos (TimeStampedModel), HealthCheck y comandos CLI
+│   │   ├── core/              # Modelos base abstractos (TimeStampedModel), HealthCheck, despachador central de emails y comandos CLI
+│   │   │   ├── emails.py      # Despachador resiliente unificado (SMTP + fallbacks HTTPS Resend/SendGrid)
 │   │   │   └── management/commands/test_email.py # Diagnóstico SMTP y conectividad en vivo
 │   │   ├── users/             # Autenticación JWT, modelo de usuario y autovinculación de pedidos
 │   │   ├── orders/            # Tarifas por libra, órdenes de lavandería, suscripciones y emails (LaundryGo)
@@ -76,8 +77,16 @@ LaundryGo/
 - **Servidor de Archivos Estáticos**: `whitenoise` (`CompressedManifestStaticFilesStorage`) para servir el panel Unfold sin requerir Nginx.
 - **Base de Datos Dinámica**: `dj-database-url` con soporte nativo para `DATABASE_URL` (PostgreSQL de Render) y fallback local a SQLite.
 - **Resolución de Red Robusta (IPv4 Forzado)**: En `backend/config/settings.py`, `socket.getaddrinfo` está interceptado globalmente para forzar `socket.AF_INET`. Esto previene el error `[Errno 101] Network is unreachable` en contenedores de Render/Linux cuando el DNS retorna registros IPv6 sin ruta de salida habilitada.
-- **Panel de Administración**: `django-unfold` (Diseño moderno, minimalista, optimizado para Tailwind CSS y responsivo a móviles).
-- **Autenticación**: JSON Web Tokens (JWT) mediante `djangorestframework-simplejwt`.
+- **Panel de Administración**: `django-unfold` con navegación modular dedicada en la barra lateral:
+  - *LaundryGo Operations*: Laundry Orders, Recurring Schedules, Per-Pound Rates.
+  - *GoPropertyCare Operations*: Cleaning Reservations, Rates per Sq Ft, Difficulty Add-ons.
+  - *User & Access Management*: Customers & Staff.
+- **Autenticación & Seguridad JWT**: JSON Web Tokens (JWT) mediante `djangorestframework-simplejwt` con validación defensiva de longitud de clave HMAC-SHA256 según RFC 7518 ($\ge 32$ bytes), impidiendo advertencias o vulnerabilidades criptográficas en producción.
+- **Seguridad HTTP en Producción**:
+  - HSTS forzado (`SECURE_HSTS_SECONDS = 31536000`, `SECURE_HSTS_INCLUDE_SUBDOMAINS`, `SECURE_HSTS_PRELOAD`).
+  - Cabeceras `X_FRAME_OPTIONS = 'SAMEORIGIN'` y protección XSS/Sniffing activa.
+  - CORS configurado de forma estricta: `CORS_ALLOW_ALL_ORIGINS = DEBUG` (solo permisivo en desarrollo local; en producción se exige coincidencia con lista blanca o expresiones regulares de `thelaundrygo.com`, `gopropertycare.com` y `*.onrender.com` con `CORS_ALLOW_CREDENTIALS = True`).
+- **Despacho Resiliente de Emails (`apps.core.emails`)**: Módulo unificado con `send_mail_worker` que intenta primero SMTP estándar y, en caso de fallo, activa automáticamente fallbacks mediante API REST HTTPS (Resend y SendGrid), permitiendo remitentes dedicados para cada marca (`info@thelaundrygo.com` y `info@gopropertycare.com`).
 - **Variables de Entorno**: Gestionadas con `python-decouple` desde `backend/.env`.
 
 ### Modelo de Usuarios y Autenticación (`apps.users`)
@@ -303,7 +312,8 @@ El archivo `render.yaml` implementa la infraestructura completa en Render como c
 - **Costes de Render (\$0 extra)**: Los Static Sites en Render son completamente gratuitos. Al agregar nuevas marcas o landings para el cliente, basta con crear una carpeta frontend adicional (`frontend-*`), un módulo en `apps/` en el backend existente, y un servicio `type: web, runtime: static` en `render.yaml`.
 - **Puertos de Desarrollo**: LaundryGo corre en `http://localhost:5173` y GoPropertyCare en `http://localhost:5174`. Ambos proxian sus solicitudes `/api` al backend Django en `http://localhost:8000` en entornos locales.
 - **Resolución de Red IPv4 en Render**: En `config/settings.py`, `socket.getaddrinfo` fuerza `AF_INET` para garantizar que los contenedores Linux de Render no intenten rutas IPv6 inalcanzables al conectar con `smtp.gmail.com:587`.
-- **Hilos de Email y Concurrencia ORM**: Al despachar correos asíncronos en segundo plano (`threading.Thread`), **siempre** extraer todos los campos del modelo (`order.id`, `recipient_email`, `total_price`, etc.) en variables locales *antes* de iniciar el hilo daemon. Acceder a relaciones ORM lazy dentro del hilo puede ocasionar bloqueos de base de datos (`database table is locked`).
+- **Hilos de Email y Concurrencia ORM**: Al despachar correos asíncronos en segundo plano (`threading.Thread`), **siempre** extraer todos los campos del modelo (`order.id`, `recipient_email`, `total_price`, etc.) en variables locales *antes* de iniciar el hilo daemon. Acceder a relaciones ORM lazy dentro del hilo puede ocasionar bloqueos de base de datos (`database table is locked`). Utilizar siempre `apps.core.emails.send_mail_worker` para contar con fallback automático a APIs REST HTTPS (Resend / SendGrid) si el puerto SMTP 587 fallara.
+- **Inicialización de Estado en React**: En formularios complejos con parámetros de consulta (`URLSearchParams`) o datos de sesión (`user`), inicializar `useState` con callbacks puros (`useState(() => ...)`) para evitar dobles renders en el ciclo de vida y alertas de compilador.
 - **Control de Calidad y Pruebas**:
   - Backend: 28 pruebas unitarias pasando con `pytest` (`apps/orders`, `apps/cleaning`, `apps/users`, `apps/core`).
   - Frontends: Compilación estricta con TypeScript (`tsc -b && vite build`) y análisis de linter con `oxlint`.

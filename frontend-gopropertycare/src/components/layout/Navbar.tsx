@@ -36,7 +36,7 @@ export function Navbar() {
               className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
                 isActive('/')
                   ? 'text-emerald-700'
-                  : 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-700 hover:text-emerald-700'
               }`}
             >
               {t('nav.home')}
@@ -50,25 +50,11 @@ export function Navbar() {
               className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
                 isActive('/about')
                   ? 'text-emerald-700'
-                  : 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-700 hover:text-emerald-700'
               }`}
             >
               {t('nav.about')}
               {isActive('/about') && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 rounded-full animate-fade-in" />
-              )}
-            </Link>
-
-            <Link
-              to="/schedule"
-              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
-                isActive('/schedule')
-                  ? 'text-emerald-700'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {t('nav.schedule')}
-              {isActive('/schedule') && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 rounded-full animate-fade-in" />
               )}
             </Link>
@@ -84,12 +70,20 @@ export function Navbar() {
                 to="/dashboard"
                 className={`flex items-center gap-2 text-sm font-bold px-3.5 py-2 rounded-xl transition-all whitespace-nowrap hover:scale-102 ${
                   isActive('/dashboard')
-                    ? 'bg-emerald-50 text-emerald-700 font-extrabold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'bg-emerald-50 text-emerald-800 font-extrabold'
+                    : 'text-slate-700 hover:text-emerald-800 hover:bg-slate-100'
                 }`}
               >
                 <LayoutDashboard className="w-4.5 h-4.5 shrink-0 text-emerald-600" />
                 {t('nav.dashboard')}
+              </Link>
+
+              <Link
+                to="/schedule"
+                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+              >
+                <Sparkles className="w-4 h-4" />
+                {t('nav.schedule')}
               </Link>
 
               <div className="flex items-center gap-2.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-3 py-1.5 shrink-0">
@@ -98,7 +92,7 @@ export function Navbar() {
                 </div>
                 <button
                   onClick={logout}
-                  className="text-slate-400 hover:text-rose-600 transition-colors p-1 rounded-md hover:bg-rose-50"
+                  className="text-slate-500 hover:text-rose-600 transition-colors p-1 rounded-md hover:bg-rose-50 cursor-pointer"
                   title={t('nav.logout')}
                 >
                   <LogOut className="w-4 h-4 shrink-0" />
@@ -129,7 +123,7 @@ export function Navbar() {
           <LanguageSwitcher />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="p-2.5 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -144,7 +138,7 @@ export function Navbar() {
             to="/"
             onClick={() => setIsMobileMenuOpen(false)}
             className={`block px-4 py-2.5 rounded-xl text-sm font-bold ${
-              isActive('/') ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+              isActive('/') ? 'bg-emerald-50 text-emerald-800 font-extrabold' : 'text-slate-700 hover:text-emerald-800'
             }`}
           >
             {t('nav.home')}
@@ -153,7 +147,7 @@ export function Navbar() {
             to="/about"
             onClick={() => setIsMobileMenuOpen(false)}
             className={`block px-4 py-2.5 rounded-xl text-sm font-bold ${
-              isActive('/about') ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+              isActive('/about') ? 'bg-emerald-50 text-emerald-800 font-extrabold' : 'text-slate-700 hover:text-emerald-800'
             }`}
           >
             {t('nav.about')}
@@ -162,7 +156,7 @@ export function Navbar() {
             to="/schedule"
             onClick={() => setIsMobileMenuOpen(false)}
             className={`block px-4 py-2.5 rounded-xl text-sm font-bold ${
-              isActive('/schedule') ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600'
+              isActive('/schedule') ? 'bg-emerald-50 text-emerald-800 font-extrabold' : 'text-slate-700 hover:text-emerald-800'
             }`}
           >
             {t('nav.schedule')}
@@ -175,7 +169,7 @@ export function Navbar() {
               <Link
                 to="/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50"
               >
                 <LayoutDashboard className="w-4 h-4 text-emerald-600" />
                 {t('nav.dashboard')}

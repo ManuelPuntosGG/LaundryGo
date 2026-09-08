@@ -58,20 +58,6 @@ export function Navbar() {
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full animate-fade-in" />
               )}
             </Link>
-
-            <Link
-              to="/schedule"
-              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
-                isActive('/schedule')
-                  ? 'text-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {t('nav.schedule')}
-              {isActive('/schedule') && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full animate-fade-in" />
-              )}
-            </Link>
           </div>
 
           <div className="h-5 w-px bg-slate-200" />
@@ -92,6 +78,13 @@ export function Navbar() {
                 {t('nav.dashboard')}
               </Link>
 
+              <Link
+                to="/schedule"
+                className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-extrabold h-11 px-5 rounded-xl transition-all shadow-sm hover:shadow-md hover:scale-102 active:scale-98 whitespace-nowrap"
+              >
+                {t('nav.schedule')}
+              </Link>
+
               <div className="flex items-center gap-2.5 bg-slate-100 border border-slate-200 rounded-xl px-3 py-1.5 shrink-0">
                 <div className="w-7 h-7 rounded-lg bg-blue-600 text-white text-xs font-extrabold flex items-center justify-center shrink-0">
                   {user?.first_name?.[0] || 'U'}
@@ -99,7 +92,7 @@ export function Navbar() {
                 <button
                   onClick={logout}
                   title={t('nav.logout')}
-                  className="text-slate-500 hover:text-red-600 transition-colors p-1"
+                  className="text-slate-500 hover:text-red-600 transition-colors p-1 cursor-pointer"
                 >
                   <LogOut className="w-4 h-4 shrink-0" />
                 </button>

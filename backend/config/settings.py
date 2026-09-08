@@ -181,6 +181,10 @@ REST_FRAMEWORK = {
 }
 
 # JWT
+_raw_jwt_key = config('JWT_SECRET_KEY', default='django-insecure-jwt-secret-key-minimum-32-chars-for-sha256-compliance')
+if len(_raw_jwt_key.strip()) < 32:
+    _raw_jwt_key = (_raw_jwt_key.strip() + "-padding-minimum-32-bytes-for-sha256-compliance")[:64]
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -188,7 +192,7 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': config('JWT_SECRET_KEY', default='jwt-dev-key-change-in-production-long-secure-key-32'),
+    'SIGNING_KEY': _raw_jwt_key,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -217,7 +221,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http:\/\/127\.0\.0\.1:\d+$",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# Allow all origins in development, but strictly enforce whitelist in production with credentials
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOW_CREDENTIALS = True
 
 csrf_origins_env = config('CSRF_TRUSTED_ORIGINS', default='')
@@ -245,6 +250,10 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Email Configuration
 raw_email_user = config('EMAIL_HOST_USER', default='').strip().strip('\'"')
@@ -310,11 +319,11 @@ UNFOLD = {
         "show_all_applications": False,
         "navigation": [
             {
-                "title": _("Operations & Logistics"),
+                "title": _("LaundryGo Operations"),
                 "separator": True,
                 "items": [
                     {
-                        "title": _("Orders"),
+                        "title": _("Laundry Orders"),
                         "icon": "local_laundry_service",
                         "link": reverse_lazy("admin:orders_order_changelist"),
                     },
@@ -323,21 +332,36 @@ UNFOLD = {
                         "icon": "event_repeat",
                         "link": reverse_lazy("admin:orders_recurringschedule_changelist"),
                     },
-                ],
-            },
-            {
-                "title": _("Catalog & Pricing"),
-                "separator": True,
-                "items": [
                     {
-                        "title": _("Service Rates"),
+                        "title": _("Per-Pound Rates"),
                         "icon": "sell",
                         "link": reverse_lazy("admin:orders_servicerate_changelist"),
                     },
                 ],
             },
             {
-                "title": _("User Management"),
+                "title": _("GoPropertyCare Operations"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Cleaning Reservations"),
+                        "icon": "cleaning_services",
+                        "link": reverse_lazy("admin:cleaning_cleaningorder_changelist"),
+                    },
+                    {
+                        "title": _("Rates per Sq Ft"),
+                        "icon": "square_foot",
+                        "link": reverse_lazy("admin:cleaning_cleaningservicerate_changelist"),
+                    },
+                    {
+                        "title": _("Difficulty Add-ons"),
+                        "icon": "tune",
+                        "link": reverse_lazy("admin:cleaning_cleaningaddon_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("User & Access Management"),
                 "separator": True,
                 "items": [
                     {
