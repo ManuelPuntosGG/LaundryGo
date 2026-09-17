@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from django.utils import timezone
 from django.db import transaction
 from datetime import timedelta
+from django.db.models import Q
 from .models import CleaningServiceRate, CleaningAddon, CleaningOrder
 from .serializers import (
     CleaningServiceRateSerializer,
@@ -18,15 +19,27 @@ from .emails import (
 
 
 class CleaningServiceRateListView(generics.ListAPIView):
-    queryset = CleaningServiceRate.objects.filter(is_active=True)
     serializer_class = CleaningServiceRateSerializer
     permission_classes = (permissions.AllowAny,)
 
+    def get_queryset(self):
+        qs = CleaningServiceRate.objects.filter(is_active=True)
+        brand = self.request.query_params.get('brand')
+        if brand:
+            qs = qs.filter(brand=brand)
+        return qs
+
 
 class CleaningAddonListView(generics.ListAPIView):
-    queryset = CleaningAddon.objects.filter(is_active=True)
     serializer_class = CleaningAddonSerializer
     permission_classes = (permissions.AllowAny,)
+
+    def get_queryset(self):
+        qs = CleaningAddon.objects.filter(is_active=True)
+        brand = self.request.query_params.get('brand')
+        if brand:
+            qs = qs.filter(Q(brand=brand) | Q(brand='both'))
+        return qs
 
 
 class CleaningOrderListCreateView(generics.ListCreateAPIView):
@@ -42,7 +55,11 @@ class CleaningOrderListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
-            return CleaningOrder.objects.filter(user=self.request.user)
+            qs = CleaningOrder.objects.filter(user=self.request.user)
+            brand = self.request.query_params.get('brand')
+            if brand:
+                qs = qs.filter(brand=brand)
+            return qs
         return CleaningOrder.objects.none()
 
     @transaction.atomic

@@ -106,6 +106,12 @@
       "bookNow": "Book This Service",
       "minNotice": "$99 minimum service dispatch. Custom contracts and recurring master service agreements available upon request."
     },
+    "residentialReferral": {
+      "badge": "Residential Cleaning Division",
+      "title": "Looking for Residential Home Cleaning?",
+      "description": "For private residences, apartments, regular housekeeping, and move-in/move-out cleanings, visit our dedicated residential sister brand, GoPropertyCare.",
+      "cta": "Explore GoPropertyCare"
+    },
     "coverage": {
       "title": "Commercial Coverage Area",
       "subtitle": "Serving developers, GCs, and enterprise facilities throughout the Front Range corridor.",

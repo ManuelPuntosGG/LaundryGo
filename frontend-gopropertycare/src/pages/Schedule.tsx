@@ -72,10 +72,15 @@ export function Schedule() {
     return 1200;
   });
 
+  const [postConstructionRequested] = useState<boolean>(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get('tier') === 'post_construction';
+  });
+
   const [selectedRateId, setSelectedRateId] = useState<number>(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const tierParam = searchParams.get('tier');
-    if (tierParam) {
+    if (tierParam && tierParam !== 'post_construction') {
       const match = DEFAULT_CLEANING_RATES.find((r) => r.service_type === tierParam);
       if (match) return match.id;
     }
@@ -149,8 +154,8 @@ export function Schedule() {
     const fetchApiData = async () => {
       try {
         const [ratesRes, addonsRes, datesRes] = await Promise.all([
-          api.get('/cleaning/rates/').catch(() => null),
-          api.get('/cleaning/addons/').catch(() => null),
+          api.get('/cleaning/rates/?brand=gopropertycare').catch(() => null),
+          api.get('/cleaning/addons/?brand=gopropertycare').catch(() => null),
           api.get('/cleaning/schedule/available-dates/').catch(() => null),
         ]);
 
@@ -161,13 +166,13 @@ export function Schedule() {
             ? ratesRes.data
             : (ratesRes.data as { results?: CleaningServiceRate[] })?.results || [];
           if (list.length > 0) {
-            const residentialTypes = ['regular', 'deep', 'move_in_out', 'post_construction'];
+            const residentialTypes = ['regular', 'deep', 'move_in_out'];
             const filtered = list.filter((r) => residentialTypes.includes(r.service_type));
             const activeList = filtered.length > 0 ? filtered : list;
             setRates(activeList);
             const searchParams = new URLSearchParams(window.location.search);
             const tierParam = searchParams.get('tier');
-            if (tierParam) {
+            if (tierParam && tierParam !== 'post_construction') {
               const match = activeList.find((r) => r.service_type === tierParam);
               if (match) {
                 setSelectedRateId(match.id);
@@ -293,6 +298,7 @@ export function Schedule() {
       }));
 
     const payload = {
+      brand: 'gopropertycare',
       guest_email: formData.email.trim(),
       guest_first_name: formData.first_name.trim(),
       guest_last_name: formData.last_name.trim(),
@@ -473,6 +479,27 @@ export function Schedule() {
             </p>
           </div>
 
+          {postConstructionRequested && (
+            <div className="p-4 bg-amber-50/90 border border-amber-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-950 shadow-xs animate-fade-in">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                <div className="text-xs sm:text-sm">
+                  <strong className="block font-bold">Looking for Post-Construction Cleanup?</strong>
+                  <span className="text-amber-800">Post-construction cleanup is provided exclusively through our specialized partner, <strong>Evolving Solutions LLC</strong>.</span>
+                </div>
+              </div>
+              <a
+                href="https://evolvingsolutionsllc.com/schedule?tier=post_construction"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#573725] text-white text-xs font-bold hover:bg-[#43291b] shrink-0 shadow-sm"
+              >
+                <span>Book with Evolving Solutions</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          )}
+
           {/* Sq Ft Controls */}
           <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-6 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -481,7 +508,7 @@ export function Schedule() {
                   {t('schedule.sqftLabel')}
                 </label>
                 <span className="text-xs text-slate-600 font-medium">
-                  Approximate total area for residential or commercial cleaning
+                  Approximate total area for residential cleaning (apartments, townhomes, single family houses)
                 </span>
               </div>
               <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-4 py-2 shadow-2xs">

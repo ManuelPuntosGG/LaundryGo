@@ -18,10 +18,7 @@ export interface AuthResponse {
 export type CommercialServiceType =
   | 'commercial'
   | 'post_construction'
-  | 'industrial_demolition'
-  | 'regular'
-  | 'deep'
-  | 'move_in_out';
+  | 'industrial_demolition';
 
 export interface CleaningServiceRate {
   id: number;

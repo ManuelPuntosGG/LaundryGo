@@ -9,24 +9,35 @@ from .models import CleaningServiceRate, CleaningAddon, CleaningOrder
 class CleaningServiceRateAdmin(ModelAdmin):
     list_display = (
         'name',
+        'brand_badge',
         'service_type_badge',
         'rate_display',
         'min_order_display',
         'is_active_badge',
     )
-    list_filter = ('service_type', 'is_active')
+    list_filter = ('brand', 'service_type', 'is_active')
     list_filter_submit = True
     search_fields = ('name',)
     ordering = ('rate_per_sqft',)
 
     fieldsets = (
         (_('Service Information'), {
-            'fields': ('name', 'service_type', 'description'),
+            'fields': ('name', 'brand', 'service_type', 'description'),
         }),
         (_('Pricing & Minimums'), {
             'fields': ('rate_per_sqft', 'min_order_amount', 'is_active'),
         }),
     )
+
+    @display(
+        description=_('Brand'),
+        label={
+            'gopropertycare': 'success',
+            'evolvingsolutions': 'warning',
+        }
+    )
+    def brand_badge(self, obj):
+        return obj.brand, 'GoPropertyCare' if obj.brand == 'gopropertycare' else 'Evolving Solutions'
 
     @display(
         description=_('Service Tier'),
@@ -35,6 +46,8 @@ class CleaningServiceRateAdmin(ModelAdmin):
             'deep': 'primary',
             'move_in_out': 'warning',
             'post_construction': 'danger',
+            'commercial': 'secondary',
+            'industrial_demolition': 'warning',
         }
     )
     def service_type_badge(self, obj):
@@ -64,11 +77,34 @@ class CleaningAddonAdmin(ModelAdmin):
     list_display = (
         'name',
         'code',
+        'brand_badge',
         'price_display',
         'is_active_badge',
     )
-    list_filter = ('is_active',)
+    list_filter = ('brand', 'is_active')
     search_fields = ('name', 'code')
+
+    fieldsets = (
+        (_('Add-on Details'), {
+            'fields': ('name', 'code', 'brand', 'price', 'description', 'is_active'),
+        }),
+    )
+
+    @display(
+        description=_('Brand'),
+        label={
+            'gopropertycare': 'success',
+            'evolvingsolutions': 'warning',
+            'both': 'info',
+        }
+    )
+    def brand_badge(self, obj):
+        labels = {
+            'gopropertycare': 'GoPropertyCare',
+            'evolvingsolutions': 'Evolving Solutions',
+            'both': 'Both Brands',
+        }
+        return obj.brand, labels.get(obj.brand, obj.brand)
 
     @display(description=_('Surcharge'))
     def price_display(self, obj):

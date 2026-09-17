@@ -15,7 +15,7 @@ export interface AuthResponse {
   refresh: string;
 }
 
-export type CleaningServiceType = 'regular' | 'deep' | 'move_in_out' | 'post_construction';
+export type CleaningServiceType = 'regular' | 'deep' | 'move_in_out';
 
 export interface CleaningServiceRate {
   id: number;
@@ -38,6 +38,7 @@ export interface CleaningAddon {
 
 export interface CleaningOrder {
   id: number;
+  brand?: 'gopropertycare' | 'evolvingsolutions';
   user: number | null;
   guest_email: string;
   guest_first_name: string;

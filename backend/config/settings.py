@@ -22,7 +22,10 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-pro
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allowed Hosts
-allowed_hosts_env = config('ALLOWED_HOSTS', default='.onrender.com,.thelaundrygo.com,thelaundrygo.com,localhost,127.0.0.1')
+allowed_hosts_env = config(
+    'ALLOWED_HOSTS',
+    default='.onrender.com,.thelaundrygo.com,thelaundrygo.com,.gopropertycare.com,gopropertycare.com,.evolvingsolutionsllc.com,evolvingsolutionsllc.com,.evolvingsolutions.com,evolvingsolutions.com,localhost,127.0.0.1'
+)
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',') if host.strip()]
 
 # Render external hostname auto-detection
@@ -31,7 +34,13 @@ if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Ensure essential production domains are always included
-for default_host in ('.thelaundrygo.com', 'thelaundrygo.com', '.gopropertycare.com', 'gopropertycare.com', '.onrender.com'):
+for default_host in (
+    '.thelaundrygo.com', 'thelaundrygo.com',
+    '.gopropertycare.com', 'gopropertycare.com',
+    '.evolvingsolutionsllc.com', 'evolvingsolutionsllc.com',
+    '.evolvingsolutions.com', 'evolvingsolutions.com',
+    '.onrender.com',
+):
     if default_host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(default_host)
 

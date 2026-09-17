@@ -102,26 +102,13 @@
           "Guaranteed ready for landlord or buyer walkthrough"
         ]
       },
-      "postConstruction": {
-        "name": "Post-Construction",
-        "tagline": "Renovation Cleanup & Dust Removal",
-        "rate": "$0.26 / sq ft",
-        "description": "Turn your newly remodeled space into a clean, safe, and livable home. We eliminate fine drywall dust so you can move right in.",
-        "features": [
-          "Specialized capture of fine dust, plaster & drywall powder",
-          "Removal of paint specks, tape & sticker residue",
-          "Detailed dusting of light fixtures, vents & ledges",
-          "Floors and tiles stripped of construction residue",
-          "Fresh, breathable air ready for you to enjoy"
-        ]
-      },
       "bookNow": "Book This Service",
       "minNotice": "$99 minimum service fee per visit. Final price is calculated using verified dimensions and selected extras."
     },
     "commercialReferral": {
       "badge": "Commercial & Construction Division",
-      "title": "Need Commercial Janitorial or Drywall Demolition?",
-      "description": "For enterprise office janitorial, retail spaces, post-construction cleanup, and drywall demolition labor, visit our dedicated commercial division, Evolving Solutions LLC.",
+      "title": "Need Commercial Janitorial, Post-Construction, or Demolition?",
+      "description": "For enterprise office janitorial, commercial retail spaces, post-construction cleanup, and selective drywall demolition labor, visit our dedicated commercial division, Evolving Solutions LLC.",
       "cta": "Explore Evolving Solutions LLC"
     },
     "coverage": {

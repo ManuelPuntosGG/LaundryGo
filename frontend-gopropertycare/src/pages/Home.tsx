@@ -33,10 +33,10 @@ export function Home() {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        const response = await api.get('/cleaning/rates/');
+        const response = await api.get('/cleaning/rates/?brand=gopropertycare');
         const list = Array.isArray(response.data) ? response.data : response.data?.results || [];
         if (list.length > 0) {
-          const residentialTypes = ['regular', 'deep', 'move_in_out', 'post_construction'];
+          const residentialTypes = ['regular', 'deep', 'move_in_out'];
           const filtered = list.filter((r: CleaningServiceRate) => residentialTypes.includes(r.service_type));
           setRates(filtered.length > 0 ? filtered : list);
         }
@@ -353,7 +353,7 @@ export function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {/* Regular */}
           <Card className="flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-lg transition-all duration-300 group">
             <div className="space-y-4">
@@ -429,33 +429,6 @@ export function Home() {
               className="w-full mt-6 text-slate-800 font-bold border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/50 hover:scale-102 active:scale-98 transition-all duration-200"
               variant="outline"
               onClick={() => navigate('/schedule?tier=move_in_out')}
-            >
-              {t('home.pricing.bookNow')}
-            </Button>
-          </Card>
-
-          {/* Post-Construction */}
-          <Card className="flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-lg transition-all duration-300 group">
-            <div className="space-y-4">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-900 bg-emerald-100/80 border border-emerald-200/90 px-2.5 py-1 rounded-md">
-                {t('home.pricing.postConstruction.tagline')}
-              </span>
-              <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-950 transition-colors">{t('home.pricing.postConstruction.name')}</h3>
-              <div className="text-2xl font-black text-slate-900">{t('home.pricing.postConstruction.rate')}</div>
-              <p className="text-xs text-slate-600 font-medium leading-relaxed">{t('home.pricing.postConstruction.description')}</p>
-              <ul className="space-y-2 pt-2 border-t border-slate-100 text-xs text-slate-700 font-medium">
-                {((t('home.pricing.postConstruction.features', { returnObjects: true }) as string[]) || []).map((f, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Button
-              className="w-full mt-6 text-slate-800 font-bold border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/50 hover:scale-102 active:scale-98 transition-all duration-200"
-              variant="outline"
-              onClick={() => navigate('/schedule?tier=post_construction')}
             >
               {t('home.pricing.bookNow')}
             </Button>

@@ -130,8 +130,8 @@ export function Schedule() {
     const fetchData = async () => {
       try {
         const [ratesRes, addonsRes, datesRes] = await Promise.allSettled([
-          api.get('/cleaning/rates/'),
-          api.get('/cleaning/addons/'),
+          api.get('/cleaning/rates/?brand=evolvingsolutions'),
+          api.get('/cleaning/addons/?brand=evolvingsolutions'),
           api.get('/cleaning/schedule/available-dates/'),
         ]);
 

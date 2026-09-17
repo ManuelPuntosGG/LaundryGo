@@ -12,10 +12,10 @@ Este repositorio aloja una arquitectura desacoplada y multi-tenant que sirve a *
    - **Modelo de Negocio**: Lavado de ropa a domicilio cobrado por libra ($2.25, $2.45, $3.85/lb) con opciones de entrega en 2 días (*Standard*), día siguiente (*Go*) o mismo día express (*GoFurther* antes de las 12:00 PM). Permite pedidos puntuales o suscripciones recurrentes con 7.5% de descuento (*Daily*, *Weekly*, *Biweekly*, *Monthly*). Orden mínima de $40.00.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en azules y grises slate). Puerto local `5173`.
 2. **GoPropertyCare (`gopropertycare.com`)**:
-   - **Modelo de Negocio**: Servicios profesionales de limpieza y ordenanza a domicilios residenciales (Regular, Profunda, Move-In/Move-Out) cobrados por pie cuadrado (**\$/sq ft**), con un umbral de orden mínima de **\$99.00** y recargos por dificultad/cuidados especiales del hogar. Agendamiento con antelación (**sin disponibilidad para el mismo día**; citas habilitadas a partir de mañana). Incluye sección de derivación a Evolving Solutions LLC para servicios comerciales y demolición.
+   - **Modelo de Negocio**: Servicios profesionales de limpieza y ordenanza exclusivamente para domicilios residenciales particulares (Regular, Profunda, Move-In/Move-Out) cobrados por pie cuadrado (**\$/sq ft**), con un umbral de orden mínima de **\$99.00** y recargos por dificultad/cuidados especiales del hogar. **No realiza servicios de post-construcción ni comerciales**. Agendamiento con antelación (**sin disponibilidad para el mismo día**; citas habilitadas a partir de mañana). Incluye sección destacada de derivación cruzada a Evolving Solutions LLC para servicios de post-construcción, limpieza comercial y demolición selectiva.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en blanco y verdes bosque/esmeralda). Puerto local `5174`.
 3. **Evolving Solutions LLC (`evolvingsolutionsllc.com`)**:
-   - **Modelo de Negocio**: Socio confiable en Denver para limpieza comercial, janitorial de corporativos y locales, limpieza post-construcción (gruesa, fina y entrega) y cuadrillas de mano de obra para demolición selectiva de drywall/tablaroca. Tarifas por pie cuadrado (**$0.18/sqft** comercial, **$0.26/sqft** post-obra, **$0.35/sqft** demolición de drywall) con umbral mínimo de visita de **\$99.00**. 100% de cumplimiento en seguros de responsabilidad civil (General Liability), compensación laboral (Workers' Comp) y estándares de seguridad OSHA.
+   - **Modelo de Negocio**: Socio confiable en Denver para limpieza comercial de corporativos y locales, limpieza post-construcción y fin de obra (gruesa, fina y entrega) y cuadrillas de mano de obra para demolición selectiva de drywall/tablaroca. Tarifas por pie cuadrado (**$0.18/sqft** comercial, **$0.26/sqft** post-obra, **$0.35/sqft** demolición de drywall) con umbral mínimo de visita de **\$99.00**. 100% de cumplimiento en seguros de responsabilidad civil (General Liability), compensación laboral (Workers' Comp) y estándares de seguridad OSHA. Incluye sección de derivación cruzada a GoPropertyCare para propietarios particulares que busquen limpieza residencial de casas y apartamentos.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en blanco, bronces cálidos y marrones tierra: `#9c6843`, `#815133`, `#573725`, `#2f1b11`). Puerto local `5175`.
 
 - **Internacionalización Integral**: Las tres plataformas son 100% bilingües (Inglés y Español) en sus interfaces y correos transaccionales automatizados (confirmaciones y cancelaciones).
@@ -116,22 +116,30 @@ LaundryGo/
 
 ### Módulo de Limpieza y Mano de Obra (`apps.cleaning`)
 - **Modelos**:
-  1. `CleaningServiceRate`: Tarifas dinámicas por pie cuadrado (estandarizadas a 2 decimales):
-     - `regular`: Limpieza Regular a **$0.10/sqft** (mantenimiento estándar residencial).
-     - `deep`: Limpieza Profunda - GoFurther a **$0.16/sqft** (suciedad pesada, zócalos, desincrustación).
-     - `move_in_out`: Limpieza Move-In / Move-Out a **$0.20/sqft** (preparación integral para mudanzas).
-     - `post_construction`: Limpieza Post-Construcción a **$0.26/sqft** (aspirado industrial HEPA, yeso, pintura).
-     - `commercial`: Limpieza Comercial / Janitorial a **$0.18/sqft** (oficinas, locales, bodegas).
-     - `industrial_demolition`: Demolición de Drywall y Mano de Obra Industrial a **$0.35/sqft** (demolición selectiva, ensacado y retiro).
+  1. `CleaningServiceRate`: Tarifas dinámicas por pie cuadrado (estandarizadas a 2 decimales) con asignación estricta de marca (`brand`):
+     - **GoPropertyCare (`brand='gopropertycare'`) — 100% Residencial**:
+       - `regular`: Limpieza Regular a **$0.10/sqft** (mantenimiento estándar del hogar).
+       - `deep`: Limpieza Profunda - GoFurther a **$0.16/sqft** (desincrustación profunda, zócalos, suciedad pesada).
+       - `move_in_out`: Limpieza Move-In / Move-Out a **$0.20/sqft** (entrega o recibimiento de viviendas y apartamentos).
+       *(Nota: GoPropertyCare NO ofrece servicio de post-construcción ni comercial).*
+     - **Evolving Solutions LLC (`brand='evolvingsolutions'`) — Comercial & Post-Construcción**:
+       - `commercial`: Limpieza Comercial / Janitorial a **$0.18/sqft** (oficinas, locales, bodegas y corporativos).
+       - `post_construction`: Limpieza Post-Construcción a **$0.26/sqft** (aspirado industrial HEPA, yeso, pintura, entrega de obra).
+       - `industrial_demolition`: Demolición de Drywall y Mano de Obra Industrial a **$0.35/sqft** (demolición selectiva, ensacado y retiro de escombros).
      - Campo `min_order_amount`: Umbral mínimo de **$99.00**.
-  2. `CleaningAddon`: Recargos por dificultad o áreas adicionales (mascotas, techos altos, electrodomésticos, acarreo de escombros, pulido mecanizado de pisos, etc.).
+  2. `CleaningAddon`: Recargos por dificultad o áreas adicionales segregados por marca:
+     - Residenciales (`gopropertycare`): Presencia de mascotas ($35), techos altos/ventanales ($30), interior de horno/refrigerador ($45), alacenas/gabinetes ($35), sótano/ático ($50), balcón/patio ($25).
+     - Comerciales (`evolvingsolutions`): Techos altos/vigas industriales ($45), retiro y carga de escombros pesados ($95), lavado mecanizado de pisos ($65), vitrinas/cristales ($55), desinfección de baterías de baño ($45), turno nocturno/fin de semana ($50).
   3. `CleaningOrder`: Registro de servicio con:
      - `brand`: `'gopropertycare'` o `'evolvingsolutions'`.
      - Prefijo de visualización dinámico: `GPC-#{id}` para GoPropertyCare y `ESL-#{id}` para Evolving Solutions LLC.
      - `square_feet`, `service_rate`, `selected_addons` (JSON), `service_date`, `time_slot` (`morning` 8AM-12PM / `afternoon` 1PM-5PM), dirección en Denver/Boulder, zona (`inner` $0 / `outer` $25), `base_price` ($\max(\text{sqft} \times \text{rate}, \$99)$), `addons_total`, `delivery_fee`, `total_price`, `special_instructions`, `status` e idioma `language` (`'en'` o `'es'`).
 
-- **Reglas de Agendamiento**:
-  - **Sin mismo día**: `service_date` debe ser estrictamente mañana o posterior. El endpoint `/api/v1/cleaning/schedule/available-dates/` genera los próximos 60 días iniciando en `today + 1 day`. Si se intenta enviar una orden para hoy, el serializador arroja un error 400.
+- **Reglas de Agendamiento y Validación Cruzada de Marcas**:
+  - **Sin mismo día**: `service_date` debe ser estrictamente mañana o posterior (+1 día en adelante).
+  - **Segregación Estricta de Órdenes en Backend**:
+    - Si se intenta reservar un servicio de post-construcción o comercial con `brand='gopropertycare'`, el serializador lanza error 400 y deriva a Evolving Solutions LLC.
+    - Si se intenta reservar un servicio residencial con `brand='evolvingsolutions'`, el serializador lanza error 400 y deriva a GoPropertyCare.
 
 - **Emails Transaccionales Bilingües (`apps.cleaning.emails`)**:
   - Detectan automáticamente el campo `order.brand`.
@@ -139,9 +147,9 @@ LaundryGo/
   - Si `brand == 'gopropertycare'`: Emite notificaciones con membrete verde (`#16a34a`), remitente `GoPropertyCare <info@gopropertycare.com>`, referencia `GPC-#{id}`.
 
 - **Endpoints de Limpieza** (`/api/v1/cleaning/`):
-  - `GET /rates/`: Lista pública de tarifas activas por sq ft.
-  - `GET /addons/`: Lista pública de recargos y extras.
-  - `GET|POST /orders/`: Lista de órdenes del usuario autenticado / Creación de orden (pública para invitados o autenticados, aceptando parámetro `brand`).
+  - `GET /rates/?brand=<brand>`: Lista de tarifas filtrada por marca comercial.
+  - `GET /addons/?brand=<brand>`: Lista de add-ons filtrada por marca comercial.
+  - `GET|POST /orders/?brand=<brand>`: Lista de órdenes del usuario autenticado filtradas por marca / Creación de orden validada contra la marca.
   - `GET|PUT|PATCH /orders/<id>/`: Detalle y actualización de reserva.
   - `POST /orders/<id>/cancel/`: Cancelación de orden pendiente.
   - `GET /schedule/available-dates/`: Calendario dinámico de fechas disponibles desde mañana.
@@ -232,7 +240,7 @@ python manage.py test_email [correo_destino]
 # Servidor de desarrollo Django (puerto 8000)
 python manage.py runserver 8000
 
-# Ejecutar suite de pruebas completa con pytest (29 tests pasando)
+# Ejecutar suite de pruebas completa con pytest (34 tests pasando)
 pytest
 ```
 

@@ -417,6 +417,16 @@
     "confirm": "Confirm",
     "back": "Back",
     "next": "Next",
-    "required": "Required"
+    "required": "Required",
+    "yes": "Yes",
+    "no": "No",
+    "details": "Details",
+    "status": "Status",
+    "date": "Date",
+    "total": "Total",
+    "price": "Price",
+    "description": "Description",
+    "submit": "Submit",
+    "close": "Close"
   }
 }

@@ -27,15 +27,14 @@ export function Dashboard() {
   const fetchOrders = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get('/cleaning/orders/');
+      const response = await api.get('/cleaning/orders/?brand=evolvingsolutions');
       const list: CleaningOrder[] = Array.isArray(response.data) ? response.data : response.data?.results || [];
-      // If order has brand, filter for evolvingsolutions or show all user's commercial orders
-      const filtered = list.filter(
+      const commercialOrders = list.filter(
         (o) =>
           o.brand === 'evolvingsolutions' ||
           ['commercial', 'post_construction', 'industrial_demolition'].includes(o.service_rate?.service_type)
       );
-      setOrders(filtered.length > 0 ? filtered : list);
+      setOrders(commercialOrders);
     } catch (err) {
       console.error('Failed to fetch commercial orders:', err);
     } finally {

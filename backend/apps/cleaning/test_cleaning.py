@@ -19,9 +19,36 @@ def regular_rate(db):
     return CleaningServiceRate.objects.create(
         name='Limpieza Regular',
         service_type='regular',
+        brand='gopropertycare',
         rate_per_sqft=Decimal('0.10'),
         min_order_amount=Decimal('99.00'),
-        description='Standard cleaning',
+        description='Standard residential cleaning',
+        is_active=True,
+    )
+
+
+@pytest.fixture
+def commercial_rate(db):
+    return CleaningServiceRate.objects.create(
+        name='Limpieza Comercial',
+        service_type='commercial',
+        brand='evolvingsolutions',
+        rate_per_sqft=Decimal('0.18'),
+        min_order_amount=Decimal('99.00'),
+        description='Commercial janitorial',
+        is_active=True,
+    )
+
+
+@pytest.fixture
+def post_construction_rate(db):
+    return CleaningServiceRate.objects.create(
+        name='Limpieza Post-Construcción',
+        service_type='post_construction',
+        brand='evolvingsolutions',
+        rate_per_sqft=Decimal('0.26'),
+        min_order_amount=Decimal('99.00'),
+        description='Post-construction cleaning',
         is_active=True,
     )
 
@@ -31,8 +58,21 @@ def pet_addon(db):
     return CleaningAddon.objects.create(
         name='Presencia de Mascotas',
         code='pets_presence',
+        brand='gopropertycare',
         price=Decimal('35.00'),
         description='Tratamiento de pelos',
+        is_active=True,
+    )
+
+
+@pytest.fixture
+def commercial_addon(db):
+    return CleaningAddon.objects.create(
+        name='Lavado Mecanizado de Pisos Industriales',
+        code='floor_machine_scrub',
+        brand='evolvingsolutions',
+        price=Decimal('65.00'),
+        description='Pulido y fregado con máquina industrial',
         is_active=True,
     )
 
@@ -184,7 +224,7 @@ class TestCleaningAPI:
         assert cancel_resp.status_code == 200
         assert cancel_resp.json()['status'] == 'cancelled'
 
-    def test_create_evolvingsolutions_order(self, api_client, regular_rate):
+    def test_create_evolvingsolutions_order(self, api_client, commercial_rate):
         tomorrow = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
         payload = {
             'guest_email': 'contractor@example.com',
@@ -195,7 +235,7 @@ class TestCleaningAPI:
             'city': 'Denver',
             'zip_code': '80202',
             'delivery_zone': 'inner',
-            'service_rate_id': regular_rate.id,
+            'service_rate_id': commercial_rate.id,
             'square_feet': 3000,
             'service_date': tomorrow,
             'time_slot': 'morning',
@@ -208,4 +248,128 @@ class TestCleaningAPI:
         order = CleaningOrder.objects.get(guest_email='contractor@example.com')
         assert order.brand == 'evolvingsolutions'
         assert str(order).startswith('ESL-#')
-        assert order.total_price == Decimal('300.00')
+        assert order.total_price == Decimal('540.00')  # 3000 * 0.18 = $540.00
+
+    def test_post_construction_rejected_on_gopropertycare(self, api_client, post_construction_rate):
+        tomorrow = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
+        payload = {
+            'guest_email': 'residential_user@example.com',
+            'guest_first_name': 'Alice',
+            'guest_last_name': 'Walker',
+            'guest_phone': '7205551122',
+            'street_address': '123 Pine St',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'service_rate_id': post_construction_rate.id,
+            'square_feet': 1500,
+            'service_date': tomorrow,
+            'time_slot': 'morning',
+            'brand': 'gopropertycare',
+        }
+        response = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+        assert response.status_code == 400
+        assert 'service_rate_id' in response.json()
+        error_msg = str(response.json()['service_rate_id'])
+        assert 'residential cleaning' in error_msg
+        assert 'Evolving Solutions LLC' in error_msg
+
+    def test_residential_rejected_on_evolvingsolutions(self, api_client, regular_rate):
+        tomorrow = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
+        payload = {
+            'guest_email': 'biz_user@example.com',
+            'guest_first_name': 'John',
+            'guest_last_name': 'Doe',
+            'guest_phone': '7205553344',
+            'street_address': '456 Market St',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'service_rate_id': regular_rate.id,
+            'square_feet': 2000,
+            'service_date': tomorrow,
+            'time_slot': 'morning',
+            'brand': 'evolvingsolutions',
+        }
+        response = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+        assert response.status_code == 400
+        assert 'service_rate_id' in response.json()
+        error_msg = str(response.json()['service_rate_id'])
+        assert 'commercial facilities' in error_msg
+        assert 'GoPropertyCare' in error_msg
+
+    def test_rates_filter_by_brand(self, api_client, regular_rate, commercial_rate, post_construction_rate):
+        # Filter for GoPropertyCare
+        gpc_resp = api_client.get('/api/v1/cleaning/rates/?brand=gopropertycare')
+        assert gpc_resp.status_code == 200
+        gpc_data = gpc_resp.json() if isinstance(gpc_resp.json(), list) else gpc_resp.json().get('results', [])
+        assert any(r['service_type'] == 'regular' for r in gpc_data)
+        assert not any(r['service_type'] == 'post_construction' for r in gpc_data)
+        assert not any(r['service_type'] == 'commercial' for r in gpc_data)
+
+        # Filter for Evolving Solutions
+        esl_resp = api_client.get('/api/v1/cleaning/rates/?brand=evolvingsolutions')
+        assert esl_resp.status_code == 200
+        esl_data = esl_resp.json() if isinstance(esl_resp.json(), list) else esl_resp.json().get('results', [])
+        assert any(r['service_type'] == 'commercial' for r in esl_data)
+        assert any(r['service_type'] == 'post_construction' for r in esl_data)
+        assert not any(r['service_type'] == 'regular' for r in esl_data)
+
+    def test_addons_filter_by_brand(self, api_client, pet_addon, commercial_addon):
+        # GoPropertyCare addons
+        gpc_resp = api_client.get('/api/v1/cleaning/addons/?brand=gopropertycare')
+        assert gpc_resp.status_code == 200
+        gpc_data = gpc_resp.json() if isinstance(gpc_resp.json(), list) else gpc_resp.json().get('results', [])
+        assert any(a['code'] == 'pets_presence' for a in gpc_data)
+        assert not any(a['code'] == 'floor_machine_scrub' for a in gpc_data)
+
+        # Evolving Solutions addons
+        esl_resp = api_client.get('/api/v1/cleaning/addons/?brand=evolvingsolutions')
+        assert esl_resp.status_code == 200
+        esl_data = esl_resp.json() if isinstance(esl_resp.json(), list) else esl_resp.json().get('results', [])
+        assert any(a['code'] == 'floor_machine_scrub' for a in esl_data)
+        assert not any(a['code'] == 'pets_presence' for a in esl_data)
+
+    def test_user_orders_filter_by_brand(self, api_client, regular_rate, commercial_rate, sample_user):
+        api_client.force_authenticate(user=sample_user)
+        tomorrow = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
+
+        # Create GPC order
+        api_client.post('/api/v1/cleaning/orders/', {
+            'street_address': '100 Home Ave',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'service_rate_id': regular_rate.id,
+            'square_feet': 1000,
+            'service_date': tomorrow,
+            'time_slot': 'morning',
+            'brand': 'gopropertycare',
+        }, format='json')
+
+        # Create ESL order
+        api_client.post('/api/v1/cleaning/orders/', {
+            'street_address': '200 Commercial Way',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'service_rate_id': commercial_rate.id,
+            'square_feet': 2000,
+            'service_date': tomorrow,
+            'time_slot': 'afternoon',
+            'brand': 'evolvingsolutions',
+        }, format='json')
+
+        # Fetch only GPC orders
+        gpc_orders = api_client.get('/api/v1/cleaning/orders/?brand=gopropertycare').json()
+        if not isinstance(gpc_orders, list):
+            gpc_orders = gpc_orders.get('results', [])
+        assert len(gpc_orders) == 1
+        assert gpc_orders[0]['brand'] == 'gopropertycare'
+
+        # Fetch only ESL orders
+        esl_orders = api_client.get('/api/v1/cleaning/orders/?brand=evolvingsolutions').json()
+        if not isinstance(esl_orders, list):
+            esl_orders = esl_orders.get('results', [])
+        assert len(esl_orders) == 1
+        assert esl_orders[0]['brand'] == 'evolvingsolutions'

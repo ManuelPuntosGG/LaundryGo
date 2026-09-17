@@ -28,14 +28,5 @@ export const DEFAULT_CLEANING_RATES: CleaningServiceRate[] = [
     description: 'Múdate con total tranquilidad. Dejamos tu nuevo hogar listo para habitar o tu vivienda anterior lista para entrega y recuperación de depósito.',
     is_active: true,
   },
-  {
-    id: 4,
-    name: 'Limpieza Post-Construcción',
-    service_type: 'post_construction',
-    rate_per_sqft: '0.26',
-    min_order_amount: '99.00',
-    description: 'Transforma tu remodelación en un espacio habitable, limpio y seguro. Retiramos el polvo fino de obra para que estrenes sin estrés.',
-    is_active: true,
-  },
 ];
 

@@ -1,0 +1,15 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <rect width="48" height="48" rx="12" fill="#573725"/>
+  <rect x="2" y="2" width="44" height="44" rx="10" stroke="#9c6843" stroke-width="2" stroke-opacity="0.4"/>
+  <!-- Commercial building silhouette -->
+  <path d="M12 40V18L24 10L36 18V40H12Z" fill="#815133"/>
+  <path d="M24 10L36 18V40H24V10Z" fill="#6d4126"/>
+  <!-- Windows grid -->
+  <rect x="16" y="20" width="4" height="4" rx="1" fill="#fcf9f6"/>
+  <rect x="28" y="20" width="4" height="4" rx="1" fill="#fcf9f6"/>
+  <rect x="16" y="27" width="4" height="4" rx="1" fill="#fcf9f6"/>
+  <rect x="28" y="27" width="4" height="4" rx="1" fill="#fcf9f6"/>
+  <!-- Industrial door / entrance -->
+  <rect x="21" y="33" width="6" height="7" rx="1" fill="#2f1b11"/>
+  <path d="M8 40H40" stroke="#9c6843" stroke-width="2" stroke-linecap="round"/>
+</svg>

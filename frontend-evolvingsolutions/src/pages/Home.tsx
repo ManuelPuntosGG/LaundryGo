@@ -14,6 +14,7 @@ import {
   Layers,
   Award,
   Check,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -30,7 +31,7 @@ export function Home() {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        const response = await api.get('/cleaning/rates/');
+        const response = await api.get('/cleaning/rates/?brand=evolvingsolutions');
         const list: CleaningServiceRate[] = Array.isArray(response.data) ? response.data : response.data?.results || [];
         if (list.length > 0) {
           // Filter to commercial & post_construction & industrial_demolition
@@ -460,6 +461,36 @@ export function Home() {
                 <span>Same-Day COI Turnaround</span>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Residential Division Referral to GoPropertyCare */}
+      <section>
+        <div className="bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#059669] text-white rounded-3xl p-8 sm:p-10 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-emerald-500/30">
+          <div className="space-y-3 text-center md:text-left max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-emerald-100 text-xs font-bold uppercase tracking-wider">
+              <HomeIcon className="w-3.5 h-3.5 text-emerald-200" />
+              <span>{t('home.residentialReferral.badge')}</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              {t('home.residentialReferral.title')}
+            </h3>
+            <p className="text-emerald-100 text-sm sm:text-base leading-relaxed font-medium">
+              {t('home.residentialReferral.description')}
+            </p>
+          </div>
+
+          <div className="shrink-0 w-full md:w-auto">
+            <a
+              href="https://gopropertycare.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 w-full md:w-auto px-6 py-3.5 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 font-black text-sm shadow-lg hover:shadow-xl hover:scale-102 active:scale-98 transition-all"
+            >
+              <span>{t('home.residentialReferral.cta')}</span>
+              <ArrowRight className="w-4 h-4 text-emerald-700" />
+            </a>
           </div>
         </div>
       </section>

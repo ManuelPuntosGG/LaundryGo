@@ -106,6 +106,12 @@
       "bookNow": "Reservar Este Servicio",
       "minNotice": "Despacho mínimo de $99. Contratos maestros y acuerdos recurrentes disponibles bajo solicitud."
     },
+    "residentialReferral": {
+      "badge": "División Residencial para el Hogar",
+      "title": "¿Buscas Limpieza Residencial para tu Hogar?",
+      "description": "Para residencias particulares, condominios, apartamentos, mantenimiento regular del hogar y mudanzas, visita nuestra marca especializada para el hogar, GoPropertyCare.",
+      "cta": "Conoce GoPropertyCare"
+    },
     "coverage": {
       "title": "Área de Cobertura Comercial",
       "subtitle": "Atendemos desarrolladores, contratistas y complejos comerciales en todo el corredor de Denver y Boulder.",

@@ -102,26 +102,13 @@
           "Listo para entrega inmediata al propietario o inquilino"
         ]
       },
-      "postConstruction": {
-        "name": "Limpieza Post-Construcción",
-        "tagline": "Espacios Renovados y Libres de Polvo",
-        "rate": "$0.26 / sq ft",
-        "description": "Transforma tu remodelación en un espacio habitable, limpio y seguro. Retiramos el polvo fino de obra para que estrenes sin estrés.",
-        "features": [
-          "Aspirado de polvo fino, yeso y residuos de obra",
-          "Eliminación de salpicaduras de pintura y cintas",
-          "Limpieza minuciosa de lámparas, rejillas y marcos",
-          "Pisos y azulejos desmanchados y lustrados",
-          "Aire y superficies limpios listos para disfrutar"
-        ]
-      },
       "bookNow": "Reservar este Servicio",
       "minNotice": "Tarifa mínima de $99 por visita. El precio final se basa en las dimensiones verificadas y cuidados adicionales seleccionados."
     },
     "commercialReferral": {
       "badge": "División Comercial y Construcción",
-      "title": "¿Requieres Limpieza Comercial o Demolición de Drywall?",
-      "description": "Para oficinas corporativas, locales comerciales, limpieza post-construcción y mano de obra para demolición de drywall, visita nuestra división comercial especializada, Evolving Solutions LLC.",
+      "title": "¿Requieres Limpieza Comercial, Post-Construcción o Demolición?",
+      "description": "Para oficinas corporativas, locales comerciales, limpieza post-construcción de obra y mano de obra para demolición de drywall, visita nuestra división comercial especializada, Evolving Solutions LLC.",
       "cta": "Conoce Evolving Solutions LLC"
     },
     "coverage": {

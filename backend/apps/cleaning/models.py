@@ -3,6 +3,12 @@ from django.conf import settings
 from apps.core.models import TimeStampedModel
 
 
+BRAND_CHOICES = [
+    ('gopropertycare', 'GoPropertyCare (Residential)'),
+    ('evolvingsolutions', 'Evolving Solutions LLC (Commercial & Post-Construction)'),
+]
+
+
 class CleaningServiceRate(TimeStampedModel):
     SERVICE_TYPES = [
         ('regular', 'Limpieza Regular'),
@@ -13,8 +19,17 @@ class CleaningServiceRate(TimeStampedModel):
         ('industrial_demolition', 'Demolición de Drywall y Mano de Obra Industrial'),
     ]
 
+    RESIDENTIAL_SERVICES = ('regular', 'deep', 'move_in_out')
+    COMMERCIAL_SERVICES = ('commercial', 'post_construction', 'industrial_demolition')
+
     name = models.CharField(max_length=100)
     service_type = models.CharField(max_length=30, choices=SERVICE_TYPES, unique=True)
+    brand = models.CharField(
+        max_length=30,
+        choices=BRAND_CHOICES,
+        default='gopropertycare',
+        help_text='Brand providing this service'
+    )
     rate_per_sqft = models.DecimalField(
         max_digits=6,
         decimal_places=2,
@@ -35,12 +50,24 @@ class CleaningServiceRate(TimeStampedModel):
         ordering = ['rate_per_sqft']
 
     def __str__(self):
-        return f'{self.name} - ${self.rate_per_sqft:.2f}/sqft'
+        return f'{self.name} ({self.get_brand_display()}) - ${self.rate_per_sqft:.2f}/sqft'
 
 
 class CleaningAddon(TimeStampedModel):
+    ADDON_BRAND_CHOICES = [
+        ('gopropertycare', 'GoPropertyCare (Residential)'),
+        ('evolvingsolutions', 'Evolving Solutions LLC (Commercial)'),
+        ('both', 'Both Brands'),
+    ]
+
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=50, unique=True)
+    code = models.CharField(max_length=50)
+    brand = models.CharField(
+        max_length=30,
+        choices=ADDON_BRAND_CHOICES,
+        default='gopropertycare',
+        help_text='Target brand for this add-on'
+    )
     price = models.DecimalField(max_digits=6, decimal_places=2)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
@@ -49,9 +76,12 @@ class CleaningAddon(TimeStampedModel):
         verbose_name = 'Cleaning Add-on'
         verbose_name_plural = 'Cleaning Add-ons'
         ordering = ['price']
+        constraints = [
+            models.UniqueConstraint(fields=['code', 'brand'], name='unique_addon_code_per_brand')
+        ]
 
     def __str__(self):
-        return f'{self.name} (+${self.price})'
+        return f'{self.name} [{self.brand}] (+${self.price})'
 
 
 class CleaningOrder(TimeStampedModel):

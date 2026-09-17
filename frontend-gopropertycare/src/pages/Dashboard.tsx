@@ -41,9 +41,14 @@ export function Dashboard() {
   const fetchOrders = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get('/cleaning/orders/');
+      const response = await api.get('/cleaning/orders/?brand=gopropertycare');
       const list = Array.isArray(response.data) ? response.data : response.data?.results || [];
-      setOrders(list);
+      const residentialOrders = list.filter(
+        (o: CleaningOrder) =>
+          o.brand === 'gopropertycare' ||
+          ['regular', 'deep', 'move_in_out'].includes(o.service_rate?.service_type)
+      );
+      setOrders(residentialOrders);
     } catch (err) {
       console.error('Failed to fetch cleaning orders:', err);
     } finally {

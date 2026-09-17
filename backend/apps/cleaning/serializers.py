@@ -15,6 +15,7 @@ class CleaningServiceRateSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'service_type',
+            'brand',
             'rate_per_sqft',
             'min_order_amount',
             'description',
@@ -31,6 +32,7 @@ class CleaningAddonSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'code',
+            'brand',
             'price',
             'description',
             'is_active',
@@ -157,6 +159,25 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
             if missing:
                 raise serializers.ValidationError({
                     field: 'This field is required for guest checkout.' for field in missing
+                })
+
+        brand = data.get('brand') or 'gopropertycare'
+        service_rate = data.get('service_rate')
+
+        if service_rate:
+            if brand == 'gopropertycare' and service_rate.service_type not in CleaningServiceRate.RESIDENTIAL_SERVICES:
+                raise serializers.ValidationError({
+                    'service_rate_id': (
+                        'GoPropertyCare provides strictly residential cleaning (Regular, Deep, Move-In/Move-Out). '
+                        'Post-construction cleanup and commercial services are provided exclusively by Evolving Solutions LLC.'
+                    )
+                })
+            elif brand == 'evolvingsolutions' and service_rate.service_type not in CleaningServiceRate.COMMERCIAL_SERVICES:
+                raise serializers.ValidationError({
+                    'service_rate_id': (
+                        'Evolving Solutions LLC is dedicated exclusively to commercial facilities, post-construction projects, '
+                        'and demolition labor. For residential home cleaning, please book through GoPropertyCare.'
+                    )
                 })
 
         return data
