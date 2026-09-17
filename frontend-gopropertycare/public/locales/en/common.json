@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "GoPropertyCare",
-    "tagline": "Professional Residential & Commercial Cleaning in Denver & Boulder"
+    "tagline": "Professional Residential Cleaning & Home Care in Denver & Boulder"
   },
   "nav": {
     "home": "Home",
@@ -16,9 +16,9 @@
     "badge": "Professional Cleaning at Your Doorstep • Denver & Boulder",
     "socialProof": {
       "rating": "4.9/5 Customer Rating",
-      "properties": "+850 Homes & Offices Cleaned",
-      "eco": "Eco-Friendly & Safe Supplies",
-      "guarantee": "100% Satisfaction Guarantee"
+      "properties": "+850 Happy Homes Cleaned",
+      "eco": "Eco-Friendly & Family Safe Supplies",
+      "guarantee": "100% Clean Satisfaction Guarantee"
     },
     "hero": {
       "title": "Spotless Spaces, More Time for You",

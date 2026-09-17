@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "GoPropertyCare",
-    "tagline": "Servicio Profesional de Limpieza Residencial y Comercial en Denver y Boulder"
+    "tagline": "Servicio Profesional de Limpieza Residencial y Cuidado del Hogar en Denver y Boulder"
   },
   "nav": {
     "home": "Inicio",
@@ -16,8 +16,8 @@
     "badge": "Limpieza Profesional a Domicilio • Denver y Boulder",
     "socialProof": {
       "rating": "4.9/5 Calificación de Clientes",
-      "properties": "+850 Hogares y Negocios Limpios",
-      "eco": "Insumos Ecológicos y Seguros",
+      "properties": "+850 Hogares y Familias Atendidas",
+      "eco": "Insumos Ecológicos y Seguros para la Familia",
       "guarantee": "100% Satisfacción Garantizada"
     },
     "hero": {
