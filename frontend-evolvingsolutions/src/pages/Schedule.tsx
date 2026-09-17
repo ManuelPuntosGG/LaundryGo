@@ -418,7 +418,7 @@ export function Schedule() {
 
       {/* Step 1: Scope & Footprint */}
       {step === 1 && (
-        <Card className="p-6 sm:p-8 space-y-8">
+        <Card className="p-4 sm:p-8 space-y-6 sm:space-y-8">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-stone-950 mb-1">
               {t('schedule.step1.title')}
@@ -468,11 +468,11 @@ export function Schedule() {
 
           {/* Square Footage Input & Slider */}
           <div className="space-y-4 pt-4 border-t border-stone-100">
-            <div className="flex items-center justify-between">
-              <label htmlFor={sqftSliderId} className="text-sm font-bold text-stone-700">
+            <div className="flex items-center justify-between gap-3">
+              <label htmlFor={sqftSliderId} className="text-xs sm:text-sm font-bold text-stone-700">
                 {t('schedule.step1.sqftLabel')}
               </label>
-              <div className="flex items-center gap-2 bg-[#f7efe6] px-4 py-1.5 rounded-xl border border-[#e0c3a7]">
+              <div className="flex items-center gap-2 bg-[#f7efe6] px-3 sm:px-4 py-1.5 rounded-xl border border-[#e0c3a7] shrink-0">
                 <input
                   type="number"
                   min={300}
@@ -480,7 +480,7 @@ export function Schedule() {
                   step={100}
                   value={sqft}
                   onChange={(e) => setSqft(Math.max(100, Number(e.target.value) || 100))}
-                  className="w-24 text-right focus:outline-none text-[#815133] font-black text-base"
+                  className="w-20 sm:w-24 text-right focus:outline-none text-[#815133] font-black text-sm sm:text-base"
                 />
                 <span className="text-stone-600 font-bold text-xs">sq ft</span>
               </div>
@@ -505,7 +505,7 @@ export function Schedule() {
           </div>
 
           {/* Live Base Calculation Box */}
-          <div className="p-4 rounded-2xl bg-[#f7efe6] border border-[#e0c3a7] flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-[#f7efe6] border border-[#e0c3a7] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div>
               <span className="text-xs font-bold text-stone-600 uppercase">
                 {t('schedule.step1.basePrice')}
@@ -520,7 +520,7 @@ export function Schedule() {
               </div>
             </div>
 
-            <Button size="md" onClick={() => setStep(2)}>
+            <Button size="md" onClick={() => setStep(2)} className="w-full sm:w-auto">
               <span>{t('schedule.steps.step2')}</span>
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
@@ -530,7 +530,7 @@ export function Schedule() {
 
       {/* Step 2: Date & Shift Window */}
       {step === 2 && (
-        <Card className="p-6 sm:p-8 space-y-8">
+        <Card className="p-4 sm:p-8 space-y-6 sm:space-y-8">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-stone-950 mb-1">
               {t('schedule.step2.title')}
@@ -668,7 +668,7 @@ export function Schedule() {
 
       {/* Step 3: Location, Add-ons & Contact Details */}
       {step === 3 && (
-        <Card className="p-6 sm:p-8 space-y-8">
+        <Card className="p-4 sm:p-8 space-y-6 sm:space-y-8">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-stone-950 mb-1">
               {t('schedule.step3.title')}
@@ -847,7 +847,7 @@ export function Schedule() {
 
       {/* Step 4: Review, Terms & Dispatch */}
       {step === 4 && (
-        <Card className="p-6 sm:p-8 space-y-8">
+        <Card className="p-4 sm:p-8 space-y-6 sm:space-y-8">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-stone-950 mb-1">
               {t('schedule.step4.title')}

@@ -92,11 +92,11 @@ export function Home() {
           <span>{t('home.badge')}</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-stone-950 tracking-tight max-w-4xl leading-[1.1] mb-6 animate-fade-in-up">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-stone-950 tracking-tight max-w-4xl leading-[1.1] mb-6 animate-fade-in-up">
           {t('home.hero.title')}
         </h1>
 
-        <p className="text-base sm:text-lg lg:text-xl text-stone-600 max-w-2xl leading-relaxed mb-8 sm:mb-10 font-medium animate-fade-in-up delay-75">
+        <p className="text-sm sm:text-lg lg:text-xl text-stone-600 max-w-2xl leading-relaxed mb-8 sm:mb-10 font-medium animate-fade-in-up delay-75 px-2">
           {t('home.hero.subtitle')}
         </p>
 
@@ -124,30 +124,30 @@ export function Home() {
         </div>
 
         {/* Commercial Proof Badges */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-12 sm:mt-16 w-full max-w-4xl pt-8 border-t border-stone-200/80 animate-fade-in delay-200">
-          <div className="flex flex-col items-center text-center p-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-10 sm:mt-16 w-full max-w-4xl pt-8 border-t border-stone-200/80 animate-fade-in delay-200">
+          <div className="flex flex-col items-center text-center p-2.5 sm:p-3 bg-white/60 sm:bg-transparent rounded-xl border border-stone-200/60 sm:border-0">
             <span className="font-black text-stone-950 text-xl sm:text-2xl">100%</span>
-            <span className="text-xs text-stone-600 font-bold mt-0.5">{t('home.socialProof.guarantee')}</span>
+            <span className="text-[11px] sm:text-xs text-stone-600 font-bold mt-0.5">{t('home.socialProof.guarantee')}</span>
           </div>
-          <div className="flex flex-col items-center text-center p-3">
+          <div className="flex flex-col items-center text-center p-2.5 sm:p-3 bg-white/60 sm:bg-transparent rounded-xl border border-stone-200/60 sm:border-0">
             <span className="font-black text-[#815133] text-xl sm:text-2xl">+450</span>
-            <span className="text-xs text-stone-600 font-bold mt-0.5">{t('home.socialProof.properties')}</span>
+            <span className="text-[11px] sm:text-xs text-stone-600 font-bold mt-0.5">{t('home.socialProof.properties')}</span>
           </div>
-          <div className="flex flex-col items-center text-center p-3">
+          <div className="flex flex-col items-center text-center p-2.5 sm:p-3 bg-white/60 sm:bg-transparent rounded-xl border border-stone-200/60 sm:border-0">
             <span className="font-black text-stone-950 text-xl sm:text-2xl">OSHA</span>
-            <span className="text-xs text-stone-600 font-bold mt-0.5">{t('home.socialProof.eco')}</span>
+            <span className="text-[11px] sm:text-xs text-stone-600 font-bold mt-0.5">{t('home.socialProof.eco')}</span>
           </div>
-          <div className="flex flex-col items-center text-center p-3">
+          <div className="flex flex-col items-center text-center p-2.5 sm:p-3 bg-white/60 sm:bg-transparent rounded-xl border border-stone-200/60 sm:border-0">
             <span className="font-black text-[#815133] text-xl sm:text-2xl">5.0 ★</span>
-            <span className="text-xs text-stone-600 font-bold mt-0.5">{t('home.socialProof.rating')}</span>
+            <span className="text-[11px] sm:text-xs text-stone-600 font-bold mt-0.5">{t('home.socialProof.rating')}</span>
           </div>
         </div>
       </section>
 
       {/* Interactive Sq Ft Cost Estimator */}
       <section id="estimator" className="scroll-mt-24">
-        <Card variant="featured" className="p-6 sm:p-10 border-[#815133]/40 bg-white/95">
-          <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
+        <Card variant="featured" className="p-4 sm:p-10 border-[#815133]/40 bg-white/95">
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8 space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f7efe6] text-[#573725] text-xs font-bold uppercase tracking-wider">
               <Building2 className="w-3.5 h-3.5 text-[#815133]" />
               <span>{t('home.estimator.title')}</span>
@@ -155,18 +155,18 @@ export function Home() {
             <h2 className="text-2xl sm:text-3xl font-black text-stone-950 tracking-tight">
               {t('home.estimator.title')}
             </h2>
-            <p className="text-stone-600 text-sm sm:text-base font-medium">
+            <p className="text-stone-600 text-xs sm:text-base font-medium px-2">
               {t('home.estimator.subtitle')}
             </p>
           </div>
 
           {/* Slider Controls */}
-          <div className="max-w-xl mx-auto mb-10 space-y-4">
-            <div className="flex items-center justify-between">
-              <label htmlFor="sqft-slider" className="text-sm font-bold text-stone-700">
+          <div className="max-w-xl mx-auto mb-8 sm:mb-10 space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <label htmlFor="sqft-slider" className="text-xs sm:text-sm font-bold text-stone-700">
                 {t('home.estimator.sqftLabel')}
               </label>
-              <div className="flex items-center gap-2 bg-[#f7efe6] px-4 py-1.5 rounded-xl border border-[#e0c3a7]">
+              <div className="flex items-center gap-2 bg-[#f7efe6] px-3 sm:px-4 py-1.5 rounded-xl border border-[#e0c3a7] shrink-0">
                 <input
                   type="number"
                   min={300}
@@ -174,7 +174,7 @@ export function Home() {
                   step={100}
                   value={sqft}
                   onChange={(e) => setSqft(Math.max(100, Number(e.target.value) || 100))}
-                  className="w-24 text-right focus:outline-none text-[#815133] font-black text-base"
+                  className="w-20 sm:w-24 text-right focus:outline-none text-[#815133] font-black text-sm sm:text-base"
                 />
                 <span className="text-stone-600 font-bold text-xs">sq ft</span>
               </div>

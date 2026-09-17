@@ -118,83 +118,93 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Mobile menu button */}
-        <div className="flex items-center gap-2 md:hidden">
-          <LanguageSwitcher />
+        {/* Mobile menu button — Hamburger only */}
+        <div className="flex items-center md:hidden">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2.5 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="p-2.5 rounded-xl text-slate-700 hover:text-slate-900 bg-slate-100/90 border border-slate-200/80 focus:outline-none transition-transform active:scale-95 shrink-0 cursor-pointer"
             aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden mt-2 bg-white/95 backdrop-blur-xl border border-emerald-100 rounded-2xl shadow-xl p-4 animate-fade-in space-y-2">
-          <Link
-            to="/"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className={`block px-4 py-2.5 rounded-xl text-sm font-bold ${
-              isActive('/') ? 'bg-emerald-50 text-emerald-800 font-extrabold' : 'text-slate-700 hover:text-emerald-800'
-            }`}
-          >
-            {t('nav.home')}
-          </Link>
-          <Link
-            to="/about"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className={`block px-4 py-2.5 rounded-xl text-sm font-bold ${
-              isActive('/about') ? 'bg-emerald-50 text-emerald-800 font-extrabold' : 'text-slate-700 hover:text-emerald-800'
-            }`}
-          >
-            {t('nav.about')}
-          </Link>
-          <Link
-            to="/schedule"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className={`block px-4 py-2.5 rounded-xl text-sm font-bold ${
-              isActive('/schedule') ? 'bg-emerald-50 text-emerald-800 font-extrabold' : 'text-slate-700 hover:text-emerald-800'
-            }`}
-          >
-            {t('nav.schedule')}
-          </Link>
+        <div className="md:hidden mt-2 bg-white/95 backdrop-blur-xl border border-emerald-100 rounded-2xl shadow-xl p-4 sm:p-5 animate-fade-in space-y-3">
+          <div className="flex flex-col gap-1.5">
+            <Link
+              to="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center h-11 px-4 rounded-xl text-sm font-bold transition-colors ${
+                isActive('/') ? 'bg-emerald-50 text-emerald-800 font-extrabold border border-emerald-200' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {t('nav.home')}
+            </Link>
+            <Link
+              to="/about"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center h-11 px-4 rounded-xl text-sm font-bold transition-colors ${
+                isActive('/about') ? 'bg-emerald-50 text-emerald-800 font-extrabold border border-emerald-200' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {t('nav.about')}
+            </Link>
+            <Link
+              to="/schedule"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-2 h-11 px-4 rounded-xl text-sm font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all active:scale-98"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>{t('nav.schedule')}</span>
+            </Link>
+          </div>
 
-          <div className="h-px bg-slate-100 my-2" />
+          <div className="h-px bg-slate-100 my-1" />
 
           {isAuthenticated ? (
-            <>
+            <div className="space-y-1.5">
               <Link
                 to="/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50"
+                className={`flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-bold transition-colors ${
+                  isActive('/dashboard') ? 'bg-emerald-50 text-emerald-800 font-extrabold border border-emerald-200' : 'text-slate-700 hover:bg-slate-50'
+                }`}
               >
                 <LayoutDashboard className="w-4 h-4 text-emerald-600" />
-                {t('nav.dashboard')}
+                <span>{t('nav.dashboard')}</span>
               </Link>
               <button
                 onClick={() => {
                   logout();
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-rose-600 hover:bg-rose-50"
+                className="w-full flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-bold text-rose-600 hover:bg-rose-50 cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
-                {t('nav.logout')}
+                <span>{t('nav.logout')}</span>
               </button>
-            </>
+            </div>
           ) : (
             <Link
               to="/login"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold bg-emerald-600 text-white shadow-sm"
+              className="flex items-center justify-center gap-2 w-full h-10 rounded-xl text-sm font-bold border border-slate-300 text-slate-800 hover:bg-slate-50"
             >
-              <User className="w-4 h-4" />
-              {t('nav.login')}
+              <User className="w-4 h-4 text-slate-500" />
+              <span>{t('nav.login')}</span>
             </Link>
           )}
+
+          {/* Bottom Utilities: Region Info & Language Switcher */}
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            <span className="text-xs text-slate-500 font-bold">
+              Denver & Boulder, CO
+            </span>
+            <LanguageSwitcher />
+          </div>
         </div>
       )}
     </header>
