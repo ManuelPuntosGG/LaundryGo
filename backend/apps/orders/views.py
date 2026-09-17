@@ -2,6 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
+from django.db import transaction
 from datetime import timedelta
 from .models import ServiceRate, Order, RecurringSchedule
 from .serializers import (
@@ -34,6 +35,7 @@ class OrderListCreateView(generics.ListCreateAPIView):
             return Order.objects.filter(user=self.request.user)
         return Order.objects.none()
 
+    @transaction.atomic
     def perform_create(self, serializer):
         order = serializer.save()
         from .emails import send_order_confirmation_email
@@ -84,13 +86,14 @@ class OrderCancelView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        order.status = 'cancelled'
-        order.save()
+        with transaction.atomic():
+            order.status = 'cancelled'
+            order.save()
 
-        # If order has an active recurring schedule, pause it
-        if hasattr(order, 'recurring_schedule') and order.recurring_schedule:
-            order.recurring_schedule.is_active = False
-            order.recurring_schedule.save()
+            # If order has an active recurring schedule, pause it
+            if hasattr(order, 'recurring_schedule') and order.recurring_schedule:
+                order.recurring_schedule.is_active = False
+                order.recurring_schedule.save()
 
         # Send cancellation notification email
         from .emails import send_order_cancellation_email

@@ -1,0 +1,270 @@
+{
+  "app": {
+    "name": "Evolving Solutions LLC",
+    "subtitle": "Limpieza Comercial y Mano de Obra Industrial",
+    "tagline": "Socio Confiable en Denver para Limpieza Comercial y Mano de Obra Industrial"
+  },
+  "nav": {
+    "home": "Inicio",
+    "about": "Nosotros",
+    "schedule": "Solicitar Cuadrilla / Cotizar",
+    "login": "Portal de Clientes",
+    "register": "Registrarse",
+    "dashboard": "Panel de Proyectos",
+    "logout": "Cerrar Sesión"
+  },
+  "home": {
+    "badge": "Personal Verificado • 100% Cumplimiento en Seguros y OSHA • Denver y Boulder",
+    "socialProof": {
+      "rating": "5.0 Calificación de Contratistas",
+      "properties": "+450 Proyectos Entregados",
+      "eco": "Prácticas Certificadas OSHA",
+      "guarantee": "100% Cobertura de Seguros"
+    },
+    "hero": {
+      "title": "El Socio Confiable en Denver para Limpieza Comercial y Mano de Obra Industrial",
+      "subtitle": "Proveemos mano de obra confiable y verificada para proyectos comerciales y de construcción en Denver. Desde servicios profesionales de limpieza janitorial hasta demolición especializada de drywall, brindamos soluciones laborales de alto estándar con un enfoque en seguridad, rapidez y 100% de cumplimiento en seguros.",
+      "cta": "Cotizar y Reservar Cuadrilla",
+      "secondaryCta": "Ver Servicios y Tarifas"
+    },
+    "estimator": {
+      "title": "Cotizador de Costos Comerciales",
+      "subtitle": "Ajusta los pies cuadrados para obtener una cotización inmediata y clara en limpieza janitorial, post-construcción y demolición.",
+      "small": "Oficina / Local (~1,500 sq ft)",
+      "smallDesc": "Oficinas boutique, clínicas, locales comerciales",
+      "medium": "Piso Comercial (~3,500 sq ft)",
+      "mediumDesc": "Pisos corporativos, edificios multi-inquilino, restaurantes",
+      "large": "Bodega / Proyecto Grande (~7,500 sq ft)",
+      "largeDesc": "Instalaciones industriales, remodelaciones y obras integrales",
+      "sqftLabel": "Área del Proyecto",
+      "estTotal": "Mano de Obra Estimada",
+      "minOrderNotice": "Tarifa mínima por despacho: $99.00 para garantizar cuadrillas equipadas y aseguradas en sitio.",
+      "sqftUnit": "sq ft"
+    },
+    "howItWorks": {
+      "title": "Despliegue de Cuadrillas en 4 Pasos",
+      "subtitle": "Un proceso ágil diseñado para administradores de propiedades, contratistas generales y directores de operaciones.",
+      "step1": {
+        "title": "1. Alcance y Dimensiones",
+        "description": "Selecciona las dimensiones del inmueble, el nivel de servicio requerido y la fecha de inicio deseada."
+      },
+      "step2": {
+        "title": "2. Logística del Sitio",
+        "description": "Especifica requerimientos de techos altos, acarreo de escombros, turnos nocturnos o protocolos de acceso."
+      },
+      "step3": {
+        "title": "3. Despacho de Cuadrilla Asegurada",
+        "description": "Nuestros trabajadores verificados llegan puntualmente con equipo comercial y equipo de protección personal (EPP)."
+      },
+      "step4": {
+        "title": "4. Inspección y Entrega",
+        "description": "Revisa el trabajo terminado junto a nuestro jefe de cuadrilla. Recibe documentación completa de cumplimiento y factura desglosada."
+      }
+    },
+    "pricing": {
+      "title": "Tarifas Comerciales Transparentes",
+      "subtitle": "Tarifas por pie cuadrado predecibles respaldadas por seguros integrales y supervisión rigurosa de seguridad.",
+      "commercial": {
+        "name": "Limpieza Comercial / Janitorial",
+        "tagline": "Oficinas, Locales y Corporativos",
+        "rate": "$0.18 / sq ft",
+        "description": "Desinfección profesional y mantenimiento para oficinas corporativas, bancos, consultorios y establecimientos comerciales.",
+        "features": [
+          "Desinfección profunda y reposición de baños",
+          "Comedores, cocinas y salas de conferencias",
+          "Aspirado comercial y cuidado de pisos duros",
+          "Desinfección de puntos de alto contacto",
+          "Gestión de basura, reciclaje y cambio de bolsas"
+        ]
+      },
+      "post_construction": {
+        "name": "Limpieza Post-Construcción",
+        "tagline": "Limpieza Gruesa, Fina y Entrega",
+        "rate": "$0.26 / sq ft",
+        "description": "Aspirado industrial HEPA y preparación de espacios para entrega inmediata tras remodelaciones u obras nuevas.",
+        "features": [
+          "Aspirado HEPA de polvo fino de tablaroca y yeso",
+          "Remoción de calcomanías, restos de pintura y silicona",
+          "Lámparas, difusores y ductería expuesta",
+          "Cristalería interior, marcos comerciales y rieles",
+          "Listo para el recorrido final de entrega"
+        ]
+      },
+      "industrial_demolition": {
+        "name": "Demolición de Drywall y Mano de Obra",
+        "tagline": "Demolición Selectiva y Cuadrillas de Obra",
+        "rate": "$0.35 / sq ft",
+        "description": "Mano de obra calificada para demolición de divisiones interiores de tablaroca, desmontajes no estructurales y retiro de escombros.",
+        "features": [
+          "Derribo selectivo de paneles de yeso / drywall",
+          "Desmontaje de perfiles y retiro de fijaciones",
+          "Ensacado y organización de escombros en obra",
+          "Adhesión estricta a protocolos de seguridad OSHA",
+          "Seguro de responsabilidad civil y compensación laboral"
+        ]
+      },
+      "bookNow": "Reservar Este Servicio",
+      "minNotice": "Despacho mínimo de $99. Contratos maestros y acuerdos recurrentes disponibles bajo solicitud."
+    },
+    "coverage": {
+      "title": "Área de Cobertura Comercial",
+      "subtitle": "Atendemos desarrolladores, contratistas y complejos comerciales en todo el corredor de Denver y Boulder.",
+      "innerBadge": "Zona Núcleo — Traslado Gratuito",
+      "outerBadge": "Zona Exterior — $25 Tarifa Logística",
+      "innerDesc": "Denver (Downtown, LoDo, RiNo, DTC), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, Broomfield.",
+      "outerDesc": "Aurora, Thornton, Centennial, Highlands Ranch y corredores industriales aledaños."
+    },
+    "contact": {
+      "title": "Trabaja con Evolving Solutions LLC",
+      "subtitle": "Ya sea que necesites una cuadrilla diaria o soporte continuo en sitio, conectamos el mejor talento con el éxito de tu proyecto.",
+      "phone": "(720) 590-8632",
+      "email": "info@evolvingsolutionsllc.com",
+      "hours": "Lun – Sáb: 6:00 AM – 7:00 PM (Soporte 24/7 disponible)",
+      "location": "Área Metropolitana de Denver y Boulder, CO"
+    }
+  },
+  "about": {
+    "tagline": "Líderes en Limpieza Comercial y Mano de Obra Industrial",
+    "title": "Construyendo la Fuerza Laboral Comercial Más Confiable de Denver",
+    "subtitle": "Ya sea que necesites una cuadrilla diaria o soporte de obra a largo plazo, Evolving Solutions LLC conecta talento calificado con el éxito de tu proyecto.",
+    "insuredBadge": "100% Responsabilidad Civil y Workers' Comp",
+    "ecoBadge": "Cumplimiento Estricto OSHA y Protocolos de Seguridad",
+    "mission": {
+      "title": "Nuestra Misión",
+      "description": "Proveemos una fuerza laboral confiable y verificada para los proyectos comerciales y de construcción en Denver. Desde servicios profesionales de limpieza janitorial hasta demolición especializada de tablaroca, entregamos soluciones laborales de alto estándar enfocadas en seguridad, rapidez y 100% de cumplimiento en seguros."
+    },
+    "pillarsTitle": "Por Qué los Contratistas Generales Confían en Nosotros",
+    "values": {
+      "safetyTitle": "Rigor en Seguridad y OSHA",
+      "safetyDesc": "Cada trabajador llega equipado con el EPP reglamentario (cascos, gafas de seguridad, chalecos reflectivos, botas con punta de acero) y asiste a charlas de seguridad previas.",
+      "staffTitle": "Fuerza Laboral Verificada y Puntual",
+      "staffDesc": "Revisión exhaustiva de antecedentes, experiencia comprobada y estricto control de asistencia garantizan que tu proyecto avance sin retrasos.",
+      "pricingTitle": "Precios Claros y Predecibles",
+      "pricingDesc": "Tarifas transparentes por pie cuadrado, umbral mínimo de $99 por visita y facturación detallada sin sorpresas de sobrecostos.",
+      "speedTitle": "Rapidez y Agilidad Operativa",
+      "speedDesc": "Despliegue rápido de cuadrillas en Denver y Boulder, con capacidad para turnos nocturnos, fines de semana y entregas aceleradas."
+    },
+    "capabilitiesTitle": "Capacidades Laborales Principales",
+    "checklist": {
+      "item1": "Limpieza Janitorial y Mantenimiento Diario de Instalaciones",
+      "item2": "Limpieza Post-Construcción (Fase Gruesa, Fina y Entrega)",
+      "item3": "Demolición Selectiva de Drywall, Tablaroca y Divisiones",
+      "item4": "Fregado Mecanizado de Pisos Industriales y Preparación de Concreto",
+      "item5": "Acarreo, Ensacado y Disposición de Escombros en Contenedor",
+      "item6": "Desinfección Intensiva de Baterías de Sanitarios Múltiples",
+      "item7": "Desempolvado en Alturas (Tuberías, Vigas y Ductos de Ventilación)",
+      "item8": "Entrega Inmediata de Pólizas de Seguro (COI) y Documentación"
+    }
+  },
+  "schedule": {
+    "title": "Solicitar Cuadrilla Comercial y Mano de Obra",
+    "subtitle": "Agenda servicios de limpieza comercial, post-construcción o demolición de drywall en 4 sencillos pasos.",
+    "steps": {
+      "step1": "Alcance y Tarifa",
+      "step2": "Fecha y Turno",
+      "step3": "Ubicación y Logística",
+      "step4": "Revisión y Despacho"
+    },
+    "step1": {
+      "title": "Selecciona el Servicio y los Pies Cuadrados",
+      "sqftLabel": "Área del Proyecto (Sq Ft)",
+      "ratesLabel": "Selecciona el Alcance Laboral",
+      "basePrice": "Mano de Obra Base Estimada",
+      "minApplied": "Aplica Umbral Mínimo de $99 por Visita"
+    },
+    "step2": {
+      "title": "Elige la Fecha de Despacho y Turno",
+      "noSameDay": "Agendamiento con Anticipación: Disponible desde mañana para garantizar preparación de la cuadrilla y verificación de seguros.",
+      "morning": "Turno Mañana (8:00 AM – 12:00 PM)",
+      "afternoon": "Turno Tarde (1:00 PM – 5:00 PM)",
+      "timeSlot": "Selecciona el Turno de Trabajo"
+    },
+    "step3": {
+      "title": "Ubicación del Proyecto y Requerimientos Adicionales",
+      "cityLabel": "Área de Denver Metro / Boulder",
+      "addressLabel": "Dirección del Sitio / Instalación",
+      "zipLabel": "Código Postal",
+      "addonsLabel": "Logística Especializada y Servicios Adicionales",
+      "contactInfo": "Información del Contacto en Sitio",
+      "firstName": "Nombre del Contacto",
+      "lastName": "Apellido del Contacto",
+      "email": "Correo Corporativo Oficial",
+      "phone": "Teléfono Directo / Celular",
+      "instructions": "Acceso al Sitio, Muelle de Carga, Portón y Requisitos de EPP"
+    },
+    "step4": {
+      "title": "Resumen de la Orden y Confirmación de Despacho",
+      "summary": "Resumen de la Solicitud",
+      "service": "Alcance del Servicio",
+      "sqft": "Pies Cuadrados",
+      "date": "Fecha Agendada",
+      "time": "Ventana de Turno",
+      "location": "Ubicación del Proyecto",
+      "basePrice": "Mano de Obra Base",
+      "addons": "Servicios Adicionales",
+      "travelFee": "Tarifa Logística / Traslado",
+      "total": "Total Estimado de Mano de Obra",
+      "terms": "Confirmo los detalles del proyecto y acepto las condiciones de orden mínima de $99 y políticas de seguridad.",
+      "confirmButton": "Confirmar y Despachar Cuadrilla",
+      "successTitle": "¡Despacho de Cuadrilla Confirmado!",
+      "orderId": "Referencia de Orden de Trabajo",
+      "successMsg": "Hemos enviado a tu correo una confirmación detallada con el número de orden y las instrucciones para solicitar el Certificado de Seguro (COI).",
+      "nextSteps": "¿Qué sucede después?",
+      "nextStep1": "Nuestro coordinador de despacho revisará la logística de tu sitio en menos de 1 hora.",
+      "nextStep2": "Tu cuadrilla asignada se presentará puntualmente en el turno seleccionado con todo su EPP reglamentario."
+    }
+  },
+  "auth": {
+    "loginTitle": "Portal de Clientes y Contratistas",
+    "loginSubtitle": "Accede a tus órdenes de trabajo, estados de cuenta e historial de proyectos.",
+    "registerTitle": "Registrar Cuenta Corporativa",
+    "registerSubtitle": "Crea una cuenta para agilizar el despacho de cuadrillas y monitorear trabajos activos.",
+    "email": "Correo Electrónico Corporativo",
+    "password": "Contraseña",
+    "passwordConfirm": "Confirmar Contraseña",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Teléfono",
+    "loginButton": "Ingresar al Portal",
+    "registerButton": "Crear Cuenta",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "alreadyHaveAccount": "¿Ya estás registrado?",
+    "signUp": "Regístrate Aquí",
+    "signIn": "Iniciar Sesión",
+    "guestNotice": "Las órdenes generadas con este correo corporativo se vincularán automáticamente a tu cuenta."
+  },
+  "dashboard": {
+    "title": "Panel de Proyectos Comerciales",
+    "subtitle": "Monitorea órdenes de trabajo activas, estados de despacho y solicita cuadrillas recurrentes.",
+    "noOrders": "No se encontraron órdenes comerciales.",
+    "newOrder": "Solicitar Nueva Cuadrilla",
+    "orderRef": "Referencia de Orden",
+    "date": "Fecha Agendada",
+    "shift": "Turno",
+    "sqft": "Área (Sq Ft)",
+    "total": "Total de Mano de Obra",
+    "status": "Estado de Despacho",
+    "actions": "Acciones",
+    "cancel": "Cancelar Solicitud",
+    "cancelConfirm": "¿Estás seguro de que deseas cancelar esta orden de trabajo?",
+    "reorder": "Repetir Solicitud",
+    "statuses": {
+      "pending": "Pendiente de Despacho",
+      "confirmed": "Confirmada y Cuadrilla Asignada",
+      "in_progress": "Cuadrilla en Sitio",
+      "completed": "Trabajo Concluido",
+      "cancelled": "Cancelada"
+    }
+  },
+  "footer": {
+    "description": "El socio confiable en Denver para limpieza comercial y mano de obra industrial. Personal verificado, certificado en seguridad y 100% asegurado.",
+    "quickLinks": "Navegación Rápida",
+    "contactArea": "Despacho y Cobertura Regional",
+    "rights": "Todos los derechos reservados. Evolving Solutions LLC."
+  },
+  "common": {
+    "error": "Ocurrió un error. Por favor verifica los datos e intenta de nuevo.",
+    "loading": "Cargando...",
+    "submitting": "Procesando despacho..."
+  }
+}

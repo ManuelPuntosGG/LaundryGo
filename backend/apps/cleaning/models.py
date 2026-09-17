@@ -9,6 +9,8 @@ class CleaningServiceRate(TimeStampedModel):
         ('deep', 'Limpieza Profunda (GoFurther)'),
         ('move_in_out', 'Limpieza MoveIn/MoveOut'),
         ('post_construction', 'Limpieza Post-Construcción'),
+        ('commercial', 'Limpieza Comercial / Janitorial'),
+        ('industrial_demolition', 'Demolición de Drywall y Mano de Obra Industrial'),
     ]
 
     name = models.CharField(max_length=100)
@@ -44,8 +46,8 @@ class CleaningAddon(TimeStampedModel):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = 'Cleaning Add-on / Surcharge'
-        verbose_name_plural = 'Cleaning Add-ons / Surcharges'
+        verbose_name = 'Cleaning Add-on'
+        verbose_name_plural = 'Cleaning Add-ons'
         ordering = ['price']
 
     def __str__(self):
@@ -54,7 +56,7 @@ class CleaningAddon(TimeStampedModel):
 
 class CleaningOrder(TimeStampedModel):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
+        ('pending', 'Pending Confirmation'),
         ('confirmed', 'Confirmed'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
@@ -75,6 +77,13 @@ class CleaningOrder(TimeStampedModel):
         ('en', 'English'),
         ('es', 'Spanish'),
     ]
+
+    BRAND_CHOICES = [
+        ('gopropertycare', 'GoPropertyCare'),
+        ('evolvingsolutions', 'Evolving Solutions LLC'),
+    ]
+
+    brand = models.CharField(max_length=30, choices=BRAND_CHOICES, default='gopropertycare', blank=True)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -126,4 +135,5 @@ class CleaningOrder(TimeStampedModel):
 
     def __str__(self):
         client = self.user.email if self.user else self.guest_email or 'Guest'
-        return f'GPC-#{self.id} - {self.service_rate.name} ({self.square_feet} sqft) - {client}'
+        prefix = 'ESL' if self.brand == 'evolvingsolutions' else 'GPC'
+        return f'{prefix}-#{self.id} - {self.service_rate.name} ({self.square_feet} sqft) - {client}'

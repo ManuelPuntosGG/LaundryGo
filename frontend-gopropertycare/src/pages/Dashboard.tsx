@@ -52,7 +52,9 @@ export function Dashboard() {
   };
 
   useEffect(() => {
-    fetchOrders();
+    queueMicrotask(() => {
+      fetchOrders();
+    });
   }, []);
 
   const handleCancelOrder = async (orderId: number) => {

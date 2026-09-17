@@ -183,3 +183,29 @@ class TestCleaningAPI:
         cancel_resp = api_client.post(f'/api/v1/cleaning/orders/{order_id}/cancel/')
         assert cancel_resp.status_code == 200
         assert cancel_resp.json()['status'] == 'cancelled'
+
+    def test_create_evolvingsolutions_order(self, api_client, regular_rate):
+        tomorrow = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
+        payload = {
+            'guest_email': 'contractor@example.com',
+            'guest_first_name': 'Robert',
+            'guest_last_name': 'Miller',
+            'guest_phone': '7205558899',
+            'street_address': '500 16th St Mall',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'service_rate_id': regular_rate.id,
+            'square_feet': 3000,
+            'service_date': tomorrow,
+            'time_slot': 'morning',
+            'brand': 'evolvingsolutions',
+            'special_instructions': 'Security check-in at dock 2',
+            'language': 'en',
+        }
+        response = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+        assert response.status_code == 201
+        order = CleaningOrder.objects.get(guest_email='contractor@example.com')
+        assert order.brand == 'evolvingsolutions'
+        assert str(order).startswith('ESL-#')
+        assert order.total_price == Decimal('300.00')

@@ -2,6 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
+from django.db import transaction
 from datetime import timedelta
 from .models import CleaningServiceRate, CleaningAddon, CleaningOrder
 from .serializers import (
@@ -44,6 +45,7 @@ class CleaningOrderListCreateView(generics.ListCreateAPIView):
             return CleaningOrder.objects.filter(user=self.request.user)
         return CleaningOrder.objects.none()
 
+    @transaction.atomic
     def perform_create(self, serializer):
         order = serializer.save()
         send_cleaning_order_confirmation_email(order)
@@ -81,19 +83,25 @@ class CleaningOrderCancelView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        brand = getattr(order, 'brand', 'gopropertycare') or 'gopropertycare'
+        is_evolving = brand == 'evolvingsolutions'
+        company_name = "Evolving Solutions LLC" if is_evolving else "GoPropertyCare"
+        company_email = "info@evolvingsolutionsllc.com" if is_evolving else "info@gopropertycare.com"
+
         if order.status not in ['pending', 'confirmed']:
             return Response(
                 {
                     'detail': (
                         f'Cannot cancel order in "{order.get_status_display()}" status. '
-                        'Please call GoPropertyCare support at (720) 590-8632.'
+                        f'Please call {company_name} support at (720) 590-8632 or email {company_email}.'
                     )
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        order.status = 'cancelled'
-        order.save()
+        with transaction.atomic():
+            order.status = 'cancelled'
+            order.save()
 
         send_cleaning_order_cancellation_email(order)
         return Response(CleaningOrderSerializer(order).data, status=status.HTTP_200_OK)

@@ -1,0 +1,270 @@
+{
+  "app": {
+    "name": "Evolving Solutions LLC",
+    "subtitle": "Commercial Cleaning & Industrial Labor",
+    "tagline": "Denver's Trusted Partner for Commercial Cleaning & Industrial Labor"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "schedule": "Request Crew / Estimate",
+    "login": "Client Portal",
+    "register": "Register",
+    "dashboard": "Project Dashboard",
+    "logout": "Logout"
+  },
+  "home": {
+    "badge": "Vetted Workforce • 100% Insurance & OSHA Compliant • Denver & Boulder",
+    "socialProof": {
+      "rating": "5.0 General Contractor Rating",
+      "properties": "+450 Projects Delivered",
+      "eco": "OSHA Certified Practices",
+      "guarantee": "100% Insurance & Compliance"
+    },
+    "hero": {
+      "title": "Denver's Trusted Partner for Commercial Cleaning & Industrial Labor",
+      "subtitle": "We provide a vetted, reliable workforce for Denver’s commercial and construction projects. From professional janitorial services to specialized drywall demolition, we deliver high-standard labor solutions with a focus on safety, speed, and 100% insurance compliance.",
+      "cta": "Estimate & Book Crew",
+      "secondaryCta": "Explore Services & Rates"
+    },
+    "estimator": {
+      "title": "Commercial Cost Estimator",
+      "subtitle": "Adjust square footage for immediate upfront pricing across janitorial, post-construction, and demolition labor.",
+      "small": "Office / Retail (~1,500 sq ft)",
+      "smallDesc": "Boutique offices, clinics, retail storefronts",
+      "medium": "Commercial Floor (~3,500 sq ft)",
+      "mediumDesc": "Corporate floors, multi-tenant spaces, restaurants",
+      "large": "Warehouse / Job Site (~7,500 sq ft)",
+      "largeDesc": "Industrial facilities, buildouts, whole-site projects",
+      "sqftLabel": "Project Footprint",
+      "estTotal": "Estimated Labor Cost",
+      "minOrderNotice": "Standard job dispatch minimum: $99.00 to guarantee fully equipped, insured crews on site.",
+      "sqftUnit": "sq ft"
+    },
+    "howItWorks": {
+      "title": "Workforce Deployment in 4 Steps",
+      "subtitle": "Streamlined scheduling designed for property managers, general contractors, and facility directors.",
+      "step1": {
+        "title": "1. Scope & Square Footage",
+        "description": "Select your facility dimensions, required service level, and preferred service date."
+      },
+      "step2": {
+        "title": "2. Site Logistics & Requirements",
+        "description": "Specify high ceilings, debris hauling, off-hours shift needs, or special access protocols."
+      },
+      "step3": {
+        "title": "3. Insured Crew Dispatch",
+        "description": "Our vetted, background-checked crew arrives on schedule equipped with commercial equipment and full PPE."
+      },
+      "step4": {
+        "title": "4. Quality Walkthrough & Sign-off",
+        "description": "Inspect completed work with our site lead. Full compliance documentation and itemized billing provided."
+      }
+    },
+    "pricing": {
+      "title": "Transparent Commercial Rates",
+      "subtitle": "Predictable per-square-foot labor rates backed by comprehensive insurance and safety oversight.",
+      "commercial": {
+        "name": "Commercial Janitorial",
+        "tagline": "Offices, Retail & Facilities",
+        "rate": "$0.18 / sq ft",
+        "description": "Professional sanitization and upkeep for corporate offices, banks, clinics, and commercial venues.",
+        "features": [
+          "Restroom deep sanitization & restocking",
+          "Breakrooms, kitchens & conference rooms",
+          "Commercial vacuuming & hard-floor care",
+          "High-touch point disinfection",
+          "Trash, recycling & liner replacement"
+        ]
+      },
+      "post_construction": {
+        "name": "Post-Construction Cleanup",
+        "tagline": "Rough, Final & Fluff Cleans",
+        "rate": "$0.26 / sq ft",
+        "description": "Industrial dust extraction and site handover readiness for commercial builds and tenant improvements.",
+        "features": [
+          "HEPA vacuuming of fine drywall & cement dust",
+          "Sticker, paint splatter & sealant removal",
+          "Light fixtures, diffusers & exposed conduit",
+          "Interior glass, storefront frames & tracks",
+          "Final punch-list walkthrough readiness"
+        ]
+      },
+      "industrial_demolition": {
+        "name": "Drywall Demolition & Industrial Labor",
+        "tagline": "Selective Demo & Site Crews",
+        "rate": "$0.35 / sq ft",
+        "description": "Skilled demolition labor for interior partitions, drywall teardown, non-structural dismantling, and debris loadout.",
+        "features": [
+          "Selective drywall & sheetrock teardown",
+          "Stud preparation & fastener removal",
+          "Debris bagging & organized site staging",
+          "Strict adherence to OSHA safety protocols",
+          "Full general liability & workers' comp"
+        ]
+      },
+      "bookNow": "Book This Service",
+      "minNotice": "$99 minimum service dispatch. Custom contracts and recurring master service agreements available upon request."
+    },
+    "coverage": {
+      "title": "Commercial Coverage Area",
+      "subtitle": "Serving developers, GCs, and enterprise facilities throughout the Front Range corridor.",
+      "innerBadge": "Metro Core — Free Travel",
+      "outerBadge": "Outer Corridor — $25 Logistics Fee",
+      "innerDesc": "Denver (Downtown, LoDo, RiNo, DTC), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, Broomfield.",
+      "outerDesc": "Aurora, Thornton, Centennial, Highlands Ranch, and surrounding industrial corridors."
+    },
+    "contact": {
+      "title": "Partner With Evolving Solutions LLC",
+      "subtitle": "Whether you need a daily crew or long-term site support, we bridge the gap between quality talent and project success.",
+      "phone": "(720) 590-8632",
+      "email": "info@evolvingsolutionsllc.com",
+      "hours": "Mon – Sat: 6:00 AM – 7:00 PM (24/7 Site Support Available)",
+      "location": "Denver Metropolitan Area & Boulder, CO"
+    }
+  },
+  "about": {
+    "tagline": "Commercial Cleaning & Industrial Labor Leaders",
+    "title": "Building Denver's Most Reliable Commercial Workforce",
+    "subtitle": "Whether you need a daily crew or long-term site support, Evolving Solutions LLC bridges the gap between quality talent and project success.",
+    "insuredBadge": "100% General Liability & Workers' Comp",
+    "ecoBadge": "OSHA Compliant & Safety Focused",
+    "mission": {
+      "title": "Our Mission",
+      "description": "We provide a vetted, reliable workforce for Denver’s commercial and construction projects. From professional janitorial services to specialized drywall demolition, we deliver high-standard labor solutions with an uncompromising focus on safety, speed, and 100% insurance compliance."
+    },
+    "pillarsTitle": "Why General Contractors & Facilities Choose Us",
+    "values": {
+      "safetyTitle": "Safety & OSHA Rigor",
+      "safetyDesc": "Every laborer arrives equipped with required PPE (hard hats, eye protection, high-vis vests, steel-toe boots) and completes safety briefings prior to work.",
+      "staffTitle": "Vetted & Reliable Workforce",
+      "staffDesc": "Thorough background verification, verified experience, and reliable attendance tracking ensure your project remains on schedule.",
+      "pricingTitle": "Predictable Transparent Pricing",
+      "pricingDesc": "Clear sq ft rates, guaranteed $99 minimum visit thresholds, and itemized billing eliminate surprise labor overruns.",
+      "speedTitle": "Speed & Project Agility",
+      "speedDesc": "Rapid crew dispatch across Denver and Boulder, with capabilities for night shifts, weekend pushes, and expedited turnover."
+    },
+    "capabilitiesTitle": "Core Labor Capabilities",
+    "checklist": {
+      "item1": "Commercial Janitorial & Daily Facility Maintenance",
+      "item2": "Rough, Final & Turnover Post-Construction Cleaning",
+      "item3": "Selective Drywall, Sheetrock & Partition Demolition",
+      "item4": "Industrial Floor Machine Scrubbing & Concrete Prep",
+      "item5": "Heavy Debris Staging, Hauling & Dumpster Packing",
+      "item6": "Restroom Sanitization & Multi-Stall Deep Disinfection",
+      "item7": "High-Dusting (Pipes, Beams, Trusses & HVAC Ducts)",
+      "item8": "Full Site Safety Documentation & COI Delivery"
+    }
+  },
+  "schedule": {
+    "title": "Book Commercial Crew & Labor",
+    "subtitle": "Schedule commercial janitorial, post-construction cleanup, or drywall demolition labor in 4 quick steps.",
+    "steps": {
+      "step1": "Scope & Rate",
+      "step2": "Date & Shift",
+      "step3": "Location & Logistics",
+      "step4": "Review & Dispatch"
+    },
+    "step1": {
+      "title": "Select Service & Square Footage",
+      "sqftLabel": "Project Footprint (Sq Ft)",
+      "ratesLabel": "Select Labor Scope",
+      "basePrice": "Estimated Base Labor",
+      "minApplied": "$99 Minimum Visit Threshold Applied"
+    },
+    "step2": {
+      "title": "Choose Deployment Date & Shift",
+      "noSameDay": "Advanced Scheduling: Available from tomorrow onward to guarantee crew preparation & insurance verification.",
+      "morning": "Morning Shift (8:00 AM – 12:00 PM)",
+      "afternoon": "Afternoon Shift (1:00 PM – 5:00 PM)",
+      "timeSlot": "Select Work Shift"
+    },
+    "step3": {
+      "title": "Site Location & Add-on Requirements",
+      "cityLabel": "Denver Metro / Boulder Area",
+      "addressLabel": "Job Site / Facility Address",
+      "zipLabel": "ZIP Code",
+      "addonsLabel": "Site Logistics & Specialized Add-ons",
+      "contactInfo": "On-Site Contact Information",
+      "firstName": "Contact First Name",
+      "lastName": "Contact Last Name",
+      "email": "Official Business Email",
+      "phone": "Direct Phone / Mobile",
+      "instructions": "Site Access, Loading Dock, Gate Code & PPE Instructions"
+    },
+    "step4": {
+      "title": "Review Order & Dispatch Confirmation",
+      "summary": "Service Summary",
+      "service": "Service Scope",
+      "sqft": "Square Footage",
+      "date": "Scheduled Date",
+      "time": "Shift Window",
+      "location": "Project Location",
+      "basePrice": "Base Labor",
+      "addons": "Site Add-ons",
+      "travelFee": "Travel / Logistics Fee",
+      "total": "Total Estimated Labor",
+      "terms": "I confirm project details and agree to the $99 minimum service visit terms and safety compliance policies.",
+      "confirmButton": "Confirm & Dispatch Crew",
+      "successTitle": "Crew Dispatch Confirmed!",
+      "orderId": "Work Order Reference",
+      "successMsg": "A detailed confirmation with your work order number and COI request instructions has been sent to your email.",
+      "nextSteps": "What happens next?",
+      "nextStep1": "Our dispatch coordinator will review your site logistics within 1 hour.",
+      "nextStep2": "Your designated crew will arrive on site promptly at the scheduled shift window with required PPE."
+    }
+  },
+  "auth": {
+    "loginTitle": "Client & Contractor Portal",
+    "loginSubtitle": "Access your project work orders, billing statements, and site history.",
+    "registerTitle": "Register Corporate Account",
+    "registerSubtitle": "Create an account to streamline work order dispatch and track ongoing crew schedules.",
+    "email": "Business Email",
+    "password": "Password",
+    "passwordConfirm": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone Number",
+    "loginButton": "Sign In to Portal",
+    "registerButton": "Create Account",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already registered?",
+    "signUp": "Register Here",
+    "signIn": "Sign In",
+    "guestNotice": "Orders placed with this business email will be automatically linked to your account."
+  },
+  "dashboard": {
+    "title": "Commercial Projects Dashboard",
+    "subtitle": "Track current work orders, dispatch statuses, and request repeat crews.",
+    "noOrders": "No commercial orders found.",
+    "newOrder": "Request New Crew",
+    "orderRef": "Order Reference",
+    "date": "Scheduled Date",
+    "shift": "Shift Window",
+    "sqft": "Footprint",
+    "total": "Labor Total",
+    "status": "Dispatch Status",
+    "actions": "Actions",
+    "cancel": "Cancel Request",
+    "cancelConfirm": "Are you sure you want to cancel this work order?",
+    "reorder": "Repeat Scope",
+    "statuses": {
+      "pending": "Pending Dispatch",
+      "confirmed": "Confirmed & Crew Assigned",
+      "in_progress": "Crew On Site",
+      "completed": "Work Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "footer": {
+    "description": "Denver’s Trusted Partner for Commercial Cleaning & Industrial Labor. Fully vetted workforce, safety certified, and 100% insured.",
+    "quickLinks": "Quick Navigation",
+    "contactArea": "Dispatch & Regional Coverage",
+    "rights": "All rights reserved. Evolving Solutions LLC."
+  },
+  "common": {
+    "error": "An error occurred. Please verify your details and try again.",
+    "loading": "Loading...",
+    "submitting": "Processing dispatch..."
+  }
+}

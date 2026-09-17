@@ -89,6 +89,7 @@ class CleaningAddonAdmin(ModelAdmin):
 class CleaningOrderAdmin(ModelAdmin):
     list_display = (
         'order_number',
+        'brand_badge',
         'customer_display',
         'service_info',
         'size_display',
@@ -98,6 +99,7 @@ class CleaningOrderAdmin(ModelAdmin):
         'status_badge',
     )
     list_filter = (
+        'brand',
         'status',
         'delivery_zone',
         'service_rate',
@@ -130,8 +132,9 @@ class CleaningOrderAdmin(ModelAdmin):
     ordering = ('-created_at',)
 
     fieldsets = (
-        (_('Customer Information'), {
+        (_('Customer & Brand Information'), {
             'fields': (
+                'brand',
                 'user',
                 ('guest_first_name', 'guest_last_name'),
                 ('guest_email', 'guest_phone'),
@@ -170,7 +173,18 @@ class CleaningOrderAdmin(ModelAdmin):
 
     @display(description=_('Order #'), header=True)
     def order_number(self, obj):
-        return f'GPC-#{obj.id}'
+        prefix = 'ESL' if getattr(obj, 'brand', '') == 'evolvingsolutions' else 'GPC'
+        return f'{prefix}-#{obj.id}'
+
+    @display(
+        description=_('Brand / Company'),
+        label={
+            'gopropertycare': 'success',
+            'evolvingsolutions': 'warning',
+        }
+    )
+    def brand_badge(self, obj):
+        return obj.brand, 'Evolving Solutions' if obj.brand == 'evolvingsolutions' else 'GoPropertyCare'
 
     @display(description=_('Customer'))
     def customer_display(self, obj):

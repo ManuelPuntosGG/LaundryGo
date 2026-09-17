@@ -4,7 +4,9 @@ import type { User, AuthResponse } from '@/types';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(
+    () => typeof window !== 'undefined' && Boolean(localStorage.getItem('access_token'))
+  );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const fetchUser = useCallback(async () => {
@@ -73,9 +75,9 @@ export const useAuth = () => {
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (token) {
-      fetchUser();
-    } else {
-      setIsLoading(false);
+      queueMicrotask(() => {
+        fetchUser();
+      });
     }
   }, [fetchUser]);
 

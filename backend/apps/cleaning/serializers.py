@@ -74,6 +74,7 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
             'addons_total',
             'total_price',
             'status',
+            'brand',
             'language',
             'created_at',
             'updated_at',
@@ -100,6 +101,7 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         model = CleaningOrder
         fields = (
             'id',
+            'brand',
             'guest_email',
             'guest_first_name',
             'guest_last_name',

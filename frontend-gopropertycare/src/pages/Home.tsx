@@ -16,6 +16,7 @@ import {
   Zap,
   Clock,
   Check,
+  Building2,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -35,7 +36,9 @@ export function Home() {
         const response = await api.get('/cleaning/rates/');
         const list = Array.isArray(response.data) ? response.data : response.data?.results || [];
         if (list.length > 0) {
-          setRates(list);
+          const residentialTypes = ['regular', 'deep', 'move_in_out', 'post_construction'];
+          const filtered = list.filter((r: CleaningServiceRate) => residentialTypes.includes(r.service_type));
+          setRates(filtered.length > 0 ? filtered : list);
         }
       } catch (err) {
         console.warn('Using fallback cleaning rates:', err);
@@ -457,6 +460,36 @@ export function Home() {
               {t('home.pricing.bookNow')}
             </Button>
           </Card>
+        </div>
+      </section>
+
+      {/* Commercial & Construction Division Referral to Evolving Solutions LLC */}
+      <section>
+        <div className="bg-gradient-to-br from-[#2f1b11] via-[#573725] to-[#815133] text-white rounded-3xl p-8 sm:p-10 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-[#a3704c]/30">
+          <div className="space-y-3 text-center md:text-left max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[#eedecd] text-xs font-bold uppercase tracking-wider">
+              <Building2 className="w-3.5 h-3.5 text-[#e0c3a7]" />
+              <span>{t('home.commercialReferral.badge')}</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              {t('home.commercialReferral.title')}
+            </h3>
+            <p className="text-stone-200 text-sm sm:text-base leading-relaxed font-medium">
+              {t('home.commercialReferral.description')}
+            </p>
+          </div>
+
+          <div className="shrink-0 w-full md:w-auto">
+            <a
+              href="https://evolvingsolutionsllc.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 w-full md:w-auto px-6 py-3.5 rounded-xl bg-white text-[#573725] hover:bg-[#fdfaf6] font-black text-sm shadow-lg hover:shadow-xl hover:scale-102 active:scale-98 transition-all"
+            >
+              <span>{t('home.commercialReferral.cta')}</span>
+              <ArrowRight className="w-4 h-4 text-[#815133]" />
+            </a>
+          </div>
         </div>
       </section>
 

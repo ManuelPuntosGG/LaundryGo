@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuthContext } from '@/providers/AuthProvider';
 import { Layout } from '@/components/layout/Layout';
 import { PageSkeleton } from '@/components/ui/PageSkeleton';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { ScrollToTop } from '@/components/layout/ScrollToTop';
 
 // Code splitting / Lazy-loaded routes for instant initial page paint
 const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })));
@@ -49,13 +51,16 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Layout>
-          <AppRoutes />
-        </Layout>
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ScrollToTop />
+        <AuthProvider>
+          <Layout>
+            <AppRoutes />
+          </Layout>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

@@ -121,22 +121,24 @@ export function Schedule() {
   // Pre-fill user data if user loads asynchronously after initial mount
   useEffect(() => {
     if (isAuthenticated && user) {
-      const userCity = user.city || 'Denver (Downtown / Central)';
-      const found = DENVER_LOCATIONS.find((l) => l.name === userCity) || DENVER_LOCATIONS[0];
-      setSelectedLocation(found);
+      queueMicrotask(() => {
+        const userCity = user.city || 'Denver (Downtown / Central)';
+        const found = DENVER_LOCATIONS.find((l) => l.name === userCity) || DENVER_LOCATIONS[0];
+        setSelectedLocation(found);
 
-      setFormData((prev) => {
-        if (prev.email) return prev;
-        return {
-          ...prev,
-          first_name: user.first_name || prev.first_name,
-          last_name: user.last_name || prev.last_name,
-          phone: user.phone || prev.phone,
-          email: user.email || prev.email,
-          street_address: user.street_address || prev.street_address,
-          city: userCity,
-          zip_code: user.zip_code || prev.zip_code,
-        };
+        setFormData((prev) => {
+          if (prev.email) return prev;
+          return {
+            ...prev,
+            first_name: user.first_name || prev.first_name,
+            last_name: user.last_name || prev.last_name,
+            phone: user.phone || prev.phone,
+            email: user.email || prev.email,
+            street_address: user.street_address || prev.street_address,
+            city: userCity,
+            zip_code: user.zip_code || prev.zip_code,
+          };
+        });
       });
     }
   }, [isAuthenticated, user]);
@@ -159,17 +161,20 @@ export function Schedule() {
             ? ratesRes.data
             : (ratesRes.data as { results?: CleaningServiceRate[] })?.results || [];
           if (list.length > 0) {
-            setRates(list);
+            const residentialTypes = ['regular', 'deep', 'move_in_out', 'post_construction'];
+            const filtered = list.filter((r) => residentialTypes.includes(r.service_type));
+            const activeList = filtered.length > 0 ? filtered : list;
+            setRates(activeList);
             const searchParams = new URLSearchParams(window.location.search);
             const tierParam = searchParams.get('tier');
             if (tierParam) {
-              const match = list.find((r) => r.service_type === tierParam);
+              const match = activeList.find((r) => r.service_type === tierParam);
               if (match) {
                 setSelectedRateId(match.id);
                 return;
               }
             }
-            setSelectedRateId((prev) => (list.some((r) => r.id === prev) ? prev : list[0].id));
+            setSelectedRateId((prev) => (activeList.some((r) => r.id === prev) ? prev : activeList[0].id));
           }
         }
 

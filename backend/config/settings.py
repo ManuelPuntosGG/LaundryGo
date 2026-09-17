@@ -178,6 +178,14 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/minute',
+        'user': '300/minute',
+    },
 }
 
 # JWT
@@ -204,8 +212,12 @@ CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(',')
 if not CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS = [
         'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
         'http://localhost:3000',
         'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://127.0.0.1:5175',
     ]
 
 if FRONTEND_URL and FRONTEND_URL not in CORS_ALLOWED_ORIGINS:
@@ -216,6 +228,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/thelaundrygo\.com$",
     r"^https:\/\/.*\.gopropertycare\.com$",
     r"^https:\/\/gopropertycare\.com$",
+    r"^https:\/\/.*\.evolvingsolutions.*$",
+    r"^https:\/\/evolvingsolutions.*$",
     r"^https:\/\/.*\.onrender\.com$",
     r"^http:\/\/localhost:\d+$",
     r"^http:\/\/127\.0\.0\.1:\d+$",
@@ -230,16 +244,34 @@ CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_env.split(',')
 if not CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS = [
         'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
         'http://localhost:3000',
         'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://127.0.0.1:5175',
         'https://*.onrender.com',
         'https://*.thelaundrygo.com',
         'https://thelaundrygo.com',
         'https://*.gopropertycare.com',
         'https://gopropertycare.com',
+        'https://*.evolvingsolutions.com',
+        'https://evolvingsolutions.com',
+        'https://*.evolvingsolutionsllc.com',
+        'https://evolvingsolutionsllc.com',
     ]
 
-for trusted_domain in ('https://*.onrender.com', 'https://*.thelaundrygo.com', 'https://thelaundrygo.com', 'https://*.gopropertycare.com', 'https://gopropertycare.com'):
+for trusted_domain in (
+    'https://*.onrender.com',
+    'https://*.thelaundrygo.com',
+    'https://thelaundrygo.com',
+    'https://*.gopropertycare.com',
+    'https://gopropertycare.com',
+    'https://*.evolvingsolutions.com',
+    'https://evolvingsolutions.com',
+    'https://*.evolvingsolutionsllc.com',
+    'https://evolvingsolutionsllc.com',
+):
     if trusted_domain not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(trusted_domain)
 

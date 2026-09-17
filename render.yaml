@@ -24,11 +24,11 @@ services:
           name: laundrygo-db
           property: connectionString
       - key: ALLOWED_HOSTS
-        value: ".onrender.com,.thelaundrygo.com,thelaundrygo.com,.gopropertycare.com,gopropertycare.com,localhost,127.0.0.1"
+        value: ".onrender.com,.thelaundrygo.com,thelaundrygo.com,.gopropertycare.com,gopropertycare.com,.evolvingsolutionsllc.com,evolvingsolutionsllc.com,.evolvingsolutions.com,evolvingsolutions.com,localhost,127.0.0.1"
       - key: CSRF_TRUSTED_ORIGINS
-        value: "https://*.onrender.com,https://*.thelaundrygo.com,https://thelaundrygo.com,https://*.gopropertycare.com,https://gopropertycare.com"
+        value: "https://*.onrender.com,https://*.thelaundrygo.com,https://thelaundrygo.com,https://*.gopropertycare.com,https://gopropertycare.com,https://*.evolvingsolutionsllc.com,https://evolvingsolutionsllc.com,https://*.evolvingsolutions.com,https://evolvingsolutions.com"
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://thelaundrygo.com,https://www.thelaundrygo.com,https://gopropertycare.com,https://www.gopropertycare.com"
+        value: "https://thelaundrygo.com,https://www.thelaundrygo.com,https://gopropertycare.com,https://www.gopropertycare.com,https://evolvingsolutionsllc.com,https://www.evolvingsolutionsllc.com,https://evolvingsolutions.com,https://www.evolvingsolutions.com"
       - key: FRONTEND_URL
         value: "https://thelaundrygo.com"
       - key: EMAIL_BACKEND
@@ -73,6 +73,24 @@ services:
     name: gopropertycare-web
     runtime: static
     rootDir: frontend-gopropertycare
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "./dist"
+    routes:
+      # Single Page Application (SPA) routing rewrite rule
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"
+    envVars:
+      - key: VITE_API_URL
+        value: "https://laundrygo-api.onrender.com"
+
+  # ============================================================================
+  # Frontend Static Site - Evolving Solutions LLC (React 19 + Vite + Tailwind CSS v4)
+  # ============================================================================
+  - type: web
+    name: evolvingsolutions-web
+    runtime: static
+    rootDir: frontend-evolvingsolutions
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./dist"
     routes:

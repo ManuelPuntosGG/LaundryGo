@@ -118,6 +118,12 @@
       "bookNow": "Reservar este Servicio",
       "minNotice": "Tarifa mínima de $99 por visita. El precio final se basa en las dimensiones verificadas y cuidados adicionales seleccionados."
     },
+    "commercialReferral": {
+      "badge": "División Comercial y Construcción",
+      "title": "¿Requieres Limpieza Comercial o Demolición de Drywall?",
+      "description": "Para oficinas corporativas, locales comerciales, limpieza post-construcción y mano de obra para demolición de drywall, visita nuestra división comercial especializada, Evolving Solutions LLC.",
+      "cta": "Conoce Evolving Solutions LLC"
+    },
     "coverage": {
       "title": "Zonas de Cobertura en Denver y Boulder",
       "subtitle": "Llegamos a tu puerta con puntualidad y garantía en todo el corredor metropolitano.",

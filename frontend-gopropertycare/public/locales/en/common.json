@@ -118,6 +118,12 @@
       "bookNow": "Book This Service",
       "minNotice": "$99 minimum service fee per visit. Final price is calculated using verified dimensions and selected extras."
     },
+    "commercialReferral": {
+      "badge": "Commercial & Construction Division",
+      "title": "Need Commercial Janitorial or Drywall Demolition?",
+      "description": "For enterprise office janitorial, retail spaces, post-construction cleanup, and drywall demolition labor, visit our dedicated commercial division, Evolving Solutions LLC.",
+      "cta": "Explore Evolving Solutions LLC"
+    },
     "coverage": {
       "title": "Service Areas in Denver & Boulder",
       "subtitle": "Prompt, reliable service delivered across the entire Denver metropolitan corridor.",

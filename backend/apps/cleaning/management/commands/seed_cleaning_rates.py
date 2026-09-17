@@ -36,6 +36,20 @@ class Command(BaseCommand):
                 'min_order_amount': Decimal('99.00'),
                 'description': 'Limpieza de máximo nivel con aspirado de grado industrial, remoción de polvo fino de obra y restos de pintura tras remodelaciones.',
             },
+            {
+                'name': 'Limpieza Comercial / Janitorial',
+                'service_type': 'commercial',
+                'rate_per_sqft': Decimal('0.18'),
+                'min_order_amount': Decimal('99.00'),
+                'description': 'Servicio profesional para oficinas, comercios y locales. Desinfección integral, áreas comunes, sanitarios y pisos.',
+            },
+            {
+                'name': 'Demolición de Drywall y Mano de Obra Industrial',
+                'service_type': 'industrial_demolition',
+                'rate_per_sqft': Decimal('0.35'),
+                'min_order_amount': Decimal('99.00'),
+                'description': 'Mano de obra especializada para demolición selectiva de tablaroca/drywall, retiro de escombros y soporte en sitio 100% asegurado.',
+            },
         ]
 
         addons_data = [
