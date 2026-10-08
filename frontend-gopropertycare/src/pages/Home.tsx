@@ -371,8 +371,8 @@ export function Home() {
             </p>
           </div>
 
-          {/* Results Grid Across the 5 Specialized Services */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {/* Results Grid Across the Specialized Services */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {rates.map((rate) => {
               const price = calculateTierPrice(rate.rate_per_sqft, rate.min_order_amount);
               const isMinimum = sqft * Number(rate.rate_per_sqft) < Number(rate.min_order_amount);
@@ -430,7 +430,7 @@ export function Home() {
         </Card>
       </section>
 
-      {/* Services Detailed Cards Grid (5 Specialized Services) */}
+      {/* Services Detailed Cards Grid (4 Specialized Services) */}
       <section className="space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">
@@ -441,7 +441,7 @@ export function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {rates.map((rate) => {
             const Icon = getServiceIcon(rate.service_type);
             const localizedName = t(`home.pricing.${rate.service_type}.name`, { defaultValue: rate.name });

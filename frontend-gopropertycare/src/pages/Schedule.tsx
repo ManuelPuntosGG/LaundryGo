@@ -76,9 +76,30 @@ const isSameDayAllowed = (): boolean => {
   return now.getHours() < 12;
 };
 
+const formatTimeTo12Hour = (time24: string): string => {
+  const [hStr, mStr] = time24.split(':');
+  let h = parseInt(hStr, 10);
+  const m = parseInt(mStr || '0', 10);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  if (h === 0) h = 12;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
+};
+
+const parseTo24Hour = (time12: string): string => {
+  const match = time12.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return '09:00';
+  let h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  const ampm = match[3].toUpperCase();
+  if (ampm === 'PM' && h < 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+};
+
 const isTimeSlotValidForToday = (timeStr: string): boolean => {
   const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return true;
+  if (!match) return false;
   let hours = parseInt(match[1], 10);
   const minutes = parseInt(match[2], 10);
   const meridiem = match[3].toUpperCase();
@@ -321,7 +342,8 @@ export function Schedule() {
     isZipValid;
 
   // Calendar Helpers
-  const currentMonthYearStr = viewMonthDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+  const calendarLocale = i18n.language?.startsWith('es') ? 'es' : 'en';
+  const currentMonthYearStr = viewMonthDate.toLocaleString(calendarLocale, { month: 'long', year: 'numeric' });
 
   const getCalendarDays = () => {
     const year = viewMonthDate.getFullYear();
@@ -374,6 +396,11 @@ export function Schedule() {
   };
 
   const isDateToday = selectedDate === getTodayDateStr();
+  const canProceedFromStep2 = Boolean(
+    selectedDate &&
+    selectedTimeSlot &&
+    (!isDateToday || isTimeSlotValidForToday(selectedTimeSlot))
+  );
 
   const handleSubmitBooking = async () => {
     if (!agreedToTerms) return;
@@ -465,21 +492,21 @@ export function Schedule() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500 font-semibold">Dimensions</span>
+              <span className="text-slate-500 font-semibold">{t('schedule.dimensions')}</span>
               <span className="font-bold text-slate-900">
-                {sqft} sq ft • {bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, {bathrooms} Baths
+                {sqft} sq ft • {bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, {bathrooms} {t('schedule.baths')}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500 font-semibold">Scheduled Visit</span>
+              <span className="text-slate-500 font-semibold">{t('schedule.scheduledVisit')}</span>
               <span className="font-bold text-slate-900">{selectedDate} @ {selectedTimeSlot}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500 font-semibold">Address</span>
+              <span className="text-slate-500 font-semibold">{t('schedule.addressLabel')}</span>
               <span className="font-bold text-slate-900 text-right">{formData.street_address}, {selectedLocation.name}</span>
             </div>
             <div className="flex justify-between pt-2 border-t border-slate-200">
-              <span className="text-slate-900 font-extrabold text-sm sm:text-base">Total</span>
+              <span className="text-slate-900 font-extrabold text-sm sm:text-base">{t('schedule.total')}</span>
               <span className="font-black text-emerald-700 text-base sm:text-lg">${totalPrice.toFixed(2)}</span>
             </div>
           </div>
@@ -530,20 +557,28 @@ export function Schedule() {
               const isCurrent = step === s;
               return (
                 <div key={s} className="flex flex-col items-center gap-1">
-                  <div
+                  <button
+                    type="button"
+                    disabled={!isCompleted && !isCurrent}
+                    onClick={() => {
+                      if (isCompleted) {
+                        setStep(s as Step);
+                      }
+                    }}
                     className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-xs transition-all duration-300 ${
                       isCurrent
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-4 ring-emerald-500/20 scale-105'
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-4 ring-emerald-500/20 scale-105 cursor-default'
                         : isCompleted
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-white border border-slate-200 text-slate-400'
+                        ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 hover:scale-105 cursor-pointer active:scale-95'
+                        : 'bg-white border border-slate-200 text-slate-400 cursor-not-allowed'
                     }`}
+                    aria-label={`Step ${s}`}
                   >
                     {isCompleted ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pop-in" /> : s}
-                  </div>
+                  </button>
                   <span
                     className={`text-[11px] sm:text-xs font-bold truncate max-w-[70px] sm:max-w-none transition-colors duration-300 ${
-                      isCurrent ? 'text-emerald-800' : 'text-slate-500'
+                      isCurrent ? 'text-emerald-800' : isCompleted ? 'text-slate-700' : 'text-slate-400'
                     }`}
                   >
                     {s === 1
@@ -621,7 +656,7 @@ export function Schedule() {
             {isMinApplied && (
               <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs rounded-xl flex items-center gap-2 font-medium">
                 <AlertCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Standard order minimum of $99.00 applies to smaller spaces.</span>
+                <span>{t('schedule.minOrderApplied')}</span>
               </div>
             )}
           </div>
@@ -660,7 +695,7 @@ export function Schedule() {
                               : 'border-slate-300'
                           }`}
                         >
-                          {isSelected && <Check className="w-3 h-3 animate-pop-in" />}
+                          {isSelected && <Check className="w-3.5 h-3.5 animate-pop-in" />}
                         </div>
                       </div>
                       <h3 className="font-black text-slate-900 text-sm sm:text-base leading-snug">
@@ -672,7 +707,7 @@ export function Schedule() {
                     </div>
 
                     <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] sm:text-xs text-slate-500 font-semibold">Estimated Base</span>
+                      <span className="text-[11px] sm:text-xs text-slate-500 font-semibold">{t('schedule.estimatedBase')}</span>
                       <span className="text-base sm:text-lg font-black text-slate-900">
                         ${estPrice.toFixed(2)}
                       </span>
@@ -688,7 +723,7 @@ export function Schedule() {
             <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
               <Home className="w-4 h-4 text-emerald-600" />
               <span>{t('schedule.propertyDetailsTitle')}</span>
-              <span className="text-[10px] text-slate-400 font-normal uppercase tracking-wider">(Inquiry details - no extra charge)</span>
+              <span className="text-[10px] text-slate-500 font-normal uppercase tracking-wider">{t('schedule.inquiryNoCharge')}</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -704,13 +739,13 @@ export function Schedule() {
                       key={num}
                       type="button"
                       onClick={() => setBedrooms(num)}
-                      className={`flex-1 min-w-[38px] py-1.5 px-2 rounded-xl text-xs font-black border transition-all cursor-pointer ${
+                      className={`flex-1 min-w-[38px] min-h-[42px] py-1.5 px-2 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation ${
                         bedrooms === num
                           ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
                           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
                       }`}
                     >
-                      {num === 0 ? 'Studio' : num === 5 ? '5+' : num}
+                      {num === 0 ? t('schedule.studio') : num === 5 ? '5+' : num}
                     </button>
                   ))}
                 </div>
@@ -728,7 +763,7 @@ export function Schedule() {
                       key={num}
                       type="button"
                       onClick={() => setBathrooms(num)}
-                      className={`flex-1 min-w-[34px] py-1.5 px-1.5 rounded-xl text-xs font-black border transition-all cursor-pointer ${
+                      className={`flex-1 min-w-[34px] min-h-[42px] py-1.5 px-1.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation ${
                         bathrooms === num
                           ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
                           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
@@ -750,7 +785,7 @@ export function Schedule() {
                   <button
                     type="button"
                     onClick={() => setIsOccupied(true)}
-                    className={`py-1.5 px-2.5 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer ${
+                    className={`min-h-[42px] py-1.5 px-2.5 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer touch-manipulation ${
                       isOccupied
                         ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/30'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
@@ -761,7 +796,7 @@ export function Schedule() {
                   <button
                     type="button"
                     onClick={() => setIsOccupied(false)}
-                    className={`py-1.5 px-2.5 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer ${
+                    className={`min-h-[42px] py-1.5 px-2.5 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer touch-manipulation ${
                       !isOccupied
                         ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/30'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
@@ -839,7 +874,10 @@ export function Schedule() {
 
             {/* Days Grid */}
             <div className="grid grid-cols-7 gap-1 text-center text-xs">
-              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
+              {(i18n.language?.startsWith('es')
+                ? ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá']
+                : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+              ).map((d) => (
                 <div key={d} className="font-black text-slate-600 py-1 text-[11px]">
                   {d}
                 </div>
@@ -876,7 +914,7 @@ export function Schedule() {
                     <span>{day}</span>
                     {isTodayDate && (
                       <span className="block text-[8px] font-black leading-none text-emerald-600 uppercase mt-0.5">
-                        Today
+                        {t('schedule.todayBadge')}
                       </span>
                     )}
                   </button>
@@ -886,7 +924,7 @@ export function Schedule() {
           </div>
 
           {/* Time Picker */}
-          <div className="space-y-3 max-w-lg mx-auto">
+          <div className="space-y-4 max-w-lg mx-auto">
             <div className="flex items-center justify-between">
               <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-emerald-600" />
@@ -894,34 +932,73 @@ export function Schedule() {
               </label>
               {isDateToday && (
                 <span className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md font-bold">
-                  Min. 3h notice required
+                  {t('schedule.min3hNotice')}
                 </span>
               )}
             </div>
 
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-              {TIME_SLOTS.map((slot) => {
-                const isSelected = selectedTimeSlot === slot;
-                const isValidForToday = !isDateToday || isTimeSlotValidForToday(slot);
+            {/* Custom Time Selector & Validation */}
+            <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs font-black text-slate-900 block">{t('schedule.customTime')}</span>
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    {i18n.language?.startsWith('es') ? 'Elige cualquier hora específica de llegada' : 'Choose any specific arrival time'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <input
+                    type="time"
+                    value={parseTo24Hour(selectedTimeSlot)}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setSelectedTimeSlot(formatTimeTo12Hour(e.target.value));
+                      }
+                    }}
+                    className="bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 shadow-2xs"
+                    aria-label={t('schedule.customTime')}
+                  />
+                  <span className="text-xs font-extrabold text-emerald-800 bg-emerald-100/80 px-2.5 py-1 rounded-lg">
+                    {selectedTimeSlot}
+                  </span>
+                </div>
+              </div>
 
-                return (
-                  <button
-                    key={slot}
-                    type="button"
-                    disabled={!isValidForToday}
-                    onClick={() => setSelectedTimeSlot(slot)}
-                    className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
-                      isSelected
-                        ? 'border-2 border-emerald-600 bg-emerald-600 text-white shadow-xs font-black ring-2 ring-emerald-600/30 scale-102'
-                        : isValidForToday
-                        ? 'border border-slate-200 bg-white hover:border-slate-300 hover:bg-emerald-50/50 text-slate-800'
-                        : 'border border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
-                    }`}
-                  >
-                    {slot}
-                  </button>
-                );
-              })}
+              {isDateToday && !isTimeSlotValidForToday(selectedTimeSlot) && (
+                <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl flex items-center gap-2 font-medium">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>{t('schedule.noticeMinNotice')}</span>
+                </div>
+              )}
+
+              {/* Quick Preset Slots */}
+              <div className="pt-2 border-t border-slate-200/70">
+                <span className="text-[11px] font-bold text-slate-500 block mb-2">{t('schedule.quickSlots')}</span>
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                  {TIME_SLOTS.map((slot) => {
+                    const isSelected = selectedTimeSlot === slot;
+                    const isValidForToday = !isDateToday || isTimeSlotValidForToday(slot);
+
+                    return (
+                      <button
+                        key={slot}
+                        type="button"
+                        disabled={!isValidForToday}
+                        onClick={() => setSelectedTimeSlot(slot)}
+                        className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer min-h-[38px] ${
+                          isSelected
+                            ? 'border-2 border-emerald-600 bg-emerald-600 text-white shadow-xs font-black ring-2 ring-emerald-600/30 scale-102'
+                            : isValidForToday
+                            ? 'border border-slate-200 bg-white hover:border-slate-300 hover:bg-emerald-50/50 text-slate-800'
+                            : 'border border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
+                        }`}
+                      >
+                        {slot}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -929,9 +1006,16 @@ export function Schedule() {
           <div className="flex justify-between pt-4 border-t border-slate-100">
             <Button variant="outline" onClick={() => setStep(1)} className="hover:scale-102 active:scale-98 transition-all duration-200">
               <ChevronLeft className="w-4 h-4 mr-1" />
-              <span>Back</span>
+              <span>{t('schedule.back')}</span>
             </Button>
-            <Button size="lg" onClick={() => setStep(3)} className="hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm">
+            <Button
+              size="lg"
+              disabled={!canProceedFromStep2}
+              onClick={() => setStep(3)}
+              className={`hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm ${
+                !canProceedFromStep2 ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
               <span>{t('schedule.step3')}</span>
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
@@ -947,7 +1031,7 @@ export function Schedule() {
               {t('schedule.step3Title')}
             </h2>
             <p className="text-xs text-slate-600 font-medium mt-0.5">
-              Specify your property address, access method, and any deep cleaning add-ons.
+              {t('schedule.step3Subtitle')}
             </p>
           </div>
 
@@ -989,58 +1073,58 @@ export function Schedule() {
           {/* Address and Contact Inputs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Input
-              label="Street Address *"
+              label={`${t('schedule.addressLabel')} *`}
               value={formData.street_address}
               onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, street_address: true })}
-              error={touchedFields.street_address && !isAddressValid ? 'Address is required (min 5 characters)' : ''}
-              placeholder="e.g. 1234 Blake St, Apt 4B"
+              error={touchedFields.street_address && !isAddressValid ? t('schedule.errAddress') : ''}
+              placeholder={t('schedule.addressPlaceholder')}
             />
 
             <Input
-              label="ZIP Code *"
+              label={`${t('schedule.zipLabel')} *`}
               value={formData.zip_code}
               onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, zip_code: true })}
-              error={touchedFields.zip_code && !isZipValid ? 'Valid 5-digit ZIP code required' : ''}
-              placeholder="e.g. 80202"
+              error={touchedFields.zip_code && !isZipValid ? t('schedule.errZip') : ''}
+              placeholder={t('schedule.zipPlaceholder')}
             />
 
             <Input
-              label="First Name *"
+              label={`${t('auth.firstName')} *`}
               value={formData.first_name}
               onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, first_name: true })}
-              error={touchedFields.first_name && !isFirstNameValid ? 'First name required' : ''}
-              placeholder="First name"
+              error={touchedFields.first_name && !isFirstNameValid ? t('schedule.errFirstName') : ''}
+              placeholder={t('auth.firstName')}
             />
 
             <Input
-              label="Last Name *"
+              label={`${t('auth.lastName')} *`}
               value={formData.last_name}
               onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, last_name: true })}
-              error={touchedFields.last_name && !isLastNameValid ? 'Last name required' : ''}
-              placeholder="Last name"
+              error={touchedFields.last_name && !isLastNameValid ? t('schedule.errLastName') : ''}
+              placeholder={t('auth.lastName')}
             />
 
             <Input
-              label="Phone Number *"
+              label={`${t('auth.phone')} *`}
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, phone: true })}
-              error={touchedFields.phone && !isPhoneValid ? 'Valid 10-digit phone required' : ''}
-              placeholder="(720) 000-0000"
+              error={touchedFields.phone && !isPhoneValid ? t('schedule.errPhone') : ''}
+              placeholder={t('schedule.phonePlaceholder')}
             />
 
             <Input
-              label="Email Address *"
+              label={`${t('auth.emailLabel')} *`}
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, email: true })}
-              error={touchedFields.email && !isEmailValid ? 'Valid email required' : ''}
-              placeholder="you@example.com"
+              error={touchedFields.email && !isEmailValid ? t('schedule.errEmail') : ''}
+              placeholder={t('schedule.emailPlaceholder')}
             />
           </div>
 
@@ -1163,7 +1247,7 @@ export function Schedule() {
               rows={2}
               value={specialInstructions}
               onChange={(e) => setSpecialInstructions(e.target.value)}
-              placeholder="e.g. Friendly dog in laundry room, please focus on kitchen grout..."
+              placeholder={t('schedule.instructionsPlaceholder')}
               className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs font-medium"
             />
           </div>
@@ -1172,7 +1256,7 @@ export function Schedule() {
           <div className="flex justify-between pt-4 border-t border-slate-100">
             <Button variant="outline" onClick={() => setStep(2)} className="hover:scale-102 active:scale-98 transition-all duration-200">
               <ChevronLeft className="w-4 h-4 mr-1" />
-              <span>Back</span>
+              <span>{t('schedule.back')}</span>
             </Button>
             <Button
               size="lg"
@@ -1195,7 +1279,7 @@ export function Schedule() {
               {t('schedule.step4Title')}
             </h2>
             <p className="text-xs text-slate-600 font-medium mt-0.5">
-              Review your cleaning reservation details before confirmation.
+              {t('schedule.step4Subtitle')}
             </p>
           </div>
 
@@ -1212,32 +1296,32 @@ export function Schedule() {
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2.5 text-xs">
               <h3 className="font-black text-slate-900 text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
                 <Home className="w-4 h-4 text-emerald-600" />
-                <span>Service Details</span>
+                <span>{t('schedule.serviceDetails')}</span>
               </h3>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Service Tier:</span>
+                <span className="text-slate-600 font-semibold">{t('schedule.selectTier')}:</span>
                 <span className="font-bold text-slate-900">
                   {t(`home.pricing.${activeRate.service_type}.name`, { defaultValue: activeRate.name })}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Dimensions:</span>
+                <span className="text-slate-600 font-semibold">{t('schedule.dimensions')}:</span>
                 <span className="font-bold text-slate-900">
-                  {sqft} sq ft • {bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, {bathrooms} Baths
+                  {sqft} sq ft • {bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, {bathrooms} {t('schedule.baths')}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Occupancy:</span>
+                <span className="text-slate-600 font-semibold">{t('schedule.occupancyLabel')}:</span>
                 <span className="font-bold text-slate-900">
                   {isOccupied ? t('schedule.occupied') : t('schedule.vacant')}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Scheduled Date:</span>
+                <span className="text-slate-600 font-semibold">{t('schedule.scheduledDate')}:</span>
                 <span className="font-bold text-slate-900">{selectedDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Arrival Time:</span>
+                <span className="text-slate-600 font-semibold">{t('schedule.timeSlotLabel')}:</span>
                 <span className="font-bold text-slate-900">{selectedTimeSlot}</span>
               </div>
             </div>
@@ -1246,22 +1330,22 @@ export function Schedule() {
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2.5 text-xs">
               <h3 className="font-black text-slate-900 text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-emerald-600" />
-                <span>Location & Access</span>
+                <span>{t('schedule.locationContact')}</span>
               </h3>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Client:</span>
+                <span className="text-slate-600 font-semibold">{t('schedule.client')}:</span>
                 <span className="font-bold text-slate-900">{formData.first_name} {formData.last_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Phone:</span>
+                <span className="text-slate-600 font-semibold">{t('auth.phone')}:</span>
                 <span className="font-bold text-slate-900">{formData.phone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Address:</span>
+                <span className="text-slate-600 font-semibold">{t('schedule.addressLabel')}:</span>
                 <span className="font-bold text-slate-900 text-right">{formData.street_address}, {selectedLocation.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Access:</span>
+                <span className="text-slate-600 font-semibold">{t('schedule.accessMethod')}:</span>
                 <span className="font-bold text-slate-900">
                   {entryMethod === 'someone_home'
                     ? t('schedule.entry_someone_home')
@@ -1276,7 +1360,7 @@ export function Schedule() {
               </div>
               {entryNotes && (
                 <div className="flex justify-between">
-                  <span className="text-slate-600 font-semibold">Access Note:</span>
+                  <span className="text-slate-600 font-semibold">{t('schedule.accessNote')}:</span>
                   <span className="font-medium text-slate-900 text-right max-w-[200px] truncate">{entryNotes}</span>
                 </div>
               )}
@@ -1286,7 +1370,7 @@ export function Schedule() {
           {/* Pricing Breakdown Card */}
           <div className="bg-white border-2 border-emerald-200/90 rounded-2xl p-4 sm:p-6 space-y-3 shadow-2xs">
             <h3 className="font-black text-emerald-950 text-xs sm:text-sm uppercase tracking-wider">
-              Cost Breakdown
+              {t('schedule.costBreakdown')}
             </h3>
             <div className="flex justify-between text-slate-700 text-xs font-medium">
               <span>{t('schedule.basePrice')} ({sqft} sqft @ ${activeRate.rate_per_sqft}/sqft):</span>
@@ -1330,7 +1414,7 @@ export function Schedule() {
           <div className="flex justify-between pt-4 border-t border-slate-100">
             <Button variant="outline" onClick={() => setStep(3)} className="hover:scale-102 active:scale-98 transition-all duration-200">
               <ChevronLeft className="w-4 h-4 mr-1" />
-              <span>Back</span>
+              <span>{t('schedule.back')}</span>
             </Button>
             <Button
               size="lg"

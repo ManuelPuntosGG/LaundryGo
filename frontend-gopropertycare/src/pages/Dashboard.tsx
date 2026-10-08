@@ -46,7 +46,7 @@ export function Dashboard() {
       const residentialOrders = list.filter(
         (o: CleaningOrder) =>
           o.brand === 'gopropertycare' ||
-          ['regular', 'deep', 'move_in_out'].includes(o.service_rate?.service_type)
+          ['residential', 'regular', 'deep', 'move_in_out', 'str_on_site', 'str_off_site'].includes(o.service_rate?.service_type)
       );
       setOrders(residentialOrders);
     } catch (err) {
@@ -223,11 +223,16 @@ export function Dashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{t('dashboard.window', 'Window')}: <strong className="text-slate-900 font-bold">{order.time_slot === 'morning' ? '8AM - 12PM' : '1PM - 5PM'}</strong></span>
+                      <span>{t('dashboard.window', 'Arrival')}: <strong className="text-slate-900 font-bold">{order.time_slot === 'morning' ? '8AM - 12PM' : order.time_slot === 'afternoon' ? '1PM - 5PM' : order.time_slot}</strong></span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Home className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{t('dashboard.size', 'Size')}: <strong className="text-slate-900 font-bold">{order.square_feet} sq ft</strong></span>
+                      <span>
+                        {t('dashboard.size', 'Size')}: <strong className="text-slate-900 font-bold">{order.square_feet} sq ft</strong>
+                        {order.bedrooms !== undefined && order.bedrooms !== null ? (
+                          <span className="text-slate-500 font-medium"> • {order.bedrooms === 0 ? 'Studio' : `${order.bedrooms}b`}, {order.bathrooms}ba</span>
+                        ) : null}
+                      </span>
                     </div>
                     <div className="sm:col-span-2 flex items-center gap-2 text-slate-700">
                       <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
