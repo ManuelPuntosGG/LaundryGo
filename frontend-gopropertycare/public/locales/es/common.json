@@ -1,40 +1,61 @@
 {
   "app": {
     "name": "GoPropertyCare",
-    "tagline": "Servicio Profesional de Limpieza Residencial y Cuidado del Hogar en Denver y Boulder"
+    "tagline": "Soluciones Integrales de Limpieza y Mantenimiento",
+    "region": "Denver, Colorado y Áreas Vecinas",
+    "phone": "(720) 590-8632",
+    "email": "info@gopropertycare.com",
+    "website": "www.gopropertycare.com"
   },
   "nav": {
     "home": "Inicio",
     "about": "Conócenos",
-    "schedule": "Agendar Limpieza",
+    "schedule": "Agendar Servicio",
     "login": "Iniciar Sesión",
     "register": "Registrarse",
     "dashboard": "Mi Cuenta",
     "logout": "Cerrar Sesión"
   },
   "home": {
-    "badge": "Limpieza Profesional a Domicilio • Denver y Boulder",
+    "badge": "Denver, Colorado y Áreas Vecinas • Soluciones Integrales",
     "socialProof": {
-      "rating": "4.9/5 Calificación de Clientes",
-      "properties": "+850 Hogares y Familias Atendidas",
-      "eco": "Insumos Ecológicos y Seguros para la Familia",
-      "guarantee": "100% Satisfacción Garantizada"
+      "rating": "Confiable y Puntual",
+      "properties": "Atención al Detalle",
+      "instant": "Personal Asegurado (Insured)",
+      "bonded": "Satisfacción Garantizada"
     },
     "hero": {
-      "title": "Espacios Impecables, Más Tiempo para Ti",
-      "subtitle": "Disfruta de un hogar fresco, ordenado y reluciente sin levantar un dedo. Limpieza profesional a tu medida con tarifas claras y personal de confianza en Denver y Boulder.",
-      "cta": "Agendar mi Limpieza",
-      "secondaryCta": "Calcular mi Precio"
+      "title": "Soluciones Integrales de Limpieza y Mantenimiento",
+      "subtitle": "Limpieza residencial y comercial de primer nivel, diseñada a la medida de propietarios, profesionales del sector inmobiliario y administradores en toda el área metropolitana de Denver.",
+      "cta": "Agendar mi Servicio",
+      "secondaryCta": "Calcular mi Estimado"
+    },
+    "letter": {
+      "badge": "Presentación de la Empresa y Visión General de Servicios",
+      "salutation": "Estimado Cliente / Administrador de Propiedades:",
+      "body": "En GoPropertyCare, ofrecemos soluciones de limpieza residencial y comercial de primer nivel, diseñadas a la medida de propietarios, profesionales del sector inmobiliario y administradores en toda el área metropolitana de Denver. Entendemos que un espacio impecable y bien mantenido es esencial para su tranquilidad, la satisfacción de sus huéspedes y entregas de propiedades sin contratiempos.",
+      "closing": "Agradecemos la oportunidad de colaborar con usted. Ya sea que requiera una limpieza profunda puntual o el cuidado continuo de sus inmuebles, ofrecemos precios claros y satisfacción garantizada.",
+      "signature": "Atentamente, El Equipo de GoPropertyCare"
+    },
+    "pillars": {
+      "title": "¿Por Qué Elegir GoPropertyCare?",
+      "subtitle": "Un socio confiable en el cuidado de tus propiedades con estándares estrictos.",
+      "reliableTitle": "Confiable y Puntual",
+      "reliableDesc": "Equipos puntuales comprometidos con el cumplimiento estricto de horarios.",
+      "detailTitle": "Atención al Detalle",
+      "detailDesc": "Listas de control rigurosas para asegurar resultados impecables y consistentes.",
+      "trustedTitle": "Socio de Confianza",
+      "trustedDesc": "Personal profesional y totalmente asegurado (Insured) en quien puede confiar."
     },
     "estimator": {
-      "title": "Calcula tu Precio al Instante",
-      "subtitle": "Mueve el control al tamaño de tu propiedad y conoce tu cotización inmediata en cada servicio.",
+      "title": "Calcula tu Estimado al Instante",
+      "subtitle": "Mueve el control al tamaño de tu propiedad y conoce tu cotización inmediata en cada uno de nuestros servicios especializados.",
       "small": "Apartamento / Estudio (~800 sq ft)",
       "smallDesc": "1-2 habitaciones, 1 baño",
-      "medium": "Casa Familiar (~1,800 sq ft)",
-      "mediumDesc": "3 habitaciones, 2 baños",
-      "large": "Casa Amplia (~3,000 sq ft)",
-      "largeDesc": "4+ habitaciones o varios niveles",
+      "medium": "Casa / Inmueble Medio (~1,800 sq ft)",
+      "mediumDesc": "Propiedad familiar o local estándar",
+      "large": "Inmueble Amplio (~3,000 sq ft)",
+      "largeDesc": "4+ habitaciones o espacio comercial",
       "sqftLabel": "Tamaño de la Propiedad",
       "estTotal": "Precio Estimado",
       "minOrderNotice": "Tarifa mínima de $99 por visita para garantizar un servicio dedicado y de máxima calidad.",
@@ -42,74 +63,126 @@
     },
     "howItWorks": {
       "title": "Tu Limpieza en 4 Simples Pasos",
-      "subtitle": "Fácil, rápido y sin complicaciones para que disfrutes de tu hogar.",
+      "subtitle": "Fácil, rápido y sin complicaciones para que disfrutes de un espacio impecable.",
       "step1": {
         "title": "1. Cuéntanos sobre tu espacio",
-        "description": "Indica los pies cuadrados aproximados, elige el nivel de limpieza y la fecha de tu preferencia."
+        "description": "Indica los pies cuadrados aproximados, elige el servicio especializado y la fecha de tu preferencia."
       },
       "step2": {
         "title": "2. Personaliza a tu gusto",
-        "description": "Mascotas, techos altos o limpieza interior de horno y refrigerador: dinos qué necesitas."
+        "description": "Mascotas, electrodomésticos o cuidados especiales: dinos exactamente qué necesitas."
       },
       "step3": {
         "title": "3. Cuidamos cada rincón",
-        "description": "Nuestro equipo asegurado llega puntual con todos los insumos ecológicos y seguros para tu familia."
+        "description": "Nuestro equipo asegurado llega puntual con listas de control rigurosas e insumos de primera calidad."
       },
       "step4": {
-        "title": "4. Disfruta un espacio reluciente",
-        "description": "Llega a un ambiente fresco, limpio y relajante, respaldado por nuestra garantía de satisfacción."
+        "title": "4. Resultados Impecables",
+        "description": "Disfruta de un ambiente fresco, limpio y listo para tus huéspedes, clientes o familia con satisfacción garantizada."
       }
     },
     "pricing": {
-      "title": "Precios Claros por Pie Cuadrado",
-      "subtitle": "Pagas exactamente por el tamaño de tu espacio, sin sorpresas ni cobros ocultos.",
+      "title": "Nuestros Servicios Especializados",
+      "subtitle": "Pagas exactamente por el tamaño de tu espacio, con precios claros por pie cuadrado y sin cargos ocultos.",
+      "residential": {
+        "name": "Basic Residential Cleaning",
+        "tagline": "Mantenimiento Continuo Regular o Profundo",
+        "rate": "$0.125 / sq ft",
+        "description": "Mantenimiento de hogar personalizado (limpieza estándar regular o profunda) adaptado a su estilo de vida.",
+        "features": [
+          "Cocina, baños y recámaras desinfectados a fondo",
+          "Aspirado profundo de alfombras y trapeado de pisos",
+          "Muebles, molduras y superficies libres de polvo",
+          "Insumos seguros para familias y mascotas",
+          "Adaptado a mantenimiento regular o limpiezas profundas"
+        ]
+      },
+      "move_in_out": {
+        "name": "Move-In / Move-Out Cleaning",
+        "tagline": "Devolución de Depósitos y Transiciones",
+        "rate": "$0.20 / sq ft",
+        "description": "Desinfección profunda y detallada para garantizar la devolución de depósitos de alquiler, transiciones fluidas de inquilinos y presentaciones listas para venta.",
+        "features": [
+          "Desinfección profunda para inspecciones de entrega",
+          "Garantía de devolución de depósitos de alquiler",
+          "Transiciones fluidas de inquilinos",
+          "Presentaciones impecables listas para venta",
+          "Interior de gabinetes, marcos y zócalos higienizados"
+        ]
+      },
+      "str_on_site": {
+        "name": "Short Term Rentals (Laundry on site)",
+        "tagline": "Turnover Rápido con Lavandería en Sitio",
+        "rate": "$0.17 / sq ft",
+        "description": "Rotación express entre huéspedes con lavado de sábanas y toallas en la lavadora/secadora de la propiedad, reposición de insumos y preparación 5 estrellas.",
+        "features": [
+          "Preparación rápida y puntual en ventana entre huéspedes",
+          "Lavado y secado en sitio de sábanas y toallas",
+          "Reabastecimiento de insumos básicos de cortesía",
+          "Desinfección minuciosa de puntos de alto contacto",
+          "Lista de control estricta para valoraciones de 5 estrellas"
+        ]
+      },
+      "str_off_site": {
+        "name": "Short Term Rentals (Off Site Laundry)",
+        "tagline": "Rotación Integral con Lavandería Fuera de Sitio",
+        "rate": "$0.23 / sq ft",
+        "description": "Servicio integral con retiro de blancos, lavado profesional externo (off-site), tendido con sábanas limpias y desinfección total de la propiedad.",
+        "features": [
+          "Servicio llave en mano con lavado de blancos off-site",
+          "Retiro, lavado profesional y reposición de toallas y sábanas",
+          "Desinfección completa y reabastecimiento de amenidades",
+          "Ideal para propiedades sin lavadora/secadora propia",
+          "Presentación impecable garantizada para cada huésped"
+        ]
+      },
+      "short_term_rental": {
+        "name": "Short-Term Rentals Turnover",
+        "tagline": "Turnover Rápido Calidad 5 Estrellas",
+        "rate": "$0.17 / sq ft",
+        "description": "Preparación rápida entre huéspedes: cambio y lavado de ropa de cama/toallas, reabastecimiento de insumos y desinfección.",
+        "features": [
+          "Preparación rápida y puntual en ventana entre huéspedes",
+          "Cambio y lavado de ropa de cama y toallas",
+          "Reabastecimiento de insumos básicos de cortesía",
+          "Desinfección minuciosa de puntos de alto contacto"
+        ]
+      },
       "regular": {
-        "name": "Limpieza Regular",
-        "tagline": "Mantenimiento Continuo",
-        "rate": "$0.10 / sq ft",
-        "description": "Tu hogar siempre fresco, ordenado y reluciente. La solución perfecta para mantener tus espacios impecables semana a semana.",
+        "name": "Residential Cleaning",
+        "tagline": "Mantenimiento Continuo del Hogar",
+        "rate": "$0.12 / sq ft",
+        "description": "Mantenimiento de hogar personalizado adaptado a su estilo de vida.",
         "features": [
           "Cocina y baños desinfectados a fondo",
           "Aspirado de alfombras y trapeado de pisos",
-          "Muebles y superficies libres de polvo",
-          "Encimeras, lavamanos y grifería relucientes",
-          "Retiro de basura y ordenamiento general"
+          "Muebles y superficies libres de polvo"
         ]
       },
       "deep": {
-        "name": "Limpieza Profunda (GoFurther)",
-        "tagline": "Renovación Total a Fondo",
+        "name": "Limpieza Profunda",
+        "tagline": "Renovación Total",
         "rate": "$0.16 / sq ft",
-        "description": "Para cuando tu hogar necesita un cariño extra. Llegamos a la suciedad oculta, zócalos y rincones que la rutina deja atrás.",
+        "description": "Limpieza exhaustiva con desincrustación profunda y atención a cada rincón.",
         "features": [
-          "Todo lo incluido en Limpieza Regular",
-          "Limpieza manual de zócalos, marcos y puertas",
-          "Fregado a fondo de juntas y sarro en baños",
-          "Frentes de gabinetes y alacenas limpios y desengrasados",
-          "Eliminación de grasa y suciedad acumulada"
+          "Limpieza manual de zócalos y marcos",
+          "Fregado de juntas y sarro en baños",
+          "Eliminación de grasa acumulada"
         ]
       },
       "moveInOut": {
-        "name": "Limpieza Move-In / Move-Out",
+        "name": "Move-In / Move-Out Cleaning",
         "tagline": "Lista para Mudanza e Inspección",
         "rate": "$0.20 / sq ft",
-        "description": "Múdate con total tranquilidad. Dejamos tu nuevo hogar listo para habitar o tu vivienda anterior lista para entrega y recuperación de depósito.",
+        "description": "Desinfección profunda para garantizar la devolución de depósitos de alquiler.",
         "features": [
-          "Todo lo incluido en Limpieza Profunda",
-          "Interior de clósets, gabinetes y alacenas vacías",
-          "Rieles de ventanas, marcos y vidrios interiores",
-          "Interruptores, zócalos y puertas higienizados",
-          "Listo para entrega inmediata al propietario o inquilino"
+          "Interior de gabinetes y alacenas",
+          "Marcos y cristales interiores",
+          "Listo para entrega al propietario"
         ]
       },
       "bookNow": "Reservar este Servicio",
       "minNotice": "Tarifa mínima de $99 por visita. El precio final se basa en las dimensiones verificadas y cuidados adicionales seleccionados."
-    },
-    "commercialReferral": {
-      "badge": "División Comercial y Construcción",
-      "title": "¿Requieres Limpieza Comercial, Post-Construcción o Demolición?",
-      "description": "Para oficinas corporativas, locales comerciales, limpieza post-construcción de obra y mano de obra para demolición de drywall, visita nuestra división comercial especializada, Evolving Solutions LLC.",
-      "cta": "Conoce Evolving Solutions LLC"
     },
     "coverage": {
       "title": "Zonas de Cobertura en Denver y Boulder",
@@ -120,113 +193,122 @@
       "outerDesc": "Aurora, Thornton, Centennial y Highlands Ranch."
     },
     "contact": {
-      "title": "¿Tienes dudas o requieres atención especial?",
-      "subtitle": "Nuestros especialistas en limpieza en Denver están listos para ayudarte.",
+      "title": "¿Tienes dudas o requieres una propuesta personalizada?",
+      "subtitle": "Estamos a la orden para propietarios, administradores y profesionales inmobiliarios en Denver.",
       "phone": "(720) 590-8632",
       "email": "info@gopropertycare.com",
       "hours": "Lunes a Sábado: 7:00 AM – 7:00 PM",
-      "location": "Denver y Boulder, Colorado"
+      "location": "Denver, Colorado y Áreas Vecinas"
     }
   },
   "about": {
-    "tagline": "Especialistas en Denver y Boulder",
-    "title": "Cuidamos tu Hogar Como si Fuera Nuestro",
-    "subtitle": "Especialistas locales dedicados a transformar tus espacios con esmero, productos seguros y atención al detalle.",
-    "insuredBadge": "Asegurados y Verificados",
-    "ecoBadge": "Seguro para Familias y Mascotas",
+    "tagline": "Denver, Colorado y Áreas Vecinas",
+    "title": "Soluciones Integrales para tus Inmuebles",
+    "subtitle": "Tu socio confiable en limpieza residencial, comercial, post-construcción y turnovers de alquiler vacacional en Denver.",
+    "insuredBadge": "Personal 100% Asegurado (Insured)",
+    "ecoBadge": "Insumos Profesionales y Seguros",
     "mission": {
       "title": "Nuestra Misión",
-      "description": "Creemos que un espacio limpio y armonioso te devuelve tiempo libre, salud y serenidad mental. Combinamos técnicas de limpieza profunda con la calidez y el respeto que tu hogar merece, tanto para familias como para negocios en Denver y Boulder."
+      "description": "Ofrecer soluciones de limpieza residencial y comercial de primer nivel, diseñadas a la medida de propietarios, profesionales del sector inmobiliario y administradores en toda el área metropolitana de Denver. Entendemos que un espacio impecable y bien mantenido es esencial para su tranquilidad, la satisfacción de sus huéspedes y entregas de propiedades sin contratiempos."
     },
-    "pillarsTitle": "Nuestros Pilares de Confianza",
+    "pillarsTitle": "¿Por Qué Elegir GoPropertyCare?",
     "values": {
-      "ecoTitle": "Seguro para tu Familia y Mascotas",
-      "ecoDesc": "Utilizamos productos biodegradables y no tóxicos que limpian a fondo cuidando la salud de quienes más quieres.",
-      "vettedTitle": "Personal Verificado y Asegurado",
-      "vettedDesc": "Cada limpiador pasa por verificación de antecedentes y cuenta con cobertura de seguro para tu completa tranquilidad.",
-      "standardTitle": "Control de Calidad de 50 Puntos",
-      "standardDesc": "Revisamos cada espacio con una lista exhaustiva para asegurarnos de que no quede ningún rincón sin atender.",
+      "ecoTitle": "Confiable y Puntual",
+      "ecoDesc": "Equipos puntuales comprometidos con el cumplimiento estricto de horarios para no retrasar nunca tus operaciones.",
+      "vettedTitle": "Atención al Detalle",
+      "vettedDesc": "Listas de control rigurosas en cada visita para asegurar resultados impecables, consistentes y de alto impacto.",
+      "standardTitle": "Socio de Confianza (Insured)",
+      "standardDesc": "Personal profesional y totalmente asegurado (Insured) en quien propietarios y administradores pueden confiar con total serenidad.",
       "pricingTitle": "Precios Claros y Justos",
-      "pricingDesc": "Sin cobros arbitrarios por hora. Pagas exactamente por el tamaño real de tu propiedad con total transparencia."
+      "pricingDesc": "Tarifas por pie cuadrado transparentes y estimaciones claras sin sorpresas ni costes ocultos."
     },
     "checklist": {
-      "title": "Nuestra Lista de Cuidado en Cada Visita",
-      "subtitle": "Garantizamos un resultado impecable en cada ambiente de tu casa o negocio.",
-      "kitchenTitle": "Cocina Reluciente",
-      "kitchen": "Cocina: Encimeras, estufa, exterior de electrodomésticos, fregadero reluciente y frentes de gabinetes desinfectados.",
-      "bathroomsTitle": "Baños y Azulejos",
-      "bathrooms": "Baños: Azulejos y mamparas abrillantadas, inodoros y regaderas desinfectadas, espejos sin marcas.",
-      "livingTitle": "Salas y Recámaras",
-      "living": "Salas y Recámaras: Muebles y superficies libres de polvo, lámparas, cuadros y aspirado bajo muebles accesibles.",
+      "title": "Nuestro Estándar de Cuidado Integral",
+      "subtitle": "Garantizamos resultados impecables ya sea en tu hogar, oficina o propiedad vacacional.",
+      "kitchenTitle": "Cocina y Puntos de Apoyo",
+      "kitchen": "Encimeras, frentes de electrodomésticos, fregaderos relucientes y desinfección de superficies.",
+      "bathroomsTitle": "Baños e Higiene",
+      "bathrooms": "Azulejos, mamparas, inodoros y regaderas desinfectadas a fondo con acabados brillantes.",
+      "livingTitle": "Espacios Comunes y Habitaciones",
+      "living": "Mobiliario libre de polvo, orden meticuloso y ambientes frescos listos para usar.",
       "floorsTitle": "Pisos Impecables",
-      "floors": "Pisos: Aspirado profundo de alfombras y trapeado cuidadoso de pisos duros con fragancias frescas y suaves."
+      "floors": "Aspirado profundo de alfombras y trapeado cuidadoso de pisos duros con fragancias agradables."
     },
     "cta": {
-      "title": "¿Listo para Disfrutar de un Espacio Impecable?",
-      "subtitle": "Agenda tu servicio en minutos con tarifas transparentes por pie cuadrado y sin cargos sorpresa de traslado en Denver y Boulder.",
+      "title": "¿Listo para Experimentar un Cuidado Profesional?",
+      "subtitle": "Agenda tu servicio hoy mismo con tarifas claras y la garantía de un equipo puntual y asegurado.",
       "scheduleBtn": "Agendar en Línea"
     }
   },
   "cleaningAddons": {
-    "pets_presence": {
-      "name": "Hogar con Mascotas",
-      "description": "Cuidado especial para retirar pelos rebeldes y refrescar tapicerías y pisos."
+    "oven": {
+      "name": "Interior de Horno",
+      "description": "Limpieza profunda y desengrasado térmico del interior de horno (+$60)."
     },
-    "high_ceilings": {
-      "name": "Techos Altos o Ventanales",
-      "description": "Limpieza segura de lámparas elevadas, molduras y ventanales fuera de alcance."
+    "inside_fridge": {
+      "name": "Interior de Refrigerador",
+      "description": "Desinfección integral y limpieza de compartimentos interiores de refrigerador (+$50)."
     },
-    "oven_fridge_interior": {
-      "name": "Interior de Horno y Refrigerador",
-      "description": "Limpieza a fondo por dentro de tus electrodomésticos, frescos y listos para tus alimentos."
+    "blinds": {
+      "name": "Limpieza de Persianas",
+      "description": "Desempolvado y limpieza detallada de persianas en todo el inmueble (+$40)."
     },
-    "cabinets_interior": {
-      "name": "Interior de Alacenas y Gabinetes",
-      "description": "Limpieza y desinfección interna de cajones y estantes de cocina o baños."
-    },
-    "basement_attic": {
-      "name": "Sótano Amueblado o Ático",
-      "description": "Limpieza integral de tu área adicional de sótano terminado o ático habitable."
-    },
-    "patio_balcony": {
-      "name": "Balcón o Terraza Exterior",
-      "description": "Barrido y lavado de tu espacio exterior para que disfrutes del aire fresco."
+    "inside_windows": {
+      "name": "Vidrios Interiores",
+      "description": "Lavado a mano y pulido sin marcas de vidrios interiores y marcos (+$35)."
     }
   },
   "schedule": {
-    "title": "Agenda tu Limpieza en Minutos",
-    "subtitle": "Personaliza tu servicio en 4 simples pasos y relájate: nosotros nos encargamos.",
-    "step1": "Espacio y Nivel",
-    "step2": "Fecha y Horario",
-    "step3": "Ubicación y Extras",
+    "title": "Agenda tu Servicio en Minutos",
+    "subtitle": "Personaliza tu servicio en 4 simples pasos: nuestro equipo puntual y asegurado se encarga de todo.",
+    "step1": "Espacio y Servicio",
+    "step2": "Fecha y Hora",
+    "step3": "Ubicación y Acceso",
     "step4": "Confirmación",
-    "step1Title": "Elige el Tamaño de tu Propiedad y Servicio",
-    "sqftLabel": "Pies Cuadrados de tu Inmueble (Sq Ft)",
+    "step1Title": "Elige la Dimensión de la Propiedad y el Servicio",
+    "sqftLabel": "Pies Cuadrados del Inmueble (Sq Ft)",
     "sqftHelp": "Indica el tamaño aproximado de las áreas a limpiar (mínimo 100 sq ft).",
-    "selectTier": "Selecciona el Nivel de Limpieza Ideal",
+    "selectTier": "Selecciona el Servicio Especializado",
+    "propertyDetailsTitle": "Detalles del Inmueble y Consulta",
+    "bedroomsLabel": "Habitaciones",
+    "bathroomsLabel": "Baños",
+    "occupancyLabel": "Estado de Ocupación",
+    "occupied": "Habitada / Amoblada",
+    "occupiedDesc": "Propiedad actualmente habitada o con muebles",
+    "vacant": "Desocupada / Vacía",
+    "vacantDesc": "Inmueble desocupado o sin muebles",
     "step2Title": "¿Cuándo Deseas que te Visitemos?",
-    "dateNotice": "Citas disponibles a partir de mañana con llegada puntual en la franja seleccionada.",
-    "morningSlot": "Turno Mañana (8:00 AM – 12:00 PM)",
-    "afternoonSlot": "Turno Tarde (1:00 PM – 5:00 PM)",
-    "step3Title": "Tu Dirección y Cuidados Especiales",
+    "sameDayNotice": "Servicio para el mismo día disponible hoy hasta las 12:00 PM. Por favor selecciona una hora de llegada con al menos 3 horas de diferencia.",
+    "futureDateNotice": "Citas disponibles a partir de mañana con llegada puntual a la hora seleccionada.",
+    "timeSlotLabel": "Hora Preferida de Llegada",
+    "step3Title": "Dirección de la Propiedad, Acceso y Extras",
     "citySelect": "Ciudad o Zona en Denver / Boulder",
     "innerZone": "Denver y Boulder Central (Traslado GRATIS)",
     "outerZone": "Zona Periférica de Denver (Recargo $25)",
     "addressLabel": "Dirección",
     "zipLabel": "Código Postal (ZIP Code)",
-    "addonsTitle": "Cuidados Especiales y Extras",
-    "addonsSubtitle": "Elige si tu hogar cuenta con alguna de estas condiciones para llevar el equipo adecuado.",
+    "accessTitle": "¿Cómo Podrá Entrar el Equipo a la Vivienda?",
+    "accessSubtitle": "Selecciona cómo ingresará nuestro personal para que la visita sea 100% fluida.",
+    "entry_someone_home": "Habrá alguien en casa",
+    "entry_keypad": "Código de acceso / Cerradura digital",
+    "entry_lockbox": "Llave escondida / Lockbox",
+    "entry_unlocked": "Puerta sin cerrojo / Abierta",
+    "entry_other": "Otro método de acceso",
+    "accessNotesLabel": "Detalles de Acceso y Claves",
+    "accessNotesPlaceholder": "Código de puerta, clave de lockbox, ubicación de llave o instrucciones...",
+    "addonsTitle": "Extras con Costo Adicional",
+    "addonsSubtitle": "Elige servicios adicionales que desees incluir en la cotización de hoy.",
     "step4Title": "Revisa los Detalles de tu Reserva",
     "guestNotice": "Reservando como invitado. Puedes crear una cuenta en cualquier momento con tu correo.",
     "basePrice": "Servicio Base de Limpieza",
     "addonsFee": "Cuidados Especiales / Extras",
     "travelFee": "Tarifa de Traslado",
     "totalDue": "Total Estimado",
-    "specialInstructions": "Instrucciones de Acceso y Notas (Código de portón, llaves, notas para el equipo)",
+    "specialInstructions": "Instrucciones Especiales y Notas Adicionales",
     "termsAgree": "Acepto los términos del servicio y conozco la política de tarifa mínima de $99 por visita.",
-    "submitOrder": "Confirmar Reserva de Limpieza",
+    "submitOrder": "Confirmar Reserva",
     "submitting": "Confirmando tu cita...",
-    "successTitle": "¡Listo! Tu Limpieza Está Agendada",
+    "successTitle": "¡Listo! Tu Cita Está Agendada",
     "successSubtitle": "Hemos recibido tu reserva. Te hemos enviado todos los detalles a tu correo electrónico.",
     "orderNumber": "Número de Orden",
     "backHome": "Volver al Inicio",
@@ -255,12 +337,12 @@
     "title": "Mi Cuenta",
     "subtitle": "Consulta tus reservas pasadas y administra tus próximas visitas.",
     "welcome": "Bienvenido de nuevo",
-    "bookNew": "Agendar Nueva Limpieza",
-    "myOrders": "Mis Limpiezas",
+    "bookNew": "Agendar Nuevo Servicio",
+    "myOrders": "Mis Servicios",
     "profile": "Mis Datos y Dirección",
     "loadingOrders": "Cargando tus reservaciones...",
     "noOrders": "Aún no tienes visitas agendadas.",
-    "bookFirst": "Agendar Mi Primera Limpieza",
+    "bookFirst": "Agendar Mi Primer Servicio",
     "orderNum": "Orden #",
     "status": "Estado",
     "date": "Fecha",
@@ -268,7 +350,7 @@
     "size": "Tamaño",
     "total": "Total",
     "cancel": "Cancelar Cita",
-    "cancelConfirm": "¿Estás seguro de que deseas cancelar esta reserva de limpieza?",
+    "cancelConfirm": "¿Estás seguro de que deseas cancelar esta reserva?",
     "cancelledSuccess": "Tu cita ha sido cancelada exitosamente.",
     "cancelFailed": "No se pudo cancelar la reservación.",
     "reorder": "Volver a Pedir",
@@ -287,13 +369,13 @@
     "statusCancelled": "Cancelada"
   },
   "footer": {
-    "description": "Cuidamos hogares y espacios en Denver y Boulder con personal asegurado, productos ecológicos y tarifas transparentes.",
+    "description": "Soluciones integrales de limpieza residencial, comercial, post-construcción y turnovers de alquiler vacacional en Denver y Boulder.",
     "guarantee": "100% Satisfacción y Tranquilidad",
     "quickLinks": "Enlaces Rápidos",
-    "cleaningTiers": "Niveles de Limpieza",
+    "cleaningTiers": "Servicios Especializados",
     "contactArea": "Contacto y Cobertura",
     "rights": "Todos los derechos reservados.",
-    "localNote": "Operando localmente en Denver y Boulder, CO"
+    "localNote": "Denver, Colorado y Áreas Vecinas"
   },
   "common": {
     "loading": "Cargando...",

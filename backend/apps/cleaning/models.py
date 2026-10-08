@@ -11,19 +11,23 @@ BRAND_CHOICES = [
 
 class CleaningServiceRate(TimeStampedModel):
     SERVICE_TYPES = [
+        ('residential', 'Basic Residential Cleaning'),
+        ('move_in_out', 'Move In / Out Cleaning'),
+        ('str_on_site', 'Short Term Rentals (Laundry on site)'),
+        ('str_off_site', 'Short Term Rentals (Off Site Laundry)'),
+        ('short_term_rental', 'Short-Term Rentals Turnover (Airbnb / VRBO)'),
+        ('commercial', 'Commercial Cleaning'),
+        ('post_construction', 'Post-Construction Cleaning'),
         ('regular', 'Limpieza Regular'),
         ('deep', 'Limpieza Profunda (GoFurther)'),
-        ('move_in_out', 'Limpieza MoveIn/MoveOut'),
-        ('post_construction', 'Limpieza Post-Construcción'),
-        ('commercial', 'Limpieza Comercial / Janitorial'),
         ('industrial_demolition', 'Demolición de Drywall y Mano de Obra Industrial'),
     ]
 
-    RESIDENTIAL_SERVICES = ('regular', 'deep', 'move_in_out')
+    RESIDENTIAL_SERVICES = ('residential', 'regular', 'deep', 'move_in_out', 'short_term_rental', 'str_on_site', 'str_off_site')
     COMMERCIAL_SERVICES = ('commercial', 'post_construction', 'industrial_demolition')
 
     name = models.CharField(max_length=100)
-    service_type = models.CharField(max_length=30, choices=SERVICE_TYPES, unique=True)
+    service_type = models.CharField(max_length=30, choices=SERVICE_TYPES)
     brand = models.CharField(
         max_length=30,
         choices=BRAND_CHOICES,
@@ -31,9 +35,9 @@ class CleaningServiceRate(TimeStampedModel):
         help_text='Brand providing this service'
     )
     rate_per_sqft = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        help_text='Rate per square foot (e.g. 0.10 for $0.10/sqft)'
+        max_digits=7,
+        decimal_places=3,
+        help_text='Rate per square foot (e.g. 0.125 for $0.125/sqft)'
     )
     min_order_amount = models.DecimalField(
         max_digits=6,
@@ -48,9 +52,12 @@ class CleaningServiceRate(TimeStampedModel):
         verbose_name = 'Cleaning Service Rate'
         verbose_name_plural = 'Cleaning Service Rates'
         ordering = ['rate_per_sqft']
+        constraints = [
+            models.UniqueConstraint(fields=['service_type', 'brand'], name='unique_service_type_per_brand')
+        ]
 
     def __str__(self):
-        return f'{self.name} ({self.get_brand_display()}) - ${self.rate_per_sqft:.2f}/sqft'
+        return f'{self.name} ({self.get_brand_display()}) - ${self.rate_per_sqft}/sqft'
 
 
 class CleaningAddon(TimeStampedModel):
@@ -147,8 +154,13 @@ class CleaningOrder(TimeStampedModel):
         blank=True,
         help_text='List of selected addon objects or codes'
     )
+    bedrooms = models.PositiveSmallIntegerField(default=1, null=True, blank=True, help_text="Number of bedrooms")
+    bathrooms = models.DecimalField(max_digits=3, decimal_places=1, default=1.0, null=True, blank=True, help_text="Number of bathrooms")
+    is_occupied = models.BooleanField(default=True, help_text="Whether property is occupied/furnished or vacant")
+    entry_method = models.CharField(max_length=50, blank=True, default='someone_home', help_text="Access method")
+    entry_notes = models.CharField(max_length=255, blank=True, help_text="Access code or key notes")
     service_date = models.DateField(help_text='Scheduled date for cleaning service')
-    time_slot = models.CharField(max_length=20, choices=TIME_SLOT_CHOICES)
+    time_slot = models.CharField(max_length=50, help_text='Selected time or window (e.g. 02:00 PM, morning, afternoon)')
     special_instructions = models.TextField(blank=True, help_text='Property access, gate codes or special notes')
 
     base_price = models.DecimalField(max_digits=8, decimal_places=2, default=99.00)

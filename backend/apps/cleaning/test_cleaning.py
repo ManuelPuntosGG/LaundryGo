@@ -109,16 +109,29 @@ class TestCleaningAPI:
         assert addons[0]['code'] == 'pets_presence'
         assert float(addons[0]['price']) == 35.0
 
-    def test_get_available_dates_starts_tomorrow(self, api_client):
-        response = api_client.get('/api/v1/cleaning/schedule/available-dates/')
-        assert response.status_code == 200
-        dates = response.json()
-        assert len(dates) == 60
-        today_str = timezone.localtime(timezone.now()).date().isoformat()
-        tomorrow_str = (timezone.localtime(timezone.now()).date() + timedelta(days=1)).isoformat()
-        # Ensure today is NOT in the list
-        assert all(item['date'] != today_str for item in dates)
-        assert dates[0]['date'] == tomorrow_str
+    def test_get_available_dates_before_and_after_noon(self, api_client):
+        from unittest.mock import patch
+        from datetime import datetime
+        tz = timezone.get_current_timezone()
+        # Mock 10:00 AM (before 12 PM cutoff)
+        morning_dt = timezone.make_aware(datetime(2026, 6, 1, 10, 0, 0), tz)
+        with patch('django.utils.timezone.now', return_value=morning_dt):
+            response = api_client.get('/api/v1/cleaning/schedule/available-dates/')
+            assert response.status_code == 200
+            dates = response.json()
+            assert len(dates) == 61
+            assert dates[0]['date'] == '2026-06-01'
+            assert dates[0]['is_today'] is True
+
+        # Mock 1:00 PM (after 12 PM cutoff)
+        afternoon_dt = timezone.make_aware(datetime(2026, 6, 1, 13, 0, 0), tz)
+        with patch('django.utils.timezone.now', return_value=afternoon_dt):
+            response = api_client.get('/api/v1/cleaning/schedule/available-dates/')
+            assert response.status_code == 200
+            dates = response.json()
+            assert len(dates) == 60
+            assert dates[0]['date'] == '2026-06-02'
+            assert dates[0]['is_today'] is False
 
     def test_create_guest_order_with_min_order(self, api_client, regular_rate):
         tomorrow = (timezone.localtime(timezone.now()).date() + timedelta(days=1)).isoformat()
@@ -175,25 +188,79 @@ class TestCleaningAPI:
         assert order.delivery_fee == Decimal('25.00')
         assert order.total_price == Decimal('260.00')  # 200 + 35 + 25
 
-    def test_same_day_order_rejected(self, api_client, regular_rate):
-        today = timezone.localtime(timezone.now()).date().isoformat()
-        payload = {
-            'guest_email': 'sameday@example.com',
-            'guest_first_name': 'Test',
-            'guest_last_name': 'User',
-            'guest_phone': '3035550000',
-            'street_address': '789 Pine St',
-            'city': 'Denver',
-            'zip_code': '80203',
-            'delivery_zone': 'inner',
-            'service_rate_id': regular_rate.id,
-            'square_feet': 1200,
-            'service_date': today,
-            'time_slot': 'morning',
-        }
-        response = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
-        assert response.status_code == 400
-        assert 'service_date' in response.json()
+    def test_same_day_order_rules(self, api_client, regular_rate):
+        from unittest.mock import patch
+        from datetime import datetime
+        tz = timezone.get_current_timezone()
+
+        # 1. After 12 PM: same-day rejected
+        afternoon_dt = timezone.make_aware(datetime(2026, 6, 1, 13, 0, 0), tz)
+        with patch('django.utils.timezone.now', return_value=afternoon_dt):
+            payload = {
+                'guest_email': 'sameday@example.com',
+                'guest_first_name': 'Test',
+                'guest_last_name': 'User',
+                'guest_phone': '3035550000',
+                'street_address': '789 Pine St',
+                'city': 'Denver',
+                'zip_code': '80203',
+                'delivery_zone': 'inner',
+                'service_rate_id': regular_rate.id,
+                'square_feet': 1200,
+                'service_date': '2026-06-01',
+                'time_slot': '04:30 PM',
+            }
+            resp = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+            assert resp.status_code == 400
+            assert 'service_date' in resp.json()
+
+        # 2. Before 12 PM but arrival is less than 3 hours from now: rejected
+        morning_dt = timezone.make_aware(datetime(2026, 6, 1, 10, 0, 0), tz)
+        with patch('django.utils.timezone.now', return_value=morning_dt):
+            payload = {
+                'guest_email': 'sameday@example.com',
+                'guest_first_name': 'Test',
+                'guest_last_name': 'User',
+                'guest_phone': '3035550000',
+                'street_address': '789 Pine St',
+                'city': 'Denver',
+                'zip_code': '80203',
+                'delivery_zone': 'inner',
+                'service_rate_id': regular_rate.id,
+                'square_feet': 1200,
+                'service_date': '2026-06-01',
+                'time_slot': '11:30 AM',  # only 1.5h notice
+            }
+            resp = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+            assert resp.status_code == 400
+            assert 'time_slot' in resp.json()
+
+        # 3. Before 12 PM with >= 3 hours notice: accepted!
+        with patch('django.utils.timezone.now', return_value=morning_dt):
+            payload = {
+                'guest_email': 'sameday_ok@example.com',
+                'guest_first_name': 'Test',
+                'guest_last_name': 'User',
+                'guest_phone': '3035550000',
+                'street_address': '789 Pine St',
+                'city': 'Denver',
+                'zip_code': '80203',
+                'delivery_zone': 'inner',
+                'service_rate_id': regular_rate.id,
+                'square_feet': 1200,
+                'service_date': '2026-06-01',
+                'time_slot': '02:00 PM',  # 4h notice
+                'bedrooms': 3,
+                'bathrooms': 2.0,
+                'is_occupied': True,
+                'entry_method': 'keypad',
+                'entry_notes': 'Code 4432',
+            }
+            resp = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+            assert resp.status_code == 201
+            order = CleaningOrder.objects.get(guest_email='sameday_ok@example.com')
+            assert order.bedrooms == 3
+            assert order.entry_method == 'keypad'
 
     def test_authenticated_user_order_and_cancel(self, api_client, regular_rate, sample_user):
         api_client.force_authenticate(user=sample_user)
@@ -250,7 +317,7 @@ class TestCleaningAPI:
         assert str(order).startswith('ESL-#')
         assert order.total_price == Decimal('540.00')  # 3000 * 0.18 = $540.00
 
-    def test_post_construction_rejected_on_gopropertycare(self, api_client, post_construction_rate):
+    def test_cross_brand_rate_rejected_on_gopropertycare(self, api_client, post_construction_rate):
         tomorrow = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
         payload = {
             'guest_email': 'residential_user@example.com',
@@ -271,10 +338,9 @@ class TestCleaningAPI:
         assert response.status_code == 400
         assert 'service_rate_id' in response.json()
         error_msg = str(response.json()['service_rate_id'])
-        assert 'residential cleaning' in error_msg
-        assert 'Evolving Solutions LLC' in error_msg
+        assert 'does not belong to GoPropertyCare' in error_msg
 
-    def test_residential_rejected_on_evolvingsolutions(self, api_client, regular_rate):
+    def test_cross_brand_rate_rejected_on_evolvingsolutions(self, api_client, regular_rate):
         tomorrow = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
         payload = {
             'guest_email': 'biz_user@example.com',
@@ -295,8 +361,7 @@ class TestCleaningAPI:
         assert response.status_code == 400
         assert 'service_rate_id' in response.json()
         error_msg = str(response.json()['service_rate_id'])
-        assert 'commercial facilities' in error_msg
-        assert 'GoPropertyCare' in error_msg
+        assert 'does not belong to Evolving Solutions LLC' in error_msg
 
     def test_rates_filter_by_brand(self, api_client, regular_rate, commercial_rate, post_construction_rate):
         # Filter for GoPropertyCare

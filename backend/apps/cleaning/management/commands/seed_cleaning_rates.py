@@ -8,30 +8,38 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         rates_data = [
-            # GoPropertyCare (Residential only - No post construction)
+            # GoPropertyCare - Tarifas provistas por el cliente
             {
-                'name': 'Limpieza Regular',
-                'service_type': 'regular',
+                'name': 'Basic Residential Cleaning',
+                'service_type': 'residential',
                 'brand': 'gopropertycare',
-                'rate_per_sqft': Decimal('0.10'),
+                'rate_per_sqft': Decimal('0.125'),
                 'min_order_amount': Decimal('99.00'),
-                'description': 'Cuidado y limpieza estándar para residencias particulares. Mantenimiento preventivo, desinfección de superficies, baños, cocina y pisos.',
+                'description': 'Mantenimiento de hogar personalizado (regular o profundo) adaptado a su estilo de vida.',
             },
             {
-                'name': 'Limpieza Profunda (GoFurther)',
-                'service_type': 'deep',
-                'brand': 'gopropertycare',
-                'rate_per_sqft': Decimal('0.16'),
-                'min_order_amount': Decimal('99.00'),
-                'description': 'Limpieza exhaustiva residencial con desincrustación profunda, zócalos, juntas y suciedad acumulada.',
-            },
-            {
-                'name': 'Limpieza MoveIn/MoveOut',
+                'name': 'Move-In / Move-Out Cleaning',
                 'service_type': 'move_in_out',
                 'brand': 'gopropertycare',
-                'rate_per_sqft': Decimal('0.20'),
+                'rate_per_sqft': Decimal('0.200'),
                 'min_order_amount': Decimal('99.00'),
-                'description': 'Limpieza completa y detallada para entrega o mudanza en viviendas y apartamentos.',
+                'description': 'Desinfección profunda y detallada para devoluciones de depósito, mudanzas y propiedades en venta.',
+            },
+            {
+                'name': 'Short Term Rentals (Laundry on site)',
+                'service_type': 'str_on_site',
+                'brand': 'gopropertycare',
+                'rate_per_sqft': Decimal('0.170'),
+                'min_order_amount': Decimal('99.00'),
+                'description': 'Preparación y rotación express entre huéspedes con lavado de sábanas y toallas en sitio.',
+            },
+            {
+                'name': 'Short Term Rentals (Off Site Laundry)',
+                'service_type': 'str_off_site',
+                'brand': 'gopropertycare',
+                'rate_per_sqft': Decimal('0.230'),
+                'min_order_amount': Decimal('99.00'),
+                'description': 'Rotación integral entre huéspedes con retiro, lavado externo (off-site) y reposición de blancos.',
             },
             # Evolving Solutions LLC (Commercial, Post-Construction & Demolition)
             {
@@ -61,48 +69,34 @@ class Command(BaseCommand):
         ]
 
         addons_data = [
-            # GoPropertyCare Residential Add-ons
+            # GoPropertyCare Add-ons (Only 4 priced add-ons as specified by client)
             {
-                'code': 'pets_presence',
-                'name': 'Presencia de Mascotas',
+                'code': 'oven',
+                'name': 'Oven Cleaning',
                 'brand': 'gopropertycare',
-                'price': Decimal('35.00'),
-                'description': 'Tratamiento especial de pelos, caspa y eliminación de olores en tapicería y pisos.',
+                'price': Decimal('60.00'),
+                'description': 'Limpieza profunda y desengrasado interior de horno.',
             },
             {
-                'code': 'high_ceilings',
-                'name': 'Techos Altos / Ventanales',
-                'brand': 'gopropertycare',
-                'price': Decimal('30.00'),
-                'description': 'Limpieza de cornisas, lámparas elevadas y ventanales residenciales con equipo telescópico.',
-            },
-            {
-                'code': 'oven_fridge_interior',
-                'name': 'Interior de Horno y Refrigerador',
-                'brand': 'gopropertycare',
-                'price': Decimal('45.00'),
-                'description': 'Desengrasado térmico profundo y desinfección total de interiores de electrodomésticos.',
-            },
-            {
-                'code': 'cabinets_interior',
-                'name': 'Interior de Alacenas y Gabinetes',
-                'brand': 'gopropertycare',
-                'price': Decimal('35.00'),
-                'description': 'Desocupar, aspirar residuos y desinfectar cajones y estantes de cocina y baños.',
-            },
-            {
-                'code': 'basement_attic',
-                'name': 'Sótano Terminado / Ático',
+                'code': 'inside_fridge',
+                'name': 'Inside Fridge Cleaning',
                 'brand': 'gopropertycare',
                 'price': Decimal('50.00'),
-                'description': 'Inclusión de área adicional terminada en el plan de limpieza.',
+                'description': 'Desinfección integral y limpieza de compartimentos interiores de refrigerador.',
             },
             {
-                'code': 'patio_balcony',
-                'name': 'Balcón o Patio Exterior',
+                'code': 'blinds',
+                'name': 'Blinds Cleaning',
                 'brand': 'gopropertycare',
-                'price': Decimal('25.00'),
-                'description': 'Barrido, lavado y remoción de polvo y hojas en área exterior inmediata.',
+                'price': Decimal('40.00'),
+                'description': 'Desempolvado y limpieza detallada de persianas.',
+            },
+            {
+                'code': 'inside_windows',
+                'name': 'Inside Windows Cleaning',
+                'brand': 'gopropertycare',
+                'price': Decimal('35.00'),
+                'description': 'Lavado minucioso de vidrios y ventanales interiores.',
             },
             # Evolving Solutions LLC Commercial & Post-Construction Add-ons
             {
@@ -149,10 +143,18 @@ class Command(BaseCommand):
             },
         ]
 
+        # Clean obsolete GoPropertyCare rates and add-ons
+        active_gpc_rates = [r['service_type'] for r in rates_data if r['brand'] == 'gopropertycare']
+        CleaningServiceRate.objects.filter(brand='gopropertycare').exclude(service_type__in=active_gpc_rates).delete()
+
+        active_gpc_addons = [a['code'] for a in addons_data if a['brand'] == 'gopropertycare']
+        CleaningAddon.objects.filter(brand='gopropertycare').exclude(code__in=active_gpc_addons).delete()
+
         # Seed Service Rates
         for rate in rates_data:
             obj, created = CleaningServiceRate.objects.update_or_create(
                 service_type=rate['service_type'],
+                brand=rate['brand'],
                 defaults=rate
             )
             status = 'Created' if created else 'Updated'

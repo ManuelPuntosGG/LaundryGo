@@ -55,7 +55,7 @@ class CleaningServiceRateAdmin(ModelAdmin):
 
     @display(description=_('Rate per Sq Ft'))
     def rate_display(self, obj):
-        return f'${obj.rate_per_sqft:.2f} / sq ft'
+        return f'${obj.rate_per_sqft} / sq ft'
 
     @display(description=_('Min. Order'))
     def min_order_display(self, obj):
@@ -182,6 +182,13 @@ class CleaningOrderAdmin(ModelAdmin):
                 'street_address',
                 ('city', 'zip_code'),
                 ('delivery_zone', 'delivery_fee'),
+            ),
+        }),
+        (_('Property Details & Access'), {
+            'fields': (
+                ('bedrooms', 'bathrooms'),
+                'is_occupied',
+                ('entry_method', 'entry_notes'),
             ),
         }),
         (_('Service & Schedule'), {

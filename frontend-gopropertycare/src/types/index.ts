@@ -15,7 +15,16 @@ export interface AuthResponse {
   refresh: string;
 }
 
-export type CleaningServiceType = 'regular' | 'deep' | 'move_in_out';
+export type CleaningServiceType =
+  | 'residential'
+  | 'move_in_out'
+  | 'str_on_site'
+  | 'str_off_site'
+  | 'short_term_rental'
+  | 'commercial'
+  | 'post_construction'
+  | 'regular'
+  | 'deep';
 
 export interface CleaningServiceRate {
   id: number;
@@ -51,9 +60,14 @@ export interface CleaningOrder {
   delivery_fee: string | number;
   service_rate: CleaningServiceRate;
   square_feet: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  is_occupied?: boolean;
+  entry_method?: string;
+  entry_notes?: string;
   selected_addons: CleaningAddon[];
   service_date: string;
-  time_slot: 'morning' | 'afternoon';
+  time_slot: string;
   special_instructions: string;
   base_price: string | number;
   addons_total: string | number;
@@ -67,6 +81,7 @@ export interface CleaningOrder {
 export interface CleaningAvailableDate {
   date: string;
   available: boolean;
+  is_today?: boolean;
 }
 
 export interface DenverLocation {

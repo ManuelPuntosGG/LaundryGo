@@ -128,14 +128,17 @@ class CleaningAvailableDatesView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
-        today = timezone.localtime(timezone.now()).date()
-        # Strictly starting tomorrow - same day is not available for GoPropertyCare
+        now_local = timezone.localtime(timezone.now())
+        today = now_local.date()
+        # Same-day booking is available if requested before 12:00 PM local time
+        start_day = 0 if now_local.hour < 12 else 1
         dates = []
-        for i in range(1, 61):
+        for i in range(start_day, 61):
             date = today + timedelta(days=i)
             dates.append({
                 'date': date.isoformat(),
                 'available': True,
+                'is_today': (i == 0),
             })
 
         return Response(dates)

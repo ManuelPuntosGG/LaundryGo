@@ -12,7 +12,7 @@ Este repositorio aloja una arquitectura desacoplada y multi-tenant que sirve a *
    - **Modelo de Negocio**: Lavado de ropa a domicilio cobrado por libra ($2.25, $2.45, $3.85/lb) con opciones de entrega en 2 días (*Standard*), día siguiente (*Go*) o mismo día express (*GoFurther* antes de las 12:00 PM). Permite pedidos puntuales o suscripciones recurrentes con 7.5% de descuento (*Daily*, *Weekly*, *Biweekly*, *Monthly*). Orden mínima de $40.00.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en azules y grises slate). Puerto local `5173`.
 2. **GoPropertyCare (`gopropertycare.com`)**:
-   - **Modelo de Negocio**: Servicios profesionales de limpieza y ordenanza exclusivamente para domicilios residenciales particulares (Regular, Profunda, Move-In/Move-Out) cobrados por pie cuadrado (**\$/sq ft**), con un umbral de orden mínima de **\$99.00** y recargos por dificultad/cuidados especiales del hogar. **No realiza servicios de post-construcción ni comerciales**. Agendamiento con antelación (**sin disponibilidad para el mismo día**; citas habilitadas a partir de mañana). Incluye sección destacada de derivación cruzada a Evolving Solutions LLC para servicios de post-construcción, limpieza comercial y demolición selectiva.
+   - **Modelo de Negocio**: Soluciones integrales de limpieza y mantenimiento residencial y comercial para propietarios, profesionales del sector inmobiliario y administradores de propiedades en el área metropolitana de Denver y Boulder. Ofrece 5 servicios especializados cobrados por pie cuadrado (**\$/sq ft**) con orden mínima de **\$99.00**: *Move-In / Move-Out Cleaning* ($0.20/sqft), *Residential Cleaning* ($0.12/sqft), *Commercial Cleaning* ($0.18/sqft), *Post-Construction Cleaning* ($0.26/sqft) y *Short-Term Rentals Turnover (Airbnb / VRBO)* ($0.15/sqft). Cuenta con personal profesional 100% asegurado (Insured), listas de control rigurosas y equipos puntuales. Agendamiento con antelación (**sin disponibilidad para el mismo día**; citas habilitadas a partir de mañana). Operación totalmente independiente y desligada de derivaciones externas.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en blanco y verdes bosque/esmeralda). Puerto local `5174`.
 3. **Evolving Solutions LLC (`evolvingsolutionsllc.com`)**:
    - **Modelo de Negocio**: Socio confiable en Denver para limpieza comercial de corporativos y locales, limpieza post-construcción y fin de obra (gruesa, fina y entrega) y cuadrillas de mano de obra para demolición selectiva de drywall/tablaroca. Tarifas por pie cuadrado (**$0.18/sqft** comercial, **$0.26/sqft** post-obra, **$0.35/sqft** demolición de drywall) con umbral mínimo de visita de **\$99.00**. 100% de cumplimiento en seguros de responsabilidad civil (General Liability), compensación laboral (Workers' Comp) y estándares de seguridad OSHA. Incluye sección de derivación cruzada a GoPropertyCare para propietarios particulares que busquen limpieza residencial de casas y apartamentos.
@@ -117,12 +117,14 @@ LaundryGo/
 ### Módulo de Limpieza y Mano de Obra (`apps.cleaning`)
 - **Modelos**:
   1. `CleaningServiceRate`: Tarifas dinámicas por pie cuadrado (estandarizadas a 2 decimales) con asignación estricta de marca (`brand`):
-     - **GoPropertyCare (`brand='gopropertycare'`) — 100% Residencial**:
-       - `regular`: Limpieza Regular a **$0.10/sqft** (mantenimiento estándar del hogar).
-       - `deep`: Limpieza Profunda - GoFurther a **$0.16/sqft** (desincrustación profunda, zócalos, suciedad pesada).
-       - `move_in_out`: Limpieza Move-In / Move-Out a **$0.20/sqft** (entrega o recibimiento de viviendas y apartamentos).
-       *(Nota: GoPropertyCare NO ofrece servicio de post-construcción ni comercial).*
-     - **Evolving Solutions LLC (`brand='evolvingsolutions'`) — Comercial & Post-Construcción**:
+     - **GoPropertyCare (`brand='gopropertycare'`) — Soluciones Integrales Residenciales y Comerciales**:
+       - `move_in_out`: Move-In / Move-Out Cleaning a **$0.20/sqft** (inspecciones, devoluciones de depósito y venta).
+       - `residential`: Residential Cleaning a **$0.12/sqft** (mantenimiento estándar regular o profundo).
+       - `commercial`: Commercial Cleaning a **$0.18/sqft** (oficinas, locales e instalaciones comerciales).
+       - `post_construction`: Post-Construction Cleaning a **$0.26/sqft** (polvo de yeso, escombros y fin de obra).
+       - `short_term_rental`: Short-Term Rentals Turnover (Airbnb / VRBO) a **$0.15/sqft** (ropa de cama, insumos y 5 estrellas).
+       - Campo `min_order_amount`: Umbral mínimo de **$99.00**.
+     - **Evolving Solutions LLC (`brand='evolvingsolutions'`) — Comercial & Demolición**:
        - `commercial`: Limpieza Comercial / Janitorial a **$0.18/sqft** (oficinas, locales, bodegas y corporativos).
        - `post_construction`: Limpieza Post-Construcción a **$0.26/sqft** (aspirado industrial HEPA, yeso, pintura, entrega de obra).
        - `industrial_demolition`: Demolición de Drywall y Mano de Obra Industrial a **$0.35/sqft** (demolición selectiva, ensacado y retiro de escombros).
@@ -135,11 +137,9 @@ LaundryGo/
      - Prefijo de visualización dinámico: `GPC-#{id}` para GoPropertyCare y `ESL-#{id}` para Evolving Solutions LLC.
      - `square_feet`, `service_rate`, `selected_addons` (JSON), `service_date`, `time_slot` (`morning` 8AM-12PM / `afternoon` 1PM-5PM), dirección en Denver/Boulder, zona (`inner` $0 / `outer` $25), `base_price` ($\max(\text{sqft} \times \text{rate}, \$99)$), `addons_total`, `delivery_fee`, `total_price`, `special_instructions`, `status` e idioma `language` (`'en'` o `'es'`).
 
-- **Reglas de Agendamiento y Validación Cruzada de Marcas**:
+- **Reglas de Agendamiento y Validación**:
   - **Sin mismo día**: `service_date` debe ser estrictamente mañana o posterior (+1 día en adelante).
-  - **Segregación Estricta de Órdenes en Backend**:
-    - Si se intenta reservar un servicio de post-construcción o comercial con `brand='gopropertycare'`, el serializador lanza error 400 y deriva a Evolving Solutions LLC.
-    - Si se intenta reservar un servicio residencial con `brand='evolvingsolutions'`, el serializador lanza error 400 y deriva a GoPropertyCare.
+  - **Validación de Pertenencia de Marca**: El serializador valida que la tarifa seleccionada pertenezca a la marca correspondiente de la orden (`gopropertycare` o `evolvingsolutions`), garantizando total autonomía entre plataformas.
 
 - **Emails Transaccionales Bilingües (`apps.cleaning.emails`)**:
   - Detectan automáticamente el campo `order.brand`.

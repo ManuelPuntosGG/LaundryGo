@@ -6,7 +6,8 @@ import {
   Leaf,
   CheckCircle2,
   Phone,
-  FileCheck,
+  Clock,
+  CheckSquare,
   HeartHandshake,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
@@ -70,7 +71,7 @@ export function About() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="p-6 space-y-3 hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 transition-all duration-300 group">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-100 transition-all duration-300">
-              <Leaf className="w-5 h-5" />
+              <Clock className="w-5 h-5" />
             </div>
             <h3 className="font-extrabold text-slate-900 text-base group-hover:text-emerald-950 transition-colors">{t('about.values.ecoTitle')}</h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">{t('about.values.ecoDesc')}</p>
@@ -78,7 +79,7 @@ export function About() {
 
           <Card className="p-6 space-y-3 hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 transition-all duration-300 group">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-100 transition-all duration-300">
-              <ShieldCheck className="w-5 h-5" />
+              <CheckSquare className="w-5 h-5" />
             </div>
             <h3 className="font-extrabold text-slate-900 text-base group-hover:text-emerald-950 transition-colors">{t('about.values.vettedTitle')}</h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">{t('about.values.vettedDesc')}</p>
@@ -86,7 +87,7 @@ export function About() {
 
           <Card className="p-6 space-y-3 hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 transition-all duration-300 group">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-100 transition-all duration-300">
-              <FileCheck className="w-5 h-5" />
+              <ShieldCheck className="w-5 h-5" />
             </div>
             <h3 className="font-extrabold text-slate-900 text-base group-hover:text-emerald-950 transition-colors">{t('about.values.standardTitle')}</h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">{t('about.values.standardDesc')}</p>

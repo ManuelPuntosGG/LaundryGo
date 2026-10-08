@@ -13,10 +13,14 @@ import {
   Calendar,
   Layers,
   Award,
-  Zap,
   Clock,
   Check,
   Building2,
+  KeyRound,
+  HardHat,
+  Star,
+  FileCheck2,
+  CheckSquare,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -36,9 +40,7 @@ export function Home() {
         const response = await api.get('/cleaning/rates/?brand=gopropertycare');
         const list = Array.isArray(response.data) ? response.data : response.data?.results || [];
         if (list.length > 0) {
-          const residentialTypes = ['regular', 'deep', 'move_in_out'];
-          const filtered = list.filter((r: CleaningServiceRate) => residentialTypes.includes(r.service_type));
-          setRates(filtered.length > 0 ? filtered : list);
+          setRates(list);
         }
       } catch (err) {
         console.warn('Using fallback cleaning rates:', err);
@@ -48,10 +50,31 @@ export function Home() {
   }, []);
 
   const calculateTierPrice = (ratePerSqft: string | number, minAmount: string | number = 99) => {
-    const rate = Number(ratePerSqft) || 0.1;
+    const rate = Number(ratePerSqft) || 0.12;
     const min = Number(minAmount) || 99;
     const raw = sqft * rate;
     return Math.max(raw, min);
+  };
+
+  const getServiceIcon = (serviceType: string) => {
+    switch (serviceType) {
+      case 'move_in_out':
+        return KeyRound;
+      case 'residential':
+      case 'regular':
+      case 'deep':
+        return HomeIcon;
+      case 'commercial':
+        return Building2;
+      case 'post_construction':
+        return HardHat;
+      case 'short_term_rental':
+      case 'str_on_site':
+      case 'str_off_site':
+        return Star;
+      default:
+        return Sparkles;
+    }
   };
 
   const steps = [
@@ -69,7 +92,7 @@ export function Home() {
     },
     {
       step: '03',
-      icon: Sparkles,
+      icon: FileCheck2,
       title: t('home.howItWorks.step3.title'),
       desc: t('home.howItWorks.step3.description'),
     },
@@ -84,9 +107,9 @@ export function Home() {
   return (
     <div className="flex flex-col gap-16 sm:gap-24 py-4 sm:py-6">
       {/* Hero Section */}
-      <section className="relative pt-6 sm:pt-12 pb-8 sm:pb-12 text-center flex flex-col items-center">
-        {/* Location Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs sm:text-sm font-bold mb-6 shadow-2xs animate-fade-in-down">
+      <section className="relative pt-6 sm:pt-12 pb-6 sm:pb-10 text-center flex flex-col items-center">
+        {/* Contact & Location Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs sm:text-sm font-bold mb-6 shadow-2xs animate-fade-in-down">
           <MapPin className="w-3.5 h-3.5 text-emerald-600 animate-float" />
           <span>{t('home.badge')}</span>
         </div>
@@ -95,7 +118,7 @@ export function Home() {
           {t('home.hero.title')}
         </h1>
 
-        <p className="text-base sm:text-lg lg:text-xl text-slate-600 max-w-2xl leading-relaxed mb-8 sm:mb-10 font-medium animate-fade-in-up delay-75">
+        <p className="text-base sm:text-lg lg:text-xl text-slate-600 max-w-3xl leading-relaxed mb-8 sm:mb-10 font-medium animate-fade-in-up delay-75">
           {t('home.hero.subtitle')}
         </p>
 
@@ -124,37 +147,132 @@ export function Home() {
 
         {/* Social Proof Pills */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-12 w-full max-w-4xl text-left animate-fade-in-up delay-200">
-          <div className="bg-white/80 border border-emerald-100/90 rounded-xl p-3.5 shadow-2xs flex items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-xs hover:border-emerald-300 transition-all duration-300">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0">
-              <Award className="w-4 h-4" />
+          <div className="bg-white/90 border border-emerald-100 rounded-xl p-3.5 shadow-2xs flex items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-xs hover:border-emerald-300 transition-all duration-300">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <Clock className="w-4 h-4" />
             </div>
             <span className="text-xs font-bold text-slate-800">{t('home.socialProof.rating')}</span>
           </div>
 
-          <div className="bg-white/80 border border-emerald-100/90 rounded-xl p-3.5 shadow-2xs flex items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-xs hover:border-emerald-300 transition-all duration-300">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0">
-              <HomeIcon className="w-4 h-4" />
+          <div className="bg-white/90 border border-emerald-100 rounded-xl p-3.5 shadow-2xs flex items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-xs hover:border-emerald-300 transition-all duration-300">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <CheckSquare className="w-4 h-4" />
             </div>
             <span className="text-xs font-bold text-slate-800">{t('home.socialProof.properties')}</span>
           </div>
 
-          <div className="bg-white/80 border border-emerald-100/90 rounded-xl p-3.5 shadow-2xs flex items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-xs hover:border-emerald-300 transition-all duration-300">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0">
-              <Zap className="w-4 h-4" />
+          <div className="bg-white/90 border border-emerald-100 rounded-xl p-3.5 shadow-2xs flex items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-xs hover:border-emerald-300 transition-all duration-300">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4 h-4" />
             </div>
             <span className="text-xs font-bold text-slate-800">{t('home.socialProof.instant')}</span>
           </div>
 
-          <div className="bg-white/80 border border-emerald-100/90 rounded-xl p-3.5 shadow-2xs flex items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-xs hover:border-emerald-300 transition-all duration-300">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-4 h-4" />
+          <div className="bg-white/90 border border-emerald-100 rounded-xl p-3.5 shadow-2xs flex items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-xs hover:border-emerald-300 transition-all duration-300">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <Award className="w-4 h-4" />
             </div>
             <span className="text-xs font-bold text-slate-800">{t('home.socialProof.bonded')}</span>
           </div>
         </div>
       </section>
 
-      {/* Interactive Sq Ft Estimator */}
+      {/* Official Company Presentation Card (Directly from Document) */}
+      <section className="max-w-4xl mx-auto w-full">
+        <Card className="border-2 border-emerald-300/80 bg-linear-to-br from-emerald-50/50 via-white to-emerald-50/20 p-7 sm:p-10 shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-200/30 rounded-bl-full pointer-events-none" />
+
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-800 text-white text-xs font-extrabold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{t('home.letter.badge')}</span>
+            </div>
+
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+              {t('home.letter.salutation')}
+            </h3>
+
+            <p className="text-slate-700 text-sm sm:text-base leading-relaxed font-medium">
+              {t('home.letter.body')}
+            </p>
+
+            <div className="pt-4 border-t border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <p className="text-xs sm:text-sm text-slate-600 italic">
+                {t('home.letter.closing')}
+              </p>
+              <div className="shrink-0 text-right sm:text-right">
+                <span className="text-xs font-black text-emerald-900 block">
+                  {t('home.letter.signature')}
+                </span>
+                <span className="text-[11px] text-slate-500 font-semibold">
+                  Denver, Colorado • (720) 590-8632
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      {/* Why Choose GoPropertyCare? (The 3 Official Pillars) */}
+      <section className="space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+            {t('home.pillars.title')}
+          </h2>
+          <p className="text-slate-600 text-sm sm:text-base font-medium">
+            {t('home.pillars.subtitle')}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {/* Pillar 1 */}
+          <Card className="p-7 border-emerald-200/80 bg-white hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-start gap-4 group">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+              <Clock className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-slate-900 group-hover:text-emerald-950 transition-colors mb-2">
+                {t('home.pillars.reliableTitle')}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                {t('home.pillars.reliableDesc')}
+              </p>
+            </div>
+          </Card>
+
+          {/* Pillar 2 */}
+          <Card className="p-7 border-emerald-200/80 bg-white hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-start gap-4 group">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+              <CheckSquare className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-slate-900 group-hover:text-emerald-950 transition-colors mb-2">
+                {t('home.pillars.detailTitle')}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                {t('home.pillars.detailDesc')}
+              </p>
+            </div>
+          </Card>
+
+          {/* Pillar 3 */}
+          <Card className="p-7 border-emerald-200/80 bg-white hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col items-start gap-4 group">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-slate-900 group-hover:text-emerald-950 transition-colors mb-2">
+                {t('home.pillars.trustedTitle')}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                {t('home.pillars.trustedDesc')}
+              </p>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* Interactive Sq Ft Estimator Across the 5 Services */}
       <section id="estimator" className="scroll-mt-24">
         <Card className="border-emerald-200/80 bg-linear-to-b from-white via-white to-emerald-50/30 p-6 sm:p-10 shadow-lg">
           <div className="max-w-3xl mx-auto text-center space-y-3 mb-8">
@@ -178,7 +296,7 @@ export function Home() {
               }`}
             >
               <div className="text-xs font-black text-slate-900">{t('home.estimator.small')}</div>
-              <div className="text-xs text-slate-600 font-medium mt-0.5">{t('home.estimator.smallDesc')}</div>
+              <div className="text-[11px] text-slate-500 font-medium">{t('home.estimator.smallDesc')}</div>
             </button>
 
             <button
@@ -191,7 +309,7 @@ export function Home() {
               }`}
             >
               <div className="text-xs font-black text-slate-900">{t('home.estimator.medium')}</div>
-              <div className="text-xs text-slate-600 font-medium mt-0.5">{t('home.estimator.mediumDesc')}</div>
+              <div className="text-[11px] text-slate-500 font-medium">{t('home.estimator.mediumDesc')}</div>
             </button>
 
             <button
@@ -204,34 +322,34 @@ export function Home() {
               }`}
             >
               <div className="text-xs font-black text-slate-900">{t('home.estimator.large')}</div>
-              <div className="text-xs text-slate-600 font-medium mt-0.5">{t('home.estimator.largeDesc')}</div>
+              <div className="text-[11px] text-slate-500 font-medium">{t('home.estimator.largeDesc')}</div>
             </button>
           </div>
 
-          {/* Slider & Input Controls */}
-          <div className="max-w-xl mx-auto space-y-4 mb-10">
+          {/* Slider & Number Control */}
+          <div className="max-w-2xl mx-auto space-y-4 mb-10">
             <div className="flex items-center justify-between">
-              <label htmlFor="sqft-slider" className="text-sm font-extrabold text-slate-800">
+              <label htmlFor="sqft-range-input" className="text-sm font-extrabold text-slate-800">
                 {t('home.estimator.sqftLabel')}:
               </label>
-              <div className="flex items-center gap-1.5 bg-white border border-slate-300 rounded-xl px-3.5 py-1.5 text-slate-900 font-extrabold text-sm shadow-2xs">
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-1.5 shadow-2xs">
                 <input
                   id="sqft-number-input"
-                  aria-label={t('home.estimator.sqftLabel')}
                   type="number"
                   min={100}
                   max={8000}
                   step={50}
                   value={sqft}
                   onChange={(e) => setSqft(Math.max(100, Number(e.target.value) || 100))}
-                  className="w-20 text-right focus:outline-none text-emerald-700 font-black text-base"
+                  className="w-20 text-right font-black text-emerald-700 text-lg focus:outline-none"
+                  aria-label={t('home.estimator.sqftLabel')}
                 />
-                <span className="text-slate-600 font-bold text-xs">sq ft</span>
+                <span className="text-slate-500 text-xs font-bold">{t('home.estimator.sqftUnit')}</span>
               </div>
             </div>
 
             <input
-              id="sqft-slider"
+              id="sqft-range-input"
               type="range"
               min={300}
               max={5000}
@@ -239,12 +357,12 @@ export function Home() {
               value={sqft}
               onChange={(e) => setSqft(Number(e.target.value))}
               className="w-full accent-emerald-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-              aria-label="Square footage slider"
+              aria-label={t('home.estimator.sqftLabel')}
             />
 
-            <div className="flex justify-between text-xs text-slate-600 font-semibold">
+            <div className="flex justify-between text-xs text-slate-500 font-semibold">
               <span>300 sq ft</span>
-              <span>2,500 sq ft</span>
+              <span>1,800 sq ft</span>
               <span>5,000+ sq ft</span>
             </div>
 
@@ -253,46 +371,46 @@ export function Home() {
             </p>
           </div>
 
-          {/* Results Grid Across 4 Tiers */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Results Grid Across the 5 Specialized Services */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {rates.map((rate) => {
               const price = calculateTierPrice(rate.rate_per_sqft, rate.min_order_amount);
               const isMinimum = sqft * Number(rate.rate_per_sqft) < Number(rate.min_order_amount);
               const localizedName = t(`home.pricing.${rate.service_type}.name`, { defaultValue: rate.name });
               const localizedDesc = t(`home.pricing.${rate.service_type}.description`, { defaultValue: rate.description });
+              const Icon = getServiceIcon(rate.service_type);
 
               return (
                 <div
                   key={rate.id}
-                  className="bg-white border-2 border-slate-200/90 rounded-2xl p-5 flex flex-col justify-between hover:border-emerald-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+                  className="bg-white border-2 border-slate-200/90 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:border-emerald-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-black uppercase tracking-wider text-emerald-700 bg-emerald-50/80 px-2 py-0.5 rounded-md">
-                        ${Number(rate.rate_per_sqft).toFixed(2)}/sqft
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">
+                        ${rate.rate_per_sqft}/sqft
                       </span>
-                      {rate.service_type === 'deep' && (
-                        <span className="text-[11px] bg-emerald-600 text-white px-2.5 py-0.5 rounded-full font-extrabold shadow-2xs animate-pulse-glow">
-                          Popular
-                        </span>
-                      )}
                     </div>
-                    <h3 className="font-black text-slate-900 text-base leading-snug group-hover:text-emerald-950 transition-colors">
+
+                    <h3 className="font-black text-slate-900 text-sm leading-snug group-hover:text-emerald-950 transition-colors">
                       {localizedName}
                     </h3>
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2">
+                    <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-3">
                       {localizedDesc}
                     </p>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-slate-100">
-                    <div className="text-xs text-slate-600 font-semibold">{t('home.estimator.estTotal')}</div>
+                  <div className="pt-3 mt-4 border-t border-slate-100">
+                    <div className="text-[11px] text-slate-500 font-semibold">{t('home.estimator.estTotal')}</div>
                     <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-2xl font-black text-slate-900">
+                      <span className="text-xl font-black text-slate-900">
                         ${price.toFixed(2)}
                       </span>
                       {isMinimum && (
-                        <span className="text-xs text-amber-700 font-bold ml-1">(min $99)</span>
+                        <span className="text-[10px] text-amber-700 font-bold ml-1">(min $99)</span>
                       )}
                     </div>
 
@@ -310,6 +428,75 @@ export function Home() {
             })}
           </div>
         </Card>
+      </section>
+
+      {/* Services Detailed Cards Grid (5 Specialized Services) */}
+      <section className="space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+            {t('home.pricing.title')}
+          </h2>
+          <p className="text-slate-600 text-sm sm:text-base font-medium">
+            {t('home.pricing.subtitle')}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {rates.map((rate) => {
+            const Icon = getServiceIcon(rate.service_type);
+            const localizedName = t(`home.pricing.${rate.service_type}.name`, { defaultValue: rate.name });
+            const localizedTagline = t(`home.pricing.${rate.service_type}.tagline`, { defaultValue: 'Servicio Especializado' });
+            const localizedRate = t(`home.pricing.${rate.service_type}.rate`, { defaultValue: `$${rate.rate_per_sqft} / sq ft` });
+            const localizedDesc = t(`home.pricing.${rate.service_type}.description`, { defaultValue: rate.description });
+            const features = (t(`home.pricing.${rate.service_type}.features`, { returnObjects: true }) as string[]) || [];
+
+            return (
+              <Card
+                key={rate.id}
+                className="flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 group border-slate-200 hover:border-emerald-400 p-6"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md">
+                      {localizedTagline}
+                    </span>
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-950 transition-colors">
+                    {localizedName}
+                  </h3>
+
+                  <div className="text-2xl font-black text-emerald-700">{localizedRate}</div>
+
+                  <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                    {localizedDesc}
+                  </p>
+
+                  {Array.isArray(features) && features.length > 0 && (
+                    <ul className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700 font-medium">
+                      {features.map((f, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <Button
+                  className="w-full mt-6 font-extrabold shadow-sm hover:shadow-md hover:scale-102 active:scale-98 transition-all duration-200"
+                  onClick={() => navigate(`/schedule?tier=${rate.service_type}`)}
+                >
+                  {t('home.pricing.bookNow')}
+                </Button>
+              </Card>
+            );
+          })}
+        </div>
       </section>
 
       {/* How It Works */}
@@ -339,130 +526,6 @@ export function Home() {
               </Card>
             );
           })}
-        </div>
-      </section>
-
-      {/* Services Comparison Grid */}
-      <section className="space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-            {t('home.pricing.title')}
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base font-medium">
-            {t('home.pricing.subtitle')}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {/* Regular */}
-          <Card className="flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-lg transition-all duration-300 group">
-            <div className="space-y-4">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md">
-                {t('home.pricing.regular.tagline')}
-              </span>
-              <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-950 transition-colors">{t('home.pricing.regular.name')}</h3>
-              <div className="text-2xl font-black text-slate-900">{t('home.pricing.regular.rate')}</div>
-              <p className="text-xs text-slate-600 font-medium leading-relaxed">{t('home.pricing.regular.description')}</p>
-              <ul className="space-y-2 pt-2 border-t border-slate-100 text-xs text-slate-700 font-medium">
-                {((t('home.pricing.regular.features', { returnObjects: true }) as string[]) || []).map((f, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Button
-              className="w-full mt-6 text-slate-800 font-bold border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/50 hover:scale-102 active:scale-98 transition-all duration-200"
-              variant="outline"
-              onClick={() => navigate('/schedule?tier=regular')}
-            >
-              {t('home.pricing.bookNow')}
-            </Button>
-          </Card>
-
-          {/* Deep Clean */}
-          <Card variant="featured" className="flex flex-col justify-between relative hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 group ring-2 ring-emerald-600/30">
-            <div className="space-y-4">
-              <span className="text-xs font-black uppercase tracking-wider text-white bg-emerald-700 px-2.5 py-1 rounded-md shadow-2xs">
-                {t('home.pricing.deep.tagline')}
-              </span>
-              <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-950 transition-colors">{t('home.pricing.deep.name')}</h3>
-              <div className="text-2xl font-black text-emerald-700">{t('home.pricing.deep.rate')}</div>
-              <p className="text-xs text-slate-600 font-medium leading-relaxed">{t('home.pricing.deep.description')}</p>
-              <ul className="space-y-2 pt-2 border-t border-slate-100 text-xs text-slate-700 font-medium">
-                {((t('home.pricing.deep.features', { returnObjects: true }) as string[]) || []).map((f, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Button
-              className="w-full mt-6 font-extrabold shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200"
-              onClick={() => navigate('/schedule?tier=deep')}
-            >
-              {t('home.pricing.bookNow')}
-            </Button>
-          </Card>
-
-          {/* Move-In / Move-Out */}
-          <Card className="flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-lg transition-all duration-300 group">
-            <div className="space-y-4">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md">
-                {t('home.pricing.moveInOut.tagline')}
-              </span>
-              <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-950 transition-colors">{t('home.pricing.moveInOut.name')}</h3>
-              <div className="text-2xl font-black text-slate-900">{t('home.pricing.moveInOut.rate')}</div>
-              <p className="text-xs text-slate-600 font-medium leading-relaxed">{t('home.pricing.moveInOut.description')}</p>
-              <ul className="space-y-2 pt-2 border-t border-slate-100 text-xs text-slate-700 font-medium">
-                {((t('home.pricing.moveInOut.features', { returnObjects: true }) as string[]) || []).map((f, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Button
-              className="w-full mt-6 text-slate-800 font-bold border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/50 hover:scale-102 active:scale-98 transition-all duration-200"
-              variant="outline"
-              onClick={() => navigate('/schedule?tier=move_in_out')}
-            >
-              {t('home.pricing.bookNow')}
-            </Button>
-          </Card>
-        </div>
-      </section>
-
-      {/* Commercial & Construction Division Referral to Evolving Solutions LLC */}
-      <section>
-        <div className="bg-gradient-to-br from-[#2f1b11] via-[#573725] to-[#815133] text-white rounded-3xl p-8 sm:p-10 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-[#a3704c]/30">
-          <div className="space-y-3 text-center md:text-left max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[#eedecd] text-xs font-bold uppercase tracking-wider">
-              <Building2 className="w-3.5 h-3.5 text-[#e0c3a7]" />
-              <span>{t('home.commercialReferral.badge')}</span>
-            </div>
-            <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              {t('home.commercialReferral.title')}
-            </h3>
-            <p className="text-stone-200 text-sm sm:text-base leading-relaxed font-medium">
-              {t('home.commercialReferral.description')}
-            </p>
-          </div>
-
-          <div className="shrink-0 w-full md:w-auto">
-            <a
-              href="https://evolvingsolutionsllc.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 w-full md:w-auto px-6 py-3.5 rounded-xl bg-white text-[#573725] hover:bg-[#fdfaf6] font-black text-sm shadow-lg hover:shadow-xl hover:scale-102 active:scale-98 transition-all"
-            >
-              <span>{t('home.commercialReferral.cta')}</span>
-              <ArrowRight className="w-4 h-4 text-[#815133]" />
-            </a>
-          </div>
         </div>
       </section>
 

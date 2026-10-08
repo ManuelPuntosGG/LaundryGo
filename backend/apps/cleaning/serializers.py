@@ -1,12 +1,12 @@
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime, timedelta
 from rest_framework import serializers
 from django.utils import timezone
 from .models import CleaningServiceRate, CleaningAddon, CleaningOrder
 
 
 class CleaningServiceRateSerializer(serializers.ModelSerializer):
-    rate_per_sqft = serializers.DecimalField(max_digits=6, decimal_places=2, coerce_to_string=True)
+    rate_per_sqft = serializers.DecimalField(max_digits=7, decimal_places=3, coerce_to_string=True)
     min_order_amount = serializers.DecimalField(max_digits=6, decimal_places=2, coerce_to_string=True)
 
     class Meta:
@@ -68,6 +68,11 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
             'service_rate',
             'service_rate_id',
             'square_feet',
+            'bedrooms',
+            'bathrooms',
+            'is_occupied',
+            'entry_method',
+            'entry_notes',
             'selected_addons',
             'service_date',
             'time_slot',
@@ -115,6 +120,11 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
             'delivery_fee',
             'service_rate_id',
             'square_feet',
+            'bedrooms',
+            'bathrooms',
+            'is_occupied',
+            'entry_method',
+            'entry_notes',
             'selected_addons',
             'service_date',
             'time_slot',
@@ -137,10 +147,13 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         )
 
     def validate_service_date(self, value):
-        today = timezone.localtime(timezone.now()).date()
-        if value <= today:
+        now_local = timezone.localtime(timezone.now())
+        today = now_local.date()
+        if value < today:
+            raise serializers.ValidationError("Service date cannot be in the past.")
+        if value == today and now_local.hour >= 12:
             raise serializers.ValidationError(
-                "Same-day bookings are not available. Please choose tomorrow or a future date."
+                "Same-day bookings are only available before 12:00 PM. Please choose tomorrow or a future date."
             )
         return value
 
@@ -165,20 +178,40 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         service_rate = data.get('service_rate')
 
         if service_rate:
-            if brand == 'gopropertycare' and service_rate.service_type not in CleaningServiceRate.RESIDENTIAL_SERVICES:
+            if brand == 'gopropertycare' and service_rate.brand != 'gopropertycare':
                 raise serializers.ValidationError({
-                    'service_rate_id': (
-                        'GoPropertyCare provides strictly residential cleaning (Regular, Deep, Move-In/Move-Out). '
-                        'Post-construction cleanup and commercial services are provided exclusively by Evolving Solutions LLC.'
-                    )
+                    'service_rate_id': 'Selected service rate does not belong to GoPropertyCare.'
                 })
-            elif brand == 'evolvingsolutions' and service_rate.service_type not in CleaningServiceRate.COMMERCIAL_SERVICES:
+            elif brand == 'evolvingsolutions' and service_rate.brand != 'evolvingsolutions':
                 raise serializers.ValidationError({
-                    'service_rate_id': (
-                        'Evolving Solutions LLC is dedicated exclusively to commercial facilities, post-construction projects, '
-                        'and demolition labor. For residential home cleaning, please book through GoPropertyCare.'
-                    )
+                    'service_rate_id': 'Selected service rate does not belong to Evolving Solutions LLC.'
                 })
+
+        # Same-day minimum 3-hour notice check
+        service_date = data.get('service_date')
+        time_slot = data.get('time_slot')
+        now_local = timezone.localtime(timezone.now())
+        today = now_local.date()
+
+        if service_date == today and time_slot:
+            parsed_time = None
+            clean_ts = str(time_slot).strip().upper()
+            for fmt in ('%I:%M %p', '%I:%M%p', '%H:%M', '%I %p', '%I%p'):
+                try:
+                    parsed_time = datetime.strptime(clean_ts, fmt).time()
+                    break
+                except ValueError:
+                    continue
+
+            if parsed_time:
+                tz = timezone.get_current_timezone()
+                target_dt = timezone.make_aware(datetime.combine(today, parsed_time), tz)
+                min_notice_dt = now_local + timedelta(hours=3)
+                if target_dt < min_notice_dt:
+                    min_str = min_notice_dt.strftime('%I:%M %p')
+                    raise serializers.ValidationError({
+                        'time_slot': f"For same-day service, arrival time must be at least 3 hours from now (earliest: {min_str})."
+                    })
 
         return data
 

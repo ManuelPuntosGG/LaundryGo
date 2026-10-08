@@ -11,6 +11,14 @@ import {
   AlertCircle,
   Home,
   Check,
+  Bed,
+  Bath,
+  Key,
+  KeyRound,
+  DoorOpen,
+  Lock,
+  UserCheck,
+  Calendar as CalendarIcon,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -24,6 +32,36 @@ import { DENVER_LOCATIONS } from '@/constants/locations';
 
 type Step = 1 | 2 | 3 | 4;
 
+const TIME_SLOTS = [
+  '08:00 AM',
+  '08:30 AM',
+  '09:00 AM',
+  '09:30 AM',
+  '10:00 AM',
+  '10:30 AM',
+  '11:00 AM',
+  '11:30 AM',
+  '12:00 PM',
+  '12:30 PM',
+  '01:00 PM',
+  '01:30 PM',
+  '02:00 PM',
+  '02:30 PM',
+  '03:00 PM',
+  '03:30 PM',
+  '04:00 PM',
+  '04:30 PM',
+  '05:00 PM',
+];
+
+const getTodayDateStr = (): string => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const getTomorrowDateStr = (): string => {
   const d = new Date();
   d.setDate(d.getDate() + 1);
@@ -33,10 +71,34 @@ const getTomorrowDateStr = (): string => {
   return `${year}-${month}-${day}`;
 };
 
-const getFallbackTomorrowDates = (count = 60): CleaningAvailableDate[] => {
+const isSameDayAllowed = (): boolean => {
+  const now = new Date();
+  return now.getHours() < 12;
+};
+
+const isTimeSlotValidForToday = (timeStr: string): boolean => {
+  const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return true;
+  let hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  const meridiem = match[3].toUpperCase();
+  if (meridiem === 'PM' && hours < 12) hours += 12;
+  if (meridiem === 'AM' && hours === 12) hours = 0;
+
+  const slotDate = new Date();
+  slotDate.setHours(hours, minutes, 0, 0);
+
+  const minDate = new Date();
+  minDate.setHours(minDate.getHours() + 3);
+
+  return slotDate >= minDate;
+};
+
+const getFallbackDates = (count = 60): CleaningAvailableDate[] => {
   const list: CleaningAvailableDate[] = [];
   const today = new Date();
-  for (let i = 1; i <= count; i++) {
+  const startOffset = isSameDayAllowed() ? 0 : 1;
+  for (let i = startOffset; i <= count; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     const y = d.getFullYear();
@@ -45,6 +107,7 @@ const getFallbackTomorrowDates = (count = 60): CleaningAvailableDate[] => {
     list.push({
       date: `${y}-${m}-${day}`,
       available: true,
+      is_today: i === 0,
     });
   }
   return list;
@@ -59,9 +122,9 @@ export function Schedule() {
   const [step, setStep] = useState<Step>(1);
   const [rates, setRates] = useState<CleaningServiceRate[]>(DEFAULT_CLEANING_RATES);
   const [addons, setAddons] = useState<CleaningAddon[]>(PROPERTY_ADDONS);
-  const [availableDates, setAvailableDates] = useState<CleaningAvailableDate[]>(() => getFallbackTomorrowDates(60));
+  const [availableDates, setAvailableDates] = useState<CleaningAvailableDate[]>(() => getFallbackDates(60));
 
-  // Step 1: Size & Tier
+  // Step 1: Size, Service & Inquiry Details
   const [sqft, setSqft] = useState<number>(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const sqftParam = searchParams.get('sqft');
@@ -72,37 +135,52 @@ export function Schedule() {
     return 1200;
   });
 
-  const [postConstructionRequested] = useState<boolean>(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    return searchParams.get('tier') === 'post_construction';
-  });
-
   const [selectedRateId, setSelectedRateId] = useState<number>(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const tierParam = searchParams.get('tier');
-    if (tierParam && tierParam !== 'post_construction') {
+    if (tierParam) {
       const match = DEFAULT_CLEANING_RATES.find((r) => r.service_type === tierParam);
       if (match) return match.id;
     }
     return 1;
   });
 
-  // Step 2: Date & Window (strictly tomorrow onwards)
-  const [selectedDate, setSelectedDate] = useState<string>(() => getTomorrowDateStr());
+  const [bedrooms, setBedrooms] = useState<number>(2);
+  const [bathrooms, setBathrooms] = useState<number>(2);
+  const [isOccupied, setIsOccupied] = useState<boolean>(true);
+
+  // Step 2: Date & Arrival Time
+  const sameDayAvailable = isSameDayAllowed();
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    return sameDayAvailable ? getTodayDateStr() : getTomorrowDateStr();
+  });
+
   const [viewMonthDate, setViewMonthDate] = useState<Date>(() => {
     const d = new Date();
-    d.setDate(d.getDate() + 1);
+    if (!sameDayAvailable) {
+      d.setDate(d.getDate() + 1);
+    }
     return d;
   });
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<'morning' | 'afternoon'>('morning');
 
-  // Step 3: Location, Contact & Addons
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(() => {
+    if (sameDayAvailable) {
+      const firstValid = TIME_SLOTS.find((s) => isTimeSlotValidForToday(s));
+      return firstValid || '02:00 PM';
+    }
+    return '09:00 AM';
+  });
+
+  // Step 3: Location, Contact, Access & Priced Addons
   const [selectedLocation, setSelectedLocation] = useState(() => {
     if (user?.city) {
       return DENVER_LOCATIONS.find((l) => l.name === user.city) || DENVER_LOCATIONS[0];
     }
     return DENVER_LOCATIONS[0];
   });
+
+  const [entryMethod, setEntryMethod] = useState<string>('someone_home');
+  const [entryNotes, setEntryNotes] = useState<string>('');
   const [selectedAddonCodes, setSelectedAddonCodes] = useState<Record<string, boolean>>({});
   const [specialInstructions, setSpecialInstructions] = useState<string>('');
 
@@ -123,7 +201,7 @@ export function Schedule() {
   const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Pre-fill user data if user loads asynchronously after initial mount
+  // Pre-fill user data if auth loads asynchronously
   useEffect(() => {
     if (isAuthenticated && user) {
       queueMicrotask(() => {
@@ -148,6 +226,8 @@ export function Schedule() {
     }
   }, [isAuthenticated, user]);
 
+
+
   // Fetch rates, addons and available dates from backend API
   useEffect(() => {
     let isMounted = true;
@@ -166,20 +246,17 @@ export function Schedule() {
             ? ratesRes.data
             : (ratesRes.data as { results?: CleaningServiceRate[] })?.results || [];
           if (list.length > 0) {
-            const residentialTypes = ['regular', 'deep', 'move_in_out'];
-            const filtered = list.filter((r) => residentialTypes.includes(r.service_type));
-            const activeList = filtered.length > 0 ? filtered : list;
-            setRates(activeList);
+            setRates(list);
             const searchParams = new URLSearchParams(window.location.search);
             const tierParam = searchParams.get('tier');
-            if (tierParam && tierParam !== 'post_construction') {
-              const match = activeList.find((r) => r.service_type === tierParam);
+            if (tierParam) {
+              const match = list.find((r) => r.service_type === tierParam);
               if (match) {
                 setSelectedRateId(match.id);
                 return;
               }
             }
-            setSelectedRateId((prev) => (activeList.some((r) => r.id === prev) ? prev : activeList[0].id));
+            setSelectedRateId((prev) => (list.some((r) => r.id === prev) ? prev : list[0].id));
           }
         }
 
@@ -194,7 +271,10 @@ export function Schedule() {
 
         if (datesRes?.data && Array.isArray(datesRes.data) && datesRes.data.length > 0) {
           setAvailableDates(datesRes.data);
-          setSelectedDate(datesRes.data[0].date);
+          const firstAvailable = datesRes.data.find((d) => d.available);
+          if (firstAvailable) {
+            setSelectedDate(firstAvailable.date);
+          }
         }
       } catch (err) {
         console.warn('API data fetch fallback in Schedule:', err);
@@ -209,7 +289,7 @@ export function Schedule() {
   const activeRate = rates.find((r) => r.id === selectedRateId) || rates[0];
 
   // Pricing calculations
-  const rawBase = sqft * (Number(activeRate?.rate_per_sqft) || 0.1);
+  const rawBase = sqft * (Number(activeRate?.rate_per_sqft) || 0.125);
   const minAmount = Number(activeRate?.min_order_amount) || 99;
   const isMinApplied = rawBase < minAmount;
   const basePrice = Math.max(rawBase, minAmount);
@@ -259,19 +339,6 @@ export function Schedule() {
     return days;
   };
 
-  const handleDateSelect = (day: number) => {
-    const y = viewMonthDate.getFullYear();
-    const m = String(viewMonthDate.getMonth() + 1).padStart(2, '0');
-    const d = String(day).padStart(2, '0');
-    const dateStr = `${y}-${m}-${d}`;
-
-    const tomorrowStr = getTomorrowDateStr();
-    if (dateStr < tomorrowStr) {
-      return; // Can't select today or past
-    }
-    setSelectedDate(dateStr);
-  };
-
   const isDayAvailable = (day: number) => {
     const y = viewMonthDate.getFullYear();
     const m = String(viewMonthDate.getMonth() + 1).padStart(2, '0');
@@ -279,9 +346,34 @@ export function Schedule() {
     const dateStr = `${y}-${m}-${d}`;
     const match = availableDates.find((item) => item.date === dateStr);
     if (match) return match.available;
-    const tomorrowStr = getTomorrowDateStr();
-    return dateStr >= tomorrowStr;
+
+    const minDateStr = isSameDayAllowed() ? getTodayDateStr() : getTomorrowDateStr();
+    return dateStr >= minDateStr;
   };
+
+  const handleDateSelect = (day: number) => {
+    const y = viewMonthDate.getFullYear();
+    const m = String(viewMonthDate.getMonth() + 1).padStart(2, '0');
+    const d = String(day).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
+
+    const minDateStr = isSameDayAllowed() ? getTodayDateStr() : getTomorrowDateStr();
+    if (dateStr < minDateStr) {
+      return;
+    }
+    setSelectedDate(dateStr);
+
+    if (dateStr === getTodayDateStr()) {
+      if (!isTimeSlotValidForToday(selectedTimeSlot)) {
+        const firstValid = TIME_SLOTS.find((s) => isTimeSlotValidForToday(s));
+        if (firstValid) {
+          setSelectedTimeSlot(firstValid);
+        }
+      }
+    }
+  };
+
+  const isDateToday = selectedDate === getTodayDateStr();
 
   const handleSubmitBooking = async () => {
     if (!agreedToTerms) return;
@@ -309,6 +401,11 @@ export function Schedule() {
       delivery_zone: selectedLocation.zone,
       service_rate_id: activeRate.id,
       square_feet: sqft,
+      bedrooms: bedrooms,
+      bathrooms: bathrooms,
+      is_occupied: isOccupied,
+      entry_method: entryMethod,
+      entry_notes: entryNotes.trim(),
       selected_addons: selectedAddonsPayload,
       service_date: selectedDate,
       time_slot: selectedTimeSlot,
@@ -340,8 +437,8 @@ export function Schedule() {
   // Success Screen
   if (isSuccess && createdOrderId) {
     return (
-      <div className="max-w-2xl mx-auto py-8 sm:py-12 animate-fade-in-up">
-        <Card className="p-8 sm:p-12 text-center border-emerald-200/90 shadow-xl space-y-6">
+      <div className="max-w-2xl mx-auto py-8 sm:py-12 px-4 animate-fade-in-up">
+        <Card className="p-6 sm:p-10 text-center border-emerald-200/90 shadow-xl space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner animate-pop-in">
             <CheckCircle2 className="w-9 h-9 animate-float" />
           </div>
@@ -356,55 +453,52 @@ export function Schedule() {
           </div>
 
           {/* Details Card */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-5 text-left space-y-3 text-sm">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
-              <span className="text-slate-500 font-semibold">{t('schedule.orderNumber')}:</span>
-              <span className="font-extrabold text-emerald-800 text-base">GPC-#{createdOrderId}</span>
+          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 text-left text-xs sm:text-sm space-y-3">
+            <div className="flex justify-between pb-2 border-b border-slate-200">
+              <span className="text-slate-500 font-semibold">{t('schedule.orderNumber')}</span>
+              <span className="font-black text-emerald-800">GPC-#{createdOrderId}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500">{t('home.pricing.title')}:</span>
-              <span className="font-bold text-slate-900">{activeRate.name}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500">Square Footage:</span>
-              <span className="font-bold text-slate-900">{sqft} sq ft</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500">{t('schedule.step2')}:</span>
+            <div className="flex justify-between">
+              <span className="text-slate-500 font-semibold">{t('schedule.step1')}</span>
               <span className="font-bold text-slate-900">
-                {selectedDate} ({selectedTimeSlot === 'morning' ? '8AM - 12PM' : '1PM - 5PM'})
+                {t(`home.pricing.${activeRate.service_type}.name`, { defaultValue: activeRate.name })}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500">Address:</span>
-              <span className="font-bold text-slate-900">{formData.street_address}, {selectedLocation.name}</span>
+            <div className="flex justify-between">
+              <span className="text-slate-500 font-semibold">Dimensions</span>
+              <span className="font-bold text-slate-900">
+                {sqft} sq ft • {bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, {bathrooms} Baths
+              </span>
             </div>
-            <div className="flex justify-between items-center pt-3 border-t border-slate-200 text-base">
-              <span className="font-bold text-slate-900">{t('schedule.totalDue')}:</span>
-              <span className="font-black text-emerald-700 text-lg">${totalPrice.toFixed(2)}</span>
+            <div className="flex justify-between">
+              <span className="text-slate-500 font-semibold">Scheduled Visit</span>
+              <span className="font-bold text-slate-900">{selectedDate} @ {selectedTimeSlot}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500 font-semibold">Address</span>
+              <span className="font-bold text-slate-900 text-right">{formData.street_address}, {selectedLocation.name}</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t border-slate-200">
+              <span className="text-slate-900 font-extrabold text-sm sm:text-base">Total</span>
+              <span className="font-black text-emerald-700 text-base sm:text-lg">${totalPrice.toFixed(2)}</span>
             </div>
           </div>
 
-          <p className="text-xs text-slate-500 leading-relaxed">
-            A detailed confirmation has been dispatched to <strong>{formData.email}</strong>. Our crew will arrive punctually during your scheduled window.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Button
-              className="w-full"
+              variant="outline"
+              className="flex-1 hover:scale-102 active:scale-98 transition-all"
               onClick={() => navigate('/')}
             >
               {t('schedule.backHome')}
             </Button>
-            {isAuthenticated && (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => navigate('/dashboard')}
-              >
-                {t('schedule.viewDashboard')}
-              </Button>
-            )}
+            <Button
+              variant="primary"
+              className="flex-1 font-bold hover:scale-102 active:scale-98 transition-all"
+              onClick={() => navigate('/dashboard')}
+            >
+              {t('schedule.viewDashboard')}
+            </Button>
           </div>
         </Card>
       </div>
@@ -412,43 +506,43 @@ export function Schedule() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-4 sm:py-8 space-y-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto py-4 sm:py-8 px-4 space-y-6 sm:space-y-8 animate-fade-in">
       {/* Header & Steps Indicator */}
       <div className="text-center space-y-3">
-        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight animate-fade-in-up">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight animate-fade-in-up">
           {t('schedule.title')}
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 font-medium animate-fade-in-up delay-75">
+        <p className="text-xs sm:text-sm lg:text-base text-slate-600 font-medium animate-fade-in-up delay-75">
           {t('schedule.subtitle')}
         </p>
 
         {/* Steps Bar with Animated Track */}
-        <div className="relative max-w-xl mx-auto pt-4">
+        <div className="relative max-w-xl mx-auto pt-3">
           <div className="absolute top-[28px] left-[12%] right-[12%] h-1 bg-slate-200 rounded-full -z-0">
             <div
               className="h-full bg-emerald-600 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${((step - 1) / 3) * 100}%` }}
             />
           </div>
-          <div className="grid grid-cols-4 gap-2 sm:gap-4 relative z-10">
+          <div className="grid grid-cols-4 gap-1 sm:gap-4 relative z-10">
             {[1, 2, 3, 4].map((s) => {
               const isCompleted = step > s;
               const isCurrent = step === s;
               return (
-                <div key={s} className="flex flex-col items-center gap-1.5">
+                <div key={s} className="flex flex-col items-center gap-1">
                   <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs transition-all duration-300 ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-xs transition-all duration-300 ${
                       isCurrent
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-4 ring-emerald-500/20 scale-110'
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-4 ring-emerald-500/20 scale-105'
                         : isCompleted
                         ? 'bg-emerald-100 text-emerald-800'
                         : 'bg-white border border-slate-200 text-slate-400'
                     }`}
                   >
-                    {isCompleted ? <Check className="w-4 h-4 animate-pop-in" /> : s}
+                    {isCompleted ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pop-in" /> : s}
                   </div>
                   <span
-                    className={`text-xs font-bold truncate max-w-[80px] sm:max-w-none transition-colors duration-300 ${
+                    className={`text-[11px] sm:text-xs font-bold truncate max-w-[70px] sm:max-w-none transition-colors duration-300 ${
                       isCurrent ? 'text-emerald-800' : 'text-slate-500'
                     }`}
                   >
@@ -467,11 +561,11 @@ export function Schedule() {
         </div>
       </div>
 
-      {/* STEP 1: Size & Cleaning Tier */}
+      {/* STEP 1: Size, Service & Property Details */}
       {step === 1 && (
-        <Card key="step-1" className="p-6 sm:p-9 space-y-8 animate-fade-in-up">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-xl font-extrabold text-slate-900">
+        <Card key="step-1" className="p-5 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in-up">
+          <div className="border-b border-slate-100 pb-3">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {t('schedule.step1Title')}
             </h2>
             <p className="text-xs text-slate-600 font-medium mt-0.5">
@@ -479,39 +573,18 @@ export function Schedule() {
             </p>
           </div>
 
-          {postConstructionRequested && (
-            <div className="p-4 bg-amber-50/90 border border-amber-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-950 shadow-xs animate-fade-in">
-              <div className="flex items-start gap-2.5">
-                <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-                <div className="text-xs sm:text-sm">
-                  <strong className="block font-bold">Looking for Post-Construction Cleanup?</strong>
-                  <span className="text-amber-800">Post-construction cleanup is provided exclusively through our specialized partner, <strong>Evolving Solutions LLC</strong>.</span>
-                </div>
-              </div>
-              <a
-                href="https://evolvingsolutionsllc.com/schedule?tier=post_construction"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#573725] text-white text-xs font-bold hover:bg-[#43291b] shrink-0 shadow-sm"
-              >
-                <span>Book with Evolving Solutions</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          )}
-
           {/* Sq Ft Controls */}
-          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-6 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 sm:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <label htmlFor={sqftSliderId} className="block text-sm font-extrabold text-slate-900">
                   {t('schedule.sqftLabel')}
                 </label>
-                <span className="text-xs text-slate-600 font-medium">
-                  Approximate total area for residential cleaning (apartments, townhomes, single family houses)
+                <span className="text-xs text-slate-500 font-medium">
+                  {t('schedule.sqftHelp')}
                 </span>
               </div>
-              <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-4 py-2 shadow-2xs">
+              <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3.5 py-1.5 shadow-2xs self-start sm:self-auto">
                 <input
                   id="schedule-sqft-number-input"
                   aria-label={t('schedule.sqftLabel')}
@@ -521,9 +594,9 @@ export function Schedule() {
                   step={50}
                   value={sqft}
                   onChange={(e) => setSqft(Math.max(100, Number(e.target.value) || 100))}
-                  className="w-24 text-right font-black text-emerald-700 text-lg focus:outline-none"
+                  className="w-20 text-right font-black text-emerald-700 text-lg focus:outline-none"
                 />
-                <span className="text-slate-600 font-bold text-sm">sq ft</span>
+                <span className="text-slate-600 font-bold text-xs sm:text-sm">sq ft</span>
               </div>
             </div>
 
@@ -539,7 +612,7 @@ export function Schedule() {
               aria-label={t('schedule.sqftLabel')}
             />
 
-            <div className="flex justify-between text-xs text-slate-600 font-semibold">
+            <div className="flex justify-between text-[11px] sm:text-xs text-slate-500 font-semibold">
               <span>300 sq ft</span>
               <span>1,800 sq ft (Typical Home)</span>
               <span>5,000+ sq ft</span>
@@ -553,12 +626,12 @@ export function Schedule() {
             )}
           </div>
 
-          {/* Tiers Grid */}
-          <div className="space-y-4">
+          {/* Service Tiers Grid */}
+          <div className="space-y-3">
             <label className="block text-sm font-extrabold text-slate-900">
               {t('schedule.selectTier')}
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {rates.map((rate) => {
                 const isSelected = selectedRateId === rate.id;
                 const estPrice = Math.max(sqft * Number(rate.rate_per_sqft), Number(rate.min_order_amount));
@@ -569,16 +642,16 @@ export function Schedule() {
                   <div
                     key={rate.id}
                     onClick={() => setSelectedRateId(rate.id)}
-                    className={`p-5 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:-translate-y-0.5 hover:shadow-md active:scale-99 ${
+                    className={`p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:-translate-y-0.5 hover:shadow-md active:scale-99 ${
                       isSelected
-                        ? 'border-emerald-600 bg-emerald-50/50 shadow-sm ring-2 ring-emerald-600/20'
+                        ? 'border-emerald-600 bg-emerald-50/50 shadow-xs ring-2 ring-emerald-600/20'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md">
-                          ${Number(rate.rate_per_sqft).toFixed(2)} / sq ft
+                        <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded-md">
+                          ${rate.rate_per_sqft} / sq ft
                         </span>
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
@@ -590,17 +663,17 @@ export function Schedule() {
                           {isSelected && <Check className="w-3 h-3 animate-pop-in" />}
                         </div>
                       </div>
-                      <h3 className="font-black text-slate-900 text-base leading-snug">
+                      <h3 className="font-black text-slate-900 text-sm sm:text-base leading-snug">
                         {localizedName}
                       </h3>
-                      <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                      <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2">
                         {localizedDesc}
                       </p>
                     </div>
 
                     <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-xs text-slate-600 font-semibold">Estimated Base</span>
-                      <span className="text-lg font-black text-slate-900">
+                      <span className="text-[11px] sm:text-xs text-slate-500 font-semibold">Estimated Base</span>
+                      <span className="text-base sm:text-lg font-black text-slate-900">
                         ${estPrice.toFixed(2)}
                       </span>
                     </div>
@@ -610,9 +683,100 @@ export function Schedule() {
             </div>
           </div>
 
+          {/* Consultative Details (Bedrooms, Bathrooms, Occupancy) */}
+          <div className="space-y-4 pt-4 border-t border-slate-100">
+            <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <Home className="w-4 h-4 text-emerald-600" />
+              <span>{t('schedule.propertyDetailsTitle')}</span>
+              <span className="text-[10px] text-slate-400 font-normal uppercase tracking-wider">(Inquiry details - no extra charge)</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Bedrooms */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <Bed className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{t('schedule.bedroomsLabel')}</span>
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[0, 1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setBedrooms(num)}
+                      className={`flex-1 min-w-[38px] py-1.5 px-2 rounded-xl text-xs font-black border transition-all cursor-pointer ${
+                        bedrooms === num
+                          ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
+                          : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                      }`}
+                    >
+                      {num === 0 ? 'Studio' : num === 5 ? '5+' : num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bathrooms */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <Bath className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{t('schedule.bathroomsLabel')}</span>
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[1, 1.5, 2, 2.5, 3, 3.5, 4].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setBathrooms(num)}
+                      className={`flex-1 min-w-[34px] py-1.5 px-1.5 rounded-xl text-xs font-black border transition-all cursor-pointer ${
+                        bathrooms === num
+                          ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
+                          : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                      }`}
+                    >
+                      {num === 4 ? '4+' : num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Occupancy Status */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <DoorOpen className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{t('schedule.occupancyLabel')}</span>
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsOccupied(true)}
+                    className={`py-1.5 px-2.5 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer ${
+                      isOccupied
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/30'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                    }`}
+                  >
+                    🏠 {t('schedule.occupied')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsOccupied(false)}
+                    className={`py-1.5 px-2.5 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer ${
+                      !isOccupied
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/30'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                    }`}
+                  >
+                    📦 {t('schedule.vacant')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Next Button */}
           <div className="flex justify-end pt-4 border-t border-slate-100">
-            <Button size="lg" onClick={() => setStep(2)} className="hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm">
+            <Button size="lg" onClick={() => setStep(2)} className="w-full sm:w-auto hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm">
               <span>{t('schedule.step2')}</span>
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
@@ -620,22 +784,29 @@ export function Schedule() {
         </Card>
       )}
 
-      {/* STEP 2: Date & Window */}
+      {/* STEP 2: Date & Arrival Time */}
       {step === 2 && (
-        <Card key="step-2" className="p-6 sm:p-9 space-y-8 animate-fade-in-up">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-xl font-extrabold text-slate-900">
+        <Card key="step-2" className="p-5 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in-up">
+          <div className="border-b border-slate-100 pb-3">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {t('schedule.step2Title')}
             </h2>
-            <p className="text-xs text-emerald-900 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg inline-block mt-2 font-semibold">
-              {t('schedule.dateNotice')}
-            </p>
+            {sameDayAvailable ? (
+              <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
+                <span>{t('schedule.sameDayNotice')}</span>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-600 font-medium mt-1">
+                {t('schedule.futureDateNotice')}
+              </p>
+            )}
           </div>
 
           {/* Month Navigation & Calendar */}
-          <div className="max-w-md mx-auto bg-white border-2 border-slate-200 rounded-2xl p-5 shadow-2xs">
-            <div className="flex items-center justify-between mb-4">
-              <span className="font-black text-slate-900 capitalize text-base">
+          <div className="max-w-md mx-auto bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 shadow-2xs">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-black text-slate-900 capitalize text-sm sm:text-base flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4 text-emerald-600" />
                 {currentMonthYearStr}
               </span>
               <div className="flex items-center gap-1">
@@ -647,6 +818,7 @@ export function Schedule() {
                     setViewMonthDate(prev);
                   }}
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  aria-label="Previous Month"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -658,6 +830,7 @@ export function Schedule() {
                     setViewMonthDate(next);
                   }}
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  aria-label="Next Month"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -665,9 +838,9 @@ export function Schedule() {
             </div>
 
             {/* Days Grid */}
-            <div className="grid grid-cols-7 gap-1.5 text-center text-xs">
+            <div className="grid grid-cols-7 gap-1 text-center text-xs">
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
-                <div key={d} className="font-black text-slate-700 py-1.5">
+                <div key={d} className="font-black text-slate-600 py-1 text-[11px]">
                   {d}
                 </div>
               ))}
@@ -684,6 +857,7 @@ export function Schedule() {
 
                 const isSelected = selectedDate === dateStr;
                 const available = isDayAvailable(day);
+                const isTodayDate = dateStr === getTodayDateStr();
 
                 return (
                   <button
@@ -691,58 +865,63 @@ export function Schedule() {
                     type="button"
                     disabled={!available}
                     onClick={() => handleDateSelect(day)}
-                    className={`py-2.5 rounded-xl font-bold transition-all duration-150 text-xs cursor-pointer ${
+                    className={`py-2 rounded-xl font-bold transition-all duration-150 text-xs cursor-pointer relative ${
                       isSelected
-                        ? 'bg-emerald-600 text-white shadow-sm font-black scale-105 animate-pop-in ring-2 ring-emerald-600/30'
+                        ? 'bg-emerald-600 text-white shadow-xs font-black scale-105 animate-pop-in ring-2 ring-emerald-600/30'
                         : available
                         ? 'hover:bg-emerald-50 text-slate-900 hover:scale-105 active:scale-95'
                         : 'text-slate-300 cursor-not-allowed'
                     }`}
                   >
-                    {day}
+                    <span>{day}</span>
+                    {isTodayDate && (
+                      <span className="block text-[8px] font-black leading-none text-emerald-600 uppercase mt-0.5">
+                        Today
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Time Window Selection */}
-          <div className="space-y-3 max-w-md mx-auto">
-            <label className="block text-sm font-extrabold text-slate-900">
-              Arrival Time Window
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setSelectedTimeSlot('morning')}
-                className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-xs active:scale-98 ${
-                  selectedTimeSlot === 'morning'
-                    ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 shadow-xs ring-2 ring-emerald-600/30'
-                    : 'border-slate-200 hover:border-slate-300 bg-white text-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-2 font-black text-xs text-slate-900">
-                  <Clock className="w-4 h-4 text-emerald-600" />
-                  <span>Morning</span>
-                </div>
-                <div className="text-xs text-slate-600 font-medium mt-1">8:00 AM – 12:00 PM</div>
-              </button>
+          {/* Time Picker */}
+          <div className="space-y-3 max-w-lg mx-auto">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-emerald-600" />
+                <span>{t('schedule.timeSlotLabel')}</span>
+              </label>
+              {isDateToday && (
+                <span className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md font-bold">
+                  Min. 3h notice required
+                </span>
+              )}
+            </div>
 
-              <button
-                type="button"
-                onClick={() => setSelectedTimeSlot('afternoon')}
-                className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-xs active:scale-98 ${
-                  selectedTimeSlot === 'afternoon'
-                    ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 shadow-xs ring-2 ring-emerald-600/30'
-                    : 'border-slate-200 hover:border-slate-300 bg-white text-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-2 font-black text-xs text-slate-900">
-                  <Clock className="w-4 h-4 text-emerald-600" />
-                  <span>Afternoon</span>
-                </div>
-                <div className="text-xs text-slate-600 font-medium mt-1">1:00 PM – 5:00 PM</div>
-              </button>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+              {TIME_SLOTS.map((slot) => {
+                const isSelected = selectedTimeSlot === slot;
+                const isValidForToday = !isDateToday || isTimeSlotValidForToday(slot);
+
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    disabled={!isValidForToday}
+                    onClick={() => setSelectedTimeSlot(slot)}
+                    className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
+                      isSelected
+                        ? 'border-2 border-emerald-600 bg-emerald-600 text-white shadow-xs font-black ring-2 ring-emerald-600/30 scale-102'
+                        : isValidForToday
+                        ? 'border border-slate-200 bg-white hover:border-slate-300 hover:bg-emerald-50/50 text-slate-800'
+                        : 'border border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -760,24 +939,24 @@ export function Schedule() {
         </Card>
       )}
 
-      {/* STEP 3: Location & Property Surcharges */}
+      {/* STEP 3: Location, Access & Extras */}
       {step === 3 && (
-        <Card key="step-3" className="p-6 sm:p-9 space-y-8 animate-fade-in-up">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-xl font-extrabold text-slate-900">
+        <Card key="step-3" className="p-5 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in-up">
+          <div className="border-b border-slate-100 pb-3">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {t('schedule.step3Title')}
             </h2>
             <p className="text-xs text-slate-600 font-medium mt-0.5">
-              Specify your property address in Denver or Boulder and any difficulty factors.
+              Specify your property address, access method, and any deep cleaning add-ons.
             </p>
           </div>
 
           {/* Location / Zone Selection */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <label className="block text-sm font-extrabold text-slate-900">
               {t('schedule.citySelect')}
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
               {DENVER_LOCATIONS.map((loc) => {
                 const isSelected = selectedLocation.name === loc.name;
                 return (
@@ -785,21 +964,21 @@ export function Schedule() {
                     key={loc.name}
                     type="button"
                     onClick={() => setSelectedLocation(loc)}
-                    className={`p-3.5 rounded-xl border-2 text-left text-xs font-bold transition-all duration-200 flex items-center justify-between cursor-pointer hover:scale-102 active:scale-95 ${
+                    className={`p-2.5 rounded-xl border-2 text-left text-xs font-bold transition-all duration-150 flex flex-col justify-between cursor-pointer ${
                       isSelected
                         ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 shadow-xs ring-2 ring-emerald-600/20'
                         : 'border-slate-200 bg-white hover:border-slate-300 text-slate-800'
                     }`}
                   >
-                    <span className="font-extrabold text-slate-900">{loc.name}</span>
+                    <span className="font-extrabold text-slate-900 text-xs truncate">{loc.name}</span>
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-md font-extrabold ${
+                      className={`text-[10px] mt-1 self-start px-1.5 py-0.5 rounded-md font-extrabold ${
                         loc.zone === 'inner'
                           ? 'bg-emerald-100 text-emerald-800'
                           : 'bg-amber-100 text-amber-900'
                       }`}
                     >
-                      {loc.zone === 'inner' ? 'Free Travel' : '+$25 Travel'}
+                      {loc.zone === 'inner' ? 'Free Travel' : '+$25'}
                     </span>
                   </button>
                 );
@@ -808,7 +987,7 @@ export function Schedule() {
           </div>
 
           {/* Address and Contact Inputs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Input
               label="Street Address *"
               value={formData.street_address}
@@ -865,11 +1044,67 @@ export function Schedule() {
             />
           </div>
 
-          {/* Difficulty Surcharges (Add-ons) */}
-          <div className="space-y-3 pt-4 border-t border-slate-100">
+          {/* Access / Entry Method Section */}
+          <div className="space-y-3 pt-3 border-t border-slate-100">
             <div>
-              <label className="block text-sm font-extrabold text-slate-900">
-                {t('schedule.addonsTitle')}
+              <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                <KeyRound className="w-4 h-4 text-emerald-600" />
+                <span>{t('schedule.accessTitle')}</span>
+              </label>
+              <p className="text-xs text-slate-600 font-medium">
+                {t('schedule.accessSubtitle')}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+              {[
+                { id: 'someone_home', icon: UserCheck, label: t('schedule.entry_someone_home') },
+                { id: 'keypad', icon: Lock, label: t('schedule.entry_keypad') },
+                { id: 'lockbox', icon: Key, label: t('schedule.entry_lockbox') },
+                { id: 'unlocked', icon: DoorOpen, label: t('schedule.entry_unlocked') },
+                { id: 'other', icon: KeyRound, label: t('schedule.entry_other') },
+              ].map((m) => {
+                const Icon = m.icon;
+                const isSelected = entryMethod === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setEntryMethod(m.id)}
+                    className={`p-3 rounded-xl border-2 text-left text-xs font-bold transition-all flex items-center gap-2.5 cursor-pointer ${
+                      isSelected
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/20'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-emerald-700' : 'text-slate-400'}`} />
+                    <span>{m.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Access Notes */}
+            <div className="space-y-1 pt-1">
+              <label className="block text-xs font-bold text-slate-700">
+                {t('schedule.accessNotesLabel')}
+              </label>
+              <input
+                type="text"
+                value={entryNotes}
+                onChange={(e) => setEntryNotes(e.target.value)}
+                placeholder={t('schedule.accessNotesPlaceholder')}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs font-medium"
+              />
+            </div>
+          </div>
+
+          {/* Priced Add-ons (Strictly 4) */}
+          <div className="space-y-3 pt-3 border-t border-slate-100">
+            <div>
+              <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <span>{t('schedule.addonsTitle')}</span>
               </label>
               <p className="text-xs text-slate-600 font-medium">
                 {t('schedule.addonsSubtitle')}
@@ -891,7 +1126,7 @@ export function Schedule() {
                         [addon.code]: !isChecked,
                       });
                     }}
-                    className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3.5 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
+                    className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
                       isChecked
                         ? 'border-emerald-600 bg-emerald-50/60 shadow-xs ring-2 ring-emerald-600/20'
                         : 'border-slate-200 bg-white hover:border-slate-300'
@@ -908,10 +1143,10 @@ export function Schedule() {
                     </div>
                     <div className="flex-1 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-black text-slate-900 text-sm">{localizedName}</span>
-                        <span className="font-black text-emerald-700 text-sm">+${Number(addon.price).toFixed(2)}</span>
+                        <span className="font-black text-slate-900 text-xs sm:text-sm">{localizedName}</span>
+                        <span className="font-black text-emerald-700 text-xs sm:text-sm">+${Number(addon.price).toFixed(2)}</span>
                       </div>
-                      <p className="text-slate-600 text-xs font-medium mt-1 leading-relaxed">{localizedDesc}</p>
+                      <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
                     </div>
                   </div>
                 );
@@ -919,17 +1154,17 @@ export function Schedule() {
             </div>
           </div>
 
-          {/* Access Instructions */}
+          {/* Special Instructions */}
           <div className="space-y-1.5 pt-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+            <label className="block text-xs font-bold text-slate-700">
               {t('schedule.specialInstructions')}
             </label>
             <textarea
               rows={2}
               value={specialInstructions}
               onChange={(e) => setSpecialInstructions(e.target.value)}
-              placeholder="e.g. Callbox code #1234, key under planter, friendly golden retriever at home..."
-              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 shadow-2xs font-medium"
+              placeholder="e.g. Friendly dog in laundry room, please focus on kitchen grout..."
+              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs font-medium"
             />
           </div>
 
@@ -954,9 +1189,9 @@ export function Schedule() {
 
       {/* STEP 4: Review & Confirm */}
       {step === 4 && (
-        <Card key="step-4" className="p-6 sm:p-9 space-y-8 animate-fade-in-up">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-xl font-extrabold text-slate-900">
+        <Card key="step-4" className="p-5 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in-up">
+          <div className="border-b border-slate-100 pb-3">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {t('schedule.step4Title')}
             </h2>
             <p className="text-xs text-slate-600 font-medium mt-0.5">
@@ -972,10 +1207,10 @@ export function Schedule() {
           )}
 
           {/* Summary Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* Service & Schedule */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3.5 text-xs">
-              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider flex items-center gap-2">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2.5 text-xs">
+              <h3 className="font-black text-slate-900 text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
                 <Home className="w-4 h-4 text-emerald-600" />
                 <span>Service Details</span>
               </h3>
@@ -986,26 +1221,32 @@ export function Schedule() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Property Size:</span>
-                <span className="font-bold text-slate-900">{sqft} sq ft</span>
+                <span className="text-slate-600 font-semibold">Dimensions:</span>
+                <span className="font-bold text-slate-900">
+                  {sqft} sq ft • {bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, {bathrooms} Baths
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600 font-semibold">Occupancy:</span>
+                <span className="font-bold text-slate-900">
+                  {isOccupied ? t('schedule.occupied') : t('schedule.vacant')}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600 font-semibold">Scheduled Date:</span>
                 <span className="font-bold text-slate-900">{selectedDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Arrival Window:</span>
-                <span className="font-bold text-slate-900">
-                  {selectedTimeSlot === 'morning' ? '8:00 AM – 12:00 PM' : '1:00 PM – 5:00 PM'}
-                </span>
+                <span className="text-slate-600 font-semibold">Arrival Time:</span>
+                <span className="font-bold text-slate-900">{selectedTimeSlot}</span>
               </div>
             </div>
 
-            {/* Address & Contact */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3.5 text-xs">
-              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider flex items-center gap-2">
+            {/* Address, Contact & Access */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2.5 text-xs">
+              <h3 className="font-black text-slate-900 text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-emerald-600" />
-                <span>Location & Contact</span>
+                <span>Location & Access</span>
               </h3>
               <div className="flex justify-between">
                 <span className="text-slate-600 font-semibold">Client:</span>
@@ -1016,23 +1257,39 @@ export function Schedule() {
                 <span className="font-bold text-slate-900">{formData.phone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Email:</span>
-                <span className="font-bold text-slate-900">{formData.email}</span>
+                <span className="text-slate-600 font-semibold">Address:</span>
+                <span className="font-bold text-slate-900 text-right">{formData.street_address}, {selectedLocation.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">Address:</span>
-                <span className="font-bold text-slate-900 text-right">{formData.street_address}, {selectedLocation.name} {formData.zip_code}</span>
+                <span className="text-slate-600 font-semibold">Access:</span>
+                <span className="font-bold text-slate-900">
+                  {entryMethod === 'someone_home'
+                    ? t('schedule.entry_someone_home')
+                    : entryMethod === 'keypad'
+                    ? t('schedule.entry_keypad')
+                    : entryMethod === 'lockbox'
+                    ? t('schedule.entry_lockbox')
+                    : entryMethod === 'unlocked'
+                    ? t('schedule.entry_unlocked')
+                    : t('schedule.entry_other')}
+                </span>
               </div>
+              {entryNotes && (
+                <div className="flex justify-between">
+                  <span className="text-slate-600 font-semibold">Access Note:</span>
+                  <span className="font-medium text-slate-900 text-right max-w-[200px] truncate">{entryNotes}</span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Pricing Breakdown Card */}
-          <div className="bg-white border-2 border-emerald-200/90 rounded-2xl p-6 space-y-3.5 shadow-sm">
-            <h3 className="font-black text-emerald-950 text-sm uppercase tracking-wider">
+          <div className="bg-white border-2 border-emerald-200/90 rounded-2xl p-4 sm:p-6 space-y-3 shadow-2xs">
+            <h3 className="font-black text-emerald-950 text-xs sm:text-sm uppercase tracking-wider">
               Cost Breakdown
             </h3>
             <div className="flex justify-between text-slate-700 text-xs font-medium">
-              <span>{t('schedule.basePrice')} ({sqft} sqft @ ${Number(activeRate.rate_per_sqft).toFixed(2)}/sqft):</span>
+              <span>{t('schedule.basePrice')} ({sqft} sqft @ ${activeRate.rate_per_sqft}/sqft):</span>
               <span className="font-bold text-slate-900">
                 ${basePrice.toFixed(2)} {isMinApplied && '(Min $99)'}
               </span>
@@ -1050,13 +1307,13 @@ export function Schedule() {
               </span>
             </div>
             <div className="pt-3 border-t-2 border-emerald-100 flex justify-between items-baseline">
-              <span className="font-black text-slate-900 text-base">{t('schedule.totalDue')}:</span>
-              <span className="font-black text-2xl text-emerald-700">${totalPrice.toFixed(2)}</span>
+              <span className="font-black text-slate-900 text-sm sm:text-base">{t('schedule.totalDue')}:</span>
+              <span className="font-black text-xl sm:text-2xl text-emerald-700">${totalPrice.toFixed(2)}</span>
             </div>
           </div>
 
           {/* Terms Agreement Checkbox */}
-          <div className="flex items-start gap-3 bg-white p-4 border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-start gap-3 bg-white p-3.5 border border-slate-200 rounded-xl shadow-2xs">
             <input
               type="checkbox"
               id="agree-terms"
@@ -1079,7 +1336,7 @@ export function Schedule() {
               size="lg"
               disabled={!agreedToTerms || isSubmitting}
               onClick={handleSubmitBooking}
-              className="font-black text-base shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200"
+              className="font-black text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200"
             >
               <Sparkles className="w-4 h-4 mr-2 animate-float" />
               {isSubmitting ? t('schedule.submitting') : t('schedule.submitOrder')}
