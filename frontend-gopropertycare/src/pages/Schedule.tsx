@@ -533,9 +533,9 @@ export function Schedule() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-4 sm:py-8 px-4 space-y-6 sm:space-y-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto py-3 sm:py-8 px-3.5 sm:px-6 lg:px-8 space-y-5 sm:space-y-8 animate-fade-in">
       {/* Header & Steps Indicator */}
-      <div className="text-center space-y-3">
+      <div className="text-center space-y-2.5 sm:space-y-3">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight animate-fade-in-up">
           {t('schedule.title')}
         </h1>
@@ -544,7 +544,7 @@ export function Schedule() {
         </p>
 
         {/* Steps Bar with Animated Track */}
-        <div className="relative max-w-xl mx-auto pt-3">
+        <div className="relative max-w-xl mx-auto pt-2 sm:pt-3">
           <div className="absolute top-[28px] left-[12%] right-[12%] h-1 bg-slate-200 rounded-full -z-0">
             <div
               className="h-full bg-emerald-600 rounded-full transition-all duration-500 ease-out"
@@ -556,7 +556,7 @@ export function Schedule() {
               const isCompleted = step > s;
               const isCurrent = step === s;
               return (
-                <div key={s} className="flex flex-col items-center gap-1">
+                <div key={s} className="flex flex-col items-center gap-1 min-w-0">
                   <button
                     type="button"
                     disabled={!isCompleted && !isCurrent}
@@ -565,7 +565,7 @@ export function Schedule() {
                         setStep(s as Step);
                       }
                     }}
-                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-xs transition-all duration-300 ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-bold text-xs transition-all duration-300 shrink-0 ${
                       isCurrent
                         ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-4 ring-emerald-500/20 scale-105 cursor-default'
                         : isCompleted
@@ -577,7 +577,7 @@ export function Schedule() {
                     {isCompleted ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pop-in" /> : s}
                   </button>
                   <span
-                    className={`text-[11px] sm:text-xs font-bold truncate max-w-[70px] sm:max-w-none transition-colors duration-300 ${
+                    className={`text-[10px] sm:text-xs font-bold w-full text-center truncate transition-colors duration-300 ${
                       isCurrent ? 'text-emerald-800' : isCompleted ? 'text-slate-700' : 'text-slate-400'
                     }`}
                   >
@@ -598,7 +598,7 @@ export function Schedule() {
 
       {/* STEP 1: Size, Service & Property Details */}
       {step === 1 && (
-        <Card key="step-1" className="p-5 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in-up">
+        <Card key="step-1" className="p-4 sm:p-8 space-y-5 sm:space-y-8 animate-fade-in-up">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {t('schedule.step1Title')}
@@ -720,11 +720,15 @@ export function Schedule() {
 
           {/* Consultative Details (Bedrooms, Bathrooms, Occupancy) */}
           <div className="space-y-4 pt-4 border-t border-slate-100">
-            <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-              <Home className="w-4 h-4 text-emerald-600" />
-              <span>{t('schedule.propertyDetailsTitle')}</span>
-              <span className="text-[10px] text-slate-500 font-normal uppercase tracking-wider">{t('schedule.inquiryNoCharge')}</span>
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <Home className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{t('schedule.propertyDetailsTitle')}</span>
+              </h3>
+              <span className="text-[10px] sm:text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md font-bold self-start sm:self-auto uppercase tracking-wide">
+                {t('schedule.inquiryNoCharge')}
+              </span>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Bedrooms */}
@@ -733,13 +737,13 @@ export function Schedule() {
                   <Bed className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{t('schedule.bedroomsLabel')}</span>
                 </label>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
                   {[0, 1, 2, 3, 4, 5].map((num) => (
                     <button
                       key={num}
                       type="button"
                       onClick={() => setBedrooms(num)}
-                      className={`flex-1 min-w-[38px] min-h-[42px] py-1.5 px-2 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation ${
+                      className={`min-h-[42px] py-1.5 px-1 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
                         bedrooms === num
                           ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
                           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
@@ -757,17 +761,17 @@ export function Schedule() {
                   <Bath className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{t('schedule.bathroomsLabel')}</span>
                 </label>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
                   {[1, 1.5, 2, 2.5, 3, 3.5, 4].map((num) => (
                     <button
                       key={num}
                       type="button"
                       onClick={() => setBathrooms(num)}
-                      className={`flex-1 min-w-[34px] min-h-[42px] py-1.5 px-1.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation ${
+                      className={`min-h-[42px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
                         bathrooms === num
                           ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
                           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
-                      }`}
+                      } ${num === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
                     >
                       {num === 4 ? '4+' : num}
                     </button>
@@ -781,11 +785,11 @@ export function Schedule() {
                   <DoorOpen className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{t('schedule.occupancyLabel')}</span>
                 </label>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   <button
                     type="button"
                     onClick={() => setIsOccupied(true)}
-                    className={`min-h-[42px] py-1.5 px-2.5 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer touch-manipulation ${
+                    className={`min-h-[42px] py-2 px-3 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5 ${
                       isOccupied
                         ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/30'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
@@ -796,7 +800,7 @@ export function Schedule() {
                   <button
                     type="button"
                     onClick={() => setIsOccupied(false)}
-                    className={`min-h-[42px] py-1.5 px-2.5 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer touch-manipulation ${
+                    className={`min-h-[42px] py-2 px-3 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5 ${
                       !isOccupied
                         ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/30'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
@@ -811,7 +815,11 @@ export function Schedule() {
 
           {/* Next Button */}
           <div className="flex justify-end pt-4 border-t border-slate-100">
-            <Button size="lg" onClick={() => setStep(2)} className="w-full sm:w-auto hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm">
+            <Button
+              size="md"
+              onClick={() => setStep(2)}
+              className="w-full sm:w-auto min-h-[44px] px-6 text-xs sm:text-sm font-extrabold hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
+            >
               <span>{t('schedule.step2')}</span>
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
@@ -821,7 +829,7 @@ export function Schedule() {
 
       {/* STEP 2: Date & Arrival Time */}
       {step === 2 && (
-        <Card key="step-2" className="p-5 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in-up">
+        <Card key="step-2" className="p-4 sm:p-8 space-y-5 sm:space-y-8 animate-fade-in-up">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {t('schedule.step2Title')}
@@ -1003,21 +1011,26 @@ export function Schedule() {
           </div>
 
           {/* Controls */}
-          <div className="flex justify-between pt-4 border-t border-slate-100">
-            <Button variant="outline" onClick={() => setStep(1)} className="hover:scale-102 active:scale-98 transition-all duration-200">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-4 pt-4 border-t border-slate-100">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => setStep(1)}
+              className="shrink-0 px-3.5 sm:px-5 min-h-[44px] text-xs sm:text-sm hover:scale-102 active:scale-98 transition-all duration-200"
+            >
               <ChevronLeft className="w-4 h-4 mr-1" />
               <span>{t('schedule.back')}</span>
             </Button>
             <Button
-              size="lg"
+              size="md"
               disabled={!canProceedFromStep2}
               onClick={() => setStep(3)}
-              className={`hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm ${
+              className={`flex-1 sm:flex-initial sm:px-6 min-h-[44px] text-xs sm:text-sm font-extrabold hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm ${
                 !canProceedFromStep2 ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              <span>{t('schedule.step3')}</span>
-              <ChevronRight className="w-4 h-4 ml-1" />
+              <span className="truncate">{t('schedule.step3')}</span>
+              <ChevronRight className="w-4 h-4 ml-1 shrink-0" />
             </Button>
           </div>
         </Card>
@@ -1025,7 +1038,7 @@ export function Schedule() {
 
       {/* STEP 3: Location, Access & Extras */}
       {step === 3 && (
-        <Card key="step-3" className="p-5 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in-up">
+        <Card key="step-3" className="p-4 sm:p-8 space-y-5 sm:space-y-8 animate-fade-in-up">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {t('schedule.step3Title')}
@@ -1253,19 +1266,24 @@ export function Schedule() {
           </div>
 
           {/* Controls */}
-          <div className="flex justify-between pt-4 border-t border-slate-100">
-            <Button variant="outline" onClick={() => setStep(2)} className="hover:scale-102 active:scale-98 transition-all duration-200">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-4 pt-4 border-t border-slate-100">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => setStep(2)}
+              className="shrink-0 px-3.5 sm:px-5 min-h-[44px] text-xs sm:text-sm hover:scale-102 active:scale-98 transition-all duration-200"
+            >
               <ChevronLeft className="w-4 h-4 mr-1" />
               <span>{t('schedule.back')}</span>
             </Button>
             <Button
-              size="lg"
+              size="md"
               disabled={!canProceedFromStep3}
               onClick={() => setStep(4)}
-              className="hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
+              className="flex-1 sm:flex-initial sm:px-6 min-h-[44px] text-xs sm:text-sm font-extrabold hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
             >
-              <span>{t('schedule.step4')}</span>
-              <ChevronRight className="w-4 h-4 ml-1" />
+              <span className="truncate">{t('schedule.step4')}</span>
+              <ChevronRight className="w-4 h-4 ml-1 shrink-0" />
             </Button>
           </div>
         </Card>
@@ -1273,7 +1291,7 @@ export function Schedule() {
 
       {/* STEP 4: Review & Confirm */}
       {step === 4 && (
-        <Card key="step-4" className="p-5 sm:p-8 space-y-6 sm:space-y-8 animate-fade-in-up">
+        <Card key="step-4" className="p-4 sm:p-8 space-y-5 sm:space-y-8 animate-fade-in-up">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
               {t('schedule.step4Title')}
@@ -1298,31 +1316,31 @@ export function Schedule() {
                 <Home className="w-4 h-4 text-emerald-600" />
                 <span>{t('schedule.serviceDetails')}</span>
               </h3>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('schedule.selectTier')}:</span>
-                <span className="font-bold text-slate-900">
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.selectTier')}:</span>
+                <span className="font-bold text-slate-900 text-right">
                   {t(`home.pricing.${activeRate.service_type}.name`, { defaultValue: activeRate.name })}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('schedule.dimensions')}:</span>
-                <span className="font-bold text-slate-900">
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.dimensions')}:</span>
+                <span className="font-bold text-slate-900 text-right">
                   {sqft} sq ft • {bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, {bathrooms} {t('schedule.baths')}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('schedule.occupancyLabel')}:</span>
-                <span className="font-bold text-slate-900">
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.occupancyLabel')}:</span>
+                <span className="font-bold text-slate-900 text-right">
                   {isOccupied ? t('schedule.occupied') : t('schedule.vacant')}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('schedule.scheduledDate')}:</span>
-                <span className="font-bold text-slate-900">{selectedDate}</span>
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.scheduledDate')}:</span>
+                <span className="font-bold text-slate-900 text-right">{selectedDate}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('schedule.timeSlotLabel')}:</span>
-                <span className="font-bold text-slate-900">{selectedTimeSlot}</span>
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.timeSlotLabel')}:</span>
+                <span className="font-bold text-slate-900 text-right">{selectedTimeSlot}</span>
               </div>
             </div>
 
@@ -1332,21 +1350,21 @@ export function Schedule() {
                 <MapPin className="w-4 h-4 text-emerald-600" />
                 <span>{t('schedule.locationContact')}</span>
               </h3>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('schedule.client')}:</span>
-                <span className="font-bold text-slate-900">{formData.first_name} {formData.last_name}</span>
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.client')}:</span>
+                <span className="font-bold text-slate-900 text-right truncate">{formData.first_name} {formData.last_name}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('auth.phone')}:</span>
-                <span className="font-bold text-slate-900">{formData.phone}</span>
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('auth.phone')}:</span>
+                <span className="font-bold text-slate-900 text-right">{formData.phone}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('schedule.addressLabel')}:</span>
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.addressLabel')}:</span>
                 <span className="font-bold text-slate-900 text-right">{formData.street_address}, {selectedLocation.name}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-semibold">{t('schedule.accessMethod')}:</span>
-                <span className="font-bold text-slate-900">
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.accessMethod')}:</span>
+                <span className="font-bold text-slate-900 text-right">
                   {entryMethod === 'someone_home'
                     ? t('schedule.entry_someone_home')
                     : entryMethod === 'keypad'
@@ -1359,8 +1377,8 @@ export function Schedule() {
                 </span>
               </div>
               {entryNotes && (
-                <div className="flex justify-between">
-                  <span className="text-slate-600 font-semibold">{t('schedule.accessNote')}:</span>
+                <div className="flex justify-between items-start gap-2">
+                  <span className="text-slate-600 font-semibold shrink-0">{t('schedule.accessNote')}:</span>
                   <span className="font-medium text-slate-900 text-right max-w-[200px] truncate">{entryNotes}</span>
                 </div>
               )}
@@ -1411,19 +1429,24 @@ export function Schedule() {
           </div>
 
           {/* Controls */}
-          <div className="flex justify-between pt-4 border-t border-slate-100">
-            <Button variant="outline" onClick={() => setStep(3)} className="hover:scale-102 active:scale-98 transition-all duration-200">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-4 pt-4 border-t border-slate-100">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => setStep(3)}
+              className="shrink-0 px-3.5 sm:px-5 min-h-[44px] text-xs sm:text-sm hover:scale-102 active:scale-98 transition-all duration-200"
+            >
               <ChevronLeft className="w-4 h-4 mr-1" />
               <span>{t('schedule.back')}</span>
             </Button>
             <Button
-              size="lg"
+              size="md"
               disabled={!agreedToTerms || isSubmitting}
               onClick={handleSubmitBooking}
-              className="font-black text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200"
+              className="flex-1 sm:flex-initial sm:px-8 min-h-[44px] text-xs sm:text-sm font-black shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200"
             >
-              <Sparkles className="w-4 h-4 mr-2 animate-float" />
-              {isSubmitting ? t('schedule.submitting') : t('schedule.submitOrder')}
+              <Sparkles className="w-4 h-4 mr-1.5 shrink-0 animate-float" />
+              <span className="truncate">{isSubmitting ? t('schedule.submitting') : t('schedule.submitOrder')}</span>
             </Button>
           </div>
         </Card>
