@@ -66,7 +66,7 @@
       "subtitle": "Simple, fast, and completely stress-free so you can enjoy pristine spaces.",
       "step1": {
         "title": "1. Tell Us About Your Space",
-        "description": "Share your approximate square footage, choose your specialized service, and pick your preferred date."
+        "description": "Select your property size tier, choose your specialized service, and pick your preferred date."
       },
       "step2": {
         "title": "2. Personalize the Details",
@@ -83,11 +83,17 @@
     },
     "pricing": {
       "title": "Our Specialized Services",
-      "subtitle": "Pay strictly for your square footage with transparent per-square-foot rates and zero hidden fees.",
+      "subtitle": "Clear, upfront flat rates based on property size tiers with zero hidden fees or hourly surprises.",
+      "tierBadge": "Flat Upfront Tier Pricing",
+      "selectTierLabel": "Select Your Property Size Range (Sq Ft):",
+      "tierHelp": "Choose your property size to preview upfront flat rates for every specialized service.",
+      "flatRateTier": "Flat Tier Rate",
+      "viewAllTiers": "View Full 19-Tier Pricing Matrix",
+      "hideAllTiers": "Hide Tier Matrix",
+      "startingAt": "Starting at",
       "residential": {
-        "name": "Basic Residential Cleaning",
-        "tagline": "Tailored Regular or Deep Home Upkeep",
-        "rate": "$0.125 / sq ft",
+        "name": "Standard Residential Cleaning",
+        "tagline": "Ongoing Home Upkeep & Hygiene",
         "description": "Personalized home maintenance (standard regular or deep cleaning) adapted to your lifestyle.",
         "features": [
           "Thoroughly sanitized kitchen, bathrooms, and bedrooms",
@@ -100,7 +106,6 @@
       "move_in_out": {
         "name": "Move-In / Move-Out Cleaning",
         "tagline": "Deposit Return & Seamless Turnovers",
-        "rate": "$0.20 / sq ft",
         "description": "Thorough deep sanitization to guarantee rental deposit refunds, smooth tenant transitions, and show-ready property presentations.",
         "features": [
           "Deep sanitization for move-out walkthrough inspections",
@@ -113,7 +118,6 @@
       "str_on_site": {
         "name": "Short Term Rentals (Laundry on site)",
         "tagline": "Fast Turnover with In-House Laundry",
-        "rate": "$0.17 / sq ft",
         "description": "Rapid turnover between guests including on-site washer & dryer washing of bed linens and towels, restock, and 5-star presentation.",
         "features": [
           "Rapid, dependable turnover within checkout/check-in windows",
@@ -126,7 +130,6 @@
       "str_off_site": {
         "name": "Short Term Rentals (Off Site Laundry)",
         "tagline": "Full Linen Removal & Off-Site Laundry Service",
-        "rate": "$0.23 / sq ft",
         "description": "Complete turnover with linen collection, off-site professional laundering, replacement of fresh whites, and full unit staging.",
         "features": [
           "Turnkey turnover with off-site linen laundering service",
@@ -139,7 +142,6 @@
       "short_term_rental": {
         "name": "Short-Term Rentals Turnover",
         "tagline": "Fast Turnover for 5-Star Reviews",
-        "rate": "$0.17 / sq ft",
         "description": "Fast preparation between guests: change and laundering of linens/towels, restocking of essential supplies, and sanitization.",
         "features": [
           "Rapid, dependable turnover within checkout/check-in windows",
@@ -151,7 +153,6 @@
       "regular": {
         "name": "Residential Cleaning",
         "tagline": "Tailored Ongoing Home Upkeep",
-        "rate": "$0.12 / sq ft",
         "description": "Personalized home maintenance adapted to your lifestyle.",
         "features": [
           "Thoroughly sanitized kitchen & bathrooms",
@@ -162,7 +163,6 @@
       "deep": {
         "name": "Deep Residential Cleaning",
         "tagline": "Complete Deep Reset",
-        "rate": "$0.16 / sq ft",
         "description": "A comprehensive deep refresh reaching every hidden spot and baseboard.",
         "features": [
           "Hand-wiping of baseboards and door frames",
@@ -173,7 +173,6 @@
       "moveInOut": {
         "name": "Move-In / Move-Out Cleaning",
         "tagline": "Inspection & Turnover Ready",
-        "rate": "$0.20 / sq ft",
         "description": "Thorough sanitization for move-in and deposit return inspections.",
         "features": [
           "Inside empty closets and drawers",
@@ -182,7 +181,7 @@
         ]
       },
       "bookNow": "Book This Service",
-      "minNotice": "$99 minimum service fee per visit. Final price is calculated using verified dimensions and selected extras."
+      "minNotice": "Upfront flat rate based on your property size tier. Verified dimensions and selected extras applied at booking."
     },
     "coverage": {
       "title": "Service Areas in Denver & Boulder",
@@ -220,7 +219,7 @@
       "standardTitle": "Trusted Partner (Insured)",
       "standardDesc": "Professional and fully insured personnel you can depend on with complete confidence and peace of mind.",
       "pricingTitle": "Transparent Pricing",
-      "pricingDesc": "Clear per-square-foot rates and honest estimates with zero hidden surprises."
+      "pricingDesc": "Clear upfront tier rates and honest proposals with zero hidden surprises."
     },
     "checklist": {
       "title": "Our Comprehensive Care Standards",
