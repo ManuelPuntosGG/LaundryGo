@@ -27,12 +27,12 @@ import { Button } from '@/components/ui/Button';
 import api from '@/api';
 import type { CleaningServiceRate } from '@/types';
 import { DEFAULT_CLEANING_RATES } from '@/constants/cleaningServices';
+import { SERVICE_AREAS } from '@/constants/locations';
 
 export function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [rates, setRates] = useState<CleaningServiceRate[]>(DEFAULT_CLEANING_RATES);
-  const [sqft, setSqft] = useState<number>(1500);
 
   useEffect(() => {
     const fetchRates = async () => {
@@ -48,13 +48,6 @@ export function Home() {
     };
     fetchRates();
   }, []);
-
-  const calculateTierPrice = (ratePerSqft: string | number, minAmount: string | number = 99) => {
-    const rate = Number(ratePerSqft) || 0.12;
-    const min = Number(minAmount) || 99;
-    const raw = sqft * rate;
-    return Math.max(raw, min);
-  };
 
   const getServiceIcon = (serviceType: string) => {
     switch (serviceType) {
@@ -137,7 +130,7 @@ export function Home() {
             size="lg"
             className="w-full sm:w-auto group hover:scale-102 active:scale-98 transition-all duration-300"
             onClick={() => {
-              document.getElementById('estimator')?.scrollIntoView({ behavior: 'smooth' });
+              document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
             }}
           >
             {t('home.hero.secondaryCta')}
@@ -272,166 +265,8 @@ export function Home() {
         </div>
       </section>
 
-      {/* Interactive Sq Ft Estimator Across the 5 Services */}
-      <section id="estimator" className="scroll-mt-24">
-        <Card className="border-emerald-200/80 bg-linear-to-b from-white via-white to-emerald-50/30 p-6 sm:p-10 shadow-lg">
-          <div className="max-w-3xl mx-auto text-center space-y-3 mb-8">
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              {t('home.estimator.title')}
-            </h2>
-            <p className="text-slate-600 text-sm sm:text-base">
-              {t('home.estimator.subtitle')}
-            </p>
-          </div>
-
-          {/* Presets */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto mb-8">
-            <button
-              type="button"
-              onClick={() => setSqft(800)}
-              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer hover:scale-102 active:scale-95 ${
-                sqft === 800
-                  ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 shadow-xs ring-2 ring-emerald-500/20'
-                  : 'border-slate-200 bg-white hover:border-slate-300 text-slate-800'
-              }`}
-            >
-              <div className="text-xs font-black text-slate-900">{t('home.estimator.small')}</div>
-              <div className="text-[11px] text-slate-500 font-medium">{t('home.estimator.smallDesc')}</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSqft(1800)}
-              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer hover:scale-102 active:scale-95 ${
-                sqft === 1800
-                  ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 shadow-xs ring-2 ring-emerald-500/20'
-                  : 'border-slate-200 bg-white hover:border-slate-300 text-slate-800'
-              }`}
-            >
-              <div className="text-xs font-black text-slate-900">{t('home.estimator.medium')}</div>
-              <div className="text-[11px] text-slate-500 font-medium">{t('home.estimator.mediumDesc')}</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSqft(3000)}
-              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer hover:scale-102 active:scale-95 ${
-                sqft === 3000
-                  ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 shadow-xs ring-2 ring-emerald-500/20'
-                  : 'border-slate-200 bg-white hover:border-slate-300 text-slate-800'
-              }`}
-            >
-              <div className="text-xs font-black text-slate-900">{t('home.estimator.large')}</div>
-              <div className="text-[11px] text-slate-500 font-medium">{t('home.estimator.largeDesc')}</div>
-            </button>
-          </div>
-
-          {/* Slider & Number Control */}
-          <div className="max-w-2xl mx-auto space-y-4 mb-10">
-            <div className="flex items-center justify-between">
-              <label htmlFor="sqft-range-input" className="text-sm font-extrabold text-slate-800">
-                {t('home.estimator.sqftLabel')}:
-              </label>
-              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-1.5 shadow-2xs">
-                <input
-                  id="sqft-number-input"
-                  type="number"
-                  min={100}
-                  max={8000}
-                  step={50}
-                  value={sqft}
-                  onChange={(e) => setSqft(Math.max(100, Number(e.target.value) || 100))}
-                  className="w-20 text-right font-black text-emerald-700 text-lg focus:outline-none"
-                  aria-label={t('home.estimator.sqftLabel')}
-                />
-                <span className="text-slate-500 text-xs font-bold">{t('home.estimator.sqftUnit')}</span>
-              </div>
-            </div>
-
-            <input
-              id="sqft-range-input"
-              type="range"
-              min={300}
-              max={5000}
-              step={50}
-              value={sqft}
-              onChange={(e) => setSqft(Number(e.target.value))}
-              className="w-full accent-emerald-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-              aria-label={t('home.estimator.sqftLabel')}
-            />
-
-            <div className="flex justify-between text-xs text-slate-500 font-semibold">
-              <span>300 sq ft</span>
-              <span>1,800 sq ft</span>
-              <span>5,000+ sq ft</span>
-            </div>
-
-            <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200/80 p-3 rounded-xl text-center font-semibold shadow-2xs">
-              {t('home.estimator.minOrderNotice')}
-            </p>
-          </div>
-
-          {/* Results Grid Across the Specialized Services */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {rates.map((rate) => {
-              const price = calculateTierPrice(rate.rate_per_sqft, rate.min_order_amount);
-              const isMinimum = sqft * Number(rate.rate_per_sqft) < Number(rate.min_order_amount);
-              const localizedName = t(`home.pricing.${rate.service_type}.name`, { defaultValue: rate.name });
-              const localizedDesc = t(`home.pricing.${rate.service_type}.description`, { defaultValue: rate.description });
-              const Icon = getServiceIcon(rate.service_type);
-
-              return (
-                <div
-                  key={rate.id}
-                  className="bg-white border-2 border-slate-200/90 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:border-emerald-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">
-                        ${rate.rate_per_sqft}/sqft
-                      </span>
-                    </div>
-
-                    <h3 className="font-black text-slate-900 text-sm leading-snug group-hover:text-emerald-950 transition-colors">
-                      {localizedName}
-                    </h3>
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-3">
-                      {localizedDesc}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 mt-4 border-t border-slate-100">
-                    <div className="text-[11px] text-slate-500 font-semibold">{t('home.estimator.estTotal')}</div>
-                    <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-xl font-black text-slate-900">
-                        ${price.toFixed(2)}
-                      </span>
-                      {isMinimum && (
-                        <span className="text-[10px] text-amber-700 font-bold ml-1">(min $99)</span>
-                      )}
-                    </div>
-
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="w-full mt-3 font-extrabold text-xs hover:scale-102 active:scale-98 transition-all duration-200 shadow-xs group-hover:shadow-md"
-                      onClick={() => navigate(`/schedule?tier=${rate.service_type}&sqft=${sqft}`)}
-                    >
-                      {t('home.pricing.bookNow')}
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      </section>
-
-      {/* Services Detailed Cards Grid (4 Specialized Services) */}
-      <section className="space-y-8">
+      {/* Services Detailed Cards Grid (Specialized Services) */}
+      <section id="services" className="space-y-8 scroll-mt-20">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">
             {t('home.pricing.title')}
@@ -446,7 +281,6 @@ export function Home() {
             const Icon = getServiceIcon(rate.service_type);
             const localizedName = t(`home.pricing.${rate.service_type}.name`, { defaultValue: rate.name });
             const localizedTagline = t(`home.pricing.${rate.service_type}.tagline`, { defaultValue: 'Servicio Especializado' });
-            const localizedRate = t(`home.pricing.${rate.service_type}.rate`, { defaultValue: `$${rate.rate_per_sqft} / sq ft` });
             const localizedDesc = t(`home.pricing.${rate.service_type}.description`, { defaultValue: rate.description });
             const features = (t(`home.pricing.${rate.service_type}.features`, { returnObjects: true }) as string[]) || [];
 
@@ -468,8 +302,6 @@ export function Home() {
                   <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-950 transition-colors">
                     {localizedName}
                   </h3>
-
-                  <div className="text-2xl font-black text-emerald-700">{localizedRate}</div>
 
                   <p className="text-xs text-slate-600 font-medium leading-relaxed">
                     {localizedDesc}
@@ -540,27 +372,23 @@ export function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-7 border-emerald-200/90 bg-emerald-50/40 hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 transition-all duration-300">
-            <div className="inline-flex items-center gap-2 text-emerald-800 font-extrabold text-sm mb-3">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>{t('home.coverage.innerBadge')}</span>
-            </div>
-            <p className="text-sm text-slate-800 leading-relaxed font-medium">
-              {t('home.coverage.innerDesc')}
-            </p>
-          </Card>
-
-          <Card className="p-7 border-emerald-200/90 bg-emerald-50/40 hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 transition-all duration-300">
-            <div className="inline-flex items-center gap-2 text-emerald-800 font-extrabold text-sm mb-3">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>{t('home.coverage.outerBadge')}</span>
-            </div>
-            <p className="text-sm text-slate-800 leading-relaxed font-medium">
-              {t('home.coverage.outerDesc')}
-            </p>
-          </Card>
-        </div>
+        <Card className="p-7 sm:p-10 border-emerald-200/90 bg-emerald-50/30 shadow-md">
+          <div className="flex items-center gap-2 text-emerald-800 font-extrabold text-base mb-6">
+            <MapPin className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>{i18n.language?.startsWith('es') ? 'Áreas de Servicio en Denver y Boulder' : 'Denver & Boulder Service Areas'}</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            {SERVICE_AREAS.map((city) => (
+              <div
+                key={city}
+                className="flex items-center gap-2.5 p-3 rounded-xl bg-white border border-emerald-100 shadow-2xs font-bold text-slate-800 text-xs sm:text-sm hover:border-emerald-300 transition-colors"
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{city}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
       </section>
 
       {/* Contact & Support Section */}

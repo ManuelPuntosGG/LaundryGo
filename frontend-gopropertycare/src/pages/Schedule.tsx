@@ -32,13 +32,15 @@ import api from '@/api';
 import type { CleaningServiceRate, CleaningAddon, CleaningAvailableDate } from '@/types';
 import { DEFAULT_CLEANING_RATES } from '@/constants/cleaningServices';
 import { PROPERTY_ADDONS } from '@/constants/cleaningAddons';
-import { DENVER_LOCATIONS } from '@/constants/locations';
+import { SERVICE_AREAS } from '@/constants/locations';
 import {
   PRICING_TIERS,
   SERVICE_FREQUENCIES,
   getTierBySqft,
+  getTierPrice,
   type PricingTier,
   type ServiceFrequency,
+  type CleaningServiceTierType,
 } from '@/constants/pricingTiers';
 
 type Step = 1 | 2 | 3 | 4;
@@ -154,7 +156,6 @@ const getFallbackDates = (count = 60): CleaningAvailableDate[] => {
 
 export function Schedule() {
   const tierSelectId = useId();
-  const citySelectId = useId();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthContext();
@@ -175,10 +176,13 @@ export function Schedule() {
     return PRICING_TIERS[1]; // Default Tier 2 (1,000 - 1,299 sq ft)
   });
 
-  const [serviceType, setServiceType] = useState<'standard' | 'deep'>(() => {
+  const [serviceType, setServiceType] = useState<CleaningServiceTierType>(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const tierParam = searchParams.get('tier');
-    return tierParam === 'move_in_out' ? 'deep' : 'standard';
+    if (tierParam === 'move_in_out' || tierParam === 'deep') return 'deep';
+    if (tierParam === 'str_on_site') return 'str_on_site';
+    if (tierParam === 'str_off_site') return 'str_off_site';
+    return 'standard';
   });
 
   const [frequency, setFrequency] = useState<ServiceFrequency>('biweekly'); // Default "Most Popular"
@@ -217,13 +221,6 @@ export function Schedule() {
   });
 
   // Step 3: Location, Contact, Access & Priced Addons
-  const [selectedLocation, setSelectedLocation] = useState(() => {
-    if (user?.city) {
-      return DENVER_LOCATIONS.find((l) => l.name === user.city) || DENVER_LOCATIONS[0];
-    }
-    return DENVER_LOCATIONS[0];
-  });
-
   const [entryMethod, setEntryMethod] = useState<string>('someone_home');
   const [entryNotes, setEntryNotes] = useState<string>('');
   const [selectedAddonCodes, setSelectedAddonCodes] = useState<Record<string, boolean>>({});
@@ -235,7 +232,7 @@ export function Schedule() {
     phone: user?.phone || '',
     email: user?.email || '',
     street_address: user?.street_address || '',
-    city: user?.city || 'Denver (Downtown / Central)',
+    city: user?.city || 'Denver',
     zip_code: user?.zip_code || '',
   }));
 
@@ -250,9 +247,7 @@ export function Schedule() {
   useEffect(() => {
     if (isAuthenticated && user) {
       queueMicrotask(() => {
-        const userCity = user.city || 'Denver (Downtown / Central)';
-        const found = DENVER_LOCATIONS.find((l) => l.name === userCity) || DENVER_LOCATIONS[0];
-        setSelectedLocation(found);
+        const userCity = user.city || 'Denver';
 
         setFormData((prev) => {
           if (prev.email) return prev;
@@ -321,19 +316,16 @@ export function Schedule() {
 
   // Determine active service rate for backend mapping
   const activeRate =
-    rates.find((r) =>
-      serviceType === 'deep'
-        ? r.service_type === 'move_in_out' || r.service_type === 'deep'
-        : r.service_type === 'residential' || r.service_type === 'regular'
-    ) || rates[0];
+    rates.find((r) => {
+      if (serviceType === 'str_on_site') return r.service_type === 'str_on_site';
+      if (serviceType === 'str_off_site') return r.service_type === 'str_off_site';
+      if (serviceType === 'deep') return r.service_type === 'move_in_out' || r.service_type === 'deep';
+      return r.service_type === 'residential' || r.service_type === 'regular';
+    }) || rates[0];
 
   // Pricing calculations based on Tier matrix & recurring frequency discounts
   const isCustomQuote = selectedTier.isCustomQuote === true;
-  const baseTierPrice = isCustomQuote
-    ? 0
-    : serviceType === 'deep'
-    ? selectedTier.deepPrice
-    : selectedTier.standardPrice;
+  const baseTierPrice = getTierPrice(selectedTier, serviceType);
 
   const freqOption =
     SERVICE_FREQUENCIES.find((f) => f.id === frequency) || SERVICE_FREQUENCIES[0];
@@ -348,9 +340,7 @@ export function Schedule() {
     return sum;
   }, 0);
 
-  // All Denver locations are Free Travel
-  const deliveryFee = selectedLocation.fee || 0;
-  const totalPrice = discountedBasePrice + addonsTotal + deliveryFee;
+  const totalPrice = discountedBasePrice + addonsTotal;
 
   const representativeSqft = isCustomQuote
     ? parseInt(customQuoteSqft, 10) || 6500
@@ -362,6 +352,7 @@ export function Schedule() {
   const isPhoneValid = formData.phone.replace(/\D/g, '').length >= 10;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim());
   const isAddressValid = formData.street_address.trim().length >= 5;
+  const isCityValid = formData.city.trim().length >= 2;
   const isZipValid = /^\d{5}/.test(formData.zip_code.trim());
 
   const canProceedFromStep3 =
@@ -370,6 +361,7 @@ export function Schedule() {
     isPhoneValid &&
     isEmailValid &&
     isAddressValid &&
+    isCityValid &&
     isZipValid;
 
   // Calendar Helpers
@@ -456,9 +448,9 @@ export function Schedule() {
       guest_last_name: formData.last_name.trim(),
       guest_phone: formData.phone.trim(),
       street_address: formData.street_address.trim(),
-      city: selectedLocation.name,
+      city: formData.city.trim() || 'Denver',
       zip_code: formData.zip_code.trim(),
-      delivery_zone: selectedLocation.zone,
+      delivery_zone: 'inner' as const,
       service_rate_id: activeRate.id,
       square_feet: representativeSqft,
       frequency: frequency,
@@ -515,9 +507,9 @@ export function Schedule() {
       guest_last_name: formData.last_name.trim() || 'Property Owner',
       guest_phone: formData.phone.trim(),
       street_address: formData.street_address.trim() || 'Denver Metropolitan Area',
-      city: selectedLocation.name,
+      city: formData.city.trim() || 'Denver',
       zip_code: formData.zip_code.trim() || '80202',
-      delivery_zone: selectedLocation.zone,
+      delivery_zone: 'inner' as const,
       service_rate_id: activeRate.id,
       square_feet: parsedSqft,
       frequency: frequency,
@@ -577,13 +569,16 @@ export function Schedule() {
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.serviceTypeLabel')}</span>
               <span className="font-bold text-slate-900">
-                {serviceType === 'deep' ? t('schedule.serviceDeep') : t('schedule.serviceStandard')}
+                {serviceType === 'standard' && t('schedule.serviceStandard')}
+                {serviceType === 'deep' && t('schedule.serviceDeep')}
+                {serviceType === 'str_on_site' && t('schedule.serviceStrOnSite')}
+                {serviceType === 'str_off_site' && t('schedule.serviceStrOffSite')}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.dimensions')}</span>
               <span className="font-bold text-slate-900">
-                {selectedTier.label} ({selectedTier.propertyHint})
+                {selectedTier.label}
               </span>
             </div>
             <div className="flex justify-between">
@@ -599,7 +594,7 @@ export function Schedule() {
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.addressLabel')}</span>
               <span className="font-bold text-slate-900 text-right">
-                {formData.street_address ? `${formData.street_address}, ` : ''}{selectedLocation.name} (Free Travel)
+                {formData.street_address ? `${formData.street_address}, ` : ''}{formData.city || 'Denver'}
               </span>
             </div>
             {!customQuoteSubmitted && (
@@ -722,7 +717,7 @@ export function Schedule() {
               <span className="text-xs text-emerald-800 bg-white border border-emerald-200 px-2.5 py-0.5 rounded-md font-bold self-start sm:self-auto shadow-2xs">
                 {isCustomQuote
                   ? (i18n.language?.startsWith('es') ? 'Cotización Especial' : 'Custom Quote')
-                  : `${selectedTier.label} • ${selectedTier.propertyHint}`}
+                  : selectedTier.label}
               </span>
             </div>
 
@@ -743,7 +738,7 @@ export function Schedule() {
                       ? (i18n.language?.startsWith('es')
                           ? '6,100+ sq ft — Cotización Personalizada a Medida'
                           : '6,100+ sq ft — Custom Quote & Tailored Proposal')
-                      : `${tier.label} (${tier.propertyHint}) — $${tier.standardPrice} Standard • $${tier.deepPrice} Deep Clean`}
+                      : tier.label}
                   </option>
                 ))}
               </select>
@@ -828,26 +823,12 @@ export function Schedule() {
                     />
                   </div>
 
-                  <div>
-                    <label htmlFor="custom-city-select" className="block text-xs font-bold text-slate-700 mb-1">
-                      {t('schedule.citySelect')}
-                    </label>
-                    <select
-                      id="custom-city-select"
-                      value={selectedLocation.name}
-                      onChange={(e) => {
-                        const found = DENVER_LOCATIONS.find((l) => l.name === e.target.value);
-                        if (found) setSelectedLocation(found);
-                      }}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs cursor-pointer"
-                    >
-                      {DENVER_LOCATIONS.map((loc) => (
-                        <option key={loc.name} value={loc.name}>
-                          {loc.name} (Free Travel)
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Input
+                    label={`${t('schedule.cityLabel')} *`}
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    placeholder={t('schedule.cityPlaceholder')}
+                  />
                 </div>
 
                 <div className="space-y-1">
@@ -886,7 +867,7 @@ export function Schedule() {
             </div>
           ) : (
             <>
-              {/* Service Type Toggle (Standard Clean vs Deep / Move Clean) */}
+              {/* Service Type Selection Cards (4 services: Standard, Deep, STR On-Site, STR Off-Site) */}
               <div className="space-y-3">
                 <label className="block text-sm font-extrabold text-slate-900">
                   {t('schedule.serviceTypeLabel')}
@@ -903,9 +884,9 @@ export function Schedule() {
                   >
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md">
-                          {i18n.language?.startsWith('es') ? 'Mantenimiento Regular' : 'Regular Maintenance'}
-                        </span>
+                        <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                          {t('schedule.serviceStandard')}
+                        </h3>
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                             serviceType === 'standard'
@@ -916,9 +897,6 @@ export function Schedule() {
                           {serviceType === 'standard' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
                         </div>
                       </div>
-                      <h3 className="font-black text-slate-900 text-sm sm:text-base">
-                        {t('schedule.serviceStandard')}
-                      </h3>
                       <p className="text-xs text-slate-600 font-medium">
                         {t('schedule.serviceStandardDesc')}
                       </p>
@@ -943,9 +921,9 @@ export function Schedule() {
                   >
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md">
-                          {i18n.language?.startsWith('es') ? 'Limpieza Profunda' : 'Thorough Deep Clean'}
-                        </span>
+                        <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                          {t('schedule.serviceDeep')}
+                        </h3>
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                             serviceType === 'deep'
@@ -956,9 +934,6 @@ export function Schedule() {
                           {serviceType === 'deep' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
                         </div>
                       </div>
-                      <h3 className="font-black text-slate-900 text-sm sm:text-base">
-                        {t('schedule.serviceDeep')}
-                      </h3>
                       <p className="text-xs text-slate-600 font-medium">
                         {t('schedule.serviceDeepDesc')}
                       </p>
@@ -968,6 +943,80 @@ export function Schedule() {
                       <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
                       <span className="text-base sm:text-lg font-black text-slate-900">
                         ${selectedTier.deepPrice.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Short Term Rental Clean (On-Site Laundry) */}
+                  <div
+                    onClick={() => setServiceType('str_on_site')}
+                    className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
+                      serviceType === 'str_on_site'
+                        ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                          {t('schedule.serviceStrOnSite')}
+                        </h3>
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                            serviceType === 'str_on_site'
+                              ? 'border-emerald-600 bg-emerald-600 text-white'
+                              : 'border-slate-300'
+                          }`}
+                        >
+                          {serviceType === 'str_on_site' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-600 font-medium">
+                        {t('schedule.serviceStrOnSiteDesc')}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
+                      <span className="text-base sm:text-lg font-black text-slate-900">
+                        ${selectedTier.strOnSitePrice.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Short Term Rental Clean (Off-Site Laundry) */}
+                  <div
+                    onClick={() => setServiceType('str_off_site')}
+                    className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
+                      serviceType === 'str_off_site'
+                        ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                          {t('schedule.serviceStrOffSite')}
+                        </h3>
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                            serviceType === 'str_off_site'
+                              ? 'border-emerald-600 bg-emerald-600 text-white'
+                              : 'border-slate-300'
+                          }`}
+                        >
+                          {serviceType === 'str_off_site' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-600 font-medium">
+                        {t('schedule.serviceStrOffSiteDesc')}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
+                      <span className="text-base sm:text-lg font-black text-slate-900">
+                        ${selectedTier.strOffSitePrice.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -1045,9 +1094,6 @@ export function Schedule() {
                     <Home className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>{t('schedule.propertyDetailsTitle')}</span>
                   </h3>
-                  <span className="text-[10px] sm:text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md font-bold self-start sm:self-auto uppercase tracking-wide">
-                    {t('schedule.inquiryNoCharge')}
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1397,44 +1443,16 @@ export function Schedule() {
             </p>
           </div>
 
-          {/* Location Selection via Dropdown - All 100% Free Travel in Denver Metro */}
-          <div className="space-y-2 bg-emerald-50/40 border border-emerald-200/80 rounded-2xl p-4 sm:p-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-              <label htmlFor={citySelectId} className="block text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-emerald-600" />
-                <span>{t('schedule.citySelect')}</span>
-              </label>
-              <span className="text-xs font-black text-emerald-800 bg-emerald-100 border border-emerald-300/80 px-2.5 py-0.5 rounded-full self-start sm:self-auto shadow-2xs">
-                ✓ {i18n.language?.startsWith('es') ? 'Traslado 100% Gratis en Todo Denver y Boulder' : '100% Free Travel Across All Denver & Boulder'}
-              </span>
+          {/* Service Areas */}
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
+              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 uppercase tracking-wide">
+                {i18n.language?.startsWith('es') ? 'Áreas de Servicio' : 'Service Areas'}
+              </h3>
             </div>
-
-            <div className="relative">
-              <select
-                id={citySelectId}
-                value={selectedLocation.name}
-                onChange={(e) => {
-                  const found = DENVER_LOCATIONS.find((l) => l.name === e.target.value);
-                  if (found) {
-                    setSelectedLocation(found);
-                    setFormData((prev) => ({ ...prev, city: found.name }));
-                  }
-                }}
-                className="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-3 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 shadow-2xs appearance-none cursor-pointer pr-10 hover:border-slate-400 transition-all"
-              >
-                {DENVER_LOCATIONS.map((loc) => (
-                  <option key={loc.name} value={loc.name}>
-                    {loc.name} — {i18n.language?.startsWith('es') ? 'Traslado Gratis ($0.00)' : 'Free Travel ($0.00)'}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-5 h-5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            <p className="text-[11px] text-slate-500 font-medium">
-              {i18n.language?.startsWith('es')
-                ? 'Todas las ubicaciones en Denver Metro y Boulder cuentan con viaje y desplazamiento totalmente gratuito.'
-                : 'All locations across the Denver Metropolitan Area and Boulder include zero travel or delivery fees.'}
+            <p className="text-xs text-slate-600 font-medium">
+              {SERVICE_AREAS.join(' • ')}
             </p>
           </div>
 
@@ -1447,6 +1465,15 @@ export function Schedule() {
               onBlur={() => setTouchedFields({ ...touchedFields, street_address: true })}
               error={touchedFields.street_address && !isAddressValid ? t('schedule.errAddress') : ''}
               placeholder={t('schedule.addressPlaceholder')}
+            />
+
+            <Input
+              label={`${t('schedule.cityLabel')} *`}
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              onBlur={() => setTouchedFields({ ...touchedFields, city: true })}
+              error={touchedFields.city && !isCityValid ? t('schedule.errCity') : ''}
+              placeholder={t('schedule.cityPlaceholder')}
             />
 
             <Input
@@ -1685,13 +1712,19 @@ export function Schedule() {
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.serviceTypeLabel')}:</span>
                 <span className="font-bold text-slate-900 text-right">
-                  {serviceType === 'deep' ? t('schedule.serviceDeep') : t('schedule.serviceStandard')}
+                  {serviceType === 'deep'
+                    ? t('schedule.serviceDeep')
+                    : serviceType === 'str_on_site'
+                    ? t('schedule.serviceStrOnSite')
+                    : serviceType === 'str_off_site'
+                    ? t('schedule.serviceStrOffSite')
+                    : t('schedule.serviceStandard')}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.dimensions')}:</span>
                 <span className="font-bold text-slate-900 text-right">
-                  {selectedTier.label} ({selectedTier.propertyHint}) • {bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, {bathrooms} {t('schedule.baths')}
+                  {selectedTier.label} • {bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, {bathrooms} {t('schedule.baths')}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-2">
@@ -1732,13 +1765,7 @@ export function Schedule() {
               </div>
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.addressLabel')}:</span>
-                <span className="font-bold text-slate-900 text-right">{formData.street_address}, {selectedLocation.name}</span>
-              </div>
-              <div className="flex justify-between items-start gap-2">
-                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.travelFee')}:</span>
-                <span className="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
-                  FREE ($0.00)
-                </span>
+                <span className="font-bold text-slate-900 text-right">{formData.street_address}, {formData.city || 'Denver'}</span>
               </div>
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.accessMethod')}:</span>
@@ -1793,12 +1820,6 @@ export function Schedule() {
                 <span className="font-bold text-slate-900">+${addonsTotal.toFixed(2)}</span>
               </div>
             )}
-
-            {/* Travel Fee */}
-            <div className="flex justify-between text-slate-700 text-xs font-medium">
-              <span>{t('schedule.travelFee')} ({selectedLocation.name}):</span>
-              <span className="font-bold text-emerald-700">FREE ($0.00)</span>
-            </div>
 
             {/* Total Due */}
             <div className="pt-3 border-t-2 border-emerald-100 flex justify-between items-baseline">
