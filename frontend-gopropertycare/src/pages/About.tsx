@@ -66,7 +66,7 @@ export function About() {
       {/* Values 4-Grid */}
       <section className="space-y-6">
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 text-center tracking-tight">
-          {t('about.pillarsTitle', 'Our Operational Pillars')}
+          {t('about.pillarsTitle', 'Why Choose GoPropertyCare?')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="p-6 space-y-3 hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 transition-all duration-300 group">

@@ -583,7 +583,7 @@ export function Schedule() {
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.dimensions')}</span>
               <span className="font-bold text-slate-900">
-                Tier {selectedTier.tier} ({selectedTier.label})
+                {selectedTier.label} ({selectedTier.propertyHint})
               </span>
             </div>
             <div className="flex justify-between">
@@ -709,18 +709,20 @@ export function Schedule() {
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-emerald-800 text-xs font-bold self-start sm:self-auto">
               <Tag className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Denver Metro Tier Matrix</span>
+              <span>{i18n.language?.startsWith('es') ? 'Tarifas Claras y Transparentes' : 'Transparent Upfront Pricing'}</span>
             </div>
           </div>
 
-          {/* Size Selection Dropdown (Tiers 1 to 18 + Tier 19 Custom Quote) */}
+          {/* Size Selection Dropdown */}
           <div className="bg-slate-50 border-2 border-slate-200/90 rounded-2xl p-4 sm:p-6 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
               <label htmlFor={tierSelectId} className="block text-sm font-extrabold text-slate-900">
                 {t('schedule.tierDropdownLabel')}
               </label>
               <span className="text-xs text-emerald-800 bg-white border border-emerald-200 px-2.5 py-0.5 rounded-md font-bold self-start sm:self-auto shadow-2xs">
-                {isCustomQuote ? 'Custom Review' : `Tier ${selectedTier.tier} • ${selectedTier.sqftEquivalent}`}
+                {isCustomQuote
+                  ? (i18n.language?.startsWith('es') ? 'Cotización Especial' : 'Custom Quote')
+                  : `${selectedTier.label} • ${selectedTier.propertyHint}`}
               </span>
             </div>
 
@@ -738,8 +740,10 @@ export function Schedule() {
                 {PRICING_TIERS.map((tier) => (
                   <option key={tier.tier} value={tier.tier}>
                     {tier.isCustomQuote
-                      ? `Tier 19: > 6,100 sq ft — ${i18n.language?.startsWith('es') ? 'Cotización Personalizada / Revisión Manual' : 'Custom Quote Trigger / Manual Review'}`
-                      : `Tier ${tier.tier}: ${tier.label}  |  $${tier.standardPrice} Std  •  $${tier.deepPrice} Deep (${tier.sqftEquivalent})`}
+                      ? (i18n.language?.startsWith('es')
+                          ? '6,100+ sq ft — Cotización Personalizada a Medida'
+                          : '6,100+ sq ft — Custom Quote & Tailored Proposal')
+                      : `${tier.label} (${tier.propertyHint}) — $${tier.standardPrice} Standard • $${tier.deepPrice} Deep Clean`}
                   </option>
                 ))}
               </select>
@@ -748,8 +752,8 @@ export function Schedule() {
 
             <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
               {i18n.language?.startsWith('es')
-                ? 'El algoritmo mapea las dimensiones de tu inmueble directamente a los 18 niveles optimizados para Denver.'
-                : 'The booking engine maps your property size directly to our 18 operational tiers optimized for Denver.'}
+                ? 'Tarifas fijas e integrales según las dimensiones de tu inmueble. Sin costos ocultos ni cobros sorpresa por hora.'
+                : 'Upfront, all-inclusive pricing based on your property size. No hidden fees or surprise hourly billing.'}
             </p>
           </div>
 
@@ -900,7 +904,7 @@ export function Schedule() {
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
                         <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md">
-                          Denver Standard
+                          {i18n.language?.startsWith('es') ? 'Mantenimiento Regular' : 'Regular Maintenance'}
                         </span>
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
@@ -940,7 +944,7 @@ export function Schedule() {
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
                         <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md">
-                          Deep Reset & Turnovers
+                          {i18n.language?.startsWith('es') ? 'Limpieza Profunda' : 'Thorough Deep Clean'}
                         </span>
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
@@ -1687,7 +1691,7 @@ export function Schedule() {
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.dimensions')}:</span>
                 <span className="font-bold text-slate-900 text-right">
-                  Tier {selectedTier.tier} ({selectedTier.label}) • {bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, {bathrooms} {t('schedule.baths')}
+                  {selectedTier.label} ({selectedTier.propertyHint}) • {bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, {bathrooms} {t('schedule.baths')}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-2">
@@ -1764,13 +1768,13 @@ export function Schedule() {
             <h3 className="font-black text-emerald-950 text-xs sm:text-sm uppercase tracking-wider flex items-center justify-between">
               <span>{t('schedule.costBreakdown')}</span>
               <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
-                Denver Matrix
+                {i18n.language?.startsWith('es') ? 'Tarifa Fija' : 'Flat Rate'}
               </span>
             </h3>
 
             {/* Base Tier Price */}
             <div className="flex justify-between text-slate-700 text-xs font-medium">
-              <span>{t('schedule.baseTierPrice')} (Tier {selectedTier.tier} • {selectedTier.label}):</span>
+              <span>{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
               <span className="font-bold text-slate-900">${baseTierPrice.toFixed(2)}</span>
             </div>
 

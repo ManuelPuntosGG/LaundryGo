@@ -422,12 +422,12 @@ export function Schedule() {
 
     if (targetStep === 3) {
       if (!selectedRate) {
-        setStepError(t('schedule.errors.selectRate', { defaultValue: 'Please select a service speed tier.' }));
+        setStepError(t('schedule.errors.selectRate', { defaultValue: 'Please choose your preferred turnaround speed.' }));
         return false;
       }
       const rate = safeRates.find((r) => r.id === selectedRate);
       if (rate?.service_type === 'gofurther' && !canSelectGoFurther(selectedDate)) {
-        setStepError(t('schedule.errors.cutoffNotice', { defaultValue: 'Same-day express service is not available after 12:00 PM for today. Please choose Standard or Next-day service.' }));
+        setStepError(t('schedule.errors.cutoffNotice', { defaultValue: 'Same-day express delivery is available for orders placed before 12:00 PM today. Please choose Next-day or Standard delivery.' }));
         return false;
       }
       return true;
@@ -513,12 +513,12 @@ export function Schedule() {
         const errorList: string[] = [];
         for (const [key, val] of Object.entries(data)) {
           const valMsg = Array.isArray(val) ? val.join(', ') : String(val);
-          if (key === 'service_rate') {
-            errorList.push(
-              i18n.language?.startsWith('es')
-                ? 'Tarifa de servicio: El servicio mismo día no está disponible para hoy después de las 12:00 PM. Por favor selecciona Estándar o Día Siguiente.'
-                : 'Service speed: Same-day GoFurther service for today is only available before 12:00 PM. Please choose Standard or Next-day service.'
-            );
+            if (key === 'service_rate') {
+              errorList.push(
+                i18n.language?.startsWith('es')
+                  ? 'Tiempo de entrega: La entrega express mismo día está disponible para pedidos realizados antes de las 12:00 PM de hoy. Por favor selecciona Día Siguiente o Estándar.'
+                  : 'Turnaround speed: Same-day GoFurther delivery is available for orders placed before 12:00 PM today. Please choose Next-Day or Standard delivery.'
+              );
           } else if (key === 'pickup_date') {
             errorList.push(
               i18n.language?.startsWith('es')

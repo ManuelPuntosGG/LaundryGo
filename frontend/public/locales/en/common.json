@@ -90,7 +90,7 @@
       "title": "Service Area",
       "description": "We serve the entire Denver metropolitan area",
       "innerBadge": "Free Delivery (Central Denver)",
-      "outerBadge": "Outer Metro ($25 Fee)"
+      "outerBadge": "Extended Metro ($25 Travel Fee)"
     },
     "contact": {
       "title": "Contact Us",
@@ -130,7 +130,7 @@
     "recurringTip": "💡 Click frequency again to revert to a single one-time pickup.",
     "oneTimeTip": "ℹ️ By default this is a single one-time pickup. Select an option above for recurring service.",
     "recurringDiscountBenefit": "🔥 7.5% discount applies automatically starting from your 2nd recurring pickup!",
-    "minimumOrderNotice": "Note: $40 minimum order applies to laundry wash services.",
+    "minimumOrderNotice": "Transparent pricing: $40 minimum order per pickup.",
     "yourInfo": "Your Information",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -141,11 +141,11 @@
     "cityLocation": "Denver Area Location",
     "zipCode": "Zip Code",
     "freeDelivery": "FREE Delivery Included (Central Denver)",
-    "outerZoneFee": "+$25.00 Outer Zone Delivery Fee",
+    "outerZoneFee": "+$25.00 Extended Area Delivery",
     "terms": "I agree to the Terms of Service and Privacy Policy",
     "serviceType": "Service Type",
-    "selectServiceSpeed": "Select Service Speed",
-    "cutoffNotice": "Cutoff 12PM",
+    "selectServiceSpeed": "Choose Turnaround Speed",
+    "cutoffNotice": "Order by 12:00 PM for Same-Day",
     "addonsTitle": "Custom Add-ons & Bedding Items",
     "addonsSubtitle": "Select optional scent boosts, stain treatments, or bulky bedding pieces",
     "treatmentsCategory": "Special Wash Treatments",
@@ -187,7 +187,7 @@
     "customerDetails": "Customer & Address Details",
     "deliveryFeeLabel": "Delivery Fee",
     "freeFee": "FREE ($0.00)",
-    "outerFee": "$25.00 (Outer Zone Service Fee)",
+    "outerFee": "$25.00 (Extended Coverage Area)",
     "orderDetailsSummary": "Order Details",
     "loginPrompt": "Ordering as Guest. Want to save your info?",
     "loginLink": "Log In",
@@ -211,8 +211,8 @@
       "zipCode": "Please enter a valid 5-digit zip code.",
       "location": "Please select a valid Denver area location.",
       "terms": "You must agree to the Service Terms & Conditions to proceed.",
-      "selectRate": "Please select a service speed tier.",
-      "cutoffNotice": "Same-day express service is not available after 12:00 PM for today. Please choose Standard or Next-day service."
+      "selectRate": "Please choose your preferred turnaround speed.",
+      "cutoffNotice": "Same-day express delivery is available for orders placed before 12:00 PM today. Please choose Next-day or Standard delivery."
     }
   },
   "auth": {
@@ -354,14 +354,14 @@
     },
     "businessRules": {
       "badge": "Transparent Rules",
-      "title": "Our Core Business Model & Commitments",
+      "title": "Our Service Guarantees & Commitments",
       "subtitle": "Clear guidelines and honest pricing that make LaundryGo simple, reliable, and fair.",
       "rule1": {
         "title": "Fair Per-Pound Rates & $40 Min.",
         "description": "We bill by actual weight ($2.25/lb Standard, $2.45/lb Go next-day, $3.85/lb Same-day express). A $40 minimum order applies to laundry services."
       },
       "rule2": {
-        "title": "Same-Day Cutoff at 12:00 PM",
+        "title": "Same-Day Delivery by 12:00 PM",
         "description": "Need same-day turnaround? Book before 12:00 PM with 'GoFurther' and receive your fresh clothes back the very same day."
       },
       "rule3": {
@@ -370,7 +370,7 @@
       },
       "rule4": {
         "title": "Denver & Boulder Metro Coverage",
-        "description": "Free $0 delivery in Central Denver, Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, and Broomfield. Outer metro areas (Aurora, Thornton, Centennial, Highlands Ranch) have a $25 delivery fee."
+        "description": "Free $0 delivery in Central Denver, Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, and Broomfield. Extended coverage areas (Aurora, Thornton, Centennial, Highlands Ranch) have a $25 travel fee."
       }
     },
     "values": {

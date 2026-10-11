@@ -90,7 +90,7 @@
       "title": "Área de Servicio",
       "description": "Servimos a toda el área metropolitana de Denver",
       "innerBadge": "Envío Gratis (Zona Central de Denver)",
-      "outerBadge": "Zona Exterior (Tarifa de $25)"
+      "outerBadge": "Área Extendida (Traslado $25)"
     },
     "contact": {
       "title": "Contáctanos",
@@ -130,7 +130,7 @@
     "recurringTip": "💡 Haz clic nuevamente en la frecuencia para volver a servicio único puntual.",
     "oneTimeTip": "ℹ️ De forma predeterminada es una recolección única. Si deseas programar recolecciones periódicas, elige una opción arriba.",
     "recurringDiscountBenefit": "🔥 ¡El 7.5% de descuento aplica automáticamente a partir de tu 2da recolección recurrente!",
-    "minimumOrderNotice": "Nota: Aplica una orden mínima de $40 para el servicio de lavado por libra.",
+    "minimumOrderNotice": "Precios transparentes: orden mínima de $40 por recolección.",
     "yourInfo": "Tu Información",
     "firstName": "Nombre",
     "lastName": "Apellido",
@@ -141,11 +141,11 @@
     "cityLocation": "Zona en Área de Denver",
     "zipCode": "Código Postal",
     "freeDelivery": "Envío GRATUITO Incluido (Zona Central de Denver)",
-    "outerZoneFee": "+$25.00 Tarifa de Envío Zona Exterior",
+    "outerZoneFee": "+$25.00 Traslado a Área Extendida",
     "terms": "Acepto los Términos de Servicio y la Política de Privacidad",
     "serviceType": "Tipo de Servicio",
-    "selectServiceSpeed": "Seleccionar Velocidad del Servicio",
-    "cutoffNotice": "Límite 12PM",
+    "selectServiceSpeed": "Elige el Tiempo de Entrega",
+    "cutoffNotice": "Pide antes de las 12:00 PM para hoy",
     "addonsTitle": "Tratamientos Especiales y Ropa de Cama",
     "addonsSubtitle": "Añade potenciadores de aroma, desmanchado o piezas voluminosas de cama",
     "treatmentsCategory": "Tratamientos Especiales",
@@ -187,7 +187,7 @@
     "customerDetails": "Datos del Cliente y Dirección",
     "deliveryFeeLabel": "Tarifa de Envío",
     "freeFee": "GRATIS ($0.00)",
-    "outerFee": "$25.00 (Tarifa Zona Exterior)",
+    "outerFee": "$25.00 (Área de Cobertura Extendida)",
     "orderDetailsSummary": "Detalles del Pedido",
     "loginPrompt": "¿Haciendo pedido como invitado? ¿Quieres guardar tus datos?",
     "loginLink": "Iniciar Sesión",
@@ -211,8 +211,8 @@
       "zipCode": "Por favor ingresa un código postal válido de 5 dígitos.",
       "location": "Por favor selecciona una ubicación válida en Denver.",
       "terms": "Debes aceptar los Términos y Condiciones del Servicio para continuar.",
-      "selectRate": "Por favor selecciona una velocidad de servicio.",
-      "cutoffNotice": "El servicio express mismo día no está disponible después de las 12:00 PM para hoy. Por favor selecciona Estándar o Día Siguiente."
+      "selectRate": "Por favor elige el tiempo de entrega deseado.",
+      "cutoffNotice": "La entrega express el mismo día está disponible para pedidos realizados antes de las 12:00 PM de hoy. Por favor selecciona Día Siguiente o Estándar."
     }
   },
   "auth": {
@@ -354,14 +354,14 @@
     },
     "businessRules": {
       "badge": "Transparencia Total",
-      "title": "Modelo de Negocio y Reglas Clave",
+      "title": "Nuestros Compromisos y Cómo Funciona el Servicio",
       "subtitle": "Directrices claras y tarifas honestas para una experiencia simple, justa y predecible.",
       "rule1": {
         "title": "Tarifa por Libra y Mínimo de $40",
         "description": "Cobramos únicamente por el peso de tu ropa ($2.25/lb Estándar, $2.45/lb Go día siguiente, $3.85/lb Mismo día). Aplica una orden mínima de $40 en servicios de lavado."
       },
       "rule2": {
-        "title": "Límite de Mismo Día (12:00 PM)",
+        "title": "Entrega el Mismo Día (Pidiendo antes de las 12:00 PM)",
         "description": "¿Necesitas tu ropa hoy mismo? Solicita antes de las 12:00 PM con 'GoFurther' y recibe tu ropa limpia el mismo día."
       },
       "rule3": {
@@ -370,7 +370,7 @@
       },
       "rule4": {
         "title": "Cobertura en Denver y Boulder Metro",
-        "description": "Envío gratis ($0) en Denver Central, Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder y Broomfield. Ciudades exteriores (Aurora, Thornton, Centennial, Highlands Ranch) cuentan con tarifa fija de $25."
+        "description": "Envío gratis ($0) en Denver Central, Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder y Broomfield. Áreas de cobertura extendida (Aurora, Thornton, Centennial, Highlands Ranch) cuentan con tarifa de traslado de $25."
       }
     },
     "values": {
