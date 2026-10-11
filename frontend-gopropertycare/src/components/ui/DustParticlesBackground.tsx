@@ -41,23 +41,23 @@ export function DustParticlesBackground() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Particle density: ~35-45 particles
-    const particleCount = Math.max(25, Math.min(Math.floor((width * height) / 25000), 45));
+    // Particle density: ~50-70 visible floating particles
+    const particleCount = Math.max(45, Math.min(Math.floor((width * height) / 16000), 75));
 
     const particles: Particle[] = Array.from({ length: particleCount }, () => {
       const colorRgb = GREEN_PALETTE_RGB[Math.floor(Math.random() * GREEN_PALETTE_RGB.length)];
       return {
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: 1.2 + Math.random() * 2.6, // Soft size between 1.2px and 3.8px
+        radius: 1.8 + Math.random() * 3.2, // Visible size between 1.8px and 5.0px
         colorRgb,
-        baseAlpha: 0.12 + Math.random() * 0.22, // Soft translucent opacity
-        pulseSpeed: 0.008 + Math.random() * 0.016,
+        baseAlpha: 0.25 + Math.random() * 0.35, // Clear, visible translucent glow
+        pulseSpeed: 0.012 + Math.random() * 0.022,
         pulsePhase: Math.random() * Math.PI * 2,
-        vx: (Math.random() - 0.5) * 0.15, // Subtle horizontal drift
-        vy: -0.08 - Math.random() * 0.22, // Gentle upward buoyant drift
-        swayAmplitude: 0.3 + Math.random() * 0.8,
-        swayFrequency: 0.004 + Math.random() * 0.008,
+        vx: (Math.random() - 0.5) * 0.25, // Gentle horizontal drift
+        vy: -0.15 - Math.random() * 0.35, // Gentle upward buoyant air drift
+        swayAmplitude: 0.6 + Math.random() * 1.2,
+        swayFrequency: 0.006 + Math.random() * 0.012,
         swayOffset: Math.random() * Math.PI * 2,
       };
     });
@@ -72,46 +72,46 @@ export function DustParticlesBackground() {
 
         // Animate positions unless reduced-motion is requested
         if (!prefersReducedMotion) {
-          p.x += p.vx + Math.sin(time * p.swayFrequency + p.swayOffset) * p.swayAmplitude * 0.15;
+          p.x += p.vx + Math.sin(time * p.swayFrequency + p.swayOffset) * p.swayAmplitude * 0.2;
           p.y += p.vy;
 
           // Wrap around edges seamlessly
-          if (p.y < -10) {
-            p.y = height + 10;
+          if (p.y < -12) {
+            p.y = height + 12;
             p.x = Math.random() * width;
-          } else if (p.y > height + 10) {
-            p.y = -10;
+          } else if (p.y > height + 12) {
+            p.y = -12;
             p.x = Math.random() * width;
           }
 
-          if (p.x < -10) {
-            p.x = width + 10;
-          } else if (p.x > width + 10) {
-            p.x = -10;
+          if (p.x < -12) {
+            p.x = width + 12;
+          } else if (p.x > width + 12) {
+            p.x = -12;
           }
         }
 
         // Calculate pulsing luminescence
         const currentAlpha = Math.max(
-          0.05,
-          p.baseAlpha + Math.sin(time * p.pulseSpeed + p.pulsePhase) * 0.08
+          0.12,
+          p.baseAlpha + Math.sin(time * p.pulseSpeed + p.pulsePhase) * 0.15
         );
 
-        // Render soft out-of-focus dust mote
+        // Render soft out-of-focus bokeh dust mote
         const gradient = ctx.createRadialGradient(
           p.x,
           p.y,
           0,
           p.x,
           p.y,
-          p.radius * 2.2
+          p.radius * 2.8
         );
         gradient.addColorStop(0, `rgba(${p.colorRgb}, ${currentAlpha.toFixed(3)})`);
-        gradient.addColorStop(0.5, `rgba(${p.colorRgb}, ${(currentAlpha * 0.45).toFixed(3)})`);
+        gradient.addColorStop(0.4, `rgba(${p.colorRgb}, ${(currentAlpha * 0.6).toFixed(3)})`);
         gradient.addColorStop(1, `rgba(${p.colorRgb}, 0)`);
 
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius * 2.2, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.radius * 2.8, 0, Math.PI * 2);
         ctx.fillStyle = gradient;
         ctx.fill();
       }
@@ -157,7 +157,7 @@ export function DustParticlesBackground() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none -z-10 w-full h-full select-none"
+      className="fixed inset-0 pointer-events-none z-0 w-full h-full select-none"
     />
   );
 }

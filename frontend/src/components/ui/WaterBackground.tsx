@@ -3,7 +3,7 @@ import { useWaterLevel } from '@/context/WaterLevelContext';
 
 export function WaterBackground() {
   const { scheduleStep } = useWaterLevel();
-  const [scrollHeight, setScrollHeight] = useState<number>(50);
+  const [scrollHeight, setScrollHeight] = useState<number>(65);
 
   // Scroll tracking when not on Schedule page
   useEffect(() => {
@@ -18,9 +18,9 @@ export function WaterBackground() {
           const currentScroll = window.scrollY;
           const progress = docHeight > 0 ? Math.min(Math.max(currentScroll / docHeight, 0), 1) : 0;
 
-          // Height scales from 50px at top up to 230px when scrolled to bottom
-          const minH = 50;
-          const maxH = 230;
+          // Height scales from 65px at the very top up to 260px at bottom of page
+          const minH = 65;
+          const maxH = 260;
           setScrollHeight(Math.round(minH + progress * (maxH - minH)));
           ticking = false;
         });
@@ -43,37 +43,37 @@ export function WaterBackground() {
   if (scheduleStep !== null) {
     switch (scheduleStep) {
       case 1:
-        targetHeight = 80;
+        targetHeight = 90;
         break;
       case 2:
-        targetHeight = 150;
+        targetHeight = 180;
         break;
       case 3:
-        targetHeight = 230;
+        targetHeight = 270;
         break;
       case 4:
-        targetHeight = 310;
+        targetHeight = 360;
         break;
-      case 5: // Success Screen
-        targetHeight = 390;
+      case 5: // Order confirmed / Success screen
+        targetHeight = 450;
         break;
       default:
-        targetHeight = 80;
+        targetHeight = 90;
     }
   }
 
   return (
     <div
       aria-hidden="true"
-      className="fixed bottom-0 left-0 right-0 pointer-events-none -z-10 overflow-hidden select-none"
+      className="fixed bottom-0 left-0 right-0 pointer-events-none z-0 overflow-hidden select-none bg-linear-to-t from-blue-600/25 via-sky-500/15 to-transparent"
       style={{
         height: `${targetHeight}px`,
-        transition: 'height 800ms cubic-bezier(0.25, 1, 0.5, 1)',
+        transition: 'height 750ms cubic-bezier(0.25, 1, 0.5, 1)',
         willChange: 'height',
       }}
     >
-      {/* Wave Layer 1 - Deep Background Stream */}
-      <div className="absolute inset-x-0 bottom-0 top-0 overflow-hidden opacity-40">
+      {/* Wave Layer 1 - Deep Stream */}
+      <div className="absolute inset-x-0 bottom-0 top-0 overflow-hidden opacity-60">
         <svg
           className="absolute bottom-0 left-0 w-[200%] h-full animate-wave-slow"
           viewBox="0 0 1440 160"
@@ -85,15 +85,15 @@ export function WaterBackground() {
           />
           <defs>
             <linearGradient id="water-gradient-1" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.55" />
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.75" />
             </linearGradient>
           </defs>
         </svg>
       </div>
 
       {/* Wave Layer 2 - Middle Flow Stream (Reversed Direction) */}
-      <div className="absolute inset-x-0 bottom-0 top-0 overflow-hidden opacity-55">
+      <div className="absolute inset-x-0 bottom-0 top-0 overflow-hidden opacity-75">
         <svg
           className="absolute bottom-0 left-0 w-[200%] h-full animate-wave-reverse"
           viewBox="0 0 1440 160"
@@ -105,15 +105,15 @@ export function WaterBackground() {
           />
           <defs>
             <linearGradient id="water-gradient-2" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#2563eb" stopOpacity="0.6" />
+              <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#2563eb" stopOpacity="0.8" />
             </linearGradient>
           </defs>
         </svg>
       </div>
 
-      {/* Wave Layer 3 - Surface Shimmer & Crest */}
-      <div className="absolute inset-x-0 bottom-0 top-0 overflow-hidden opacity-70">
+      {/* Wave Layer 3 - Surface Crest */}
+      <div className="absolute inset-x-0 bottom-0 top-0 overflow-hidden opacity-90">
         <svg
           className="absolute bottom-0 left-0 w-[200%] h-full animate-wave-fast"
           viewBox="0 0 1440 160"
@@ -125,8 +125,8 @@ export function WaterBackground() {
           />
           <defs>
             <linearGradient id="water-gradient-3" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.5" />
+              <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.75" />
             </linearGradient>
           </defs>
         </svg>
@@ -142,8 +142,8 @@ export function WaterBackground() {
         <span className="water-bubble bubble-6" />
       </div>
 
-      {/* Surface Light Foam Highlight */}
-      <div className="absolute top-0 inset-x-0 h-[2px] bg-linear-to-r from-transparent via-white/40 to-transparent blur-xs pointer-events-none" />
+      {/* Surface Light Shimmer Crest Highlight */}
+      <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-sky-400/30 via-white/80 to-sky-400/30 blur-2xs pointer-events-none" />
     </div>
   );
 }
