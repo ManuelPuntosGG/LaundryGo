@@ -9,8 +9,8 @@ export const DENVER_LOCATIONS: DenverLocation[] = [
   { name: 'Westminster', zone: 'inner', fee: 0 },
   { name: 'Boulder', zone: 'inner', fee: 0 },
   { name: 'Broomfield', zone: 'inner', fee: 0 },
-  { name: 'Aurora', zone: 'outer', fee: 25 },
-  { name: 'Thornton', zone: 'outer', fee: 25 },
-  { name: 'Centennial', zone: 'outer', fee: 25 },
-  { name: 'Highlands Ranch', zone: 'outer', fee: 25 },
+  { name: 'Aurora', zone: 'inner', fee: 0 },
+  { name: 'Thornton', zone: 'inner', fee: 0 },
+  { name: 'Centennial', zone: 'inner', fee: 0 },
+  { name: 'Highlands Ranch', zone: 'inner', fee: 0 },
 ];

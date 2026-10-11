@@ -84,3 +84,80 @@ html, body {
   min-width: 44px;
 }
 
+/* Water Wave Flow Animations */
+@keyframes waveFlowSlow {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-25%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes waveFlowReverse {
+  0% { transform: translateX(-50%); }
+  50% { transform: translateX(-25%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes waveFlowFast {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-25%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes bubbleFloat {
+  0% {
+    transform: translateY(100%) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-80px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+.animate-wave-slow {
+  animation: waveFlowSlow 18s linear infinite;
+  will-change: transform;
+}
+
+.animate-wave-reverse {
+  animation: waveFlowReverse 12s linear infinite;
+  will-change: transform;
+}
+
+.animate-wave-fast {
+  animation: waveFlowFast 8s linear infinite;
+  will-change: transform;
+}
+
+.water-bubble {
+  position: absolute;
+  bottom: 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(56, 189, 248, 0.3));
+  pointer-events: none;
+  animation: bubbleFloat 6s ease-in infinite;
+}
+
+.bubble-1 { left: 15%; width: 8px; height: 8px; animation-duration: 5.5s; animation-delay: 0.2s; }
+.bubble-2 { left: 32%; width: 12px; height: 12px; animation-duration: 7s; animation-delay: 1.5s; }
+.bubble-3 { left: 52%; width: 6px; height: 6px; animation-duration: 4.8s; animation-delay: 3s; }
+.bubble-4 { left: 68%; width: 10px; height: 10px; animation-duration: 6.2s; animation-delay: 0.8s; }
+.bubble-5 { left: 82%; width: 7px; height: 7px; animation-duration: 5s; animation-delay: 2.2s; }
+.bubble-6 { left: 91%; width: 11px; height: 11px; animation-duration: 6.8s; animation-delay: 4s; }
+
+/* Accessibility: Reduce motion if requested by user */
+@media (prefers-reduced-motion: reduce) {
+  .animate-wave-slow,
+  .animate-wave-reverse,
+  .animate-wave-fast,
+  .water-bubble {
+    animation: none !important;
+  }
+}
+

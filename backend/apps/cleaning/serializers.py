@@ -77,6 +77,7 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
             'service_date',
             'time_slot',
             'special_instructions',
+            'frequency',
             'base_price',
             'addons_total',
             'total_price',
@@ -96,6 +97,35 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         )
+
+
+GPC_TIER_MATRIX = [
+    (500, 999, Decimal('160.00'), Decimal('215.00')),
+    (1000, 1299, Decimal('210.00'), Decimal('275.00')),
+    (1300, 1599, Decimal('250.00'), Decimal('325.00')),
+    (1600, 1899, Decimal('285.00'), Decimal('370.00')),
+    (1900, 2199, Decimal('320.00'), Decimal('415.00')),
+    (2200, 2499, Decimal('355.00'), Decimal('460.00')),
+    (2500, 2799, Decimal('395.00'), Decimal('510.00')),
+    (2800, 3099, Decimal('435.00'), Decimal('565.00')),
+    (3100, 3399, Decimal('475.00'), Decimal('615.00')),
+    (3400, 3699, Decimal('515.00'), Decimal('670.00')),
+    (3700, 3999, Decimal('555.00'), Decimal('720.00')),
+    (4000, 4299, Decimal('595.00'), Decimal('775.00')),
+    (4300, 4599, Decimal('635.00'), Decimal('825.00')),
+    (4600, 4899, Decimal('675.00'), Decimal('875.00')),
+    (4900, 5199, Decimal('715.00'), Decimal('930.00')),
+    (5200, 5499, Decimal('750.00'), Decimal('975.00')),
+    (5500, 5799, Decimal('785.00'), Decimal('1020.00')),
+    (5800, 6099, Decimal('820.00'), Decimal('1065.00')),
+]
+
+GPC_FREQUENCY_DISCOUNTS = {
+    'weekly': Decimal('0.20'),
+    'biweekly': Decimal('0.15'),
+    'monthly': Decimal('0.10'),
+    'one_time': Decimal('0.00'),
+}
 
 
 class CleaningOrderCreateSerializer(serializers.ModelSerializer):
@@ -129,6 +159,7 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
             'service_date',
             'time_slot',
             'special_instructions',
+            'frequency',
             'base_price',
             'addons_total',
             'total_price',
@@ -219,18 +250,34 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.user if request and request.user.is_authenticated else None
 
+        brand = validated_data.get('brand') or 'gopropertycare'
         service_rate = validated_data['service_rate']
         square_feet = validated_data.get('square_feet', 1000)
+        frequency = validated_data.get('frequency', 'one_time')
         delivery_zone = validated_data.get('delivery_zone', 'inner')
         selected_addons = validated_data.get('selected_addons', [])
 
         # Delivery fee calculation
         delivery_fee = Decimal('25.00') if delivery_zone == 'outer' else Decimal('0.00')
 
-        # Base price calculation (sqft * rate_per_sqft, with minimum order of $99)
-        raw_base = round(Decimal(str(square_feet)) * service_rate.rate_per_sqft, 2)
-        min_order = round(service_rate.min_order_amount, 2)
-        base_price = max(raw_base, min_order)
+        # Base price calculation (using Tier matrix for GoPropertyCare residential/move_in_out)
+        tier_matched = None
+        if brand == 'gopropertycare' and service_rate.service_type in ('residential', 'move_in_out'):
+            for min_s, max_s, std_p, deep_p in GPC_TIER_MATRIX:
+                if min_s <= square_feet <= max_s:
+                    tier_matched = deep_p if service_rate.service_type == 'move_in_out' else std_p
+                    break
+            if not tier_matched and square_feet < 500:
+                tier_matched = Decimal('215.00') if service_rate.service_type == 'move_in_out' else Decimal('160.00')
+
+        if tier_matched is not None:
+            discount_pct = GPC_FREQUENCY_DISCOUNTS.get(frequency, Decimal('0.00'))
+            base_price = round(tier_matched * (Decimal('1.00') - discount_pct), 2)
+        else:
+            # Standard per sqft calculation (Evolving Solutions & custom rates)
+            raw_base = round(Decimal(str(square_feet)) * service_rate.rate_per_sqft, 2)
+            min_order = round(service_rate.min_order_amount, 2)
+            base_price = max(raw_base, min_order)
 
         # Addons total
         addons_total = Decimal('0.00')

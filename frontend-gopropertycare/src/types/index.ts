@@ -69,6 +69,7 @@ export interface CleaningOrder {
   service_date: string;
   time_slot: string;
   special_instructions: string;
+  frequency?: string;
   base_price: string | number;
   addons_total: string | number;
   total_price: string | number;

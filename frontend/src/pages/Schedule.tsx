@@ -34,6 +34,7 @@ import {
   calculateAddonsTotal,
   formatAddonsSummary,
 } from '@/constants/addons';
+import { useWaterLevel } from '@/context/WaterLevelContext';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -156,6 +157,16 @@ export function Schedule() {
       if (pickup_instructions) setPickupInstructions(pickup_instructions);
     }
   }, [location.state]);
+
+  const { setScheduleStep } = useWaterLevel();
+
+  // Dynamically raise water level as user progresses through booking steps
+  useEffect(() => {
+    setScheduleStep(isSuccess ? 5 : step);
+    return () => {
+      setScheduleStep(null);
+    };
+  }, [step, isSuccess, setScheduleStep]);
 
   // Capitalize helper
   const formatCapitalized = (str: string) => {

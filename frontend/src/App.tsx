@@ -5,6 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import { PageSkeleton } from '@/components/ui/PageSkeleton';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ScrollToTop } from '@/components/layout/ScrollToTop';
+import { WaterLevelProvider } from '@/context/WaterLevelContext';
 
 // Code splitting / Lazy-loaded routes for instant initial page paint
 const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })));
@@ -55,9 +56,11 @@ function App() {
       <BrowserRouter>
         <ScrollToTop />
         <AuthProvider>
-          <Layout>
-            <AppRoutes />
-          </Layout>
+          <WaterLevelProvider>
+            <Layout>
+              <AppRoutes />
+            </Layout>
+          </WaterLevelProvider>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>

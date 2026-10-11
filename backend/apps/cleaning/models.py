@@ -162,6 +162,12 @@ class CleaningOrder(TimeStampedModel):
     service_date = models.DateField(help_text='Scheduled date for cleaning service')
     time_slot = models.CharField(max_length=50, help_text='Selected time or window (e.g. 02:00 PM, morning, afternoon)')
     special_instructions = models.TextField(blank=True, help_text='Property access, gate codes or special notes')
+    frequency = models.CharField(
+        max_length=30,
+        default='one_time',
+        blank=True,
+        help_text='Recurring frequency: one_time, weekly, biweekly, monthly'
+    )
 
     base_price = models.DecimalField(max_digits=8, decimal_places=2, default=99.00)
     addons_total = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)

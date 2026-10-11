@@ -54,6 +54,20 @@ def send_cleaning_order_confirmation_email(order, language=None):
     total_price = order.total_price
     special_instructions = order.special_instructions
     selected_addons = list(order.selected_addons) if order.selected_addons else []
+    frequency = getattr(order, 'frequency', '') or ''
+    freq_map_es = {
+        'weekly': 'Limpieza Semanal (20% Desc.)',
+        'biweekly': 'Limpieza Quincenal (15% Desc.)',
+        'monthly': 'Limpieza Mensual (10% Desc.)',
+        'one_time': 'Servicio Único',
+    }
+    freq_map_en = {
+        'weekly': 'Weekly Cleaning (20% OFF)',
+        'biweekly': 'Bi-Weekly Cleaning (15% OFF)',
+        'monthly': 'Monthly Cleaning (10% OFF)',
+        'one_time': 'One-Time Clean',
+    }
+    freq_label = (freq_map_es if is_spanish else freq_map_en).get(frequency, '')
 
     def _send():
         try:
@@ -83,7 +97,7 @@ Detalles de tu Reserva:
 • Número de Orden: {order_code}
 • Empresa: {company_name}
 • Servicio: {service_name}
-• Superficie / Tamaño: {sqft} sq ft
+{f'• Frecuencia: {freq_label}\n' if freq_label else ''}• Superficie / Tamaño: {sqft} sq ft
 • Fecha del Servicio: {date_str}
 • Franja Horaria: {time_slot_label}
 • Dirección: {street_address}, {city} {zip_code}
@@ -127,7 +141,7 @@ Booking Details:
 • Order Number: {order_code}
 • Company: {company_name}
 • Service: {service_name}
-• Area / Size: {sqft} sq ft
+{f'• Frequency: {freq_label}\n' if freq_label else ''}• Area / Size: {sqft} sq ft
 • Scheduled Date: {date_str}
 • Time Window: {time_slot_label}
 • Address: {street_address}, {city} {zip_code}
@@ -152,6 +166,7 @@ Denver, Colorado
                 html_intro = f"We have received your service request. Our vetted, insured crew will arrive ready to deliver high standards for your project."
                 lbl_order = "Order Number"
                 lbl_service = "Service Tier"
+                lbl_freq = "Frecuencia" if is_spanish else "Frequency"
                 lbl_size = "Work Area / Size"
                 lbl_date = "Scheduled Date"
                 lbl_slot = "Time Window"
@@ -196,6 +211,10 @@ Denver, Colorado
                   <td style="padding: 8px 12px; color: #64748b; font-size: 13px; font-weight: 600;">{lbl_service}</td>
                   <td style="padding: 8px 12px; color: {accent_color}; font-size: 14px; font-weight: 700; text-align: right;">{service_name}</td>
                 </tr>
+                {f'''<tr>
+                  <td style="padding: 8px 12px; color: #64748b; font-size: 13px; font-weight: 600;">{lbl_freq}</td>
+                  <td style="padding: 8px 12px; color: #0f172a; font-size: 14px; font-weight: 600; text-align: right;">{freq_label}</td>
+                </tr>''' if freq_label else ''}
                 <tr>
                   <td style="padding: 8px 12px; color: #64748b; font-size: 13px; font-weight: 600;">{lbl_size}</td>
                   <td style="padding: 8px 12px; color: #0f172a; font-size: 14px; font-weight: 600; text-align: right;">{sqft} sq ft</td>

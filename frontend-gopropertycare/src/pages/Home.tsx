@@ -551,9 +551,9 @@ export function Home() {
             </p>
           </Card>
 
-          <Card className="p-7 border-amber-200/90 bg-amber-50/40 hover:-translate-y-1 hover:shadow-md hover:border-amber-300 transition-all duration-300">
-            <div className="inline-flex items-center gap-2 text-amber-800 font-extrabold text-sm mb-3">
-              <MapPin className="w-4 h-4 text-amber-600" />
+          <Card className="p-7 border-emerald-200/90 bg-emerald-50/40 hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 transition-all duration-300">
+            <div className="inline-flex items-center gap-2 text-emerald-800 font-extrabold text-sm mb-3">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>{t('home.coverage.outerBadge')}</span>
             </div>
             <p className="text-sm text-slate-800 leading-relaxed font-medium">
