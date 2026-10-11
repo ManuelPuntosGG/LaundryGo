@@ -81,7 +81,7 @@ export function WaterBackground() {
   return (
     <div
       aria-hidden="true"
-      className="fixed bottom-0 left-0 right-0 pointer-events-none z-0 overflow-hidden select-none bg-linear-to-t from-blue-700/25 via-sky-500/15 to-transparent"
+      className="fixed bottom-0 left-0 right-0 pointer-events-none z-0 overflow-hidden select-none"
       style={{
         height: `${targetHeight}px`,
         transition: transitionTiming,
@@ -89,9 +89,9 @@ export function WaterBackground() {
       }}
     >
       {/* Surface Wave Layer: Anchored to the top surface of the rising tide */}
-      <div className="absolute top-0 inset-x-0 h-20 sm:h-28 overflow-hidden pointer-events-none">
+      <div className="absolute top-0 inset-x-0 h-24 sm:h-28 overflow-hidden pointer-events-none">
         {/* Wave Layer 1 - Deep Stream */}
-        <div className="absolute inset-0 overflow-hidden opacity-60">
+        <div className="absolute inset-0 overflow-hidden opacity-75">
           <svg
             className="absolute top-0 left-0 w-[200%] h-full animate-wave-slow"
             viewBox="0 0 1440 160"
@@ -103,15 +103,15 @@ export function WaterBackground() {
             />
             <defs>
               <linearGradient id="water-gradient-1" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.55" />
-                <stop offset="100%" stopColor="#0284c7" stopOpacity="0.8" />
+                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#1d4ed8" stopOpacity="1" />
               </linearGradient>
             </defs>
           </svg>
         </div>
 
         {/* Wave Layer 2 - Middle Flow Stream (Reversed Direction) */}
-        <div className="absolute inset-0 overflow-hidden opacity-75">
+        <div className="absolute inset-0 overflow-hidden opacity-85">
           <svg
             className="absolute top-0 left-0 w-[200%] h-full animate-wave-reverse"
             viewBox="0 0 1440 160"
@@ -123,15 +123,15 @@ export function WaterBackground() {
             />
             <defs>
               <linearGradient id="water-gradient-2" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#2563eb" stopOpacity="0.85" />
+                <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#2563eb" stopOpacity="1" />
               </linearGradient>
             </defs>
           </svg>
         </div>
 
         {/* Wave Layer 3 - Surface Crest */}
-        <div className="absolute inset-0 overflow-hidden opacity-90">
+        <div className="absolute inset-0 overflow-hidden opacity-95">
           <svg
             className="absolute top-0 left-0 w-[200%] h-full animate-wave-fast"
             viewBox="0 0 1440 160"
@@ -143,19 +143,16 @@ export function WaterBackground() {
             />
             <defs>
               <linearGradient id="water-gradient-3" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.55" />
-                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.8" />
+                <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.85" />
+                <stop offset="100%" stopColor="#2563eb" stopOpacity="1" />
               </linearGradient>
             </defs>
           </svg>
         </div>
-
-        {/* Surface Light Shimmer Crest Highlight */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-sky-400/40 via-white/90 to-sky-400/40 blur-2xs pointer-events-none" />
       </div>
 
-      {/* Deep Water Volume Body: Seamlessly fills underneath the surface waves down to the bottom */}
-      <div className="absolute inset-x-0 bottom-0 top-18 sm:top-24 bg-linear-to-b from-sky-500/25 via-blue-600/30 to-blue-700/40 pointer-events-none" />
+      {/* Deep Water Volume Body: Seamlessly fills underneath the surface waves with the identical water color */}
+      <div className="absolute inset-x-0 bottom-0 top-[90px] sm:top-[106px] bg-linear-to-b from-[#2563eb] via-[#1d4ed8] to-[#1e40af] pointer-events-none" />
 
       {/* Ambient Rising Micro-Bubbles */}
       <div className="absolute inset-0 overflow-hidden">
