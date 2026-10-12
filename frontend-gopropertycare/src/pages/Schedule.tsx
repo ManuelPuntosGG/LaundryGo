@@ -27,6 +27,7 @@ import {
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { SEO } from '@/components/common/SEO';
 import { useAuthContext } from '@/providers/AuthProvider';
 import api from '@/api';
 import type { CleaningServiceRate, CleaningAddon, CleaningAvailableDate } from '@/types';
@@ -659,6 +660,11 @@ export function Schedule() {
 
   return (
     <div className="max-w-4xl mx-auto py-3 sm:py-8 px-3.5 sm:px-6 lg:px-8 space-y-5 sm:space-y-8 animate-fade-in">
+      <SEO
+        title={t('schedule.title')}
+        description={t('schedule.subtitle')}
+        canonical="https://gopropertycare.com/schedule"
+      />
       {/* Header & Steps Indicator */}
       <div className="text-center space-y-2.5 sm:space-y-3">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight animate-fade-in-up">

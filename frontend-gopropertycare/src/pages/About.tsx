@@ -12,12 +12,18 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { SEO } from '@/components/common/SEO';
 
 export function About() {
   const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-12 sm:gap-16 py-4 sm:py-6">
+      <SEO
+        title={t('about.title')}
+        description={t('about.subtitle')}
+        canonical="https://gopropertycare.com/about"
+      />
       {/* Header */}
       <section className="text-center max-w-3xl mx-auto space-y-4 pt-4">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs font-bold shadow-2xs animate-fade-in-down">

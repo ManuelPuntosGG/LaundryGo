@@ -24,6 +24,7 @@ import {
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { SEO } from '@/components/common/SEO';
 import { useAuthContext } from '@/providers/AuthProvider';
 import api from '@/api';
 import type { ServiceRate, AvailableDate } from '@/types';
@@ -633,6 +634,11 @@ export function Schedule() {
 
   return (
     <div className="max-w-6xl mx-auto w-full py-4 space-y-6 animate-fade-in pb-16 lg:pb-6">
+      <SEO
+        title={t('schedule.title')}
+        description={t('schedule.subtitle')}
+        canonical="https://thelaundrygo.com/schedule"
+      />
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl tracking-tight">

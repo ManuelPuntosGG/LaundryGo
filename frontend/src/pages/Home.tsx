@@ -23,6 +23,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import api from '@/api';
 import type { ServiceRate } from '@/types';
+import { SEO } from '@/components/common/SEO';
 
 function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -169,6 +170,11 @@ export function Home() {
 
   return (
     <div className="w-full flex flex-col gap-10 sm:gap-14 animate-fade-in max-w-6xl mx-auto">
+      <SEO
+        title={t('home.hero.title')}
+        description={t('home.hero.subtitle')}
+        canonical="https://thelaundrygo.com/"
+      />
       {/* 1. Hero Section (Compact & High Impact) */}
       <section className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-4 pt-2 sm:pt-4">
         {/* Brand Emblem & Geo Badge */}

@@ -3,8 +3,26 @@ import { initReactI18next } from 'react-i18next';
 import HttpBackend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('i18nextLng') : null;
-const initialLanguage = savedLanguage === 'es' || savedLanguage === 'en' ? savedLanguage : 'en';
+const getInitialLanguage = (): string => {
+  if (typeof window === 'undefined') return 'en';
+  try {
+    const urlParam = new URLSearchParams(window.location.search).get('lng');
+    if (urlParam === 'es' || urlParam === 'en') {
+      localStorage.setItem('i18nextLng', urlParam);
+      return urlParam;
+    }
+  } catch {
+    // Fallback if URLSearchParams fails
+  }
+  const saved = typeof window !== 'undefined' ? localStorage.getItem('i18nextLng') : null;
+  return saved === 'es' || saved === 'en' ? saved : 'en';
+};
+
+const initialLanguage = getInitialLanguage();
+
+if (typeof document !== 'undefined') {
+  document.documentElement.lang = initialLanguage;
+}
 
 i18n
   .use(HttpBackend)
@@ -24,7 +42,8 @@ i18n
     ns: ['common'],
     defaultNS: 'common',
     detection: {
-      order: ['localStorage'],
+      order: ['querystring', 'localStorage', 'navigator'],
+      lookupQuerystring: 'lng',
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
     },

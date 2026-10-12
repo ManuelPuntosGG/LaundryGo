@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { SEO } from '@/components/common/SEO';
 
 interface ProcessStep {
   number: string;
@@ -196,6 +197,11 @@ export function About() {
 
   return (
     <div className="w-full flex flex-col gap-10 sm:gap-14 animate-fade-in max-w-6xl mx-auto pb-4">
+      <SEO
+        title={t('about.hero.title')}
+        description={t('about.hero.subtitle')}
+        canonical="https://thelaundrygo.com/about"
+      />
       {/* 1. Hero & Mission Section */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-blue-50/70 via-white/80 to-slate-50/50 border border-blue-100/80 p-6 sm:p-10 lg:p-12 shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">

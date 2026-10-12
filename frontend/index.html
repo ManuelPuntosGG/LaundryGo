@@ -5,16 +5,181 @@
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#2563eb" />
-    <meta name="description" content="LaundryGo - Premium laundry pickup and delivery service in Denver, Colorado. Simple per-pound pricing, 24h turnaround, and eco-friendly care." />
-    
+
+    <!-- SEO Meta Tags -->
+    <title>LaundryGo — Denver Laundry Pickup & Delivery</title>
+    <meta name="description" content="Premium laundry pickup and delivery service in Denver & Boulder, Colorado. Simple per-pound pricing ($2.25/lb), 24h turnaround, and eco-friendly wash & fold." />
+    <meta name="keywords" content="laundry pickup Denver, wash and fold Denver, laundry delivery Boulder, Denver dry cleaning, commercial laundry Denver, clothes wash per pound" />
+    <meta name="author" content="LaundryGo" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://thelaundrygo.com/" />
+
+    <!-- Multilingual hreflang Alternate Tags -->
+    <link rel="alternate" hreflang="en" href="https://thelaundrygo.com/" />
+    <link rel="alternate" hreflang="es" href="https://thelaundrygo.com/?lng=es" />
+    <link rel="alternate" hreflang="x-default" href="https://thelaundrygo.com/" />
+
+    <!-- Open Graph (Facebook / WhatsApp / LinkedIn) -->
+    <meta property="og:site_name" content="LaundryGo" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://thelaundrygo.com/" />
+    <meta property="og:title" content="LaundryGo — Denver Laundry Pickup & Delivery" />
+    <meta property="og:description" content="Premium laundry pickup and delivery service in Denver & Boulder, Colorado. Simple per-pound pricing ($2.25/lb), 24h turnaround, and eco-friendly wash & fold." />
+    <meta property="og:image" content="https://thelaundrygo.com/logo.png" />
+    <meta property="og:image:secure_url" content="https://thelaundrygo.com/logo.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="LaundryGo - Denver Pickup & Delivery Logo" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="es_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@laundrygodenver" />
+    <meta name="twitter:creator" content="@laundrygodenver" />
+    <meta name="twitter:title" content="LaundryGo — Denver Laundry Pickup & Delivery" />
+    <meta name="twitter:description" content="Premium wash & fold pickup and delivery in Denver & Boulder, Colorado. Per-pound rates, 24h turnaround." />
+    <meta name="twitter:image" content="https://thelaundrygo.com/logo.png" />
+    <meta name="twitter:image:alt" content="LaundryGo Denver Service" />
+
+    <!-- JSON-LD Structured Data: LocalBusiness & DryCleaningOrLaundry -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": ["DryCleaningOrLaundry", "LocalBusiness"],
+      "name": "LaundryGo",
+      "image": "https://thelaundrygo.com/logo.png",
+      "logo": "https://thelaundrygo.com/logo.png",
+      "url": "https://thelaundrygo.com",
+      "telephone": "+1-720-590-8632",
+      "email": "info@thelaundrygo.com",
+      "priceRange": "$$",
+      "currenciesAccepted": "USD",
+      "paymentAccepted": "Credit Card, Debit Card",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Denver",
+        "addressRegion": "CO",
+        "addressCountry": "US"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 39.7392,
+        "longitude": -104.9903
+      },
+      "areaServed": [
+        "Denver", "Boulder", "Lakewood", "Englewood", "Wheat Ridge",
+        "Arvada", "Westminster", "Broomfield", "Aurora", "Thornton",
+        "Centennial", "Highlands Ranch"
+      ],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Laundry Delivery Services",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Standard Wash & Fold",
+              "description": "Standard 2-day turnaround wash and fold service."
+            },
+            "price": "2.25",
+            "priceCurrency": "USD"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Go (Next-Day)",
+              "description": "Fast 24-hour next day wash and fold delivery."
+            },
+            "price": "2.45",
+            "priceCurrency": "USD"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "GoFurther (Same-Day Express)",
+              "description": "Express same-day laundry delivery when scheduled before 12:00 PM."
+            },
+            "price": "3.85",
+            "priceCurrency": "USD"
+          }
+        ]
+      }
+    }
+    </script>
+
     <!-- Preconnect to Google Fonts for zero-blocking font loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" />
-
-    <title>LaundryGo — Denver Laundry Pickup & Delivery</title>
   </head>
   <body>
+    <!-- Fallback semantic content for crawlers, search engines and no-JS visitors -->
+    <noscript>
+      <div style="font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 24px; color: #0f172a; line-height: 1.6;">
+        <header style="border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 24px;">
+          <h1 style="color: #2563eb; margin: 0 0 8px 0; font-size: 28px;">LaundryGo — Denver Laundry Pickup &amp; Delivery</h1>
+          <p style="margin: 0; color: #475569; font-weight: 500;">
+            Premium Wash &amp; Fold Service in Denver &amp; Boulder, Colorado.
+          </p>
+        </header>
+
+        <section style="margin-bottom: 28px;">
+          <h2 style="font-size: 20px; color: #1e293b;">Professional Doorstep Laundry Care</h2>
+          <p>
+            LaundryGo provides on-demand and recurring laundry pickup and delivery for homes, busy professionals,
+            and local businesses across the Denver and Boulder metropolitan area. We wash, dry, neatly fold,
+            and return your garments directly to your door using hypoallergenic, eco-friendly detergents.
+          </p>
+        </section>
+
+        <section style="margin-bottom: 28px;">
+          <h2 style="font-size: 20px; color: #1e293b;">Transparent Per-Pound Pricing ($40 Minimum Order)</h2>
+          <ul style="padding-left: 20px;">
+            <li><strong>Standard (2 Days):</strong> $2.25 / lb — Economical, reliable wash and fold turnaround.</li>
+            <li><strong>Go (Next Day):</strong> $2.45 / lb — 24-hour next day rush delivery right to your door.</li>
+            <li><strong>GoFurther (Same Day Express):</strong> $3.85 / lb — Picked up and returned same day (Order before 12:00 PM).</li>
+          </ul>
+          <p><em>Recurring subscriptions (Daily, Weekly, Bi-weekly, Monthly) receive a 7.5% discount starting on the second cycle.</em></p>
+        </section>
+
+        <section style="margin-bottom: 28px;">
+          <h2 style="font-size: 20px; color: #1e293b;">Service Coverage in Colorado</h2>
+          <p>
+            <strong>Free Travel Zone ($0.00):</strong> Denver (Downtown, LoDo, RiNo, Highlands, Cap Hill),
+            Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, and Broomfield.<br />
+            <strong>Extended Coverage ($25.00):</strong> Aurora, Thornton, Centennial, and Highlands Ranch.
+          </p>
+        </section>
+
+        <footer style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 30px;">
+          <h3 style="margin: 0 0 8px 0; font-size: 16px;">Contact LaundryGo</h3>
+          <p style="margin: 4px 0;"><strong>Phone:</strong> <a href="tel:7205908632" style="color: #2563eb;">(720) 590-8632</a></p>
+          <p style="margin: 4px 0;"><strong>Email:</strong> <a href="mailto:info@thelaundrygo.com" style="color: #2563eb;">info@thelaundrygo.com</a></p>
+          <p style="margin: 4px 0;"><strong>Service Hours:</strong> Monday – Sunday, 8:00 AM – 8:00 PM</p>
+          <p style="margin-top: 16px;">
+            <a href="/schedule" style="background: #2563eb; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+              Schedule Pickup Online
+            </a>
+          </p>
+        </footer>
+      </div>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -5,6 +5,7 @@ import { LogIn, UserPlus, MapPin } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { SEO } from '@/components/common/SEO';
 import { useAuthContext } from '@/providers/AuthProvider';
 import { DENVER_LOCATIONS } from '@/constants/locations';
 
@@ -164,6 +165,11 @@ export function Auth() {
 
   return (
     <div className="max-w-lg mx-auto w-full py-4 sm:py-6 flex flex-col justify-center animate-fade-in">
+      <SEO
+        title={tab === 'login' ? t('nav.login') : t('nav.register')}
+        description={tab === 'login' ? 'Sign in to your LaundryGo account to manage pickups and orders.' : 'Create your LaundryGo account for fast laundry pickup in Denver & Boulder.'}
+        canonical="https://thelaundrygo.com/login"
+      />
       <div className="flex flex-col items-center text-center mb-6">
         <Link to="/" className="inline-block group mb-2 transition-transform active:scale-95">
           <div className="relative">

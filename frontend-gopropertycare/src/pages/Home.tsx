@@ -28,6 +28,7 @@ import api from '@/api';
 import type { CleaningServiceRate } from '@/types';
 import { DEFAULT_CLEANING_RATES } from '@/constants/cleaningServices';
 import { SERVICE_AREAS } from '@/constants/locations';
+import { SEO } from '@/components/common/SEO';
 
 export function Home() {
   const { t, i18n } = useTranslation();
@@ -99,6 +100,11 @@ export function Home() {
 
   return (
     <div className="flex flex-col gap-16 sm:gap-24 py-4 sm:py-6">
+      <SEO
+        title={t('home.hero.title')}
+        description={t('home.hero.subtitle')}
+        canonical="https://gopropertycare.com/"
+      />
       {/* Hero Section */}
       <section className="relative pt-6 sm:pt-12 pb-6 sm:pb-10 text-center flex flex-col items-center">
         {/* Contact & Location Badge */}

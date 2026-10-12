@@ -5,6 +5,7 @@ import { LogIn, UserPlus, Sparkles, AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { SEO } from '@/components/common/SEO';
 import { useAuthContext } from '@/providers/AuthProvider';
 import { DENVER_LOCATIONS } from '@/constants/locations';
 
@@ -101,6 +102,11 @@ export function Auth() {
 
   return (
     <div className="max-w-md mx-auto py-8 sm:py-12 animate-fade-in-up">
+      <SEO
+        title={tab === 'login' ? t('nav.login') : t('nav.register')}
+        description={tab === 'login' ? 'Sign in to your GoPropertyCare portal to manage cleaning appointments.' : 'Create your GoPropertyCare account for residential cleaning across Denver & Boulder.'}
+        canonical="https://gopropertycare.com/login"
+      />
       <Card className="p-6 sm:p-8 border-emerald-100 shadow-xl space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
