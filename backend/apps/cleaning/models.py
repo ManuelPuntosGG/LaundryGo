@@ -60,6 +60,73 @@ class CleaningServiceRate(TimeStampedModel):
         return f'{self.name} ({self.get_brand_display()}) - ${self.rate_per_sqft}/sqft'
 
 
+class CleaningPricingTier(TimeStampedModel):
+    brand = models.CharField(
+        max_length=30,
+        choices=BRAND_CHOICES,
+        default='gopropertycare',
+        help_text='Brand using this pricing tier'
+    )
+    tier_number = models.PositiveIntegerField(
+        help_text='Tier number (e.g. 1 to 19)'
+    )
+    label = models.CharField(
+        max_length=100,
+        help_text='Display label, e.g. "500 – 999 sq ft"'
+    )
+    min_sqft = models.PositiveIntegerField(
+        default=500,
+        help_text='Minimum square footage for this tier'
+    )
+    max_sqft = models.PositiveIntegerField(
+        default=999,
+        help_text='Maximum square footage for this tier'
+    )
+    standard_price = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        help_text='Standard cleaning flat price'
+    )
+    deep_price = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        help_text='Deep / Move-In / Move-Out cleaning flat price'
+    )
+    str_on_site_price = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        help_text='Short-Term Rental (Laundry On-Site) flat price'
+    )
+    str_off_site_price = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        help_text='Short-Term Rental (Off-Site Laundry) flat price'
+    )
+    is_custom_quote = models.BooleanField(
+        default=False,
+        help_text='Whether this tier requires custom quotes (e.g. > 6,100 sq ft)'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text='Whether this tier is currently active'
+    )
+
+    class Meta:
+        verbose_name = 'Cleaning Pricing Tier'
+        verbose_name_plural = 'Cleaning Pricing Tiers'
+        ordering = ['brand', 'tier_number']
+        constraints = [
+            models.UniqueConstraint(fields=['brand', 'tier_number'], name='unique_tier_per_brand')
+        ]
+
+    def __str__(self):
+        return f'Tier {self.tier_number} ({self.label}) [{self.get_brand_display()}] - Std: ${self.standard_price}'
+
+
 class CleaningAddon(TimeStampedModel):
     ADDON_BRAND_CHOICES = [
         ('gopropertycare', 'GoPropertyCare (Residential)'),

@@ -2,7 +2,31 @@ from decimal import Decimal
 from datetime import date, datetime, timedelta
 from rest_framework import serializers
 from django.utils import timezone
-from .models import CleaningServiceRate, CleaningAddon, CleaningOrder
+from .models import CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
+
+
+class CleaningPricingTierSerializer(serializers.ModelSerializer):
+    standard_price = serializers.DecimalField(max_digits=7, decimal_places=2, coerce_to_string=False)
+    deep_price = serializers.DecimalField(max_digits=7, decimal_places=2, coerce_to_string=False)
+    str_on_site_price = serializers.DecimalField(max_digits=7, decimal_places=2, coerce_to_string=False)
+    str_off_site_price = serializers.DecimalField(max_digits=7, decimal_places=2, coerce_to_string=False)
+
+    class Meta:
+        model = CleaningPricingTier
+        fields = (
+            'id',
+            'brand',
+            'tier_number',
+            'label',
+            'min_sqft',
+            'max_sqft',
+            'standard_price',
+            'deep_price',
+            'str_on_site_price',
+            'str_off_site_price',
+            'is_custom_quote',
+            'is_active',
+        )
 
 
 class CleaningServiceRateSerializer(serializers.ModelSerializer):
@@ -260,15 +284,39 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         # Delivery fee calculation
         delivery_fee = Decimal('25.00') if delivery_zone == 'outer' else Decimal('0.00')
 
-        # Base price calculation (using Tier matrix for GoPropertyCare residential/move_in_out)
+        # Base price calculation (using CleaningPricingTier for GoPropertyCare)
         tier_matched = None
-        if brand == 'gopropertycare' and service_rate.service_type in ('residential', 'move_in_out'):
-            for min_s, max_s, std_p, deep_p in GPC_TIER_MATRIX:
-                if min_s <= square_feet <= max_s:
-                    tier_matched = deep_p if service_rate.service_type == 'move_in_out' else std_p
-                    break
-            if not tier_matched and square_feet < 500:
-                tier_matched = Decimal('215.00') if service_rate.service_type == 'move_in_out' else Decimal('160.00')
+        if brand == 'gopropertycare':
+            # Check dynamic CleaningPricingTier from database (allows admin pricing overrides)
+            pricing_tier = CleaningPricingTier.objects.filter(
+                brand='gopropertycare',
+                is_active=True,
+                min_sqft__lte=square_feet,
+                max_sqft__gte=square_feet
+            ).first()
+            if not pricing_tier and square_feet < 500:
+                pricing_tier = CleaningPricingTier.objects.filter(
+                    brand='gopropertycare',
+                    is_active=True
+                ).order_by('tier_number').first()
+
+            if pricing_tier:
+                if service_rate.service_type in ('move_in_out', 'deep'):
+                    tier_matched = pricing_tier.deep_price
+                elif service_rate.service_type == 'str_on_site':
+                    tier_matched = pricing_tier.str_on_site_price
+                elif service_rate.service_type == 'str_off_site':
+                    tier_matched = pricing_tier.str_off_site_price
+                else:
+                    tier_matched = pricing_tier.standard_price
+            elif service_rate.service_type in ('residential', 'move_in_out'):
+                # Hardcoded fallback matrix if DB tiers are not yet created
+                for min_s, max_s, std_p, deep_p in GPC_TIER_MATRIX:
+                    if min_s <= square_feet <= max_s:
+                        tier_matched = deep_p if service_rate.service_type == 'move_in_out' else std_p
+                        break
+                if not tier_matched and square_feet < 500:
+                    tier_matched = Decimal('215.00') if service_rate.service_type == 'move_in_out' else Decimal('160.00')
 
         if tier_matched is not None:
             discount_pct = GPC_FREQUENCY_DISCOUNTS.get(frequency, Decimal('0.00'))

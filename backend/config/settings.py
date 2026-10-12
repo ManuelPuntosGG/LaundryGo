@@ -390,6 +390,11 @@ UNFOLD = {
                         "link": reverse_lazy("admin:cleaning_cleaningorder_changelist"),
                     },
                     {
+                        "title": _("Pricing Tiers"),
+                        "icon": "price_change",
+                        "link": reverse_lazy("admin:cleaning_cleaningpricingtier_changelist"),
+                    },
+                    {
                         "title": _("Rates per Sq Ft"),
                         "icon": "square_foot",
                         "link": reverse_lazy("admin:cleaning_cleaningservicerate_changelist"),

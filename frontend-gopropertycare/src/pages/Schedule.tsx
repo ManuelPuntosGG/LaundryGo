@@ -166,6 +166,7 @@ export function Schedule() {
   const [availableDates, setAvailableDates] = useState<CleaningAvailableDate[]>(() => getFallbackDates(60));
 
   // Step 1: Tier-Based Sizing, Service Type & Frequency
+  const [pricingTiers, setPricingTiers] = useState<PricingTier[]>(PRICING_TIERS);
   const [selectedTier, setSelectedTier] = useState<PricingTier>(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const sqftParam = searchParams.get('sqft');
@@ -190,7 +191,7 @@ export function Schedule() {
   // Consultative Details (no charge)
   const [bedrooms, setBedrooms] = useState<number>(2);
   const [bathrooms, setBathrooms] = useState<number>(2);
-  const [isOccupied, setIsOccupied] = useState<boolean>(true);
+  const isOccupied = true;
 
   // Custom Quote Lead Capture (for Tier 19 > 6,100 sq ft)
   const [customQuoteSqft, setCustomQuoteSqft] = useState<string>('6500');
@@ -271,10 +272,11 @@ export function Schedule() {
     let isMounted = true;
     const fetchApiData = async () => {
       try {
-        const [ratesRes, addonsRes, datesRes] = await Promise.all([
+        const [ratesRes, addonsRes, datesRes, tiersRes] = await Promise.all([
           api.get('/cleaning/rates/?brand=gopropertycare').catch(() => null),
           api.get('/cleaning/addons/?brand=gopropertycare').catch(() => null),
           api.get('/cleaning/schedule/available-dates/').catch(() => null),
+          api.get('/cleaning/tiers/?brand=gopropertycare').catch(() => null),
         ]);
 
         if (!isMounted) return;
@@ -295,6 +297,35 @@ export function Schedule() {
           if (list.length > 0) {
             setAddons(list);
           }
+        }
+
+        if (tiersRes?.data && Array.isArray(tiersRes.data) && tiersRes.data.length > 0) {
+          interface BackendTier {
+            tier_number: number;
+            label: string;
+            min_sqft: number;
+            max_sqft: number;
+            standard_price: number | string;
+            deep_price: number | string;
+            str_on_site_price: number | string;
+            str_off_site_price: number | string;
+            is_custom_quote: boolean;
+          }
+          const mapped: PricingTier[] = (tiersRes.data as BackendTier[]).map((t) => ({
+            tier: t.tier_number,
+            label: t.label,
+            minSqft: t.min_sqft,
+            maxSqft: t.max_sqft,
+            standardPrice: Number(t.standard_price),
+            deepPrice: Number(t.deep_price),
+            strOnSitePrice: Number(t.str_on_site_price),
+            strOffSitePrice: Number(t.str_off_site_price),
+            sqftEquivalent: t.label,
+            propertyHint: t.label,
+            isCustomQuote: t.is_custom_quote,
+          }));
+          setPricingTiers(mapped);
+          setSelectedTier((prev) => mapped.find((m) => m.tier === prev.tier) || prev);
         }
 
         if (datesRes?.data && Array.isArray(datesRes.data) && datesRes.data.length > 0) {
@@ -727,12 +758,12 @@ export function Schedule() {
                 value={selectedTier.tier}
                 onChange={(e) => {
                   const tNum = Number(e.target.value);
-                  const found = PRICING_TIERS.find((t) => t.tier === tNum);
+                  const found = pricingTiers.find((t) => t.tier === tNum);
                   if (found) setSelectedTier(found);
                 }}
                 className="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 shadow-2xs appearance-none cursor-pointer pr-10 hover:border-slate-400 transition-all"
               >
-                {PRICING_TIERS.map((tier) => (
+                {pricingTiers.map((tier) => (
                   <option key={tier.tier} value={tier.tier}>
                     {tier.isCustomQuote
                       ? (i18n.language?.startsWith('es')
@@ -1087,7 +1118,7 @@ export function Schedule() {
                 </div>
               </div>
 
-              {/* Consultative Details (Bedrooms, Bathrooms, Occupancy) */}
+              {/* Consultative Details (Bedrooms, Bathrooms) */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
                   <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
@@ -1096,7 +1127,7 @@ export function Schedule() {
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Bedrooms */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -1142,38 +1173,6 @@ export function Schedule() {
                           {num === 4 ? '4+' : num}
                         </button>
                       ))}
-                    </div>
-                  </div>
-
-                  {/* Occupancy Status */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                      <DoorOpen className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{t('schedule.occupancyLabel')}</span>
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => setIsOccupied(true)}
-                        className={`min-h-[40px] py-2 px-3 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5 ${
-                          isOccupied
-                            ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/30'
-                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                        }`}
-                      >
-                        🏠 {t('schedule.occupied')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsOccupied(false)}
-                        className={`min-h-[40px] py-2 px-3 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer touch-manipulation flex items-center justify-center gap-1.5 ${
-                          !isOccupied
-                            ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-black ring-1 ring-emerald-500/30'
-                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                        }`}
-                      >
-                        📦 {t('schedule.vacant')}
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -1367,35 +1366,6 @@ export function Schedule() {
                   <span>{t('schedule.noticeMinNotice')}</span>
                 </div>
               )}
-
-              {/* Quick Preset Slots */}
-              <div className="pt-2 border-t border-slate-200/70">
-                <span className="text-[11px] font-bold text-slate-500 block mb-2">{t('schedule.quickSlots')}</span>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                  {TIME_SLOTS.map((slot) => {
-                    const isSelected = selectedTimeSlot === slot;
-                    const isValidForToday = !isDateToday || isTimeSlotValidForToday(slot);
-
-                    return (
-                      <button
-                        key={slot}
-                        type="button"
-                        disabled={!isValidForToday}
-                        onClick={() => setSelectedTimeSlot(slot)}
-                        className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer min-h-[38px] ${
-                          isSelected
-                            ? 'border-2 border-emerald-600 bg-emerald-600 text-white shadow-xs font-black ring-2 ring-emerald-600/30 scale-102'
-                            : isValidForToday
-                            ? 'border border-slate-200 bg-white hover:border-slate-300 hover:bg-emerald-50/50 text-slate-800'
-                            : 'border border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
-                        }`}
-                      >
-                        {slot}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
           </div>
 
@@ -1731,12 +1701,6 @@ export function Schedule() {
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.frequencyTitle')}:</span>
                 <span className="font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md text-right">
                   {t(freqOption.nameKey)} ({freqOption.badge})
-                </span>
-              </div>
-              <div className="flex justify-between items-start gap-2">
-                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.occupancyLabel')}:</span>
-                <span className="font-bold text-slate-900 text-right">
-                  {isOccupied ? t('schedule.occupied') : t('schedule.vacant')}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-2">

@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
-from apps.cleaning.models import CleaningServiceRate, CleaningAddon, CleaningOrder
+from apps.cleaning.models import CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
 
 User = get_user_model()
 
@@ -438,3 +438,82 @@ class TestCleaningAPI:
             esl_orders = esl_orders.get('results', [])
         assert len(esl_orders) == 1
         assert esl_orders[0]['brand'] == 'evolvingsolutions'
+
+
+@pytest.mark.django_db
+class TestCleaningPricingTiers:
+    def test_cleaning_pricing_tiers_list_endpoint(self, api_client):
+        CleaningPricingTier.objects.create(
+            brand='gopropertycare',
+            tier_number=1,
+            label='500 – 999 sq ft',
+            min_sqft=500,
+            max_sqft=999,
+            standard_price=Decimal('160.00'),
+            deep_price=Decimal('215.00'),
+            str_on_site_price=Decimal('185.00'),
+            str_off_site_price=Decimal('245.00'),
+        )
+        CleaningPricingTier.objects.create(
+            brand='gopropertycare',
+            tier_number=2,
+            label='1,000 – 1,299 sq ft',
+            min_sqft=1000,
+            max_sqft=1299,
+            standard_price=Decimal('210.00'),
+            deep_price=Decimal('275.00'),
+            str_on_site_price=Decimal('240.00'),
+            str_off_site_price=Decimal('315.00'),
+        )
+
+        resp = api_client.get('/api/v1/cleaning/tiers/?brand=gopropertycare')
+        assert resp.status_code == 200
+        data = resp.json()
+        results = data if isinstance(data, list) else data.get('results', [])
+        assert len(results) == 2
+        assert results[0]['tier_number'] == 1
+        assert results[0]['label'] == '500 – 999 sq ft'
+        assert Decimal(str(results[0]['standard_price'])) == Decimal('160.00')
+
+    def test_pricing_tier_order_price_calculation(self, api_client, regular_rate):
+        # Create a tier with custom admin price (e.g. standard_price = 199.00 instead of default 160.00)
+        CleaningPricingTier.objects.create(
+            brand='gopropertycare',
+            tier_number=1,
+            label='500 – 999 sq ft',
+            min_sqft=500,
+            max_sqft=999,
+            standard_price=Decimal('199.00'),
+            deep_price=Decimal('259.00'),
+            str_on_site_price=Decimal('220.00'),
+            str_off_site_price=Decimal('270.00'),
+        )
+
+        future_date = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
+        payload = {
+            'street_address': '555 Custom Price St',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'service_rate_id': regular_rate.id,
+            'square_feet': 750,
+            'frequency': 'one_time',
+            'bedrooms': 2,
+            'bathrooms': 1.5,
+            'is_occupied': True,
+            'entry_method': 'someone_home',
+            'service_date': future_date,
+            'time_slot': '09:00 AM',
+            'guest_email': 'customtier@example.com',
+            'guest_first_name': 'Jane',
+            'guest_last_name': 'Doe',
+            'guest_phone': '303-555-9876',
+            'brand': 'gopropertycare',
+        }
+        resp = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+        assert resp.status_code == 201
+        data = resp.json()
+        # Should use the admin-customized standard_price of 199.00 for 750 sqft (tier 1)
+        assert Decimal(str(data['base_price'])) == Decimal('199.00')
+        assert Decimal(str(data['total_price'])) == Decimal('199.00')
+

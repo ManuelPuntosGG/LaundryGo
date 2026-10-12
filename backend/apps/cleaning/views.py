@@ -5,9 +5,10 @@ from django.utils import timezone
 from django.db import transaction
 from datetime import timedelta
 from django.db.models import Q
-from .models import CleaningServiceRate, CleaningAddon, CleaningOrder
+from .models import CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
 from .serializers import (
     CleaningServiceRateSerializer,
+    CleaningPricingTierSerializer,
     CleaningAddonSerializer,
     CleaningOrderSerializer,
     CleaningOrderCreateSerializer,
@@ -16,6 +17,18 @@ from .emails import (
     send_cleaning_order_confirmation_email,
     send_cleaning_order_cancellation_email,
 )
+
+
+class CleaningPricingTierListView(generics.ListAPIView):
+    serializer_class = CleaningPricingTierSerializer
+    permission_classes = (permissions.AllowAny,)
+
+    def get_queryset(self):
+        qs = CleaningPricingTier.objects.filter(is_active=True).order_by('tier_number')
+        brand = self.request.query_params.get('brand')
+        if brand:
+            qs = qs.filter(brand=brand)
+        return qs
 
 
 class CleaningServiceRateListView(generics.ListAPIView):

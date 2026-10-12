@@ -2,7 +2,52 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from unfold.admin import ModelAdmin
 from unfold.decorators import display, action
-from .models import CleaningServiceRate, CleaningAddon, CleaningOrder
+from .models import CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
+
+
+@admin.register(CleaningPricingTier)
+class CleaningPricingTierAdmin(ModelAdmin):
+    list_display = (
+        'tier_number',
+        'label',
+        'brand_badge',
+        'standard_price',
+        'deep_price',
+        'str_on_site_price',
+        'str_off_site_price',
+        'is_custom_quote',
+        'is_active',
+    )
+    list_editable = (
+        'standard_price',
+        'deep_price',
+        'str_on_site_price',
+        'str_off_site_price',
+        'is_active',
+    )
+    list_filter = ('brand', 'is_active', 'is_custom_quote')
+    list_filter_submit = True
+    search_fields = ('label',)
+    ordering = ('tier_number',)
+
+    fieldsets = (
+        (_('Tier Info'), {
+            'fields': ('brand', 'tier_number', 'label', 'min_sqft', 'max_sqft', 'is_custom_quote', 'is_active'),
+        }),
+        (_('Pricing ($ USD)'), {
+            'fields': ('standard_price', 'deep_price', 'str_on_site_price', 'str_off_site_price'),
+        }),
+    )
+
+    @display(
+        description=_('Brand'),
+        label={
+            'gopropertycare': 'success',
+            'evolvingsolutions': 'warning',
+        }
+    )
+    def brand_badge(self, obj):
+        return obj.brand, 'GoPropertyCare' if obj.brand == 'gopropertycare' else 'Evolving Solutions'
 
 
 @admin.register(CleaningServiceRate)
