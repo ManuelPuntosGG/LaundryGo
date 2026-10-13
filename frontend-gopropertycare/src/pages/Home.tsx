@@ -108,10 +108,6 @@ export function Home() {
       {/* Hero Section */}
       <section className="relative pt-6 sm:pt-12 pb-6 sm:pb-10 text-center flex flex-col items-center">
         {/* Contact & Location Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs sm:text-sm font-bold mb-6 shadow-2xs animate-fade-in-down">
-          <MapPin className="w-3.5 h-3.5 text-emerald-600 animate-float" />
-          <span>{t('home.badge')}</span>
-        </div>
 
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight max-w-4xl leading-[1.1] mb-6 animate-fade-in-up">
           {t('home.hero.title')}
