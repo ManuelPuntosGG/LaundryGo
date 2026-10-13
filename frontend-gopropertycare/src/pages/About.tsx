@@ -254,7 +254,7 @@ export function About() {
                       {t('about.contactInfo.hoursLabel', 'Service Hours')}
                     </h4>
                     <p className="text-xs text-slate-600 mt-0.5">
-                      {t('about.contactInfo.hoursValue', 'Monday – Saturday: 8:00 AM – 6:00 PM')}
+                      {t('about.contactInfo.hoursValue', '24/7')}
                     </p>
                   </div>
                 </div>
