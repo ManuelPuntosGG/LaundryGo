@@ -517,3 +517,56 @@ class TestCleaningPricingTiers:
         assert Decimal(str(data['base_price'])) == Decimal('199.00')
         assert Decimal(str(data['total_price'])) == Decimal('199.00')
 
+    def test_str_order_with_offsite_laundry_addon(self, api_client, db):
+        str_rate = CleaningServiceRate.objects.create(
+            name='Short-Term Rental Turnover',
+            service_type='str_on_site',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.17'),
+            min_order_amount=Decimal('99.00'),
+            description='STR Turnover',
+            is_active=True,
+        )
+
+        future_date = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
+        # 2 bedrooms ($135 base, 2 inc baths, external laundry $70)
+        # 3 bathrooms (1 extra bath = +$25) -> baseBeforeDisc = $160.00
+        # biweekly discount: 15% off $160 = $24.00 -> base_price = $136.00
+        # off_site_laundry addon: $70.00
+        # Total price: $136.00 + $70.00 = $206.00
+        payload = {
+            'street_address': '123 STR Test Blvd',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'service_rate_id': str_rate.id,
+            'square_feet': 1200,
+            'frequency': 'biweekly',
+            'bedrooms': 2,
+            'bathrooms': 3,
+            'is_occupied': True,
+            'entry_method': 'lockbox',
+            'entry_notes': 'Code: 1234',
+            'selected_addons': [
+                {
+                    'code': 'off_site_laundry',
+                    'name': 'Off-Site Laundry Service',
+                    'price': 70.00,
+                }
+            ],
+            'service_date': future_date,
+            'time_slot': '10:00 AM',
+            'guest_email': 'strhost@example.com',
+            'guest_first_name': 'Host',
+            'guest_last_name': 'Denver',
+            'guest_phone': '720-555-4321',
+            'brand': 'gopropertycare',
+        }
+        resp = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+        assert resp.status_code == 201
+        data = resp.json()
+        assert Decimal(str(data['base_price'])) == Decimal('136.00')
+        assert Decimal(str(data['addons_total'])) == Decimal('70.00')
+        assert Decimal(str(data['total_price'])) == Decimal('206.00')
+
+

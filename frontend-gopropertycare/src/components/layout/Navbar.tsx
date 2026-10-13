@@ -46,6 +46,20 @@ export function Navbar() {
             </Link>
 
             <Link
+              to="/services"
+              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+                isActive('/services')
+                  ? 'text-emerald-700'
+                  : 'text-slate-700 hover:text-emerald-700'
+              }`}
+            >
+              {t('nav.services', 'Services')}
+              {isActive('/services') && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 rounded-full animate-fade-in" />
+              )}
+            </Link>
+
+            <Link
               to="/about"
               className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
                 isActive('/about')
@@ -142,6 +156,15 @@ export function Navbar() {
               }`}
             >
               {t('nav.home')}
+            </Link>
+            <Link
+              to="/services"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center h-11 px-4 rounded-xl text-sm font-bold transition-colors ${
+                isActive('/services') ? 'bg-emerald-50 text-emerald-800 font-extrabold border border-emerald-200' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {t('nav.services', 'Services')}
             </Link>
             <Link
               to="/about"

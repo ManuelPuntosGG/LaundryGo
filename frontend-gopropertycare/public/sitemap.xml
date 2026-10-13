@@ -20,11 +20,20 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://gopropertycare.com/services</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gopropertycare.com/services" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://gopropertycare.com/services?lng=es" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gopropertycare.com/services" />
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://gopropertycare.com/about</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://gopropertycare.com/about" />
     <xhtml:link rel="alternate" hreflang="es" href="https://gopropertycare.com/about?lng=es" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://gopropertycare.com/about" />
-    <lastmod>2026-10-12</lastmod>
+    <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

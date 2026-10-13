@@ -99,6 +99,13 @@ class Command(BaseCommand):
                 'description': 'Lavado minucioso de vidrios y ventanales interiores.',
             },
             {
+                'code': 'off_site_laundry',
+                'name': 'Off-Site Laundry Service',
+                'brand': 'gopropertycare',
+                'price': Decimal('45.00'),
+                'description': 'Servicio de retiro, lavado profesional externo y retorno de blancos para propiedades sin lavandería en sitio.',
+            },
+            {
                 'code': 'pets',
                 'name': 'Mascotas (Pelo y Olores)',
                 'brand': 'gopropertycare',

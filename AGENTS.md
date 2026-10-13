@@ -12,8 +12,17 @@ Este repositorio aloja una arquitectura desacoplada y multi-tenant que sirve a *
    - **Modelo de Negocio**: Lavado de ropa a domicilio cobrado por libra ($2.25, $2.45, $3.85/lb) con opciones de entrega en 2 días (*Standard*), día siguiente (*Go*) o mismo día express (*GoFurther* antes de las 12:00 PM). Permite pedidos puntuales o suscripciones recurrentes con 7.5% de descuento (*Daily*, *Weekly*, *Biweekly*, *Monthly*). Orden mínima de $40.00.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en azules y grises slate). Puerto local `5173`.
 2. **GoPropertyCare (`gopropertycare.com`)**:
-   - **Modelo de Negocio**: Soluciones integrales de limpieza y mantenimiento residencial y comercial para propietarios, profesionales del sector inmobiliario y administradores de propiedades en el área metropolitana de Denver y Boulder. Ofrece 5 servicios especializados cobrados por pie cuadrado (**\$/sq ft**) con orden mínima de **\$99.00**: *Move-In / Move-Out Cleaning* ($0.20/sqft), *Residential Cleaning* ($0.12/sqft), *Commercial Cleaning* ($0.18/sqft), *Post-Construction Cleaning* ($0.26/sqft) y *Short-Term Rentals Turnover (Airbnb / VRBO)* ($0.15/sqft). Cuenta con personal profesional 100% asegurado (Insured), listas de control rigurosas y equipos puntuales. Agendamiento con antelación (**sin disponibilidad para el mismo día**; citas habilitadas a partir de mañana). Operación totalmente independiente y desligada de derivaciones externas.
-   - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en blanco y verdes bosque/esmeralda). Puerto local `5174`.
+   - **Modelo de Negocio**: Soluciones integrales de limpieza y mantenimiento residencial y turnover vacacional para propietarios, anfitriones de Airbnb/VRBO y administradores de propiedades en el área metropolitana de Denver y Boulder. Ofrece **3 servicios especializados principales**:
+     - *Standard Residential Cleaning*: Mantenimiento del hogar regular o profundo con tarifa base de **$0.125/sqft** y matriz de 18 niveles escalados (desde \$155 para 500–999 sq ft hasta \$480 para 5,700–6,099 sq ft; cotización personalizada para > 6,100 sq ft).
+     - *Move-In / Move-Out Cleaning*: Desinfección profunda para devoluciones de depósito, mudanzas y propiedades en venta con tarifa base de **$0.200/sqft** y matriz de 18 niveles escalados (desde \$235 hasta \$890).
+     - *Short-Term Rental Turnover (Airbnb / VRBO)*: Rotación express y preparación 5 estrellas unificada basada en habitaciones: Studio/1 Hab (\$90), 2 Habs (\$135), 3 Habs (\$185), 4 Habs (\$255), 5 Habs (\$330) con \$25 por baño adicional. Incluye por defecto lavado de ropa blanca en la unidad (\$0.00 adicional).
+     - *Servicio de Lavandería Fuera de la Propiedad (Off-Site Laundry)*: Add-on dinámico escalado por recuento de habitaciones (+$45 Studio/1 Hab, +$70 2 Habs, +$95 3 Habs, +$120 4 Habs, +$145 5 Habs) para propiedades sin lavadora/secadora propia o anfitriones que requieran retiro y reposición externa.
+     - *Add-ons con Incidencia en Cotización*: Horno (\$60), Interior de Refrigerador (\$50), Persianas (\$40), Ventanas Interiores (\$35), Mascotas (\$20), Jacuzzi/Hot Tub (\$25), Patio/Balcón/Parrilla (\$20).
+     - *Detalle Consultivo y Métodos de Acceso*: Recuento exacto de habitaciones y baños, estado de ocupación (habitada/amueblada vs vacía), método de entrada a la vivienda (*alguien en casa*, *código de teclado/teclera*, *caja de llaves/lockbox*, *abierta/sin cerradura* u *otro método*) y notas de acceso.
+     - *Regla de Agendamiento Mismo Día*: Citas habilitadas para el mismo día si se reservan **antes de las 12:00 PM** con un margen mínimo de **3 horas** respecto a la hora actual; posterior a las 12:00 PM, citas disponibles a partir de mañana.
+     - *Descuentos por Frecuencia*: Semanal (20%), Quincenal / Biweekly (15%), Mensual (10%), Una vez (0%).
+     - *Personal 100% Asegurado (Insured)*, listas de control rigurosas, suministros aptos para familias y mascotas, y equipos puntuales.
+   - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en blanco y verdes bosque/esmeralda). Puerto local `5174`. Incluye página separada de presentación corporativa (`/about`) y página dedicada con listas de control detalladas habitación por habitación (`/services`).
 3. **Evolving Solutions LLC (`evolvingsolutionsllc.com`)**:
    - **Modelo de Negocio**: Socio confiable en Denver para limpieza comercial de corporativos y locales, limpieza post-construcción y fin de obra (gruesa, fina y entrega) y cuadrillas de mano de obra para demolición selectiva de drywall/tablaroca. Tarifas por pie cuadrado (**$0.18/sqft** comercial, **$0.26/sqft** post-obra, **$0.35/sqft** demolición de drywall) con umbral mínimo de visita de **\$99.00**. 100% de cumplimiento en seguros de responsabilidad civil (General Liability), compensación laboral (Workers' Comp) y estándares de seguridad OSHA. Incluye sección de derivación cruzada a GoPropertyCare para propietarios particulares que busquen limpieza residencial de casas y apartamentos.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en blanco, bronces cálidos y marrones tierra: `#9c6843`, `#815133`, `#573725`, `#2f1b11`). Puerto local `5175`.
@@ -114,31 +123,32 @@ LaundryGo/
 
 ---
 
-### Módulo de Limpieza y Mano de Obra (`apps.cleaning`)
+#### Módulo de Limpieza y Mano de Obra (`apps.cleaning`)
 - **Modelos**:
   1. `CleaningServiceRate`: Tarifas dinámicas por pie cuadrado (estandarizadas a 2 decimales) con asignación estricta de marca (`brand`):
-     - **GoPropertyCare (`brand='gopropertycare'`) — Soluciones Integrales Residenciales y Comerciales**:
-       - `move_in_out`: Move-In / Move-Out Cleaning a **$0.20/sqft** (inspecciones, devoluciones de depósito y venta).
-       - `residential`: Residential Cleaning a **$0.12/sqft** (mantenimiento estándar regular o profundo).
-       - `commercial`: Commercial Cleaning a **$0.18/sqft** (oficinas, locales e instalaciones comerciales).
-       - `post_construction`: Post-Construction Cleaning a **$0.26/sqft** (polvo de yeso, escombros y fin de obra).
-       - `short_term_rental`: Short-Term Rentals Turnover (Airbnb / VRBO) a **$0.15/sqft** (ropa de cama, insumos y 5 estrellas).
+     - **GoPropertyCare (`brand='gopropertycare'`) — Soluciones Residenciales y Alquiler Temporal**:
+       - `residential`: Standard Residential Cleaning a **$0.125/sqft** (mantenimiento regular o profundo con matriz de 18 niveles desde \$155).
+       - `move_in_out`: Move-In / Move-Out Cleaning a **$0.200/sqft** (devoluciones de depósito y venta con matriz de 18 niveles desde \$235).
+       - `str_on_site` / `short_term_rental`: Short-Term Rental Turnover (Airbnb / VRBO) a **$0.170/sqft** y cotización por matriz de habitaciones ($90 Studio/1 Hab, $135 2 Habs, $185 3 Habs, $255 4 Habs, $330 5 Habs + $25/baño adicional excedente).
        - Campo `min_order_amount`: Umbral mínimo de **$99.00**.
      - **Evolving Solutions LLC (`brand='evolvingsolutions'`) — Comercial & Demolición**:
        - `commercial`: Limpieza Comercial / Janitorial a **$0.18/sqft** (oficinas, locales, bodegas y corporativos).
        - `post_construction`: Limpieza Post-Construcción a **$0.26/sqft** (aspirado industrial HEPA, yeso, pintura, entrega de obra).
        - `industrial_demolition`: Demolición de Drywall y Mano de Obra Industrial a **$0.35/sqft** (demolición selectiva, ensacado y retiro de escombros).
-     - Campo `min_order_amount`: Umbral mínimo de **$99.00**.
-  2. `CleaningAddon`: Recargos por dificultad o áreas adicionales segregados por marca:
-     - Residenciales (`gopropertycare`): Presencia de mascotas ($35), techos altos/ventanales ($30), interior de horno/refrigerador ($45), alacenas/gabinetes ($35), sótano/ático ($50), balcón/patio ($25).
+       - Campo `min_order_amount`: Umbral mínimo de **$99.00**.
+  2. `CleaningPricingTier`: Matriz escalada de 18 niveles de metraje cuadrado para GoPropertyCare (`brand='gopropertycare'`), administrable y sobreescribible desde Django Unfold:
+     - Campos: `tier_number`, `label`, `min_sqft`, `max_sqft`, `standard_price`, `deep_price`, `str_on_site_price`, `str_off_site_price`, `is_custom_quote`, `is_active`.
+     - Tiers 0 al 16 abarcan desde 500 sq ft hasta 6,099 sq ft. Tier 17 (6,100+ sq ft) activa captura de prospectos para cotización personalizada (*Custom Quote*).
+  3. `CleaningAddon`: Recargos por dificultad o extras segregados por marca:
+     - Residenciales & STR (`gopropertycare`): Limpieza de horno ($60), interior de refrigerador ($50), persianas ($40), ventanas interiores ($35), servicio de lavandería externa off-site (+$45 a +$145 escalado por habitación), mascotas ($20), jacuzzi / hot tub ($25), patio / balcón / parrilla ($20).
      - Comerciales (`evolvingsolutions`): Techos altos/vigas industriales ($45), retiro y carga de escombros pesados ($95), lavado mecanizado de pisos ($65), vitrinas/cristales ($55), desinfección de baterías de baño ($45), turno nocturno/fin de semana ($50).
-  3. `CleaningOrder`: Registro de servicio con:
+  4. `CleaningOrder`: Registro de servicio con:
      - `brand`: `'gopropertycare'` o `'evolvingsolutions'`.
      - Prefijo de visualización dinámico: `GPC-#{id}` para GoPropertyCare y `ESL-#{id}` para Evolving Solutions LLC.
-     - `square_feet`, `service_rate`, `selected_addons` (JSON), `service_date`, `time_slot` (`morning` 8AM-12PM / `afternoon` 1PM-5PM), dirección en Denver/Boulder, zona (`inner` $0 / `outer` $25), `base_price` ($\max(\text{sqft} \times \text{rate}, \$99)$), `addons_total`, `delivery_fee`, `total_price`, `special_instructions`, `status` e idioma `language` (`'en'` o `'es'`).
+     - `square_feet`, `bedrooms`, `bathrooms`, `is_occupied`, `entry_method`, `entry_notes`, `service_rate`, `selected_addons` (JSON), `service_date`, `time_slot`, dirección en Denver/Boulder, zona (`inner` $0 / `outer` $25), `frequency`, `base_price`, `addons_total`, `delivery_fee`, `total_price`, `special_instructions`, `status` e idioma `language` (`'en'` o `'es'`).
 
 - **Reglas de Agendamiento y Validación**:
-  - **Sin mismo día**: `service_date` debe ser estrictamente mañana o posterior (+1 día en adelante).
+  - **Mismo día condicional**: En GoPropertyCare y LaundryGo se permite reservar para el mismo día si la orden se crea antes de las **12:00 PM** local, con una antelación mínima de **3 horas** respecto a la hora de llegada elegida. Posterior a las 12:00 PM, se exige agendar a partir de mañana (+1 día). En Evolving Solutions LLC las visitas se programan con al menos 24 horas de antelación.
   - **Validación de Pertenencia de Marca**: El serializador valida que la tarifa seleccionada pertenezca a la marca correspondiente de la orden (`gopropertycare` o `evolvingsolutions`), garantizando total autonomía entre plataformas.
 
 - **Emails Transaccionales Bilingües (`apps.cleaning.emails`)**:
@@ -148,11 +158,12 @@ LaundryGo/
 
 - **Endpoints de Limpieza** (`/api/v1/cleaning/`):
   - `GET /rates/?brand=<brand>`: Lista de tarifas filtrada por marca comercial.
+  - `GET /tiers/?brand=<brand>`: Lista de niveles de precios escalados (CleaningPricingTier) para GoPropertyCare.
   - `GET /addons/?brand=<brand>`: Lista de add-ons filtrada por marca comercial.
   - `GET|POST /orders/?brand=<brand>`: Lista de órdenes del usuario autenticado filtradas por marca / Creación de orden validada contra la marca.
   - `GET|PUT|PATCH /orders/<id>/`: Detalle y actualización de reserva.
   - `POST /orders/<id>/cancel/`: Cancelación de orden pendiente.
-  - `GET /schedule/available-dates/`: Calendario dinámico de fechas disponibles desde mañana.
+  - `GET /schedule/available-dates/`: Calendario dinámico de fechas disponibles.
 
 ---
 
@@ -183,7 +194,7 @@ LaundryGo/
 - **Puerto Local**: `5174`.
 - **Logotipo**: Casa verde con escoba, cubeta con espuma y toallas plegadas (`public/logo.png`).
 - **Estética**: Blanco y verdes bosque/esmeralda (`--color-brand-*` desde `#f0fdf4` hasta `#052e16`).
-- **Enfoque**: Residencial (Regular, Profunda, Move-In/Move-Out, Post-Construcción) con banner de referencia hacia Evolving Solutions LLC para entes comerciales y demolición.
+- **Enfoque**: Limpieza residencial personalizada (*Standard Cleaning* y *Move-In / Move-Out*) y preparación de alojamientos turísticos (*Short-Term Rental Turnover* para Airbnb y VRBO). Dispone de páginas separadas para presentación corporativa (`/about`) y desglose de servicios habitación por habitación con checklists e imágenes (`/services`). Sistema de reservas en 4 pasos con cálculo transparente en tiempo real y soporte para prerenderizado estático (SSG) de rutas clave.
 
 ### Frontend 3: Evolving Solutions LLC (`/frontend-evolvingsolutions`)
 - **Tecnología**: React 19, Vite 8, TypeScript, Tailwind CSS v4.
@@ -199,17 +210,22 @@ LaundryGo/
 1. **Zonas de Cobertura en Denver y Boulder (Compartidas por las Tres Marcas)**:
    - **Zona Inner (Gratis - $0.00)**: Denver (Downtown / Central), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, Broomfield.
    - **Zona Outer (Recargo - $25.00)**: Aurora, Thornton, Centennial, Highlands Ranch.
-2. **Reglas Específicas de GoPropertyCare y Evolving Solutions LLC**:
-   - **Sin Mismo Día**: Todas las citas deben agendarse al menos para el día siguiente (+1 día en adelante).
+2. **Reglas Específicas de GoPropertyCare**:
+   - **Mismo Día con Cutoff de 12:00 PM**: Reservas para el mismo día disponibles únicamente si se efectúan antes de las 12:00 PM local y seleccionando una hora con al menos 3 horas de margen respecto a la hora actual. A partir de las 12:00 PM, las reservas se habilitan a partir de mañana.
+   - **Precios Escalonados Upfront**: 18 niveles para Standard ($155 a $480) y Move-In/Out ($235 a $890); más de 6,100 sq ft activa captura de leads para cotización a medida.
+   - **Rotación STR Escalada por Habitaciones**: Base de $90 (Studio/1 Hab), $135 (2 Habs), $185 (3 Habs), $255 (4 Habs), $330 (5 Habs) con $25 por baño extra. El Add-on de lavandería externa escala a +$45, +$70, +$95, +$120 y +$145 respectivamente.
+   - **Descuentos por Frecuencia Recurrente**: 20% semanal, 15% quincenal (biweekly), 10% mensual y 0% pago único (one-time).
+3. **Reglas Específicas de Evolving Solutions LLC**:
+   - **Antelación de 24 Horas**: Todas las visitas se agendan con al menos 24 horas de antelación para coordinación de cuadrillas y equipos industriales.
    - **Orden Mínima de Visita**: **$99.00**. Si $\text{sqft} \times \text{tarifa} < \$99.00$, se cobra el piso de $99.00.
    - **Medición de Precios**: Exclusivamente en **\$/square feet** (\$/sq ft) más recargos por dificultad o servicios especiales.
-3. **Reglas Específicas de LaundryGo (Lavandería)**:
+4. **Reglas Específicas de LaundryGo (Lavandería)**:
    - **Cutoff de Mismo Día (GoFurther)**: Solo disponible para hoy si la hora local es anterior a las 12:00 PM.
    - **Orden Mínima de Lavado**: **$40.00**.
    - **Descuento Recurrente (7.5%)**: Aplica a partir del segundo cobro en suscripciones.
-4. **Checkout Flexible (Usuario vs Guest)**:
+5. **Checkout Flexible (Usuario vs Guest)**:
    - Los pedidos pueden realizarse autenticado o como invitado (`guest_*`). Al registrarse posteriormente con el mismo correo, el sistema auto-vincula el historial de las tres marcas.
-5. **Notificaciones Bilingües**:
+6. **Notificaciones Bilingües**:
    - Cada orden almacena `language: 'en' | 'es'`. Los correos se emiten en el idioma seleccionado por el cliente con el branding y contacto correspondiente a cada una de las 3 marcas.
 
 ---
@@ -228,7 +244,7 @@ python manage.py migrate
 # Poblar tarifas de lavandería (LaundryGo)
 python manage.py seed_service_rates
 
-# Poblar tarifas y add-ons de limpieza (GPC & ESL)
+# Poblar tarifas, add-ons y niveles de precios de limpieza (GPC & ESL)
 python manage.py seed_cleaning_rates
 
 # Crear superusuario no interactivo
@@ -240,7 +256,7 @@ python manage.py test_email [correo_destino]
 # Servidor de desarrollo Django (puerto 8000)
 python manage.py runserver 8000
 
-# Ejecutar suite de pruebas completa con pytest (34 tests pasando)
+# Ejecutar suite de pruebas completa con pytest (37 tests pasando)
 pytest
 ```
 

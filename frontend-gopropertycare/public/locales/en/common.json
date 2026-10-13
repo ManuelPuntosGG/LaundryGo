@@ -9,6 +9,7 @@
   },
   "nav": {
     "home": "Home",
+    "services": "Services",
     "about": "About Us",
     "schedule": "Book Service",
     "login": "Login",
@@ -116,15 +117,15 @@
         ]
       },
       "str_on_site": {
-        "name": "Short Term Rentals (Laundry on site)",
-        "tagline": "Fast Turnover with In-House Laundry",
-        "description": "Rapid turnover between guests including on-site washer & dryer washing of bed linens and towels, restock, and 5-star presentation.",
+        "name": "Short-Term Rental Turnover",
+        "tagline": "5-Star Staging, Linen Service & Restocking",
+        "description": "Rapid turnover between Airbnb & VRBO guests. Includes on-site laundry or optional off-site laundry service, amenity restock, and 5-star presentation.",
         "features": [
-          "Rapid, dependable turnover within checkout/check-in windows",
-          "On-site washing and drying of bed linens & towels",
-          "Restocking and neat arrangement of guest amenities",
+          "Rapid turnover within strict checkout/check-in windows",
+          "Linen and towel service (on-site or off-site add-on)",
+          "Restocking and neat staging of guest amenities",
           "High-touch point sanitization throughout the property",
-          "Rigorous checklist designed to secure 5-star ratings"
+          "Rigorous checklist designed to protect 5-star ratings"
         ]
       },
       "str_off_site": {
@@ -209,6 +210,32 @@
     "mission": {
       "title": "Our Mission",
       "description": "At GoPropertyCare, we provide top-tier residential and commercial cleaning solutions tailored to homeowners, real estate professionals, and property managers throughout the Denver metropolitan area. We understand that an immaculate, well-maintained space is essential for your peace of mind, guest satisfaction, and seamless property turnovers."
+    },
+    "guarantees": {
+      "title": "Our Core Guarantees",
+      "subtitle": "Uncompromising standards delivering absolute confidence to property owners and hosts.",
+      "insured": "100% Insured Personnel",
+      "insuredDesc": "Full liability protection safeguarding your home and belongings on every cleaning appointment.",
+      "vetted": "Background-Checked Specialists",
+      "vettedDesc": "Punctual, vetted, and thoroughly trained specialists dedicated to your peace of mind.",
+      "satisfaction": "Satisfaction Guaranteed",
+      "satisfactionDesc": "Every visit follows strict inspection checklists to guarantee spotless, dependable 5-star results.",
+      "ecoSafe": "Family & Pet Friendly",
+      "ecoSafeDesc": "High-grade cleaning supplies carefully selected to protect the health of your loved ones and pets."
+    },
+    "contactInfo": {
+      "title": "Company Contact & Direct Support",
+      "subtitle": "Connect directly with our local Denver and Boulder management team. We are here to help.",
+      "phoneLabel": "Direct Phone",
+      "emailLabel": "Email Address",
+      "hoursLabel": "Service Hours",
+      "hoursValue": "Monday – Saturday: 8:00 AM – 6:00 PM (Direct support available for bookings)",
+      "coverageLabel": "Service Areas",
+      "coverageValue": "Denver Metropolitan Area & Boulder, CO",
+      "instagramLabel": "Official Instagram",
+      "callBtn": "Call (720) 590-8632",
+      "emailBtn": "Send an Email",
+      "exploreServicesBtn": "View Our Services"
     },
     "pillarsTitle": "Why Choose GoPropertyCare?",
     "values": {
@@ -399,6 +426,20 @@
       "scheduleBtn": "Book Online"
     }
   },
+  "servicesPage": {
+    "title": "Our Specialized Services",
+    "subtitle": "Comprehensive, room-by-room cleaning checklists designed for homes, turnovers, and property resets across Denver & Boulder.",
+    "viewAboutBtn": "About Our Company",
+    "scheduleBtn": "Schedule Online",
+    "customRequestNote": "Need something that isn't listed? Ask us. We'll tell you if it can be added.",
+    "bookThisService": "Book This Service",
+    "cta": {
+      "title": "Ready to Experience Impeccable Property Care?",
+      "subtitle": "Choose your space, pick your date, and let our insured team handle the rest.",
+      "scheduleBtn": "Book Your Cleaning",
+      "callBtn": "Call (720) 590-8632"
+    }
+  },
   "cleaningAddons": {
     "oven": {
       "name": "Oven Cleaning",
@@ -415,6 +456,10 @@
     "inside_windows": {
       "name": "Inside Windows Cleaning",
       "description": "Hand washing and streak-free polishing of interior window panes (+$35)."
+    },
+    "off_site_laundry": {
+      "name": "Off-Site Laundry Service",
+      "description": "Linen collection, off-site washing, and replacement for properties without in-unit washer/dryer."
     },
     "pets": {
       "name": "Pets (Hair & Odors)",
@@ -485,10 +530,14 @@
     "serviceStandardDesc": "Regular maintenance for upkeep and hygiene",
     "serviceDeep": "Deep / Move-In / Move-Out Clean",
     "serviceDeepDesc": "Thorough reset, baseboards, grout & inspection detailing",
+    "serviceStr": "Short-Term Rental Turnover",
+    "serviceStrDesc": "Airbnb & VRBO turnover: sanitized spaces, fresh hotel-style bed remaking, and guest amenities restocking",
     "serviceStrOnSite": "Short Term Rental (Laundry on site)",
     "serviceStrOnSiteDesc": "Turnover cleaning between guests with linen & towel washing on premises",
     "serviceStrOffSite": "Short Term Rental (Off Site Laundry)",
     "serviceStrOffSiteDesc": "Turnover cleaning with off-site linen laundry pickup, wash, and return",
+    "offSiteLaundryAddonTitle": "Off-Site Laundry Service (Add-on)",
+    "offSiteLaundryAddonDesc": "Select this add-on if the property has no washer/dryer on-site. Includes complete off-site transport, professional laundering, and crisp replacements.",
     "frequencyDiscount": "Frequency Discount",
     "baseTierPrice": "Base Cleaning Service",
     "selectTier": "Select Specialized Service",

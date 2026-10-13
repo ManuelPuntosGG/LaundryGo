@@ -45,7 +45,6 @@ import {
 import {
   STR_TIERS,
   STR_EXTRA_BATHROOM_PRICE,
-  calculateSTRPrice,
   getSTRTierByBedrooms,
 } from '@/constants/strPricing';
 
@@ -62,6 +61,7 @@ const ADDON_ICONS: Record<string, string> = {
   str_hot_tub: '♨️',
   patio_grill: '🥩',
   str_patio_grill: '🥩',
+  off_site_laundry: '🧺',
 };
 
 const TIME_SLOTS = [
@@ -193,15 +193,14 @@ export function Schedule() {
     const searchParams = new URLSearchParams(window.location.search);
     const tierParam = searchParams.get('tier');
     if (tierParam === 'move_in_out' || tierParam === 'deep') return 'deep';
-    if (tierParam === 'str_on_site') return 'str_on_site';
-    if (tierParam === 'str_off_site') return 'str_off_site';
+    if (
+      tierParam === 'str' ||
+      tierParam === 'short_term_rental' ||
+      tierParam === 'str_on_site' ||
+      tierParam === 'str_off_site'
+    )
+      return 'str_on_site';
     return 'standard';
-  });
-
-  const [hasWasherDryer, setHasWasherDryer] = useState<boolean>(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const tierParam = searchParams.get('tier');
-    return tierParam !== 'str_off_site';
   });
 
   const isSTR = serviceType === 'str_on_site' || serviceType === 'str_off_site';
@@ -244,7 +243,15 @@ export function Schedule() {
   // Step 3: Location, Contact, Access & Priced Addons
   const [entryMethod, setEntryMethod] = useState<string>('someone_home');
   const [entryNotes, setEntryNotes] = useState<string>('');
-  const [selectedAddonCodes, setSelectedAddonCodes] = useState<Record<string, boolean>>({});
+  const [selectedAddonCodes, setSelectedAddonCodes] = useState<Record<string, boolean>>(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const tierParam = searchParams.get('tier');
+    const initial: Record<string, boolean> = {};
+    if (tierParam === 'str_off_site') {
+      initial.off_site_laundry = true;
+    }
+    return initial;
+  });
   const [specialInstructions, setSpecialInstructions] = useState<string>('');
 
   const [formData, setFormData] = useState(() => ({
@@ -368,18 +375,30 @@ export function Schedule() {
   // Determine active service rate for backend mapping
   const activeRate =
     rates.find((r) => {
-      if (serviceType === 'str_on_site') return r.service_type === 'str_on_site';
-      if (serviceType === 'str_off_site') return r.service_type === 'str_off_site';
+      if (isSTR) {
+        return r.service_type === 'str_on_site' || r.service_type === 'short_term_rental';
+      }
       if (serviceType === 'deep') return r.service_type === 'move_in_out' || r.service_type === 'deep';
       return r.service_type === 'residential' || r.service_type === 'regular';
     }) || rates[0];
 
   // STR Price Calculations
-  const strCalc = calculateSTRPrice({
-    bedrooms,
-    bathrooms,
-    hasWasherDryer,
-  });
+  const strTier = getSTRTierByBedrooms(bedrooms);
+  const extraBathrooms = Math.max(0, Math.floor(bathrooms - strTier.includedBathrooms));
+  const extraBathroomFee = extraBathrooms * STR_EXTRA_BATHROOM_PRICE;
+  const currentOffSiteFee = strTier.externalLaundryFee;
+  const isOffSiteSelected = isSTR && !!selectedAddonCodes['off_site_laundry'];
+
+  const strCalc = {
+    basePrice: strTier.basePrice,
+    extraBathrooms,
+    extraBathroomFee,
+    externalLaundryFee: currentOffSiteFee,
+    totalBeforeAddons: strTier.basePrice + extraBathroomFee,
+    isCustomQuote: strTier.isCustomQuote || false,
+    includedBathrooms: strTier.includedBathrooms,
+    maxSqftHint: strTier.maxSqftHint,
+  };
 
   // Pricing calculations based on Tier matrix & recurring frequency discounts
   const isCustomQuote = isSTR
@@ -396,12 +415,14 @@ export function Schedule() {
   const frequencyDiscount = Math.round(((baseTierPrice * discountPercent) / 100) * 100) / 100;
   const discountedBasePrice = Math.max(0, baseTierPrice - frequencyDiscount);
 
-  const addonsTotal = addons.reduce((sum, item) => {
-    if (selectedAddonCodes[item.code]) {
+  const regularAddonsTotal = addons.reduce((sum, item) => {
+    if (item.code !== 'off_site_laundry' && selectedAddonCodes[item.code]) {
       return sum + Number(item.price);
     }
     return sum;
   }, 0);
+
+  const addonsTotal = regularAddonsTotal + (isOffSiteSelected ? currentOffSiteFee : 0);
 
   const totalPrice = discountedBasePrice + addonsTotal;
 
@@ -497,15 +518,23 @@ export function Schedule() {
     setErrorMessage('');
 
     const selectedAddonsPayload = addons
-      .filter((a) => selectedAddonCodes[a.code])
+      .filter((a) => a.code !== 'off_site_laundry' && selectedAddonCodes[a.code])
       .map((a) => ({
         code: a.code,
         name: a.name,
         price: Number(a.price),
       }));
 
+    if (isSTR && selectedAddonCodes['off_site_laundry']) {
+      selectedAddonsPayload.push({
+        code: 'off_site_laundry',
+        name: i18n.language?.startsWith('es') ? 'Lavandería Fuera de la Propiedad' : 'Off-Site Laundry Service',
+        price: currentOffSiteFee,
+      });
+    }
+
     const formattedInstructions = isSTR
-      ? `[STR Turnover: ${bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, ${bathrooms} Baths • Washer & Dryer: ${hasWasherDryer ? 'On-site' : 'Off-site laundry required'} • ${t(freqOption.nameKey)}] ${specialInstructions}`.trim()
+      ? `[STR Turnover: ${bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, ${bathrooms} Baths • Laundry: ${selectedAddonCodes['off_site_laundry'] ? 'Off-site laundry add-on (+$' + currentOffSiteFee + ')' : 'On-site washer & dryer'} • ${t(freqOption.nameKey)}] ${specialInstructions}`.trim()
       : `[Tier ${selectedTier.tier}: ${selectedTier.label} • ${t(freqOption.nameKey)} (${freqOption.badge})] ${specialInstructions}`.trim();
 
     const payload = {
@@ -640,8 +669,7 @@ export function Schedule() {
               <span className="font-bold text-slate-900">
                 {serviceType === 'standard' && t('schedule.serviceStandard')}
                 {serviceType === 'deep' && t('schedule.serviceDeep')}
-                {serviceType === 'str_on_site' && t('schedule.serviceStrOnSite')}
-                {serviceType === 'str_off_site' && t('schedule.serviceStrOffSite')}
+                {isSTR && t('schedule.serviceStr')}
               </span>
             </div>
             <div className="flex justify-between">
@@ -781,7 +809,7 @@ export function Schedule() {
             <label className="block text-sm font-extrabold text-slate-900">
               {t('schedule.serviceTypeLabel')}
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* Standard Clean */}
               <div
                 onClick={() => setServiceType('standard')}
@@ -856,14 +884,13 @@ export function Schedule() {
                 </div>
               </div>
 
-              {/* Short Term Rental Clean (On-Site Laundry) */}
+              {/* Short-Term Rental Clean (Unified: on-site base, off-site laundry available as Add-on) */}
               <div
                 onClick={() => {
                   setServiceType('str_on_site');
-                  setHasWasherDryer(true);
                 }}
                 className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-                  serviceType === 'str_on_site'
+                  isSTR
                     ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
@@ -871,20 +898,20 @@ export function Schedule() {
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <h3 className="font-black text-slate-900 text-sm sm:text-base">
-                      {t('schedule.serviceStrOnSite')}
+                      {t('schedule.serviceStr')}
                     </h3>
                     <div
                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        serviceType === 'str_on_site'
+                        isSTR
                           ? 'border-emerald-600 bg-emerald-600 text-white'
                           : 'border-slate-300'
                       }`}
                     >
-                      {serviceType === 'str_on_site' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                      {isSTR && <Check className="w-3.5 h-3.5 animate-pop-in" />}
                     </div>
                   </div>
                   <p className="text-xs text-slate-600 font-medium">
-                    {t('schedule.serviceStrOnSiteDesc')}
+                    {t('schedule.serviceStrDesc')}
                   </p>
                 </div>
 
@@ -892,49 +919,6 @@ export function Schedule() {
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
                   <span className="text-base sm:text-lg font-black text-slate-900">
                     ${(isSTR ? getSTRTierByBedrooms(bedrooms).basePrice : selectedTier.strOnSitePrice).toFixed(2)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Short Term Rental Clean (Off-Site Laundry) */}
-              <div
-                onClick={() => {
-                  setServiceType('str_off_site');
-                  setHasWasherDryer(false);
-                }}
-                className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-                  serviceType === 'str_off_site'
-                    ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
-                      {t('schedule.serviceStrOffSite')}
-                    </h3>
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        serviceType === 'str_off_site'
-                          ? 'border-emerald-600 bg-emerald-600 text-white'
-                          : 'border-slate-300'
-                      }`}
-                    >
-                      {serviceType === 'str_off_site' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-                    </div>
-                  </div>
-                  <p className="text-xs text-slate-600 font-medium">
-                    {t('schedule.serviceStrOffSiteDesc')}
-                  </p>
-                </div>
-
-                <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-                  <span className="text-base sm:text-lg font-black text-slate-900">
-                    ${(isSTR
-                      ? getSTRTierByBedrooms(bedrooms).basePrice + getSTRTierByBedrooms(bedrooms).externalLaundryFee
-                      : selectedTier.strOffSitePrice
-                    ).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -1225,88 +1209,65 @@ export function Schedule() {
                     </div>
                   </div>
 
-                  {/* Washer & Dryer in Property Toggle (Paso 3 del documento STR) */}
-                  <div className="space-y-2.5 pt-2 border-t border-slate-100">
-                    <div>
-                      <label className="block text-xs sm:text-sm font-extrabold text-slate-900">
-                        {t('schedule.washerDryerQuestion')}
+                  {/* Off-Site Laundry Service Add-on Option (Documento STR) */}
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <label className="text-xs sm:text-sm font-extrabold text-slate-900">
+                        {i18n.language?.startsWith('es') ? 'Servicio de Lavandería de Ropa Blanca' : 'Linen & Towel Laundry Setup'}
                       </label>
-                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                        {t('schedule.washerDryerHelp')}
-                      </p>
+                      <span className="text-[11px] text-slate-500 font-bold">
+                        {selectedAddonCodes['off_site_laundry']
+                          ? (i18n.language?.startsWith('es') ? 'Recargo off-site activo' : 'Off-site add-on active')
+                          : (i18n.language?.startsWith('es') ? 'Lavado en propiedad incluido' : 'On-site laundry included')}
+                      </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {/* Option 1: On-site */}
+                    <div
+                      onClick={() => {
+                        const nextVal = !selectedAddonCodes['off_site_laundry'];
+                        setSelectedAddonCodes((prev) => ({
+                          ...prev,
+                          off_site_laundry: nextVal,
+                        }));
+                      }}
+                      className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3 hover:border-emerald-500 active:scale-99 ${
+                        selectedAddonCodes['off_site_laundry']
+                          ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
                       <div
-                        onClick={() => {
-                          setHasWasherDryer(true);
-                          setServiceType('str_on_site');
-                        }}
-                        className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between hover:border-emerald-500 ${
-                          hasWasherDryer
-                            ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-                            : 'border-slate-200 bg-white hover:border-slate-300'
+                        className={`w-5 h-5 rounded-md border mt-0.5 flex items-center justify-center shrink-0 transition-all ${
+                          selectedAddonCodes['off_site_laundry']
+                            ? 'border-emerald-600 bg-emerald-600 text-white scale-105'
+                            : 'border-slate-300 bg-white'
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="font-black text-xs sm:text-sm text-slate-900 block">
-                              {t('schedule.washerDryerYes')}
-                            </span>
-                            <p className="text-[11px] sm:text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-                              {t('schedule.washerDryerYesDesc')}
-                            </p>
-                          </div>
-                          <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                              hasWasherDryer ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
-                            }`}
-                          >
-                            {hasWasherDryer && <Check className="w-3.5 h-3.5" />}
-                          </div>
-                        </div>
-                        <div className="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-800">
-                          <span>{t('schedule.strIncludedBaths')}</span>
-                          <span className="font-black">$0.00</span>
-                        </div>
+                        {selectedAddonCodes['off_site_laundry'] && <Check className="w-3.5 h-3.5 animate-pop-in" />}
                       </div>
 
-                      {/* Option 2: Off-site */}
-                      <div
-                        onClick={() => {
-                          setHasWasherDryer(false);
-                          setServiceType('str_off_site');
-                        }}
-                        className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between hover:border-emerald-500 ${
-                          !hasWasherDryer
-                            ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-                            : 'border-slate-200 bg-white hover:border-slate-300'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="font-black text-xs sm:text-sm text-slate-900 block">
-                              {t('schedule.washerDryerNo')}
-                            </span>
-                            <p className="text-[11px] sm:text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-                              {t('schedule.washerDryerNoDesc')}
-                            </p>
-                          </div>
-                          <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                              !hasWasherDryer ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
-                            }`}
-                          >
-                            {!hasWasherDryer && <Check className="w-3.5 h-3.5" />}
-                          </div>
-                        </div>
-                        <div className="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
-                          <span className="text-slate-600">{t('schedule.externalLaundryFee')}</span>
-                          <span className="font-black text-emerald-800">
-                            +${getSTRTierByBedrooms(bedrooms).externalLaundryFee.toFixed(2)}
+                      <div className="flex-1 text-xs">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                            <span className="text-sm shrink-0" aria-hidden="true">🧺</span>
+                            <span>{t('schedule.offSiteLaundryAddonTitle')}</span>
+                          </span>
+                          <span className="font-black text-emerald-800 text-xs sm:text-sm whitespace-nowrap">
+                            +${currentOffSiteFee.toFixed(2)}
                           </span>
                         </div>
+                        <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-1 leading-relaxed">
+                          {t('schedule.offSiteLaundryAddonDesc')}
+                        </p>
+                        <p className="text-[11px] font-semibold mt-1.5 text-slate-500">
+                          {selectedAddonCodes['off_site_laundry']
+                            ? (i18n.language?.startsWith('es')
+                                ? `✓ Tarifa escalada para ${bedrooms === 0 ? 'Studio' : `${bedrooms} hab`}: +$${currentOffSiteFee.toFixed(2)}`
+                                : `✓ Scaled fee for ${bedrooms === 0 ? 'Studio' : `${bedrooms} bed(s)`}: +$${currentOffSiteFee.toFixed(2)}`)
+                            : (i18n.language?.startsWith('es')
+                                ? '✓ Por defecto: Lavado de sábanas en la unidad ($0.00 adicional)'
+                                : '✓ Default: On-site washer & dryer linen laundering ($0.00 extra)')}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1805,9 +1766,13 @@ export function Schedule() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[...addons]
+                .filter((addon) => {
+                  if (addon.code === 'off_site_laundry') return isSTR;
+                  return true;
+                })
                 .sort((a, b) => {
                   if (isSTR) {
-                    const strCodes = ['pets', 'hot_tub', 'patio_grill'];
+                    const strCodes = ['off_site_laundry', 'pets', 'hot_tub', 'patio_grill'];
                     const aIsStr = strCodes.includes(a.code);
                     const bIsStr = strCodes.includes(b.code);
                     if (aIsStr && !bIsStr) return -1;
@@ -1819,14 +1784,16 @@ export function Schedule() {
                 const isChecked = !!selectedAddonCodes[addon.code];
                 const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
                 const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
+                const displayPrice = addon.code === 'off_site_laundry' ? currentOffSiteFee : Number(addon.price);
 
                 return (
                   <div
                     key={addon.code}
                     onClick={() => {
+                      const nextVal = !isChecked;
                       setSelectedAddonCodes({
                         ...selectedAddonCodes,
-                        [addon.code]: !isChecked,
+                        [addon.code]: nextVal,
                       });
                     }}
                     className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
@@ -1850,7 +1817,7 @@ export function Schedule() {
                           <span className="text-sm shrink-0" aria-hidden="true">{ADDON_ICONS[addon.code] || '✨'}</span>
                           <span>{localizedName}</span>
                         </span>
-                        <span className="font-black text-emerald-700 text-xs sm:text-sm">+${Number(addon.price).toFixed(2)}</span>
+                        <span className="font-black text-emerald-700 text-xs sm:text-sm">+${displayPrice.toFixed(2)}</span>
                       </div>
                       <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
                     </div>
@@ -1937,10 +1904,8 @@ export function Schedule() {
                 <span className="font-bold text-slate-900 text-right">
                   {serviceType === 'deep'
                     ? t('schedule.serviceDeep')
-                    : serviceType === 'str_on_site'
-                    ? t('schedule.serviceStrOnSite')
-                    : serviceType === 'str_off_site'
-                    ? t('schedule.serviceStrOffSite')
+                    : isSTR
+                    ? t('schedule.serviceStr')
                     : t('schedule.serviceStandard')}
                 </span>
               </div>
@@ -1948,7 +1913,7 @@ export function Schedule() {
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.dimensions')}:</span>
                 <span className="font-bold text-slate-900 text-right">
                   {isSTR
-                    ? `${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')} • ${hasWasherDryer ? (i18n.language?.startsWith('es') ? 'Lavadora en propiedad' : 'On-site washer & dryer') : (i18n.language?.startsWith('es') ? 'Lavandería externa' : 'Off-site laundry')}`
+                    ? `${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')} • ${selectedAddonCodes['off_site_laundry'] ? (i18n.language?.startsWith('es') ? 'Lavandería externa (Add-on)' : 'Off-site laundry (Add-on)') : (i18n.language?.startsWith('es') ? 'Lavado en propiedad' : 'On-site laundry')}`
                     : `${selectedTier.label} • ${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')}`}
                 </span>
               </div>
@@ -2033,20 +1998,6 @@ export function Schedule() {
                     <span className="font-bold text-slate-900">+${strCalc.extraBathroomFee.toFixed(2)}</span>
                   </div>
                 )}
-
-                <div className="flex justify-between text-slate-700 text-xs font-medium">
-                  <span>
-                    {hasWasherDryer
-                      ? (i18n.language?.startsWith('es') ? 'Lavado de ropa de cama en propiedad' : 'On-Site Linen Laundry')
-                      : t('schedule.externalLaundryFee')}
-                    :
-                  </span>
-                  <span className="font-bold text-slate-900">
-                    {hasWasherDryer
-                      ? `$0.00 (${t('schedule.strIncludedBaths')})`
-                      : `+$${strCalc.externalLaundryFee.toFixed(2)}`}
-                  </span>
-                </div>
               </>
             ) : (
               <div className="flex justify-between text-slate-700 text-xs font-medium">
@@ -2063,8 +2014,24 @@ export function Schedule() {
               </div>
             )}
 
-            {/* Addons */}
-            {addonsTotal > 0 && (
+            {/* Off-Site Laundry Add-on (for STR when selected) */}
+            {isSTR && isOffSiteSelected && (
+              <div className="flex justify-between text-slate-700 text-xs font-medium">
+                <span>{t('schedule.offSiteLaundryAddonTitle')}:</span>
+                <span className="font-bold text-slate-900">+${currentOffSiteFee.toFixed(2)}</span>
+              </div>
+            )}
+
+            {/* Other Addons for STR */}
+            {isSTR && regularAddonsTotal > 0 && (
+              <div className="flex justify-between text-slate-700 text-xs font-medium">
+                <span>{t('schedule.addonsFee')}:</span>
+                <span className="font-bold text-slate-900">+${regularAddonsTotal.toFixed(2)}</span>
+              </div>
+            )}
+
+            {/* Addons for non-STR */}
+            {!isSTR && addonsTotal > 0 && (
               <div className="flex justify-between text-slate-700 text-xs font-medium">
                 <span>{t('schedule.addonsFee')}:</span>
                 <span className="font-bold text-slate-900">+${addonsTotal.toFixed(2)}</span>

@@ -278,9 +278,11 @@ export function Home() {
           </p>
         </div>
 
-        {/* 4 Service Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {rates.map((rate) => {
+        {/* 3 Specialized Service Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {rates
+            .filter((r) => r.service_type !== 'str_off_site')
+            .map((rate) => {
             const Icon = getServiceIcon(rate.service_type);
             const localizedName = t(`home.pricing.${rate.service_type}.name`, { defaultValue: rate.name });
             const localizedDesc = t(`home.pricing.${rate.service_type}.description`, { defaultValue: rate.description });

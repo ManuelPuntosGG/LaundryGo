@@ -9,7 +9,8 @@
   },
   "nav": {
     "home": "Inicio",
-    "about": "Conócenos",
+    "services": "Servicios",
+    "about": "Nosotros",
     "schedule": "Agendar Servicio",
     "login": "Iniciar Sesión",
     "register": "Registrarse",
@@ -116,15 +117,15 @@
         ]
       },
       "str_on_site": {
-        "name": "Short Term Rentals (Laundry on site)",
-        "tagline": "Turnover Rápido con Lavandería en Sitio",
-        "description": "Rotación express entre huéspedes con lavado de sábanas y toallas en la lavadora/secadora de la propiedad, reposición de insumos y preparación 5 estrellas.",
+        "name": "Rotación de Alquiler Vacacional (Airbnb / VRBO)",
+        "tagline": "Preparación 5 Estrellas, Ropa Blanca y Reposición",
+        "description": "Rotación ágil y de alto estándar entre reservas. Incluye lavado de sábanas y toallas en sitio u opción de lavandería externa (off-site), reposición de insumos y presentación impecable.",
         "features": [
-          "Preparación rápida y puntual en ventana entre huéspedes",
-          "Lavado y secado en sitio de sábanas y toallas",
-          "Reabastecimiento de insumos básicos de cortesía",
-          "Desinfección minuciosa de puntos de alto contacto",
-          "Lista de control estricta para valoraciones de 5 estrellas"
+          "Rotación ágil dentro de los horarios de checkout y check-in",
+          "Servicio de sábanas y toallas (en sitio o con recargo off-site)",
+          "Reposición y orden de amenidades para huéspedes",
+          "Desinfección de superficies de alto contacto en toda la unidad",
+          "Checklist minucioso para garantizar calificaciones de 5 estrellas"
         ]
       },
       "str_off_site": {
@@ -209,6 +210,32 @@
     "mission": {
       "title": "Nuestra Misión",
       "description": "Ofrecer soluciones de limpieza residencial y comercial de primer nivel, diseñadas a la medida de propietarios, profesionales del sector inmobiliario y administradores en toda el área metropolitana de Denver. Entendemos que un espacio impecable y bien mantenido es esencial para su tranquilidad, la satisfacción de sus huéspedes y entregas de propiedades sin contratiempos."
+    },
+    "guarantees": {
+      "title": "Nuestras Garantías Principales",
+      "subtitle": "Estándares rigurosos que brindan total tranquilidad a propietarios y anfitriones.",
+      "insured": "Personal 100% Asegurado (Insured)",
+      "insuredDesc": "Póliza de responsabilidad civil completa que resguarda tu propiedad y pertenencias en cada visita.",
+      "vetted": "Especialistas Verificados",
+      "vettedDesc": "Personal puntual, confiable y rigurosamente capacitado enfocado en tu total serenidad.",
+      "satisfaction": "Satisfacción Garantizada",
+      "satisfactionDesc": "Cada servicio sigue estrictas listas de control para garantizar resultados de 5 estrellas en cada rincón.",
+      "ecoSafe": "Seguro para Familias y Mascotas",
+      "ecoSafeDesc": "Productos e insumos de grado profesional cuidadosamente seleccionados para cuidar la salud de tu familia y mascotas."
+    },
+    "contactInfo": {
+      "title": "Contacto Directo y Datos de la Empresa",
+      "subtitle": "Comunícate directamente con nuestro equipo de administración en Denver y Boulder. Estamos para servirte.",
+      "phoneLabel": "Teléfono Directo",
+      "emailLabel": "Correo Electrónico",
+      "hoursLabel": "Horario de Atención",
+      "hoursValue": "Lunes a Sábado: 8:00 AM – 6:00 PM (Atención y soporte para agendamiento)",
+      "coverageLabel": "Área de Cobertura",
+      "coverageValue": "Área Metropolitana de Denver y Boulder, Colorado",
+      "instagramLabel": "Instagram Oficial",
+      "callBtn": "Llamar al (720) 590-8632",
+      "emailBtn": "Enviar Correo",
+      "exploreServicesBtn": "Ver Nuestros Servicios"
     },
     "pillarsTitle": "¿Por Qué Elegir GoPropertyCare?",
     "values": {
@@ -399,6 +426,20 @@
       "scheduleBtn": "Agendar en Línea"
     }
   },
+  "servicesPage": {
+    "title": "Nuestros Servicios Especializados",
+    "subtitle": "Listas de control exhaustivas habitación por habitación diseñadas para residencias, rotaciones vacacionales y limpiezas profundas en Denver y Boulder.",
+    "viewAboutBtn": "Conoce Nuestra Empresa",
+    "scheduleBtn": "Agendar en Línea",
+    "customRequestNote": "¿Necesitas algo que no está en la lista? Pregúntanos y te diremos si podemos añadirlo.",
+    "bookThisService": "Agendar Este Servicio",
+    "cta": {
+      "title": "¿Listo para Experimentar un Cuidado Impecable?",
+      "subtitle": "Elige tu espacio, selecciona la fecha y deja que nuestro equipo asegurado se encargue de todo.",
+      "scheduleBtn": "Agendar Mi Limpieza",
+      "callBtn": "Llamar al (720) 590-8632"
+    }
+  },
   "cleaningAddons": {
     "oven": {
       "name": "Interior de Horno",
@@ -415,6 +456,10 @@
     "inside_windows": {
       "name": "Vidrios Interiores",
       "description": "Lavado a mano y pulido sin marcas de vidrios interiores y marcos (+$35)."
+    },
+    "off_site_laundry": {
+      "name": "Lavandería Fuera de la Propiedad",
+      "description": "Retiro de ropa de cama/toallas, lavado y planchado profesional externo para unidades sin lavadora en sitio."
     },
     "pets": {
       "name": "Mascotas (Pelo y Olores)",
@@ -485,10 +530,14 @@
     "serviceStandardDesc": "Mantenimiento regular continuo para higiene del hogar",
     "serviceDeep": "Limpieza Profunda / Mudanza (Move-In / Move-Out)",
     "serviceDeepDesc": "Desinfección integral a fondo, rodapiés y preparación para inspecciones",
+    "serviceStr": "Rotación de Alquiler Vacacional (Airbnb / VRBO)",
+    "serviceStrDesc": "Rotación entre huéspedes: desinfección, tendido de camas estilo hotel y reposición de insumos esenciales",
     "serviceStrOnSite": "Alquiler Temporal (Lavado en sitio)",
     "serviceStrOnSiteDesc": "Rotación express entre huéspedes con lavado de sábanas y toallas en las instalaciones",
     "serviceStrOffSite": "Alquiler Temporal (Lavado externo / Off-site)",
     "serviceStrOffSiteDesc": "Rotación integral entre huéspedes con retiro, lavado externo y reposición de blancos",
+    "offSiteLaundryAddonTitle": "Servicio de Lavandería Fuera de la Propiedad (Add-on)",
+    "offSiteLaundryAddonDesc": "Selecciona este add-on si el inmueble no dispone de lavadora y secadora en sitio. Incluye retiro, lavado profesional externo y reposición de blancos.",
     "frequencyDiscount": "Descuento por Frecuencia",
     "baseTierPrice": "Servicio Base de Limpieza",
     "selectTier": "Selecciona el Servicio Especializado",

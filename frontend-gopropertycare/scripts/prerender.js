@@ -97,25 +97,70 @@ const routes = [
     contentHtml: `
       <main class="w-full max-w-6xl mx-auto px-4 py-8">
         <header class="text-center max-w-3xl mx-auto space-y-4 mb-12">
-          <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider">
-            About GoPropertyCare
-          </span>
           <h1 class="text-4xl font-black text-slate-900 tracking-tight">Your Trusted Property Care Partner</h1>
           <p class="text-lg text-slate-600 max-w-2xl mx-auto">
             We deliver rigorous, insured, and dependable cleaning for residential properties and short-term rentals throughout Denver and Boulder.
           </p>
+          <div class="pt-4 flex flex-wrap justify-center gap-4">
+            <a href="/services" class="inline-block px-8 py-3 bg-emerald-600 text-white font-black rounded-xl shadow-md hover:bg-emerald-700 transition">
+              Explore Our Services
+            </a>
+            <a href="/schedule" class="inline-block px-6 py-3 border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition">
+              Book Online
+            </a>
+          </div>
         </header>
 
         <section class="space-y-6 max-w-4xl mx-auto mb-12">
           <div class="p-6 bg-white border border-slate-200 rounded-2xl">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">Our Operating Standards</h2>
+            <h2 class="text-xl font-bold text-slate-900 mb-2">Our Core Guarantees</h2>
             <ul class="list-disc list-inside space-y-2 text-sm text-slate-600">
               <li><strong>100% Insured Personnel:</strong> Full liability protection for complete customer peace of mind.</li>
-              <li><strong>Rigorous Quality Checklists:</strong> Standardized inspection points on kitchens, bathrooms, and living areas.</li>
-              <li><strong>Transparent $/Sq Ft Pricing:</strong> You pay strictly for the size of your space, starting at $0.125/sqft.</li>
-              <li><strong>Advance Booking:</strong> Punctual scheduling with next-day and advance reservations (minimum 3h notice).</li>
-              <li><strong>Minimum Visit Threshold:</strong> $99.00 minimum order ensures professional crew dispatch and thorough service.</li>
+              <li><strong>Background-Checked Specialists:</strong> Punctual, respectful, and vetted cleaners you can trust.</li>
+              <li><strong>Rigorous Quality Checklists:</strong> Standardized room-by-room inspection ensuring dependable 5-star results.</li>
+              <li><strong>Family &amp; Pet Friendly:</strong> Professional-grade, non-toxic supplies safe for loved ones.</li>
             </ul>
+          </div>
+        </section>
+
+        <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
+          <p>GoPropertyCare • Denver &amp; Boulder, CO • (720) 590-8632 • info@gopropertycare.com</p>
+        </footer>
+      </main>
+    `,
+  },
+  {
+    path: '/services',
+    title: 'Cleaning Services — GoPropertyCare Denver & Boulder',
+    description: 'Detailed checklists for Standard Cleaning, Deep Cleaning, Move-In / Move-Out, and Short-Term Rental turnovers in Denver and Boulder.',
+    canonical: 'https://gopropertycare.com/services',
+    heading: 'Our Specialized Cleaning Services',
+    subheading: 'Comprehensive room-by-room cleaning checklists designed for homes, turnovers, and property resets.',
+    contentHtml: `
+      <main class="w-full max-w-6xl mx-auto px-4 py-8">
+        <header class="text-center max-w-3xl mx-auto space-y-4 mb-12">
+          <h1 class="text-4xl font-black text-slate-900 tracking-tight">Our Specialized Cleaning Services</h1>
+          <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+            Clear, room-by-room checklists tailored for Denver homes, turnover rentals, and property resets.
+          </p>
+        </header>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Standard Clean</h3>
+            <p class="text-sm text-slate-600">Regular upkeep: kitchen countertops, appliances exteriors, scrubbed bathrooms, vacuumed carpets, and mopped floors.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Deep Clean</h3>
+            <p class="text-sm text-slate-600">Detailed reset: baseboards hand-wiped, tile grout scrubbed, soap scum removed, ceiling fans and vent covers cleaned.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Move-In / Move-Out Clean</h3>
+            <p class="text-sm text-slate-600">Empty home reset: inside cabinets and drawers, oven and fridge deep clean, closets, and full walkthrough readiness.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Short-Term Rental Turnover</h3>
+            <p class="text-sm text-slate-600">Fast guest turnover: fresh bed remaking, sanitized bathrooms, restocked supplies, and 5-star listing presentation.</p>
           </div>
         </section>
 

@@ -35,6 +35,14 @@ export const PROPERTY_ADDONS: CleaningAddon[] = [
   },
   {
     id: 5,
+    code: 'off_site_laundry',
+    name: 'Off-Site Laundry Service',
+    price: '45.00',
+    description: 'Off-site transport, professional wash & fold, and replacement for properties without in-unit washer/dryer.',
+    is_active: true,
+  },
+  {
+    id: 6,
     code: 'pets',
     name: 'Pets (Hair & Odors)',
     price: '20.00',

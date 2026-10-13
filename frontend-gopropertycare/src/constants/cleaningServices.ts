@@ -21,20 +21,11 @@ export const DEFAULT_CLEANING_RATES: CleaningServiceRate[] = [
   },
   {
     id: 3,
-    name: 'Short Term Rentals (Laundry on site)',
+    name: 'Short-Term Rental Turnover',
     service_type: 'str_on_site',
     rate_per_sqft: '0.170',
     min_order_amount: '99.00',
-    description: 'Preparación express entre huéspedes con lavado de sábanas y toallas en sitio.',
-    is_active: true,
-  },
-  {
-    id: 4,
-    name: 'Short Term Rentals (Off Site Laundry)',
-    service_type: 'str_off_site',
-    rate_per_sqft: '0.230',
-    min_order_amount: '99.00',
-    description: 'Rotación entre huéspedes con retiro y servicio de lavandería externo (off-site).',
+    description: 'Rotación express entre huéspedes de Airbnb y VRBO con inspección, reposición y opción de lavandería.',
     is_active: true,
   },
 ];

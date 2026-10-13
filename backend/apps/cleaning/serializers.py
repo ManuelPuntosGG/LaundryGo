@@ -286,7 +286,7 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         # Base price calculation (using CleaningPricingTier or STR Matrix for GoPropertyCare)
         tier_matched = None
         if brand == 'gopropertycare':
-            if service_rate.service_type in ('str_on_site', 'str_off_site'):
+            if service_rate.service_type in ('str_on_site', 'str_off_site', 'short_term_rental'):
                 # STR Turnover: priced by bedrooms and bathrooms
                 b_rooms = validated_data.get('bedrooms', 1) or 1
                 b_aths = float(validated_data.get('bathrooms', 1.0) or 1.0)
@@ -305,7 +305,11 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
                     str_base = tier_info['base']
                     extra_baths = max(0, int(b_aths - tier_info['inc_baths']))
                     extra_baths_fee = Decimal(str(extra_baths * 25))
-                    laundry_fee = tier_info['laundry'] if service_rate.service_type == 'str_off_site' else Decimal('0.00')
+                    has_offsite_addon = any(
+                        isinstance(x, dict) and x.get('code') == 'off_site_laundry'
+                        for x in selected_addons
+                    )
+                    laundry_fee = tier_info['laundry'] if (service_rate.service_type == 'str_off_site' and not has_offsite_addon) else Decimal('0.00')
                     tier_matched = str_base + extra_baths_fee + laundry_fee
                 else:
                     tier_matched = Decimal('0.00')  # Custom quote for 6+ bedrooms
