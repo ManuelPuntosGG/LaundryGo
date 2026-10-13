@@ -33,5 +33,29 @@ export const PROPERTY_ADDONS: CleaningAddon[] = [
     description: 'Hand washing and streak-free polishing of interior window panes.',
     is_active: true,
   },
+  {
+    id: 5,
+    code: 'pets',
+    name: 'Pets (Hair & Odors)',
+    price: '20.00',
+    description: 'Deep vacuuming, lint roll, and pet odor neutralizing treatment.',
+    is_active: true,
+  },
+  {
+    id: 6,
+    code: 'hot_tub',
+    name: 'Hot Tub / Jacuzzi Surface Clean',
+    price: '25.00',
+    description: 'Surface wipe-down, sanitization and cover cleaning without chemicals.',
+    is_active: true,
+  },
+  {
+    id: 7,
+    code: 'patio_grill',
+    name: 'Patio, Balcony or Grill Clean',
+    price: '20.00',
+    description: 'Outdoor furniture wiped, swept, and grill grates cleaned.',
+    is_active: true,
+  },
 ];
 

@@ -233,6 +233,166 @@
       "floorsTitle": "Pisos Impecables",
       "floors": "Aspirado profundo de alfombras y trapeado cuidadoso de pisos duros con fragancias agradables."
     },
+    "servicesIncluded": {
+      "badge": "Alcance y Detalle de Servicios",
+      "title": "Qué Incluye Cada Servicio",
+      "subtitle": "Listas de control habitación por habitación diseñadas para hogares, rotaciones vacacionales y mudanzas en Denver.",
+      "exploreBtn": "Ver Servicios Incluidos",
+      "customRequestNote": "¿Necesitas algo que no está en la lista? Pregúntanos y te diremos si podemos añadirlo.",
+      "bookThisService": "Agendar Este Servicio",
+      "standard": {
+        "tag": "Mantenimiento Regular",
+        "headline": "Qué Incluye una Limpieza Estándar",
+        "intro": "Una limpieza minuciosa habitación por habitación que mantiene tu hogar fresco y saludable. Cada visita sigue la misma lista de verificación para que siempre sepas qué esperar.",
+        "kitchenTitle": "Cocina",
+        "kitchen": [
+          "Desinfectar encimeras y salpicaderos",
+          "Lavar y pulir el fregadero y grifería",
+          "Limpiar el exterior de refrigerador, lavavajillas, horno y microondas",
+          "Limpiar la superficie de la estufa y charolas de goteo",
+          "Limpiar frentes y manijas de gabinetes, retirando manchas y gotas",
+          "Barrer y trapear el piso",
+          "Sacar la basura y cambiar la bolsa"
+        ],
+        "bathroomsTitle": "Baños",
+        "bathrooms": [
+          "Fregar y desinfectar el inodoro de arriba a abajo",
+          "Limpiar lavamanos, grifería y superficie del tocador",
+          "Fregar tina, paredes de ducha y canceles de vidrio",
+          "Pulir espejos y cristales sin marcas",
+          "Limpiar toalleros, accesorios e interruptores de luz",
+          "Barrer y trapear el piso",
+          "Sacar la basura"
+        ],
+        "bedroomsTitle": "Habitaciones y Áreas Comunes",
+        "bedrooms": [
+          "Desempolvar muebles, repisas y decoración al alcance",
+          "Desempolvar ventiladores de techo y lámparas al alcance",
+          "Aspirar alfombras y tapetes",
+          "Barrer y trapear pisos duros",
+          "Tender camas (con sábanas limpias si las dejas preparadas)",
+          "Limpiar alféizares de ventanas"
+        ],
+        "wholeHomeTitle": "Todo el Inmueble",
+        "wholeHome": [
+          "Retirar toda la basura",
+          "Aspirar escaleras y pasillos",
+          "Limpiar manijas de puertas, interruptores y puntos de alto contacto",
+          "Limpiar huellas dactilares en puertas y paredes"
+        ]
+      },
+      "deep": {
+        "tag": "Reseteo Profundo y Detallado",
+        "headline": "Qué Incluye una Limpieza Profunda",
+        "intro": "Todo lo incluido en la Limpieza Estándar, más el trabajo detallado que se acumula con el tiempo. Ideal para primeras visitas, limpiezas de cambio de estación o antes y después de recibir invitados.",
+        "plusTitle": "Todo lo de la Limpieza Estándar, más:",
+        "items": [
+          "Limpiar todos los zócalos, marcos de puertas y puertas, habitación por habitación",
+          "Limpiar vidrios interiores, alféizares y rieles si se seleccionó",
+          "Lavar lámparas y limpiar profundamente ventiladores de techo",
+          "Fregar boquilla/lechada y azulejos en baños",
+          "Eliminar sarro, restos de jabón y acumulación mineral en grifería y vidrio",
+          "Desengrasar estufa, exterior de campana extractora y salpicadero",
+          "Limpiar el interior del microondas",
+          "Limpiar rejillas de ventilación, registros y tapas de extractores",
+          "Limpiar detrás y debajo de muebles que puedan moverse con seguridad",
+          "Desempolvar persianas a profundidad",
+          "Retirar telarañas de todas las esquinas y techos",
+          "Lavar paredes donde haya marcas y rozaduras visibles"
+        ]
+      },
+      "move_in_out": {
+        "tag": "Garantía de Depósito y Mudanza",
+        "headline": "Qué Incluye una Limpieza de Mudanza (Move-In / Move-Out)",
+        "intro": "Una limpieza de arriba a abajo de una propiedad desocupada, diseñada para recuperar tu depósito de garantía o comenzar desde cero en tu nuevo hogar. Para mejores resultados, el inmueble debe estar vacío y con servicios activos.",
+        "kitchenTitle": "Cocina",
+        "kitchen": [
+          "Limpiar interior y exterior de horno, incluyendo rejillas y cristal si se agregó",
+          "Limpiar interior y exterior del microondas",
+          "Limpiar interior de refrigerador y congelador, incluyendo repisas y cajones si se agregó",
+          "Desengrasar estufa, quemadores y charolas",
+          "Limpiar interior y exterior de todos los gabinetes y cajones",
+          "Desinfectar encimeras y salpicaderos",
+          "Fregar fregadero y grifería eliminando acumulaciones",
+          "Limpiar exterior de electrodomésticos, interruptores y accesorios",
+          "Barrer y trapear el piso, incluyendo esquinas y orillas"
+        ],
+        "bathroomsTitle": "Baños",
+        "bathrooms": [
+          "Fregar y desinfectar el inodoro, incluyendo la base y detrás de él",
+          "Fregar azulejos, lechada, tina y paredes de ducha",
+          "Limpiar canceles de vidrio y rieles",
+          "Eliminar acumulaciones de sarro en llaves y regaderas",
+          "Limpiar lavamanos, tocador y encimeras",
+          "Limpiar interior del botiquín y cajones",
+          "Pulir espejos",
+          "Limpiar zócalos, marcos de puertas y tapa de extractor",
+          "Trapear piso y fregar líneas de boquilla"
+        ],
+        "bedroomsTitle": "Habitaciones y Clósets",
+        "bedrooms": [
+          "Limpiar repisas, muebles empotrados e interior de clósets, incluyendo tubos y pisos",
+          "Limpiar alféizares, rieles y marcos si se agregó",
+          "Limpiar espejos y cristales",
+          "Limpiar zócalos y marcos de puertas",
+          "Limpieza puntual de manchas en paredes",
+          "Desempolvar lámparas y ventiladores de techo",
+          "Aspirar alfombras o trapear pisos duros"
+        ],
+        "throughoutTitle": "En Todo el Inmueble",
+        "throughout": [
+          "Limpiar vidrios interiores, alféizares y rieles si se agregó",
+          "Limpiar puertas interiores y marcos",
+          "Lavar lámparas y ventiladores de techo",
+          "Limpiar todos los zócalos",
+          "Limpieza puntual de manchas en paredes en toda la propiedad",
+          "Aspirar toda la alfombra (incluyendo clósets) y trapear pisos duros",
+          "Vaciar y limpiar todos los botes de basura"
+        ]
+      },
+      "str_turnover": {
+        "tag": "Rotación Airbnb / VRBO",
+        "headline": "Rotación de Alquiler Temporal (Short-Term Rental Turnover)",
+        "intro": "Un cambio rápido y uniforme entre huéspedes para que cada llegada luzca exactamente como en las fotos de tu anuncio.",
+        "bedroomsTitle": "Habitaciones",
+        "bedrooms": [
+          "Retirar ropa de cama usada y embolsar blancos",
+          "Tender camas con ropa de cama limpia estilo hotel",
+          "Limpiar mesas de noche, cómodas y lámparas",
+          "Desempolvar ventiladores y lámparas",
+          "Revisar debajo de camas y en cajones por objetos olvidados de huéspedes",
+          "Aspirar o trapear pisos",
+          "Acomodar almohadas y mantas decorativas según tu anuncio"
+        ],
+        "bathroomsTitle": "Baños",
+        "bathrooms": [
+          "Fregar y desinfectar inodoro, ducha, tina y lavamanos",
+          "Pulir espejos",
+          "Colocar toallas limpias preparadas",
+          "Reponer papel higiénico, jabón y amenidades que proveas",
+          "Trapear pisos y vaciar botes de basura",
+          "Reportar cualquier daño o requerimiento de mantenimiento"
+        ],
+        "kitchenTitle": "Cocina",
+        "kitchen": [
+          "Lavar, secar y guardar vajilla de huéspedes",
+          "Desinfectar encimeras y exteriores de electrodomésticos",
+          "Limpiar el interior del microondas",
+          "Revisar refrigerador y retirar restos de comida de huéspedes",
+          "Reponer insumos provistos (jabón para platos, esponja, toallas de papel)",
+          "Barrer, trapear y sacar la basura"
+        ],
+        "livingTitle": "Áreas de Estar",
+        "living": [
+          "Alinear cojines de sofá y mantas",
+          "Desempolvar superficies y elementos decorativos",
+          "Limpiar controles remotos y mandos",
+          "Limpiar pantalla de TV y cristales",
+          "Aspirar o trapear pisos",
+          "Sacar la basura"
+        ]
+      }
+    },
     "cta": {
       "title": "¿Listo para Experimentar un Cuidado Profesional?",
       "subtitle": "Agenda tu servicio hoy mismo con tarifas claras y la garantía de un equipo puntual y asegurado.",
@@ -255,9 +415,48 @@
     "inside_windows": {
       "name": "Vidrios Interiores",
       "description": "Lavado a mano y pulido sin marcas de vidrios interiores y marcos (+$35)."
+    },
+    "pets": {
+      "name": "Mascotas (Pelo y Olores)",
+      "description": "Aspirado intensivo, rodillo antipelo y tratamiento desodorizante (+$20)."
+    },
+    "hot_tub": {
+      "name": "Jacuzzi / Tina de Hidromasaje",
+      "description": "Limpieza de superficies y tapa del jacuzzi sin químicos (+$25)."
+    },
+    "patio_grill": {
+      "name": "Patio, Balcón o Parrilla",
+      "description": "Limpieza de mobiliario exterior, barrido y desengrase de parrilla (+$20)."
+    },
+    "str_pets": {
+      "name": "Mascotas (Pelo y Olores)",
+      "description": "Aspirado intensivo, rodillo antipelo y tratamiento desodorizante (+$20)."
+    },
+    "str_hot_tub": {
+      "name": "Jacuzzi / Tina de Hidromasaje",
+      "description": "Limpieza de superficies y tapa del jacuzzi sin químicos (+$25)."
+    },
+    "str_patio_grill": {
+      "name": "Patio, Balcón o Parrilla",
+      "description": "Limpieza de mobiliario exterior, barrido y desengrase de parrilla (+$20)."
     }
   },
   "schedule": {
+    "strTurnoverTitle": "Short-Term Rental Turnover (Airbnb / Vrbo)",
+    "strTurnoverHelp": "Cotizado directamente por habitaciones y baños con servicio de sábanas y reporte de daños.",
+    "washerDryerQuestion": "¿Hay lavadora y secadora en la propiedad?",
+    "washerDryerHelp": "Define si el lavado de ropa de cama se realiza en el inmueble o requiere lavandería externa.",
+    "washerDryerYes": "Sí, en la propiedad",
+    "washerDryerYesDesc": "Lavado y reposición de blancos incluido en el turno ($0 adicional).",
+    "washerDryerNo": "No, requiere lavandería externa",
+    "washerDryerNoDesc": "Retiro de ropa sucia, lavado profesional fuera de la propiedad y entrega de juegos limpios.",
+    "extraBathFee": "Baños Adicionales",
+    "externalLaundryFee": "Servicio de Lavandería Externa",
+    "estimatedPriceNotice": "Precio estimado: El precio final depende del estado de la propiedad y de los servicios elegidos.",
+    "strCustomQuoteTitle": "Propiedad Vacacional Grande (6+ Habitaciones o > 3,500 sq ft)",
+    "strCustomQuoteDesc": "Propiedades con 6 o más habitaciones o más de 3,500 sq ft reciben una cotización y propuesta personalizada a medida.",
+    "strIncludedBaths": "incluidos",
+    "strExtraBaths": "+$25 c/u sobre los incluidos",
     "title": "Agenda tu Servicio en Minutos",
     "subtitle": "Personaliza tu servicio en 4 simples pasos: nuestro equipo puntual y asegurado se encarga de todo.",
     "step1": "Espacio y Servicio",

@@ -287,7 +287,6 @@ export function Home() {
           {rates.map((rate) => {
             const Icon = getServiceIcon(rate.service_type);
             const localizedName = t(`home.pricing.${rate.service_type}.name`, { defaultValue: rate.name });
-            const localizedTagline = t(`home.pricing.${rate.service_type}.tagline`, { defaultValue: 'Servicio Especializado' });
             const localizedDesc = t(`home.pricing.${rate.service_type}.description`, { defaultValue: rate.description });
             const features = (t(`home.pricing.${rate.service_type}.features`, { returnObjects: true }) as string[]) || [];
 
@@ -297,13 +296,8 @@ export function Home() {
                 className="flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 group border-slate-200 hover:border-emerald-400 p-6"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md">
-                      {localizedTagline}
-                    </span>
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                      <Icon className="w-4 h-4" />
-                    </div>
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <Icon className="w-5 h-5" />
                   </div>
 
                   <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-950 transition-colors">

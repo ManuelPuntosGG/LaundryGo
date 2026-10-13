@@ -124,24 +124,23 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
 
 
 GPC_TIER_MATRIX = [
-    (500, 999, Decimal('160.00'), Decimal('215.00')),
-    (1000, 1299, Decimal('210.00'), Decimal('275.00')),
-    (1300, 1599, Decimal('250.00'), Decimal('325.00')),
-    (1600, 1899, Decimal('285.00'), Decimal('370.00')),
-    (1900, 2199, Decimal('320.00'), Decimal('415.00')),
-    (2200, 2499, Decimal('355.00'), Decimal('460.00')),
-    (2500, 2799, Decimal('395.00'), Decimal('510.00')),
-    (2800, 3099, Decimal('435.00'), Decimal('565.00')),
-    (3100, 3399, Decimal('475.00'), Decimal('615.00')),
-    (3400, 3699, Decimal('515.00'), Decimal('670.00')),
-    (3700, 3999, Decimal('555.00'), Decimal('720.00')),
-    (4000, 4299, Decimal('595.00'), Decimal('775.00')),
-    (4300, 4599, Decimal('635.00'), Decimal('825.00')),
-    (4600, 4899, Decimal('675.00'), Decimal('875.00')),
-    (4900, 5199, Decimal('715.00'), Decimal('930.00')),
-    (5200, 5499, Decimal('750.00'), Decimal('975.00')),
-    (5500, 5799, Decimal('785.00'), Decimal('1020.00')),
-    (5800, 6099, Decimal('820.00'), Decimal('1065.00')),
+    (500, 999, Decimal('155.00'), Decimal('235.00')),
+    (1000, 1299, Decimal('175.00'), Decimal('270.00')),
+    (1300, 1599, Decimal('190.00'), Decimal('295.00')),
+    (1600, 1899, Decimal('200.00'), Decimal('320.00')),
+    (1900, 2199, Decimal('215.00'), Decimal('360.00')),
+    (2200, 2499, Decimal('230.00'), Decimal('410.00')),
+    (2500, 2799, Decimal('250.00'), Decimal('460.00')),
+    (2800, 3099, Decimal('270.00'), Decimal('505.00')),
+    (3100, 3399, Decimal('295.00'), Decimal('550.00')),
+    (3400, 3699, Decimal('315.00'), Decimal('590.00')),
+    (3700, 3999, Decimal('335.00'), Decimal('640.00')),
+    (4000, 4299, Decimal('355.00'), Decimal('695.00')),
+    (4300, 4599, Decimal('385.00'), Decimal('740.00')),
+    (4600, 4899, Decimal('410.00'), Decimal('785.00')),
+    (4900, 5299, Decimal('435.00'), Decimal('820.00')),
+    (5300, 5699, Decimal('455.00'), Decimal('850.00')),
+    (5700, 6099, Decimal('480.00'), Decimal('890.00')),
 ]
 
 GPC_FREQUENCY_DISCOUNTS = {
@@ -284,39 +283,59 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         # Delivery fee calculation
         delivery_fee = Decimal('25.00') if delivery_zone == 'outer' else Decimal('0.00')
 
-        # Base price calculation (using CleaningPricingTier for GoPropertyCare)
+        # Base price calculation (using CleaningPricingTier or STR Matrix for GoPropertyCare)
         tier_matched = None
         if brand == 'gopropertycare':
-            # Check dynamic CleaningPricingTier from database (allows admin pricing overrides)
-            pricing_tier = CleaningPricingTier.objects.filter(
-                brand='gopropertycare',
-                is_active=True,
-                min_sqft__lte=square_feet,
-                max_sqft__gte=square_feet
-            ).first()
-            if not pricing_tier and square_feet < 500:
+            if service_rate.service_type in ('str_on_site', 'str_off_site'):
+                # STR Turnover: priced by bedrooms and bathrooms
+                b_rooms = validated_data.get('bedrooms', 1) or 1
+                b_aths = float(validated_data.get('bathrooms', 1.0) or 1.0)
+                
+                str_matrix = {
+                    0: {'base': Decimal('90.00'), 'inc_baths': 1, 'laundry': Decimal('45.00')},
+                    1: {'base': Decimal('90.00'), 'inc_baths': 1, 'laundry': Decimal('45.00')},
+                    2: {'base': Decimal('135.00'), 'inc_baths': 2, 'laundry': Decimal('70.00')},
+                    3: {'base': Decimal('185.00'), 'inc_baths': 2, 'laundry': Decimal('95.00')},
+                    4: {'base': Decimal('255.00'), 'inc_baths': 3, 'laundry': Decimal('120.00')},
+                    5: {'base': Decimal('330.00'), 'inc_baths': 4, 'laundry': Decimal('145.00')},
+                }
+                
+                tier_info = str_matrix.get(b_rooms)
+                if tier_info:
+                    str_base = tier_info['base']
+                    extra_baths = max(0, int(b_aths - tier_info['inc_baths']))
+                    extra_baths_fee = Decimal(str(extra_baths * 25))
+                    laundry_fee = tier_info['laundry'] if service_rate.service_type == 'str_off_site' else Decimal('0.00')
+                    tier_matched = str_base + extra_baths_fee + laundry_fee
+                else:
+                    tier_matched = Decimal('0.00')  # Custom quote for 6+ bedrooms
+            else:
+                # Check dynamic CleaningPricingTier from database (allows admin pricing overrides)
                 pricing_tier = CleaningPricingTier.objects.filter(
                     brand='gopropertycare',
-                    is_active=True
-                ).order_by('tier_number').first()
+                    is_active=True,
+                    min_sqft__lte=square_feet,
+                    max_sqft__gte=square_feet
+                ).first()
+                if not pricing_tier and square_feet < 500:
+                    pricing_tier = CleaningPricingTier.objects.filter(
+                        brand='gopropertycare',
+                        is_active=True
+                    ).order_by('tier_number').first()
 
-            if pricing_tier:
-                if service_rate.service_type in ('move_in_out', 'deep'):
-                    tier_matched = pricing_tier.deep_price
-                elif service_rate.service_type == 'str_on_site':
-                    tier_matched = pricing_tier.str_on_site_price
-                elif service_rate.service_type == 'str_off_site':
-                    tier_matched = pricing_tier.str_off_site_price
-                else:
-                    tier_matched = pricing_tier.standard_price
-            elif service_rate.service_type in ('residential', 'move_in_out'):
-                # Hardcoded fallback matrix if DB tiers are not yet created
-                for min_s, max_s, std_p, deep_p in GPC_TIER_MATRIX:
-                    if min_s <= square_feet <= max_s:
-                        tier_matched = deep_p if service_rate.service_type == 'move_in_out' else std_p
-                        break
-                if not tier_matched and square_feet < 500:
-                    tier_matched = Decimal('215.00') if service_rate.service_type == 'move_in_out' else Decimal('160.00')
+                if pricing_tier:
+                    if service_rate.service_type in ('move_in_out', 'deep'):
+                        tier_matched = pricing_tier.deep_price
+                    else:
+                        tier_matched = pricing_tier.standard_price
+                elif service_rate.service_type in ('residential', 'move_in_out'):
+                    # Hardcoded fallback matrix if DB tiers are not yet created
+                    for min_s, max_s, std_p, deep_p in GPC_TIER_MATRIX:
+                        if min_s <= square_feet <= max_s:
+                            tier_matched = deep_p if service_rate.service_type == 'move_in_out' else std_p
+                            break
+                    if not tier_matched and square_feet < 500:
+                        tier_matched = Decimal('235.00') if service_rate.service_type == 'move_in_out' else Decimal('155.00')
 
         if tier_matched is not None:
             discount_pct = GPC_FREQUENCY_DISCOUNTS.get(frequency, Decimal('0.00'))

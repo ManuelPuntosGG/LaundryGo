@@ -233,6 +233,166 @@
       "floorsTitle": "Pristine Floors",
       "floors": "Deep vacuuming of carpeting and careful damp mopping of hard floors."
     },
+    "servicesIncluded": {
+      "badge": "Service Inclusions & Scope",
+      "title": "What's Included in Every Service",
+      "subtitle": "Clear, room-by-room checklists tailored for Denver homes, turnover rentals, and property resets.",
+      "exploreBtn": "Explore Included Services",
+      "customRequestNote": "Need something that isn't listed? Ask us. We'll tell you if it can be added.",
+      "bookThisService": "Book This Service",
+      "standard": {
+        "tag": "Regular Upkeep",
+        "headline": "What's Included in a Standard Clean",
+        "intro": "A thorough, room-by-room clean that keeps your home fresh and healthy. Every visit follows the same checklist so you always know what to expect.",
+        "kitchenTitle": "Kitchen",
+        "kitchen": [
+          "Disinfect countertops and backsplash",
+          "Wash and polish the sink and faucet",
+          "Wipe the outside of the refrigerator, dishwasher, oven, and microwave",
+          "Clean the stovetop surface and drip pans",
+          "Wipe cabinet fronts and handles, removing smudges and drips",
+          "Sweep and mop the floor",
+          "Take out the trash and replace the liner"
+        ],
+        "bathroomsTitle": "Bathrooms",
+        "bathrooms": [
+          "Scrub and disinfect the toilet, top to bottom",
+          "Clean the sink, faucet, and vanity top",
+          "Scrub the tub, shower walls, and glass doors",
+          "Polish mirrors and glass until streak-free",
+          "Wipe towel bars, fixtures, and light switches",
+          "Sweep and mop the floor",
+          "Take out the trash"
+        ],
+        "bedroomsTitle": "Bedrooms & Living Areas",
+        "bedrooms": [
+          "Dust furniture, shelves, and décor within reach",
+          "Dust ceiling fans and light fixtures within reach",
+          "Vacuum carpets and rugs",
+          "Sweep and mop hard floors",
+          "Make the beds (fresh linens if you leave them out for us)",
+          "Wipe windowsills"
+        ],
+        "wholeHomeTitle": "Whole Home",
+        "wholeHome": [
+          "Take out the trash",
+          "Vacuum stairs and hallways",
+          "Wipe door handles, switches, and other high-touch spots",
+          "Spot-clean fingerprints on doors and walls"
+        ]
+      },
+      "deep": {
+        "tag": "Detailed Reset",
+        "headline": "What's Included in a Deep Clean",
+        "intro": "Everything in our Standard Clean, plus the detailed work that builds up over time. Ideal for first-time visits, seasonal resets, or before and after hosting.",
+        "plusTitle": "Everything in Standard Clean, plus:",
+        "items": [
+          "Wipe all baseboards, door frames, and doors, room by room",
+          "Clean inside windows, sills, and tracks if added",
+          "Wash light fixtures and fully clean ceiling fans",
+          "Scrub grout and tile in bathrooms",
+          "Remove soap scum and mineral buildup from fixtures and glass",
+          "Degrease the stovetop, range hood exterior, and backsplash",
+          "Clean inside the microwave",
+          "Wipe vents, registers, and exhaust fan covers",
+          "Clean behind and under furniture where it can be moved safely",
+          "Dust blinds thoroughly",
+          "Remove cobwebs from all corners and ceilings",
+          "Wash walls where marks and scuffs are visible"
+        ]
+      },
+      "move_in_out": {
+        "tag": "Deposit Return & New Start",
+        "headline": "What's Included in a Move-In / Move-Out Clean",
+        "intro": "A top-to-bottom clean of an empty home, built to help you get your deposit back or start fresh in your new place. For best results, the home should be empty and the utilities on.",
+        "kitchenTitle": "Kitchen",
+        "kitchen": [
+          "Clean inside and outside the oven, including racks and door glass if added",
+          "Clean inside and outside the microwave",
+          "Clean inside the refrigerator and freezer, including shelves and drawers if added",
+          "Degrease the stovetop, burners, and drip pans",
+          "Wipe inside and outside all cabinets and drawers",
+          "Disinfect countertops and backsplash",
+          "Scrub the sink and faucet, removing buildup",
+          "Wipe appliance exteriors, switches, and fixtures",
+          "Sweep and mop the floor, including corners and edges"
+        ],
+        "bathroomsTitle": "Bathrooms",
+        "bathrooms": [
+          "Scrub and disinfect the toilet, including the base and behind it",
+          "Scrub tile, grout, tub, and shower walls",
+          "Clean shower glass and tracks",
+          "Remove buildup from faucets and showerheads",
+          "Clean the sink, vanity, and countertop",
+          "Clean inside the medicine cabinet and drawers",
+          "Polish mirrors",
+          "Wipe baseboards, door frames, and the exhaust fan cover",
+          "Mop the floor and scrub grout lines"
+        ],
+        "bedroomsTitle": "Bedrooms & Closets",
+        "bedrooms": [
+          "Wipe shelves, built-ins, and closet interiors, including rods and floors",
+          "Clean windowsills, tracks, and frames if added",
+          "Clean mirrors and glass",
+          "Wipe baseboards and door frames",
+          "Spot-clean walls",
+          "Dust light fixtures and ceiling fans",
+          "Vacuum carpets or mop hard floors"
+        ],
+        "throughoutTitle": "Throughout the Property",
+        "throughout": [
+          "Clean inside windows, sills, and tracks if added",
+          "Wipe interior doors and frames",
+          "Wash light fixtures and ceiling fans",
+          "Wipe all baseboards",
+          "Spot-clean walls throughout",
+          "Vacuum all carpet, including closets, and mop hard floors",
+          "Empty and wipe down all trash cans"
+        ]
+      },
+      "str_turnover": {
+        "tag": "Airbnb / VRBO Turnover",
+        "headline": "Short-Term Rental Turnover",
+        "intro": "A fast, consistent reset between guests so every arrival looks like your listing photos.",
+        "bedroomsTitle": "Bedrooms",
+        "bedrooms": [
+          "Strip beds and bag used linens",
+          "Remake beds with fresh linens, hotel-style",
+          "Wipe nightstands, dressers, and lamps",
+          "Dust fans and light fixtures",
+          "Check under beds and in drawers for left-behind items",
+          "Vacuum or mop floors",
+          "Restyle pillows and throws to match your listing"
+        ],
+        "bathroomsTitle": "Bathrooms",
+        "bathrooms": [
+          "Scrub and disinfect toilet, shower, tub, and sink",
+          "Polish mirrors",
+          "Set out fresh towels",
+          "Restock toilet paper, soap, and amenities you provide",
+          "Mop floors and empty trash",
+          "Report any damage or maintenance issues"
+        ],
+        "kitchenTitle": "Kitchen",
+        "kitchen": [
+          "Wash, dry, and put away guest dishes",
+          "Disinfect counters and appliance exteriors",
+          "Clean inside the microwave",
+          "Check the refrigerator and clear any guest leftovers",
+          "Restock the supplies you provide (dish soap, sponge, paper towels)",
+          "Sweep, mop, and take out the trash"
+        ],
+        "livingTitle": "Living Areas",
+        "living": [
+          "Straighten sofa cushions and throws",
+          "Dust surfaces and décor",
+          "Wipe remotes and game controllers",
+          "Clean the TV screen and glass",
+          "Vacuum or mop floors",
+          "Take out the trash"
+        ]
+      }
+    },
     "cta": {
       "title": "Ready for Exceptional Property Care?",
       "subtitle": "Book your service today with clear pricing and Denver's most dependable, insured cleaning crew.",
@@ -255,9 +415,48 @@
     "inside_windows": {
       "name": "Inside Windows Cleaning",
       "description": "Hand washing and streak-free polishing of interior window panes (+$35)."
+    },
+    "pets": {
+      "name": "Pets (Hair & Odors)",
+      "description": "Deep vacuuming, lint roll, and pet odor neutralizing treatment (+$20)."
+    },
+    "hot_tub": {
+      "name": "Hot Tub / Jacuzzi Surface Clean",
+      "description": "Surface wipe-down, sanitization and cover cleaning without chemicals (+$25)."
+    },
+    "patio_grill": {
+      "name": "Patio, Balcony or Grill Clean",
+      "description": "Outdoor furniture wiped, swept, and grill grates cleaned (+$20)."
+    },
+    "str_pets": {
+      "name": "Pets (Hair & Odors)",
+      "description": "Deep vacuuming, lint roll, and pet odor neutralizing treatment (+$20)."
+    },
+    "str_hot_tub": {
+      "name": "Hot Tub / Jacuzzi Surface Clean",
+      "description": "Surface wipe-down, sanitization and cover cleaning without chemicals (+$25)."
+    },
+    "str_patio_grill": {
+      "name": "Patio, Balcony or Grill Clean",
+      "description": "Outdoor furniture wiped, swept, and grill grates cleaned (+$20)."
     }
   },
   "schedule": {
+    "strTurnoverTitle": "Short-Term Rental Turnover (Airbnb / Vrbo)",
+    "strTurnoverHelp": "Priced directly by bedrooms and bathrooms with complete linen care and damage reporting.",
+    "washerDryerQuestion": "Is there a washer & dryer on the property?",
+    "washerDryerHelp": "Determines whether linens are washed on-site or sent to our off-site laundry facility.",
+    "washerDryerYes": "Yes, on-site washer & dryer",
+    "washerDryerYesDesc": "Linens and towels washed and staged during turnover ($0 extra).",
+    "washerDryerNo": "No, off-site laundry required",
+    "washerDryerNoDesc": "Complete linen pickup, off-site laundering, and delivery of fresh sets.",
+    "extraBathFee": "Extra Bathrooms",
+    "externalLaundryFee": "External Laundry Service",
+    "estimatedPriceNotice": "Estimated Price: The final price depends on property turnover condition and selected services.",
+    "strCustomQuoteTitle": "Large Rental Property (6+ Bedrooms or > 3,500 sq ft)",
+    "strCustomQuoteDesc": "Properties with 6+ bedrooms or over 3,500 sq ft receive an individualized walkthrough and custom turnover proposal.",
+    "strIncludedBaths": "included",
+    "strExtraBaths": "+$25/ea over included",
     "title": "Book Your Service in Minutes",
     "subtitle": "Customize your service in 4 simple steps: our punctual, insured crew handles the rest.",
     "step1": "Space & Service",

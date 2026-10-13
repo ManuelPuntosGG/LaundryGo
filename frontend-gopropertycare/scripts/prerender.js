@@ -46,25 +46,21 @@ const routes = [
 
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
-            <span class="text-xs font-bold text-emerald-700 uppercase">Regular Maintenance</span>
             <h3 class="text-xl font-black text-slate-900 mt-1 mb-2">Basic Residential</h3>
             <p class="text-2xl font-black text-emerald-600 mb-2">$0.125 <span class="text-xs text-slate-500 font-normal">/ sq ft</span></p>
             <p class="text-xs text-slate-600">Standard regular upkeep for houses and apartments.</p>
           </div>
           <div class="p-6 bg-emerald-50 border-2 border-emerald-600 rounded-2xl shadow-sm">
-            <span class="text-xs font-bold text-emerald-800 uppercase">Tenant Transitions</span>
             <h3 class="text-xl font-black text-slate-900 mt-1 mb-2">Move-In / Move-Out</h3>
             <p class="text-2xl font-black text-emerald-700 mb-2">$0.20 <span class="text-xs text-slate-500 font-normal">/ sq ft</span></p>
             <p class="text-xs text-slate-600">Deep turnover cleaning for lease handover and inspections.</p>
           </div>
           <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
-            <span class="text-xs font-bold text-emerald-700 uppercase">Airbnb Turnover</span>
             <h3 class="text-xl font-black text-slate-900 mt-1 mb-2">STR (On-Site Laundry)</h3>
             <p class="text-2xl font-black text-emerald-600 mb-2">$0.17 <span class="text-xs text-slate-500 font-normal">/ sq ft</span></p>
             <p class="text-xs text-slate-600">Turnover with linens washed and dried on the property.</p>
           </div>
           <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
-            <span class="text-xs font-bold text-emerald-700 uppercase">Full Linen Service</span>
             <h3 class="text-xl font-black text-slate-900 mt-1 mb-2">STR (Off-Site Laundry)</h3>
             <p class="text-2xl font-black text-emerald-600 mb-2">$0.23 <span class="text-xs text-slate-500 font-normal">/ sq ft</span></p>
             <p class="text-xs text-slate-600">Turnover with complete off-site professional laundering.</p>

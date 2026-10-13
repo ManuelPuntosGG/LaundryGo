@@ -20,7 +20,6 @@ import {
   Lock,
   UserCheck,
   Calendar as CalendarIcon,
-  Tag,
   Send,
   Building2,
 } from 'lucide-react';
@@ -43,6 +42,12 @@ import {
   type ServiceFrequency,
   type CleaningServiceTierType,
 } from '@/constants/pricingTiers';
+import {
+  STR_TIERS,
+  STR_EXTRA_BATHROOM_PRICE,
+  calculateSTRPrice,
+  getSTRTierByBedrooms,
+} from '@/constants/strPricing';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -51,6 +56,12 @@ const ADDON_ICONS: Record<string, string> = {
   inside_fridge: '🧊',
   blinds: '🪟',
   inside_windows: '🖼️',
+  pets: '🐾',
+  str_pets: '🐾',
+  hot_tub: '♨️',
+  str_hot_tub: '♨️',
+  patio_grill: '🥩',
+  str_patio_grill: '🥩',
 };
 
 const TIME_SLOTS = [
@@ -187,9 +198,17 @@ export function Schedule() {
     return 'standard';
   });
 
+  const [hasWasherDryer, setHasWasherDryer] = useState<boolean>(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const tierParam = searchParams.get('tier');
+    return tierParam !== 'str_off_site';
+  });
+
+  const isSTR = serviceType === 'str_on_site' || serviceType === 'str_off_site';
+
   const [frequency, setFrequency] = useState<ServiceFrequency>('biweekly'); // Default "Most Popular"
 
-  // Consultative Details (no charge)
+  // Sizing & Consultative Details
   const [bedrooms, setBedrooms] = useState<number>(2);
   const [bathrooms, setBathrooms] = useState<number>(2);
   const isOccupied = true;
@@ -355,9 +374,21 @@ export function Schedule() {
       return r.service_type === 'residential' || r.service_type === 'regular';
     }) || rates[0];
 
+  // STR Price Calculations
+  const strCalc = calculateSTRPrice({
+    bedrooms,
+    bathrooms,
+    hasWasherDryer,
+  });
+
   // Pricing calculations based on Tier matrix & recurring frequency discounts
-  const isCustomQuote = selectedTier.isCustomQuote === true;
-  const baseTierPrice = getTierPrice(selectedTier, serviceType);
+  const isCustomQuote = isSTR
+    ? strCalc.isCustomQuote
+    : selectedTier.isCustomQuote === true;
+
+  const baseTierPrice = isSTR
+    ? strCalc.totalBeforeAddons
+    : getTierPrice(selectedTier, serviceType);
 
   const freqOption =
     SERVICE_FREQUENCIES.find((f) => f.id === frequency) || SERVICE_FREQUENCIES[0];
@@ -375,7 +406,9 @@ export function Schedule() {
   const totalPrice = discountedBasePrice + addonsTotal;
 
   const representativeSqft = isCustomQuote
-    ? parseInt(customQuoteSqft, 10) || 6500
+    ? (parseInt(customQuoteSqft, 10) || (isSTR ? 4000 : 6500))
+    : isSTR
+    ? strCalc.maxSqftHint
     : Math.round((selectedTier.minSqft + selectedTier.maxSqft) / 2);
 
   // Validation
@@ -471,7 +504,9 @@ export function Schedule() {
         price: Number(a.price),
       }));
 
-    const formattedInstructions = `[Tier ${selectedTier.tier}: ${selectedTier.label} • ${t(freqOption.nameKey)} (${freqOption.badge})] ${specialInstructions}`.trim();
+    const formattedInstructions = isSTR
+      ? `[STR Turnover: ${bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, ${bathrooms} Baths • Washer & Dryer: ${hasWasherDryer ? 'On-site' : 'Off-site laundry required'} • ${t(freqOption.nameKey)}] ${specialInstructions}`.trim()
+      : `[Tier ${selectedTier.tier}: ${selectedTier.label} • ${t(freqOption.nameKey)} (${freqOption.badge})] ${specialInstructions}`.trim();
 
     const payload = {
       brand: 'gopropertycare',
@@ -529,8 +564,10 @@ export function Schedule() {
     setIsSubmittingCustomQuote(true);
     setErrorMessage('');
 
-    const parsedSqft = parseInt(customQuoteSqft, 10) || 6500;
-    const notes = `[CUSTOM QUOTE LEAD > 6,100 SQ FT • Stated Size: ${parsedSqft} sq ft] ${customQuoteNotes}`.trim();
+    const parsedSqft = parseInt(customQuoteSqft, 10) || (isSTR ? 4000 : 6500);
+    const notes = isSTR
+      ? `[CUSTOM QUOTE STR LEAD (6+ BEDS / >3,500 SQ FT) • ${bedrooms} Beds, ${bathrooms} Baths • Stated Size: ${parsedSqft} sq ft] ${customQuoteNotes}`.trim()
+      : `[CUSTOM QUOTE LEAD > 6,100 SQ FT • Stated Size: ${parsedSqft} sq ft] ${customQuoteNotes}`.trim();
 
     const payload = {
       brand: 'gopropertycare',
@@ -615,8 +652,8 @@ export function Schedule() {
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.frequencyTitle')}</span>
-              <span className="font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
-                {t(freqOption.nameKey)} ({freqOption.badge})
+              <span className="font-bold text-slate-900">
+                {t(freqOption.nameKey)}
               </span>
             </div>
             <div className="flex justify-between">
@@ -730,80 +767,207 @@ export function Schedule() {
       {/* STEP 1: Tier Dropdown, Service Type, Frequency & Property Consult */}
       {step === 1 && (
         <Card key="step-1" className="p-4 sm:p-8 space-y-6 animate-fade-in-up">
-          <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
-                {t('schedule.step1Title')}
-              </h2>
-              <p className="text-xs text-slate-600 font-medium mt-0.5">
-                {t('schedule.tierDropdownHelp')}
-              </p>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-emerald-800 text-xs font-bold self-start sm:self-auto">
-              <Tag className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{i18n.language?.startsWith('es') ? 'Tarifas Claras y Transparentes' : 'Transparent Upfront Pricing'}</span>
-            </div>
-          </div>
-
-          {/* Size Selection Dropdown */}
-          <div className="bg-slate-50 border-2 border-slate-200/90 rounded-2xl p-4 sm:p-6 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-              <label htmlFor={tierSelectId} className="block text-sm font-extrabold text-slate-900">
-                {t('schedule.tierDropdownLabel')}
-              </label>
-              <span className="text-xs text-emerald-800 bg-white border border-emerald-200 px-2.5 py-0.5 rounded-md font-bold self-start sm:self-auto shadow-2xs">
-                {isCustomQuote
-                  ? (i18n.language?.startsWith('es') ? 'Cotización Especial' : 'Custom Quote')
-                  : selectedTier.label}
-              </span>
-            </div>
-
-            <div className="relative">
-              <select
-                id={tierSelectId}
-                value={selectedTier.tier}
-                onChange={(e) => {
-                  const tNum = Number(e.target.value);
-                  const found = pricingTiers.find((t) => t.tier === tNum);
-                  if (found) setSelectedTier(found);
-                }}
-                className="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 shadow-2xs appearance-none cursor-pointer pr-10 hover:border-slate-400 transition-all"
-              >
-                {pricingTiers.map((tier) => (
-                  <option key={tier.tier} value={tier.tier}>
-                    {tier.isCustomQuote
-                      ? (i18n.language?.startsWith('es')
-                          ? '6,100+ sq ft — Cotización Personalizada a Medida'
-                          : '6,100+ sq ft — Custom Quote & Tailored Proposal')
-                      : tier.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-5 h-5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
-              {i18n.language?.startsWith('es')
-                ? 'Tarifas fijas e integrales según las dimensiones de tu inmueble. Sin costos ocultos ni cobros sorpresa por hora.'
-                : 'Upfront, all-inclusive pricing based on your property size. No hidden fees or surprise hourly billing.'}
+          <div className="border-b border-slate-100 pb-3">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
+              {t('schedule.step1Title')}
+            </h2>
+            <p className="text-xs text-slate-600 font-medium mt-0.5">
+              {t('schedule.tierDropdownHelp')}
             </p>
           </div>
 
-          {/* If Tier 19 (> 6,100 sq ft) is selected: Render Lead Capture Form */}
-          {isCustomQuote ? (
-            <div className="bg-linear-to-b from-emerald-50/60 to-white border-2 border-emerald-300 rounded-2xl p-5 sm:p-7 space-y-5 animate-fade-in">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 shadow-inner">
-                  <Building2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    {t('schedule.customQuoteTitle')}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 font-medium mt-0.5">
-                    {t('schedule.customQuoteDesc')}
+          {/* Service Type Selection Cards (4 services: Standard, Deep, STR On-Site, STR Off-Site) */}
+          <div className="space-y-3">
+            <label className="block text-sm font-extrabold text-slate-900">
+              {t('schedule.serviceTypeLabel')}
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Standard Clean */}
+              <div
+                onClick={() => setServiceType('standard')}
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
+                  serviceType === 'standard'
+                    ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceStandard')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        serviceType === 'standard'
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {serviceType === 'standard' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium">
+                    {t('schedule.serviceStandardDesc')}
                   </p>
                 </div>
+
+                <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
+                  <span className="text-base sm:text-lg font-black text-slate-900">
+                    ${selectedTier.standardPrice.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Deep / Move-In / Move-Out Clean */}
+              <div
+                onClick={() => setServiceType('deep')}
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
+                  serviceType === 'deep'
+                    ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceDeep')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        serviceType === 'deep'
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {serviceType === 'deep' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium">
+                    {t('schedule.serviceDeepDesc')}
+                  </p>
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
+                  <span className="text-base sm:text-lg font-black text-slate-900">
+                    ${selectedTier.deepPrice.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Short Term Rental Clean (On-Site Laundry) */}
+              <div
+                onClick={() => {
+                  setServiceType('str_on_site');
+                  setHasWasherDryer(true);
+                }}
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
+                  serviceType === 'str_on_site'
+                    ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceStrOnSite')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        serviceType === 'str_on_site'
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {serviceType === 'str_on_site' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium">
+                    {t('schedule.serviceStrOnSiteDesc')}
+                  </p>
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
+                  <span className="text-base sm:text-lg font-black text-slate-900">
+                    ${(isSTR ? getSTRTierByBedrooms(bedrooms).basePrice : selectedTier.strOnSitePrice).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Short Term Rental Clean (Off-Site Laundry) */}
+              <div
+                onClick={() => {
+                  setServiceType('str_off_site');
+                  setHasWasherDryer(false);
+                }}
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
+                  serviceType === 'str_off_site'
+                    ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceStrOffSite')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        serviceType === 'str_off_site'
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {serviceType === 'str_off_site' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium">
+                    {t('schedule.serviceStrOffSiteDesc')}
+                  </p>
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
+                  <span className="text-base sm:text-lg font-black text-slate-900">
+                    ${(isSTR
+                      ? getSTRTierByBedrooms(bedrooms).basePrice + getSTRTierByBedrooms(bedrooms).externalLaundryFee
+                      : selectedTier.strOffSitePrice
+                    ).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* If Custom Quote (Tier 19 > 6,100 sq ft OR STR 6+ Beds / > 3,500 sq ft): Render Lead Capture Form */}
+          {isCustomQuote ? (
+            <div className="bg-linear-to-b from-emerald-50/60 to-white border-2 border-emerald-300 rounded-2xl p-5 sm:p-7 space-y-5 animate-fade-in">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 shadow-inner">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      {isSTR ? t('schedule.strCustomQuoteTitle') : t('schedule.customQuoteTitle')}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 font-medium mt-0.5">
+                      {isSTR ? t('schedule.strCustomQuoteDesc') : t('schedule.customQuoteDesc')}
+                    </p>
+                  </div>
+                </div>
+
+                {isSTR && bedrooms >= 6 && (
+                  <button
+                    type="button"
+                    onClick={() => setBedrooms(2)}
+                    className="text-xs text-emerald-700 hover:text-emerald-900 font-bold underline shrink-0 cursor-pointer"
+                  >
+                    {i18n.language?.startsWith('es') ? 'Volver a habitaciones' : 'Change bedrooms'}
+                  </button>
+                )}
               </div>
 
               <form onSubmit={handleCustomQuoteSubmit} className="space-y-4 pt-2">
@@ -847,15 +1011,17 @@ export function Schedule() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label htmlFor="custom-sqft-input" className="block text-xs font-bold text-slate-700 mb-1">
-                      {i18n.language?.startsWith('es') ? 'Dimensión Estimada (Sq Ft)' : 'Estimated Square Footage'}
+                      {isSTR
+                        ? (i18n.language?.startsWith('es') ? 'Pies Cuadrados Estimados (> 3,500 sq ft)' : 'Estimated Square Footage (> 3,500 sq ft)')
+                        : (i18n.language?.startsWith('es') ? 'Dimensión Estimada (Sq Ft)' : 'Estimated Square Footage')}
                     </label>
                     <input
                       id="custom-sqft-input"
                       type="number"
-                      min={6100}
+                      min={isSTR ? 3500 : 6100}
                       value={customQuoteSqft}
                       onChange={(e) => setCustomQuoteSqft(e.target.value)}
-                      placeholder="e.g. 7500"
+                      placeholder={isSTR ? 'e.g. 4200' : 'e.g. 7500'}
                       className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs"
                     />
                   </div>
@@ -877,7 +1043,9 @@ export function Schedule() {
                     rows={3}
                     value={customQuoteNotes}
                     onChange={(e) => setCustomQuoteNotes(e.target.value)}
-                    placeholder={i18n.language?.startsWith('es') ? 'ej. Mansión histórica con techos abovedados y ventanales...' : 'e.g. 8-bedroom luxury residence, high vaulted ceilings, glass staircase...'}
+                    placeholder={i18n.language?.startsWith('es')
+                      ? 'ej. Villa de 7 habitaciones en Cherry Creek con hot tub y doble juego de blancos...'
+                      : 'e.g. 7-bedroom luxury rental in Cherry Creek with hot tub and double linen sets...'}
                     className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs font-medium"
                   />
                 </div>
@@ -904,163 +1072,248 @@ export function Schedule() {
             </div>
           ) : (
             <>
-              {/* Service Type Selection Cards (4 services: Standard, Deep, STR On-Site, STR Off-Site) */}
-              <div className="space-y-3">
-                <label className="block text-sm font-extrabold text-slate-900">
-                  {t('schedule.serviceTypeLabel')}
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Standard Clean */}
-                  <div
-                    onClick={() => setServiceType('standard')}
-                    className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-                      serviceType === 'standard'
-                        ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-black text-slate-900 text-sm sm:text-base">
-                          {t('schedule.serviceStandard')}
-                        </h3>
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                            serviceType === 'standard'
-                              ? 'border-emerald-600 bg-emerald-600 text-white'
-                              : 'border-slate-300'
-                          }`}
-                        >
-                          {serviceType === 'standard' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-600 font-medium">
-                        {t('schedule.serviceStandardDesc')}
-                      </p>
-                    </div>
+              {/* Residential: Property Size Dropdown (Tiers 1 to 19) */}
+              {!isSTR && (
+                <div className="bg-slate-50 border-2 border-slate-200/90 rounded-2xl p-4 sm:p-6 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <label htmlFor={tierSelectId} className="block text-sm font-extrabold text-slate-900">
+                      {t('schedule.tierDropdownLabel')}
+                    </label>
+                    <span className="text-xs text-slate-500 font-bold self-start sm:self-auto">
+                      {selectedTier.label}
+                    </span>
+                  </div>
 
-                    <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-                      <span className="text-base sm:text-lg font-black text-slate-900">
-                        ${selectedTier.standardPrice.toFixed(2)}
-                      </span>
+                  <div className="relative">
+                    <select
+                      id={tierSelectId}
+                      value={selectedTier.tier}
+                      onChange={(e) => {
+                        const tNum = Number(e.target.value);
+                        const found = pricingTiers.find((t) => t.tier === tNum);
+                        if (found) setSelectedTier(found);
+                      }}
+                      className="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 shadow-2xs appearance-none cursor-pointer pr-10 hover:border-slate-400 transition-all"
+                    >
+                      {pricingTiers.map((tier) => (
+                        <option key={tier.tier} value={tier.tier}>
+                          {tier.isCustomQuote
+                            ? (i18n.language?.startsWith('es')
+                                ? '6,100+ sq ft — Cotización Personalizada a Medida'
+                                : '6,100+ sq ft — Custom Quote & Tailored Proposal')
+                            : tier.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-5 h-5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+
+                  <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
+                    {i18n.language?.startsWith('es')
+                      ? 'Tarifas fijas e integrales según las dimensiones de tu inmueble. Sin costos ocultos ni cobros sorpresa por hora.'
+                      : 'Upfront, all-inclusive pricing based on your property size. No hidden fees or surprise hourly billing.'}
+                  </p>
+                </div>
+              )}
+
+              {/* STR: Short-Term Rental Configurator (Bedrooms, Bathrooms, Washer/Dryer) */}
+              {isSTR && (
+                <div className="space-y-5 animate-fade-in">
+                  {/* Estimated Price Notice Banner (Paso 5 del documento STR) */}
+                  <div className="bg-emerald-50/80 border-2 border-emerald-200/90 rounded-2xl p-4 sm:p-5 flex items-start gap-3 shadow-2xs">
+                    <Sparkles className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5 animate-float" />
+                    <div className="space-y-1">
+                      <h4 className="text-xs sm:text-sm font-black text-emerald-950">
+                        {t('schedule.strTurnoverTitle')}
+                      </h4>
+                      <p className="text-[11px] sm:text-xs text-emerald-800 font-medium leading-relaxed">
+                        {t('schedule.estimatedPriceNotice')}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Deep / Move-In / Move-Out Clean */}
-                  <div
-                    onClick={() => setServiceType('deep')}
-                    className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-                      serviceType === 'deep'
-                        ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-black text-slate-900 text-sm sm:text-base">
-                          {t('schedule.serviceDeep')}
-                        </h3>
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                            serviceType === 'deep'
-                              ? 'border-emerald-600 bg-emerald-600 text-white'
-                              : 'border-slate-300'
-                          }`}
-                        >
-                          {serviceType === 'deep' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-600 font-medium">
-                        {t('schedule.serviceDeepDesc')}
-                      </p>
+                  {/* Bedrooms Selector (Paso 1 del documento STR) */}
+                  <div className="space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <label className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <Bed className="w-4 h-4 text-emerald-600" />
+                        <span>{t('schedule.bedroomsLabel')}</span>
+                      </label>
+                      <span className="text-[11px] text-slate-500 font-bold">
+                        {bedrooms === 0 ? t('schedule.studio') : bedrooms >= 6 ? '6+ Beds (Custom)' : `${bedrooms} ${t('schedule.beds')}`}
+                      </span>
                     </div>
 
-                    <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-                      <span className="text-base sm:text-lg font-black text-slate-900">
-                        ${selectedTier.deepPrice.toFixed(2)}
-                      </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                      {STR_TIERS.map((tier) => {
+                        const isSelected = bedrooms === tier.bedrooms;
+                        return (
+                          <button
+                            key={tier.bedrooms}
+                            type="button"
+                            onClick={() => setBedrooms(tier.bedrooms)}
+                            className={`p-2.5 sm:p-3 rounded-xl border-2 text-left transition-all duration-150 cursor-pointer flex flex-col justify-between ${
+                              isSelected
+                                ? 'border-emerald-600 bg-emerald-50/90 ring-2 ring-emerald-600/20 shadow-xs'
+                                : 'border-slate-200 bg-white hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="space-y-0.5">
+                              <span className="text-xs sm:text-sm font-black text-slate-900 block truncate">
+                                {tier.bedrooms === 0 ? t('schedule.studio') : tier.labelKey}
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-medium block truncate">
+                                {tier.bedrooms >= 6
+                                  ? '> 3,500 sq ft'
+                                  : `~${tier.maxSqftHint.toLocaleString()} sq ft`}
+                              </span>
+                            </div>
+                            <div className="pt-2 mt-1.5 border-t border-slate-100/80 flex items-center justify-between">
+                              <span className="text-xs font-black text-emerald-800">
+                                {tier.isCustomQuote ? 'Custom' : `$${tier.basePrice}`}
+                              </span>
+                              {isSelected && <Check className="w-3 h-3 text-emerald-700" />}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* Short Term Rental Clean (On-Site Laundry) */}
-                  <div
-                    onClick={() => setServiceType('str_on_site')}
-                    className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-                      serviceType === 'str_on_site'
-                        ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-black text-slate-900 text-sm sm:text-base">
-                          {t('schedule.serviceStrOnSite')}
-                        </h3>
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                            serviceType === 'str_on_site'
-                              ? 'border-emerald-600 bg-emerald-600 text-white'
-                              : 'border-slate-300'
-                          }`}
-                        >
-                          {serviceType === 'str_on_site' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-600 font-medium">
-                        {t('schedule.serviceStrOnSiteDesc')}
-                      </p>
+                  {/* Bathrooms Selector (Paso 2 del documento STR) */}
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <label className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <Bath className="w-4 h-4 text-emerald-600" />
+                        <span>{t('schedule.bathroomsLabel')}</span>
+                      </label>
+                      <span className="text-[11px] text-slate-500 font-bold">
+                        {bathrooms} {t('schedule.baths')} ({strCalc.includedBathrooms} {t('schedule.strIncludedBaths')})
+                      </span>
                     </div>
 
-                    <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-                      <span className="text-base sm:text-lg font-black text-slate-900">
-                        ${selectedTier.strOnSitePrice.toFixed(2)}
+                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
+                      {[1, 1.5, 2, 2.5, 3, 3.5, 4].map((num) => (
+                        <button
+                          key={num}
+                          type="button"
+                          onClick={() => setBathrooms(num)}
+                          className={`min-h-[40px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
+                            bathrooms === num
+                              ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
+                              : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                          }`}
+                        >
+                          {num === 4 ? '4+' : num}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pt-0.5">
+                      <span className="text-slate-500 font-medium">
+                        {strCalc.includedBathrooms} {t('schedule.baths')} {t('schedule.strIncludedBaths')}
                       </span>
+                      {strCalc.extraBathrooms > 0 ? (
+                        <span className="text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          +{strCalc.extraBathrooms} {t('schedule.extraBathFee')} (+${strCalc.extraBathroomFee.toFixed(2)})
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 font-medium text-[11px]">
+                          {t('schedule.strExtraBaths')}
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Short Term Rental Clean (Off-Site Laundry) */}
-                  <div
-                    onClick={() => setServiceType('str_off_site')}
-                    className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-                      serviceType === 'str_off_site'
-                        ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-black text-slate-900 text-sm sm:text-base">
-                          {t('schedule.serviceStrOffSite')}
-                        </h3>
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                            serviceType === 'str_off_site'
-                              ? 'border-emerald-600 bg-emerald-600 text-white'
-                              : 'border-slate-300'
-                          }`}
-                        >
-                          {serviceType === 'str_off_site' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-                        </div>
-                      </div>
-                      <p className="text-xs text-slate-600 font-medium">
-                        {t('schedule.serviceStrOffSiteDesc')}
+                  {/* Washer & Dryer in Property Toggle (Paso 3 del documento STR) */}
+                  <div className="space-y-2.5 pt-2 border-t border-slate-100">
+                    <div>
+                      <label className="block text-xs sm:text-sm font-extrabold text-slate-900">
+                        {t('schedule.washerDryerQuestion')}
+                      </label>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                        {t('schedule.washerDryerHelp')}
                       </p>
                     </div>
 
-                    <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-                      <span className="text-base sm:text-lg font-black text-slate-900">
-                        ${selectedTier.strOffSitePrice.toFixed(2)}
-                      </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Option 1: On-site */}
+                      <div
+                        onClick={() => {
+                          setHasWasherDryer(true);
+                          setServiceType('str_on_site');
+                        }}
+                        className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between hover:border-emerald-500 ${
+                          hasWasherDryer
+                            ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                            : 'border-slate-200 bg-white hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="font-black text-xs sm:text-sm text-slate-900 block">
+                              {t('schedule.washerDryerYes')}
+                            </span>
+                            <p className="text-[11px] sm:text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+                              {t('schedule.washerDryerYesDesc')}
+                            </p>
+                          </div>
+                          <div
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                              hasWasherDryer ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
+                            }`}
+                          >
+                            {hasWasherDryer && <Check className="w-3.5 h-3.5" />}
+                          </div>
+                        </div>
+                        <div className="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-800">
+                          <span>{t('schedule.strIncludedBaths')}</span>
+                          <span className="font-black">$0.00</span>
+                        </div>
+                      </div>
+
+                      {/* Option 2: Off-site */}
+                      <div
+                        onClick={() => {
+                          setHasWasherDryer(false);
+                          setServiceType('str_off_site');
+                        }}
+                        className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between hover:border-emerald-500 ${
+                          !hasWasherDryer
+                            ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                            : 'border-slate-200 bg-white hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="font-black text-xs sm:text-sm text-slate-900 block">
+                              {t('schedule.washerDryerNo')}
+                            </span>
+                            <p className="text-[11px] sm:text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+                              {t('schedule.washerDryerNoDesc')}
+                            </p>
+                          </div>
+                          <div
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                              !hasWasherDryer ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
+                            }`}
+                          >
+                            {!hasWasherDryer && <Check className="w-3.5 h-3.5" />}
+                          </div>
+                        </div>
+                        <div className="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
+                          <span className="text-slate-600">{t('schedule.externalLaundryFee')}</span>
+                          <span className="font-black text-emerald-800">
+                            +${getSTRTierByBedrooms(bedrooms).externalLaundryFee.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Service Frequency Selection Tabs (Weekly 20%, Bi-Weekly 15% Most Popular, Monthly 10%, One-Time) */}
+              {/* Service Frequency Selection Tabs */}
               <div className="space-y-3 pt-2">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <label className="block text-sm font-extrabold text-slate-900">
@@ -1088,21 +1341,7 @@ export function Schedule() {
                             : 'border-slate-200 bg-white hover:border-slate-300'
                         }`}
                       >
-                        {freq.isPopular && (
-                          <span className="absolute -top-2.5 right-2 text-[10px] font-black uppercase tracking-wide bg-emerald-600 text-white px-2 py-0.5 rounded-full shadow-2xs">
-                            {t('schedule.frequencyPopular')}
-                          </span>
-                        )}
                         <div>
-                          <span
-                            className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md inline-block mb-1.5 ${
-                              freq.discountPercent > 0
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : 'bg-slate-100 text-slate-600'
-                            }`}
-                          >
-                            {freq.badge}
-                          </span>
                           <h4 className="font-black text-slate-900 text-xs sm:text-sm leading-snug">
                             {t(freq.nameKey)}
                           </h4>
@@ -1124,65 +1363,67 @@ export function Schedule() {
                 </div>
               </div>
 
-              {/* Consultative Details (Bedrooms, Bathrooms) */}
-              <div className="space-y-4 pt-4 border-t border-slate-100">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
-                  <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                    <Home className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>{t('schedule.propertyDetailsTitle')}</span>
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Bedrooms */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                      <Bed className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{t('schedule.bedroomsLabel')}</span>
-                    </label>
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-                      {[0, 1, 2, 3, 4, 5].map((num) => (
-                        <button
-                          key={num}
-                          type="button"
-                          onClick={() => setBedrooms(num)}
-                          className={`min-h-[40px] py-1.5 px-1 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
-                            bedrooms === num
-                              ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
-                              : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
-                          }`}
-                        >
-                          {num === 0 ? t('schedule.studio') : num === 5 ? '5+' : num}
-                        </button>
-                      ))}
-                    </div>
+              {/* Consultative Details (Bedrooms, Bathrooms for Residential) */}
+              {!isSTR && (
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
+                    <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                      <Home className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>{t('schedule.propertyDetailsTitle')}</span>
+                    </h3>
                   </div>
 
-                  {/* Bathrooms */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                      <Bath className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{t('schedule.bathroomsLabel')}</span>
-                    </label>
-                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
-                      {[1, 1.5, 2, 2.5, 3, 3.5, 4].map((num) => (
-                        <button
-                          key={num}
-                          type="button"
-                          onClick={() => setBathrooms(num)}
-                          className={`min-h-[40px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
-                            bathrooms === num
-                              ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
-                              : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
-                          } ${num === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
-                        >
-                          {num === 4 ? '4+' : num}
-                        </button>
-                      ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Bedrooms */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <Bed className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>{t('schedule.bedroomsLabel')}</span>
+                      </label>
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+                        {[0, 1, 2, 3, 4, 5].map((num) => (
+                          <button
+                            key={num}
+                            type="button"
+                            onClick={() => setBedrooms(num)}
+                            className={`min-h-[40px] py-1.5 px-1 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
+                              bedrooms === num
+                                ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
+                                : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                            }`}
+                          >
+                            {num === 0 ? t('schedule.studio') : num === 5 ? '5+' : num}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Bathrooms */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <Bath className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>{t('schedule.bathroomsLabel')}</span>
+                      </label>
+                      <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
+                        {[1, 1.5, 2, 2.5, 3, 3.5, 4].map((num) => (
+                          <button
+                            key={num}
+                            type="button"
+                            onClick={() => setBathrooms(num)}
+                            className={`min-h-[40px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
+                              bathrooms === num
+                                ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
+                                : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                            } ${num === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
+                          >
+                            {num === 4 ? '4+' : num}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Step 1 Running Summary & Next Button */}
               <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -1200,11 +1441,6 @@ export function Schedule() {
                       )}
                     </div>
                   </div>
-                  {discountPercent > 0 && (
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
-                      {freqOption.badge}
-                    </span>
-                  )}
                 </div>
 
                 <Button
@@ -1568,7 +1804,18 @@ export function Schedule() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {addons.map((addon) => {
+              {[...addons]
+                .sort((a, b) => {
+                  if (isSTR) {
+                    const strCodes = ['pets', 'hot_tub', 'patio_grill'];
+                    const aIsStr = strCodes.includes(a.code);
+                    const bIsStr = strCodes.includes(b.code);
+                    if (aIsStr && !bIsStr) return -1;
+                    if (!aIsStr && bIsStr) return 1;
+                  }
+                  return 0;
+                })
+                .map((addon) => {
                 const isChecked = !!selectedAddonCodes[addon.code];
                 const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
                 const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
@@ -1700,13 +1947,15 @@ export function Schedule() {
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.dimensions')}:</span>
                 <span className="font-bold text-slate-900 text-right">
-                  {selectedTier.label} • {bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, {bathrooms} {t('schedule.baths')}
+                  {isSTR
+                    ? `${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')} • ${hasWasherDryer ? (i18n.language?.startsWith('es') ? 'Lavadora en propiedad' : 'On-site washer & dryer') : (i18n.language?.startsWith('es') ? 'Lavandería externa' : 'Off-site laundry')}`
+                    : `${selectedTier.label} • ${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')}`}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.frequencyTitle')}:</span>
-                <span className="font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md text-right">
-                  {t(freqOption.nameKey)} ({freqOption.badge})
+                <span className="font-bold text-slate-900 text-right">
+                  {t(freqOption.nameKey)}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-2">
@@ -1764,21 +2013,52 @@ export function Schedule() {
           <div className="bg-white border-2 border-emerald-200/90 rounded-2xl p-4 sm:p-6 space-y-3 shadow-2xs">
             <h3 className="font-black text-emerald-950 text-xs sm:text-sm uppercase tracking-wider flex items-center justify-between">
               <span>{t('schedule.costBreakdown')}</span>
-              <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
-                {i18n.language?.startsWith('es') ? 'Tarifa Fija' : 'Flat Rate'}
-              </span>
             </h3>
 
-            {/* Base Tier Price */}
-            <div className="flex justify-between text-slate-700 text-xs font-medium">
-              <span>{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
-              <span className="font-bold text-slate-900">${baseTierPrice.toFixed(2)}</span>
-            </div>
+            {/* Base Turnover or Tier Price */}
+            {isSTR ? (
+              <>
+                <div className="flex justify-between text-slate-700 text-xs font-medium">
+                  <span>
+                    {t('schedule.baseTierPrice')} ({bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`} • {t('schedule.strIncludedBaths')} {strCalc.includedBathrooms} {t('schedule.baths')}):
+                  </span>
+                  <span className="font-bold text-slate-900">${strCalc.basePrice.toFixed(2)}</span>
+                </div>
+
+                {strCalc.extraBathrooms > 0 && (
+                  <div className="flex justify-between text-slate-700 text-xs font-medium">
+                    <span>
+                      {t('schedule.extraBathFee')} ({strCalc.extraBathrooms} x ${STR_EXTRA_BATHROOM_PRICE}):
+                    </span>
+                    <span className="font-bold text-slate-900">+${strCalc.extraBathroomFee.toFixed(2)}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between text-slate-700 text-xs font-medium">
+                  <span>
+                    {hasWasherDryer
+                      ? (i18n.language?.startsWith('es') ? 'Lavado de ropa de cama en propiedad' : 'On-Site Linen Laundry')
+                      : t('schedule.externalLaundryFee')}
+                    :
+                  </span>
+                  <span className="font-bold text-slate-900">
+                    {hasWasherDryer
+                      ? `$0.00 (${t('schedule.strIncludedBaths')})`
+                      : `+$${strCalc.externalLaundryFee.toFixed(2)}`}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-between text-slate-700 text-xs font-medium">
+                <span>{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
+                <span className="font-bold text-slate-900">${baseTierPrice.toFixed(2)}</span>
+              </div>
+            )}
 
             {/* Recurring Frequency Discount */}
             {discountPercent > 0 && (
               <div className="flex justify-between text-emerald-800 text-xs font-bold bg-emerald-50/80 p-2 rounded-xl">
-                <span>{t('schedule.frequencyDiscount')} ({t(freqOption.nameKey)} - {freqOption.badge}):</span>
+                <span>{t('schedule.frequencyDiscount')} ({t(freqOption.nameKey)}):</span>
                 <span>-${frequencyDiscount.toFixed(2)}</span>
               </div>
             )}
@@ -1802,6 +2082,12 @@ export function Schedule() {
                 )}
               </div>
               <span className="font-black text-xl sm:text-2xl text-emerald-700">${totalPrice.toFixed(2)}</span>
+            </div>
+
+            {/* Estimated Price Transparency Notice */}
+            <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-emerald-950 text-xs font-semibold flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>{t('schedule.estimatedPriceNotice')}</span>
             </div>
           </div>
 
