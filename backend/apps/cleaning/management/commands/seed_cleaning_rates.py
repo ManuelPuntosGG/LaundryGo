@@ -41,6 +41,14 @@ class Command(BaseCommand):
                 'min_order_amount': Decimal('99.00'),
                 'description': 'Rotación integral entre huéspedes con retiro, lavado externo (off-site) y reposición de blancos.',
             },
+            {
+                'name': 'Commercial Cleaning Walkthrough',
+                'service_type': 'commercial',
+                'brand': 'gopropertycare',
+                'rate_per_sqft': Decimal('0.000'),
+                'min_order_amount': Decimal('0.00'),
+                'description': '15-minute on-site walkthrough for commercial spaces with a same-day custom quote.',
+            },
             # Evolving Solutions LLC (Commercial, Post-Construction & Demolition)
             {
                 'name': 'Limpieza Comercial / Janitorial',

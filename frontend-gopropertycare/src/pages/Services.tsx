@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Sparkles,
@@ -16,6 +16,12 @@ import {
   Phone,
   HelpCircle,
   ChevronDown,
+  Building2,
+  Store,
+  Stethoscope,
+  Building,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -95,8 +101,27 @@ function MiniFAQ({ items }: { items: { q: string; a: string }[] }) {
   );
 }
 
+interface CommercialServiceItem {
+  title: string;
+  tag: string;
+  description: string;
+  checklist: string[];
+  miniFaq: { q: string; a: string }[];
+}
+
 export function Services() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'residential' | 'commercial'>(() => {
+    return searchParams.get('tab') === 'commercial' || searchParams.get('tier') === 'commercial'
+      ? 'commercial'
+      : 'residential';
+  });
+
+  const handleTabChange = (newTab: 'residential' | 'commercial') => {
+    setActiveTab(newTab);
+    setSearchParams({ tab: newTab }, { replace: true });
+  };
 
   const standardKitchen = (t('about.servicesIncluded.standard.kitchen', { returnObjects: true }) as string[]) || [];
   const standardBathrooms = (t('about.servicesIncluded.standard.bathrooms', { returnObjects: true }) as string[]) || [];
@@ -120,11 +145,63 @@ export function Services() {
   const moveInMiniFaq = (t('faq.miniFaq.move_in_out', { returnObjects: true }) as { q: string; a: string }[]) || [];
   const strMiniFaq = (t('faq.miniFaq.str_turnover', { returnObjects: true }) as { q: string; a: string }[]) || [];
 
+  const officeData = (t('commercialServices.office', { returnObjects: true }) as CommercialServiceItem) || {
+    title: 'Office Cleaning',
+    tag: '',
+    description: '',
+    checklist: [],
+    miniFaq: [],
+  };
+  const retailData = (t('commercialServices.retail', { returnObjects: true }) as CommercialServiceItem) || {
+    title: 'Retail Cleaning',
+    tag: '',
+    description: '',
+    checklist: [],
+    miniFaq: [],
+  };
+  const medicalData = (t('commercialServices.medical', { returnObjects: true }) as CommercialServiceItem) || {
+    title: 'Medical & Dental Cleaning',
+    tag: '',
+    description: '',
+    checklist: [],
+    miniFaq: [],
+  };
+  const hoaData = (t('commercialServices.hoa', { returnObjects: true }) as CommercialServiceItem) || {
+    title: 'HOA & Property Management Cleaning',
+    tag: '',
+    description: '',
+    checklist: [],
+    miniFaq: [],
+  };
+
+  const commercialCards = [
+    {
+      key: 'office',
+      data: officeData,
+      icon: Building2,
+    },
+    {
+      key: 'retail',
+      data: retailData,
+      icon: Store,
+    },
+    {
+      key: 'medical',
+      data: medicalData,
+      icon: Stethoscope,
+    },
+    {
+      key: 'hoa',
+      data: hoaData,
+      icon: Building,
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-10 sm:gap-14 py-4 sm:py-6 max-w-6xl mx-auto">
       <SEO
-        title={t('servicesPage.title', 'Our Specialized Cleaning Services')}
-        description={t('servicesPage.subtitle', 'Comprehensive checklists for homes, move-in/outs, and short-term rentals.')}
+        title={activeTab === 'commercial' ? t('servicesPage.commercialHeading', 'Commercial Cleaning & Janitorial Solutions') : t('servicesPage.title', 'Our Specialized Cleaning Services')}
+        description={activeTab === 'commercial' ? t('servicesPage.commercialSubheading', 'Commercial care for offices, retail, clinics & HOAs.') : t('servicesPage.subtitle', 'Comprehensive checklists for homes, move-in/outs, and short-term rentals.')}
         canonical="https://gopropertycare.com/services"
       />
 
@@ -138,9 +215,11 @@ export function Services() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Link to="/schedule" className="w-full sm:w-auto inline-flex">
+          <Link to={activeTab === 'commercial' ? '/schedule?tier=commercial' : '/schedule'} className="w-full sm:w-auto inline-flex">
             <Button size="lg" className="w-full sm:w-auto font-black px-8 shadow-md shadow-emerald-600/20 hover:scale-102 transition-transform">
-              {t('servicesPage.scheduleBtn', 'Schedule Online')}
+              {activeTab === 'commercial'
+                ? t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')
+                : t('servicesPage.scheduleBtn', 'Schedule Online')}
               <ArrowRight className="w-4.5 h-4.5 ml-1.5 shrink-0" />
             </Button>
           </Link>
@@ -150,10 +229,151 @@ export function Services() {
             </Button>
           </Link>
         </div>
+
+        {/* Tab Switcher: Residential vs Commercial */}
+        <div className="flex justify-center pt-4">
+          <div className="inline-flex p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 shadow-inner">
+            <button
+              type="button"
+              onClick={() => handleTabChange('residential')}
+              className={`flex items-center gap-2 px-5 sm:px-7 py-3 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer ${
+                activeTab === 'residential'
+                  ? 'bg-white text-emerald-900 shadow-sm border border-slate-200/80'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Home className="w-4 h-4 text-emerald-700" />
+              <span>{t('servicesPage.tabResidential', 'Residential Cleaning')}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange('commercial')}
+              className={`flex items-center gap-2 px-5 sm:px-7 py-3 rounded-xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer ${
+                activeTab === 'commercial'
+                  ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/25'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Building2 className="w-4 h-4" />
+              <span>{t('servicesPage.tabCommercial', 'Commercial Cleaning')}</span>
+              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                activeTab === 'commercial' ? 'bg-emerald-800 text-emerald-100' : 'bg-emerald-100 text-emerald-800'
+              }`}>
+                Walkthrough
+              </span>
+            </button>
+          </div>
+        </div>
       </section>
 
-      {/* 4 Dedicated Detailed Services Cards */}
-      <section className="space-y-8 sm:space-y-10">
+      {/* COMMERCIAL SECTION */}
+      {activeTab === 'commercial' && (
+        <section className="space-y-8 sm:space-y-10 animate-fade-in">
+          {/* Walkthrough Announcement Banner */}
+          <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{t('servicesPage.commercialBadge', 'Custom Quotes & Tailored Operations')}</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white">
+                {t('servicesPage.commercialHeading', 'Commercial Cleaning & Janitorial Solutions')}
+              </h2>
+              <p className="text-xs sm:text-sm text-emerald-100 font-medium leading-relaxed">
+                {t('servicesPage.commercialSubheading')}
+              </p>
+            </div>
+            <Link to="/schedule?tier=commercial" className="w-full md:w-auto shrink-0">
+              <Button
+                variant="white"
+                size="lg"
+                className="w-full md:w-auto font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-6 hover:scale-102 transition-transform"
+              >
+                <Calendar className="w-4 h-4 mr-2 text-emerald-700" />
+                <span>{t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
+              </Button>
+            </Link>
+          </div>
+
+          {/* 4 Commercial Cards */}
+          <div className="space-y-8 sm:space-y-10">
+            {commercialCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <Card
+                  key={card.key}
+                  className="p-6 sm:p-8 border-2 border-slate-200/90 hover:border-emerald-300 transition-all shadow-sm space-y-6"
+                >
+                  {/* Card Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 shadow-inner">
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 mb-1">
+                          <span>{card.data.tag}</span>
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                          {card.data.title}
+                        </h3>
+                      </div>
+                    </div>
+                    <Link to="/schedule?tier=commercial" className="self-start sm:self-auto shrink-0">
+                      <Button size="sm" className="font-extrabold shadow-xs hover:scale-102 transition-transform">
+                        <Calendar className="w-3.5 h-3.5 mr-1.5" />
+                        <span>{t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
+                      </Button>
+                    </Link>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-sm text-slate-700 font-medium leading-relaxed">
+                    {card.data.description}
+                  </p>
+
+                  {/* Checklist */}
+                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 sm:p-5 space-y-3">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>{i18n.language?.startsWith('es') ? 'Checklist de Servicio Incluido' : 'Included Service Checklist'}</span>
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {card.data.checklist.map((item, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-xs text-slate-700 font-medium">
+                          <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Mini FAQ */}
+                  <MiniFAQ items={card.data.miniFaq} />
+
+                  {/* Bottom Card Row */}
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+                    <div className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{i18n.language?.startsWith('es') ? '15 min de visita presencial • Cotización el mismo día' : '15-min walkthrough • Same-day custom quote'}</span>
+                    </div>
+                    <Link to="/schedule?tier=commercial">
+                      <Button size="md" className="font-black shadow-xs hover:scale-102 transition-transform">
+                        <span>{t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
+                        <ArrowRight className="w-4 h-4 ml-1.5" />
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* RESIDENTIAL SECTION (4 Dedicated Detailed Services Cards) */}
+      {activeTab === 'residential' && (
+      <section className="space-y-8 sm:space-y-10 animate-fade-in">
         {/* SERVICE 1: Standard Clean */}
         <Card className="p-0 overflow-hidden border-2 border-slate-200/90 hover:border-emerald-300 transition-all shadow-sm">
           <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
@@ -533,18 +753,23 @@ export function Services() {
           </div>
         </Card>
       </section>
+      )}
 
       {/* Bottom CTA Box */}
       <section className="text-center py-4">
         <Card variant="none" className="p-8 sm:p-12 bg-linear-to-r from-emerald-800 to-emerald-950 text-white max-w-4xl mx-auto shadow-xl">
           <h2 className="text-2xl sm:text-3xl font-black mb-3 text-white">
-            {t('servicesPage.cta.title', 'Ready to Experience Impeccable Property Care?')}
+            {activeTab === 'commercial'
+              ? (i18n.language?.startsWith('es') ? '¿Listo para un Cuidado Comercial Confiable?' : 'Ready for Dependable Commercial Care?')
+              : t('servicesPage.cta.title', 'Ready to Experience Impeccable Property Care?')}
           </h2>
           <p className="text-emerald-100 text-sm sm:text-base max-w-xl mx-auto mb-8 font-medium">
-            {t('servicesPage.cta.subtitle', 'Choose your space, pick your date, and let our insured team handle the rest.')}
+            {activeTab === 'commercial'
+              ? (i18n.language?.startsWith('es') ? 'Agenda tu walkthrough gratuito de 15 minutos hoy. Nuestro equipo comercial entregará tu propuesta personalizada el mismo día.' : 'Schedule your free 15-minute walkthrough today. Our commercial accounts team delivers your custom written quote same-day.')
+              : t('servicesPage.cta.subtitle', 'Choose your space, pick your date, and let our insured team handle the rest.')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/schedule">
+            <Link to={activeTab === 'commercial' ? '/schedule?tier=commercial' : '/schedule'}>
               <Button
                 variant="white"
                 size="lg"
@@ -552,7 +777,9 @@ export function Services() {
               >
                 <Sparkles className="w-5 h-5 mr-2 text-emerald-600" />
                 <span className="text-emerald-950 font-black">
-                  {t('servicesPage.cta.scheduleBtn', 'Book Your Cleaning')}
+                  {activeTab === 'commercial'
+                    ? t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')
+                    : t('servicesPage.cta.scheduleBtn', 'Book Your Cleaning')}
                 </span>
               </Button>
             </Link>

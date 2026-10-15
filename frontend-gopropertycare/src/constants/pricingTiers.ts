@@ -12,7 +12,7 @@ export interface PricingTier {
   isCustomQuote?: boolean;
 }
 
-export type CleaningServiceTierType = 'standard' | 'deep' | 'str_on_site' | 'str_off_site';
+export type CleaningServiceTierType = 'standard' | 'deep' | 'str_on_site' | 'str_off_site' | 'commercial';
 
 export const PRICING_TIERS: PricingTier[] = [
   { tier: 0, label: '500 – 999 sq ft', minSqft: 500, maxSqft: 999, standardPrice: 155, deepPrice: 235, strOnSitePrice: 205, strOffSitePrice: 270, sqftEquivalent: '500 – 999 sq ft', propertyHint: '500 – 999 sq ft' },
@@ -36,7 +36,7 @@ export const PRICING_TIERS: PricingTier[] = [
 ];
 
 export const getTierPrice = (tier: PricingTier, type: CleaningServiceTierType): number => {
-  if (tier.isCustomQuote) return 0;
+  if (tier.isCustomQuote || type === 'commercial') return 0;
   switch (type) {
     case 'standard':
       return tier.standardPrice;

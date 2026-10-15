@@ -434,11 +434,127 @@
     "scheduleBtn": "Agendar en Línea",
     "customRequestNote": "¿Necesitas algo que no está en la lista? Pregúntanos y te diremos si podemos añadirlo.",
     "bookThisService": "Agendar Este Servicio",
+    "tabResidential": "Limpieza Residencial",
+    "tabCommercial": "Limpieza Comercial",
+    "requestWalkthroughBtn": "Agendar un Walkthrough",
+    "commercialBadge": "Cotizaciones a Medida y Horarios Flexibles",
+    "commercialHeading": "Soluciones de Limpieza Comercial y Mantenimiento",
+    "commercialSubheading": "Servicio confiable y personal asegurado para oficinas, comercios, clínicas y comunidades HOA en Denver y Boulder. Propuestas personalizadas entregadas el mismo día tras una visita de 15 minutos.",
     "cta": {
       "title": "¿Listo para Experimentar un Cuidado Impecable?",
       "subtitle": "Elige tu espacio, selecciona la fecha y deja que nuestro equipo asegurado se encargue de todo.",
       "scheduleBtn": "Agendar Mi Limpieza",
       "callBtn": "Llamar al (720) 590-8632"
+    }
+  },
+  "commercialServices": {
+    "office": {
+      "title": "Limpieza de Oficinas",
+      "tag": "Equipos Saludables y Espacios Profesionales",
+      "description": "Una oficina limpia mantiene saludable a tu equipo y causa una gran impresión en tus clientes. Limpiamos estaciones de trabajo, baños, comedores, áreas de recepción y salas de juntas, desinfectando superficies de alto contacto como teclados, manijas y apagadores en cada visita. Nos adaptamos a tus operaciones, incluyendo noches y fines de semana, para no interrumpir tu jornada. Atendemos oficinas individuales y edificios corporativos en toda el área de Denver.",
+      "checklist": [
+        "Estaciones de trabajo, escritorios y superficies comunes desempolvados y limpios",
+        "Puntos de alto contacto desinfectados (apagadores, manijas de puertas, teclados)",
+        "Baños desinfectados, reabastecidos e insumos sanitarios colocados",
+        "Comedores, áreas de descanso, fregaderos y electrodomésticos limpios",
+        "Pisos aspirados y superficies duras trapeadas y desinfectadas",
+        "Recepción, cristales de entrada y salas de conferencias impecables"
+      ],
+      "miniFaq": [
+        {
+          "q": "¿Cómo funciona la cotización?",
+          "a": "Cada oficina tiene requerimientos únicos; enviamos una cotización personalizada el mismo día tras una visita presencial de 15 minutos."
+        },
+        {
+          "q": "¿Pueden limpiar fuera de nuestro horario laboral?",
+          "a": "Sí. Nos adaptamos a los horarios de tu negocio, incluyendo turnos nocturnos, madrugadas y fines de semana."
+        },
+        {
+          "q": "¿Cuentan con seguro de responsabilidad?",
+          "a": "Sí, GoPropertyCare cuenta con cobertura de seguro integral para total tranquilidad."
+        }
+      ]
+    },
+    "retail": {
+      "title": "Limpieza Comercial y Retail",
+      "tag": "Primeras Impresiones Impecables",
+      "description": "Las primeras impresiones comienzan en la puerta. Mantenemos pisos, probadores, exhibidores y vitrinas impecables, trabajando antes de abrir, tras el cierre o durante la noche, para que tu tienda esté reluciente cuando lleguen los clientes. Atendemos tiendas boutique y cadenas con múltiples sucursales en Denver.",
+      "checklist": [
+        "Vitrinas principales, aparadores y cristales de entrada pulidos sin marcas",
+        "Pisos comerciales barridos, aspirados y trapeados",
+        "Probadores limpios, desinfectados y espejos relucientes",
+        "Mostradores de cobro y puntos de venta desinfectados",
+        "Baños sanitizados y suministros reabastecidos",
+        "Retiro de basura, empaques y cajas vacías"
+      ],
+      "miniFaq": [
+        {
+          "q": "¿Pueden limpiar fuera de nuestro horario comercial?",
+          "a": "Sí. Trabajamos antes de la apertura, tras el cierre o durante la noche."
+        },
+        {
+          "q": "¿Qué incluye la limpieza comercial?",
+          "a": "Pisos, probadores, exhibidores, cristales, baños y retiro de basura, adaptado a tu checklist."
+        },
+        {
+          "q": "¿Pueden atender múltiples ubicaciones?",
+          "a": "Sí, con un único punto de contacto y un calendario sincronizado."
+        }
+      ]
+    },
+    "medical": {
+      "title": "Limpieza Médica y Dental",
+      "tag": "Desinfección Clínica con Registro EPA",
+      "description": "Las instalaciones de salud requieren más que una limpieza estándar. Limpiamos y desinfectamos salas de espera, consultorios y baños con desinfectantes hospitalarios registrados ante la EPA, utilizando herramientas con código de colores para prevenir contaminación cruzada. Nuestro personal cuenta con certificación en patógenos transmitidos por sangre. Atendemos consultorios médicos, clínicas dentales, quiroprácticos y fisioterapeutas en el área metropolitana de Denver.",
+      "checklist": [
+        "Sillas de sala de espera, mostradores de recepción y acrílicos/vidrios desinfectados",
+        "Consultorios y gabinetes dentales desinfectados con productos grado hospitalario EPA",
+        "Sistema de paños de microfibra con código de colores para evitar contaminación cruzada",
+        "Baños higienizados a fondo, desinfectados y reabastecidos",
+        "Protocolos estrictos de seguridad para patógenos en sangre (Bloodborne Pathogens)",
+        "Checklist firmado con reporte fotográfico con hora tras cada visita"
+      ],
+      "miniFaq": [
+        {
+          "q": "¿Qué tipo de productos de limpieza utilizan?",
+          "a": "Desinfectantes de grado hospitalario registrados ante la EPA, aplicados estrictamente según sus especificaciones."
+        },
+        {
+          "q": "¿Qué áreas específicas limpian?",
+          "a": "Salas de espera, consultorios, áreas de examen clínico, baños y áreas para el personal."
+        },
+        {
+          "q": "¿Podemos obtener comprobante de cada visita?",
+          "a": "Sí, entregamos un checklist firmado con fotografías tras cada turno de limpieza."
+        }
+      ]
+    },
+    "hoa": {
+      "title": "Limpieza de Áreas Comunes HOA y Edificios",
+      "tag": "Comunidades Cuidadas y Plusvalía",
+      "description": "Las áreas comunes limpias protegen el valor del inmueble y mantienen satisfechos a los residentes. Mantenemos vestíbulos, pasillos, gimnasios, casas club, lavanderías, elevadores y estacionamientos en un horario recurrente diseñado para tu comunidad. Colaboramos con administradores de propiedades y juntas de HOA en Denver, Aurora, Highlands Ranch, Centennial y Westminster.",
+      "checklist": [
+        "Vestíbulos principales, accesos peatonales y salas de correspondencia detallados",
+        "Pasillos residenciales, pasamanos e iluminación desempolvados y limpios",
+        "Cabinas de elevadores, botoneras y acero inoxidable pulido",
+        "Gimnasios, casas club y áreas de lavandería comunitaria desinfectadas",
+        "Baños comunes profundamente desinfectados y reabastecidos",
+        "Bitácoras de servicio mensuales y facturas desglosadas para juntas de HOA"
+      ],
+      "miniFaq": [
+        {
+          "q": "¿Qué áreas cubren en las propiedades residenciales?",
+          "a": "Lobbies, pasillos, gimnasios, casas club, lavanderías comunes, elevadores y áreas acordadas."
+        },
+        {
+          "q": "¿Pueden coordinarse con nuestra junta directiva y administrador?",
+          "a": "Sí. Establecemos un plan de trabajo por escrito, un calendario fijo e informes periódicos."
+        },
+        {
+          "q": "¿Qué términos contractuales ofrecen?",
+          "a": "Servicio mes a mes, sin contratos forzosos que aten a la comunidad."
+        }
+      ]
     }
   },
   "cleaningAddons": {
@@ -621,7 +737,29 @@
     "emailPlaceholder": "tu@ejemplo.com",
     "instructionsPlaceholder": "ej. Mascota amigable en el lavadero, enfocar en las juntas de cocina...",
     "scheduledVisit": "Visita Agendada",
-    "total": "Total"
+    "total": "Total",
+    "serviceCommercial": "Walkthrough Comercial",
+    "serviceCommercialDesc": "Visita presencial de 15 min para oficinas, comercios, clínicas y condominios con cotización el mismo día",
+    "commercialWalkthroughTitle": "Visita Presencial de Cotización Comercial",
+    "commercialWalkthroughBadge": "100% Gratuito y Sin Compromiso",
+    "commercialWalkthroughDesc": "Un asesor comercial de GoPropertyCare visitará tu empresa o propiedad para realizar un recorrido de 15 minutos, entender tus instalaciones, prioridades y requerimientos de horario. Recibirás una cotización detallada el mismo día hábil.",
+    "businessInfoTitle": "Información del Negocio y Espacio",
+    "businessInfoSubtitle": "Cuéntanos sobre tu negocio, tipo de inmueble y requerimientos de servicio.",
+    "businessInfoLabel": "Nombre del Negocio y Detalles del Inmueble",
+    "businessInfoPlaceholder": "Ej. Acme Corp - Oficina de 3,500 sq ft con 2 baños y comedor. Buscamos limpieza nocturna 3 veces por semana.",
+    "businessInfoHelp": "Ingresa el nombre de tu empresa, tipo de negocio, metros cuadrados aproximados y cualquier necesidad específica.",
+    "errBusinessInfo": "Por favor ingresa los datos de tu empresa y espacio (mínimo 5 caracteres)",
+    "commercialNoPriceNotice": "Cotización Personalizada (Entrega el Mismo Día) — $0.00 Anticipo",
+    "commercialScheduleBtn": "Agendar Visita Comercial",
+    "commercialSuccessTitle": "¡Visita Comercial Agendada!",
+    "commercialSuccessDesc": "¡Gracias! Nuestro equipo comercial ha recibido tu solicitud. Te visitaremos en la fecha y hora seleccionadas para realizar el recorrido de 15 minutos y enviarte tu propuesta personalizada el mismo día hábil.",
+    "commercialPillars": [
+      "Visita de Evaluación de 15 Minutos",
+      "Propuesta Personalizada el Mismo Día",
+      "Horarios Flexibles (Noches y Fines de Semana)",
+      "Personal 100% Asegurado"
+    ],
+    "commercialSummaryNotice": "Visita Gratuita • Propuesta por Escrito el Mismo Día"
   },
   "auth": {
     "loginTitle": "Bienvenido a GoPropertyCare",

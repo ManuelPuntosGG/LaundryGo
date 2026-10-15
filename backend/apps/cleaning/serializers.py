@@ -286,7 +286,11 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         # Base price calculation (using CleaningPricingTier or STR Matrix for GoPropertyCare)
         tier_matched = None
         if brand == 'gopropertycare':
-            if service_rate.service_type in ('str_on_site', 'str_off_site', 'short_term_rental'):
+            if service_rate.service_type == 'commercial':
+                # Commercial Walkthrough: free on-site consultation / custom quote ($0.00 upfront)
+                tier_matched = Decimal('0.00')
+                delivery_fee = Decimal('0.00')
+            elif service_rate.service_type in ('str_on_site', 'str_off_site', 'short_term_rental'):
                 # STR Turnover: priced by bedrooms and bathrooms
                 b_rooms = validated_data.get('bedrooms', 1) or 1
                 b_aths = float(validated_data.get('bathrooms', 1.0) or 1.0)

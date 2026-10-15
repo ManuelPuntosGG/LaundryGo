@@ -28,6 +28,15 @@ export const DEFAULT_CLEANING_RATES: CleaningServiceRate[] = [
     description: 'Rotación express entre huéspedes de Airbnb y VRBO con inspección, reposición y opción de lavandería.',
     is_active: true,
   },
+  {
+    id: 5,
+    name: 'Commercial Cleaning Walkthrough',
+    service_type: 'commercial',
+    rate_per_sqft: '0.000',
+    min_order_amount: '0.00',
+    description: '15-minute on-site walkthrough for commercial spaces with a same-day custom quote.',
+    is_active: true,
+  },
 ];
 
 export const DEFAULT_CLEANING_ADDONS = [

@@ -434,11 +434,127 @@
     "scheduleBtn": "Schedule Online",
     "customRequestNote": "Need something that isn't listed? Ask us. We'll tell you if it can be added.",
     "bookThisService": "Book This Service",
+    "tabResidential": "Residential Cleaning",
+    "tabCommercial": "Commercial Cleaning",
+    "requestWalkthroughBtn": "Request a Walkthrough",
+    "commercialBadge": "Custom Quotes & Tailored Operations",
+    "commercialHeading": "Commercial Cleaning & Janitorial Solutions",
+    "commercialSubheading": "Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver & Boulder. Custom proposals delivered same-day after a 15-minute walkthrough.",
     "cta": {
       "title": "Ready to Experience Impeccable Property Care?",
       "subtitle": "Choose your space, pick your date, and let our insured team handle the rest.",
       "scheduleBtn": "Book Your Cleaning",
       "callBtn": "Call (720) 590-8632"
+    }
+  },
+  "commercialServices": {
+    "office": {
+      "title": "Office Cleaning",
+      "tag": "Healthy Teams & Professional Spaces",
+      "description": "A clean office keeps your team healthy and your clients impressed. We clean workstations, restrooms, break rooms, lobbies and conference rooms, and sanitize high-touch surfaces like keyboards, door handles and light switches on every visit. Our schedules fit your operation, including after-hours and weekends, so we never disrupt your day. We serve single suites and multi-floor buildings across the Denver metro.",
+      "checklist": [
+        "Workstations, desks, and common surfaces dusted and wiped",
+        "High-touch points disinfected (light switches, door handles, keyboards)",
+        "Restrooms sanitized, restocked, and trash emptied",
+        "Break rooms, sinks, and appliance exteriors cleaned",
+        "Floors vacuumed and hard surfaces mopped",
+        "Lobbies, entry glass, and conference rooms detailed"
+      ],
+      "miniFaq": [
+        {
+          "q": "How does pricing work?",
+          "a": "Every office is different, so we send a custom quote after a walkthrough of your space."
+        },
+        {
+          "q": "Can you clean after hours or on weekends?",
+          "a": "Yes. We schedule around your business, including evenings, early mornings and weekends."
+        },
+        {
+          "q": "Are you insured?",
+          "a": "Yes, GoPropertyCare is fully insured."
+        }
+      ]
+    },
+    "retail": {
+      "title": "Retail Cleaning",
+      "tag": "Spotless First Impressions",
+      "description": "First impressions start at the door. We keep floors, fitting rooms, displays and storefront glass spotless, working before you open, after you close or overnight, so your store is ready when customers walk in. We serve boutiques and multi-location retailers across Denver.",
+      "checklist": [
+        "Storefront entry glass and display cases polished",
+        "Retail floors swept, vacuumed, and mopped",
+        "Fitting rooms dusted, sanitized, and mirrors streak-free",
+        "Checkout counters and POS areas disinfected",
+        "Restrooms sanitized and supplies replenished",
+        "Trash and packaging waste removed"
+      ],
+      "miniFaq": [
+        {
+          "q": "Can you clean outside store hours?",
+          "a": "Yes. We work before opening, after closing or overnight."
+        },
+        {
+          "q": "What does retail cleaning include?",
+          "a": "Floors, fitting rooms, display surfaces, storefront glass, restrooms and trash removal. Adjust to your checklist."
+        },
+        {
+          "q": "Can you cover multiple locations?",
+          "a": "Yes, with one point of contact and a coordinated schedule."
+        }
+      ]
+    },
+    "medical": {
+      "title": "Medical & Dental Cleaning",
+      "tag": "EPA-Registered Clinical Sanitation",
+      "description": "Healthcare spaces need more than a standard clean. We clean first, then disinfect waiting rooms, exam areas and restrooms with EPA-registered products, and we use color-coded tools to prevent cross-contamination. Our team is trained with Blood Pathogen. We serve medical, dental, chiropractic and physical therapy practices across the Denver metro.",
+      "checklist": [
+        "Waiting room seating, reception counters, and glass disinfected",
+        "Exam rooms and dental operatory surfaces sanitized with EPA disinfectants",
+        "Color-coded microfiber cloth system to eliminate cross-contamination",
+        "Restrooms deeply scrubbed, disinfected, and restocked",
+        "Bloodborne pathogen safety protocols strictly observed",
+        "Signed checklist with timestamped photo report after each visit"
+      ],
+      "miniFaq": [
+        {
+          "q": "Which products do you use?",
+          "a": "EPA-registered disinfectants, used as the label directs."
+        },
+        {
+          "q": "Which areas do you clean?",
+          "a": "Waiting rooms, exam rooms, restrooms and staff areas."
+        },
+        {
+          "q": "Can I get proof of each visit?",
+          "a": "Yes, a signed checklist after every visit with photos."
+        }
+      ]
+    },
+    "hoa": {
+      "title": "HOA & Property Management Cleaning",
+      "tag": "Common Areas & Community Value",
+      "description": "Clean common areas protect property values and keep residents happy. We maintain lobbies, hallways, fitness centers, clubhouses, laundry rooms, elevators and parking areas on a recurring schedule built around your property. We work with property managers and HOA boards across Denver, Aurora, Highlands Ranch, Centennial and Westminster with consistent, reliable service.",
+      "checklist": [
+        "Building lobbies, entry foyers, and mailrooms detailed",
+        "Residential hallways, handrails, and lighting fixtures dusted",
+        "Elevator cabs, buttons, and stainless steel polished",
+        "Fitness centers, clubhouses, and laundry facilities sanitized",
+        "Common restrooms thoroughly disinfected and restocked",
+        "Clear monthly activity logs and itemized invoices for HOA boards"
+      ],
+      "miniFaq": [
+        {
+          "q": "Which areas do you clean?",
+          "a": "Lobbies, hallways, fitness centers, clubhouses, laundry rooms, elevators and requested areas."
+        },
+        {
+          "q": "Can you work with our board and property manager?",
+          "a": "Yes. We provide a written scope of work and a set schedule. We also provide reports."
+        },
+        {
+          "q": "What are the contract terms?",
+          "a": "Month-to-month."
+        }
+      ]
     }
   },
   "cleaningAddons": {
@@ -621,7 +737,29 @@
     "emailPlaceholder": "you@example.com",
     "instructionsPlaceholder": "e.g. Friendly dog in laundry room, please focus on kitchen grout...",
     "scheduledVisit": "Scheduled Visit",
-    "total": "Total"
+    "total": "Total",
+    "serviceCommercial": "Commercial Walkthrough",
+    "serviceCommercialDesc": "15-minute on-site assessment for offices, retail, medical & HOAs with same-day custom proposal",
+    "commercialWalkthroughTitle": "Commercial Cleaning Walkthrough",
+    "commercialWalkthroughBadge": "100% Free & Zero Obligation",
+    "commercialWalkthroughDesc": "A GoPropertyCare commercial account manager meets you at your facility for a 15-minute walkthrough to evaluate your layout, high-traffic zones, and scheduling needs. You will receive a transparent, itemized proposal within the same business day.",
+    "businessInfoTitle": "Business & Facility Information",
+    "businessInfoSubtitle": "Tell us about your business, property type, and operational needs.",
+    "businessInfoLabel": "Business Name & Space Details",
+    "businessInfoPlaceholder": "e.g. Acme Corp - 3,500 sq ft office with 2 restrooms and breakroom. We need evening janitorial 3x/week.",
+    "businessInfoHelp": "Please include your business or property name, type of facility, approximate square footage, and any specific requirements.",
+    "errBusinessInfo": "Please provide your business name and facility details (min 5 characters)",
+    "commercialNoPriceNotice": "Custom Quote (Delivered Same-Day) — $0.00 Upfront",
+    "commercialScheduleBtn": "Schedule Commercial Walkthrough",
+    "commercialSuccessTitle": "Commercial Walkthrough Scheduled!",
+    "commercialSuccessDesc": "Thank you! Our commercial operations team has received your walkthrough request. We will visit your facility on the scheduled date and time to conduct the 15-minute walkthrough and send you a custom proposal the same business day.",
+    "commercialPillars": [
+      "15-Minute On-Site Assessment",
+      "Same-Day Custom Proposal",
+      "Tailored Operations (After-Hours & Weekends)",
+      "Fully Insured Personnel"
+    ],
+    "commercialSummaryNotice": "Free Walkthrough • Written Proposal Delivered Same-Day"
   },
   "auth": {
     "loginTitle": "Welcome Back to GoPropertyCare",

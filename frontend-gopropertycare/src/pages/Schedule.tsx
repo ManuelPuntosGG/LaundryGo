@@ -192,6 +192,8 @@ export function Schedule() {
   const [serviceType, setServiceType] = useState<CleaningServiceTierType>(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const tierParam = searchParams.get('tier');
+    const serviceParam = searchParams.get('service') || searchParams.get('tab');
+    if (tierParam === 'commercial' || serviceParam === 'commercial') return 'commercial';
     if (tierParam === 'move_in_out' || tierParam === 'deep') return 'deep';
     if (
       tierParam === 'str' ||
@@ -203,7 +205,9 @@ export function Schedule() {
     return 'standard';
   });
 
+  const isCommercial = serviceType === 'commercial';
   const isSTR = serviceType === 'str_on_site' || serviceType === 'str_off_site';
+  const [businessInfo, setBusinessInfo] = useState<string>('');
 
   const [frequency, setFrequency] = useState<ServiceFrequency>('biweekly'); // Default "Most Popular"
 
@@ -375,6 +379,7 @@ export function Schedule() {
   // Determine active service rate for backend mapping
   const activeRate =
     rates.find((r) => {
+      if (isCommercial) return r.service_type === 'commercial';
       if (isSTR) {
         return r.service_type === 'str_on_site' || r.service_type === 'short_term_rental';
       }
@@ -403,28 +408,34 @@ export function Schedule() {
   // Pricing calculations based on Tier matrix & recurring frequency discounts
   const isCustomQuote = isSTR
     ? strCalc.isCustomQuote
+    : isCommercial
+    ? false
     : selectedTier.isCustomQuote === true;
 
-  const baseTierPrice = isSTR
+  const baseTierPrice = isCommercial
+    ? 0
+    : isSTR
     ? strCalc.totalBeforeAddons
     : getTierPrice(selectedTier, serviceType);
 
   const freqOption =
     SERVICE_FREQUENCIES.find((f) => f.id === frequency) || SERVICE_FREQUENCIES[0];
-  const discountPercent = freqOption.discountPercent;
-  const frequencyDiscount = Math.round(((baseTierPrice * discountPercent) / 100) * 100) / 100;
+  const discountPercent = isCommercial ? 0 : freqOption.discountPercent;
+  const frequencyDiscount = isCommercial ? 0 : Math.round(((baseTierPrice * discountPercent) / 100) * 100) / 100;
   const discountedBasePrice = Math.max(0, baseTierPrice - frequencyDiscount);
 
-  const regularAddonsTotal = addons.reduce((sum, item) => {
-    if (item.code !== 'off_site_laundry' && selectedAddonCodes[item.code]) {
-      return sum + Number(item.price);
-    }
-    return sum;
-  }, 0);
+  const regularAddonsTotal = isCommercial
+    ? 0
+    : addons.reduce((sum, item) => {
+        if (item.code !== 'off_site_laundry' && selectedAddonCodes[item.code]) {
+          return sum + Number(item.price);
+        }
+        return sum;
+      }, 0);
 
   const addonsTotal = regularAddonsTotal + (isOffSiteSelected ? currentOffSiteFee : 0);
 
-  const totalPrice = discountedBasePrice + addonsTotal;
+  const totalPrice = isCommercial ? 0 : discountedBasePrice + addonsTotal;
 
   const representativeSqft = isCustomQuote
     ? (parseInt(customQuoteSqft, 10) || (isSTR ? 4000 : 6500))
@@ -533,7 +544,9 @@ export function Schedule() {
       });
     }
 
-    const formattedInstructions = isSTR
+    const formattedInstructions = isCommercial
+      ? `[COMMERCIAL WALKTHROUGH REQUEST • Business & Space: ${businessInfo.trim()}] ${specialInstructions || entryNotes}`.trim()
+      : isSTR
       ? `[STR Turnover: ${bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, ${bathrooms} Baths • Laundry: ${selectedAddonCodes['off_site_laundry'] ? 'Off-site laundry add-on (+$' + currentOffSiteFee + ')' : 'On-site washer & dryer'} • ${t(freqOption.nameKey)}] ${specialInstructions}`.trim()
       : `[Tier ${selectedTier.tier}: ${selectedTier.label} • ${t(freqOption.nameKey)} (${freqOption.badge})] ${specialInstructions}`.trim();
 
@@ -541,21 +554,21 @@ export function Schedule() {
       brand: 'gopropertycare',
       guest_email: formData.email.trim(),
       guest_first_name: formData.first_name.trim(),
-      guest_last_name: formData.last_name.trim(),
+      guest_last_name: formData.last_name.trim() || 'Business Contact',
       guest_phone: formData.phone.trim(),
       street_address: formData.street_address.trim(),
       city: formData.city.trim() || 'Denver',
       zip_code: formData.zip_code.trim(),
       delivery_zone: 'inner' as const,
       service_rate_id: activeRate.id,
-      square_feet: representativeSqft,
-      frequency: frequency,
-      bedrooms: bedrooms,
-      bathrooms: bathrooms,
+      square_feet: isCommercial ? 1000 : representativeSqft,
+      frequency: isCommercial ? 'one_time' : frequency,
+      bedrooms: isCommercial ? 0 : bedrooms,
+      bathrooms: isCommercial ? 0 : bathrooms,
       is_occupied: isOccupied,
       entry_method: entryMethod,
       entry_notes: entryNotes.trim(),
-      selected_addons: selectedAddonsPayload,
+      selected_addons: isCommercial ? [] : selectedAddonsPayload,
       service_date: selectedDate,
       time_slot: selectedTimeSlot,
       special_instructions: formattedInstructions,
@@ -647,12 +660,16 @@ export function Schedule() {
 
           <div className="space-y-2">
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
-              {customQuoteSubmitted
+              {isCommercial
+                ? t('schedule.commercialSuccessTitle')
+                : customQuoteSubmitted
                 ? (i18n.language?.startsWith('es') ? '¡Solicitud de Cotización Recibida!' : 'Custom Quote Request Received!')
                 : t('schedule.successTitle')}
             </h1>
             <p className="text-sm sm:text-base text-slate-600 font-medium">
-              {customQuoteSubmitted
+              {isCommercial
+                ? t('schedule.commercialSuccessDesc')
+                : customQuoteSubmitted
                 ? t('schedule.customQuoteSuccess')
                 : t('schedule.successSubtitle')}
             </p>
@@ -667,23 +684,40 @@ export function Schedule() {
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.serviceTypeLabel')}</span>
               <span className="font-bold text-slate-900">
-                {serviceType === 'standard' && t('schedule.serviceStandard')}
-                {serviceType === 'deep' && t('schedule.serviceDeep')}
-                {isSTR && t('schedule.serviceStr')}
+                {isCommercial
+                  ? t('schedule.serviceCommercial')
+                  : serviceType === 'standard'
+                  ? t('schedule.serviceStandard')
+                  : serviceType === 'deep'
+                  ? t('schedule.serviceDeep')
+                  : isSTR
+                  ? t('schedule.serviceStr')
+                  : t('schedule.serviceStandard')}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500 font-semibold">{t('schedule.dimensions')}</span>
-              <span className="font-bold text-slate-900">
-                {selectedTier.label}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500 font-semibold">{t('schedule.frequencyTitle')}</span>
-              <span className="font-bold text-slate-900">
-                {t(freqOption.nameKey)}
-              </span>
-            </div>
+            {isCommercial ? (
+              <div className="flex justify-between items-start gap-2">
+                <span className="text-slate-500 font-semibold shrink-0">{t('schedule.businessInfoLabel')}</span>
+                <span className="font-bold text-slate-900 text-right truncate max-w-[280px]">
+                  {businessInfo}
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-semibold">{t('schedule.dimensions')}</span>
+                  <span className="font-bold text-slate-900">
+                    {selectedTier.label}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-semibold">{t('schedule.frequencyTitle')}</span>
+                  <span className="font-bold text-slate-900">
+                    {t(freqOption.nameKey)}
+                  </span>
+                </div>
+              </>
+            )}
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.scheduledVisit')}</span>
               <span className="font-bold text-slate-900">{selectedDate} @ {selectedTimeSlot}</span>
@@ -694,12 +728,17 @@ export function Schedule() {
                 {formData.street_address ? `${formData.street_address}, ` : ''}{formData.city || 'Denver'}
               </span>
             </div>
-            {!customQuoteSubmitted && (
+            {isCommercial ? (
+              <div className="flex justify-between pt-2 border-t border-slate-200">
+                <span className="text-slate-900 font-extrabold text-sm sm:text-base">{t('schedule.total')}</span>
+                <span className="font-black text-emerald-700 text-base sm:text-lg">$0.00 (Free Walkthrough)</span>
+              </div>
+            ) : !customQuoteSubmitted ? (
               <div className="flex justify-between pt-2 border-t border-slate-200">
                 <span className="text-slate-900 font-extrabold text-sm sm:text-base">{t('schedule.total')}</span>
                 <span className="font-black text-emerald-700 text-base sm:text-lg">${totalPrice.toFixed(2)}</span>
               </div>
-            )}
+            ) : null}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -809,7 +848,7 @@ export function Schedule() {
             <label className="block text-sm font-extrabold text-slate-900">
               {t('schedule.serviceTypeLabel')}
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Standard Clean */}
               <div
                 onClick={() => setServiceType('standard')}
@@ -922,11 +961,130 @@ export function Schedule() {
                   </span>
                 </div>
               </div>
+
+              {/* Commercial Cleaning Walkthrough */}
+              <div
+                onClick={() => setServiceType('commercial')}
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
+                  isCommercial
+                    ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base flex items-center gap-1.5">
+                      <Building2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <span>{t('schedule.serviceCommercial')}</span>
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        isCommercial
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {isCommercial && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium">
+                    {t('schedule.serviceCommercialDesc')}
+                  </p>
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500 font-bold">{t('schedule.commercialWalkthroughBadge')}</span>
+                  <span className="text-sm font-black text-emerald-700">
+                    $0.00
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* If Custom Quote (Tier 19 > 6,100 sq ft OR STR 6+ Beds / > 3,500 sq ft): Render Lead Capture Form */}
-          {isCustomQuote ? (
+          {/* COMMERCIAL WALKTHROUGH SECTION */}
+          {isCommercial ? (
+            <div className="bg-linear-to-b from-emerald-50/70 to-white border-2 border-emerald-300 rounded-2xl p-5 sm:p-7 space-y-6 animate-fade-in">
+              <div className="flex items-start gap-3">
+                <div className="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 shadow-inner">
+                  <Building2 className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>{t('schedule.commercialWalkthroughBadge')}</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900">
+                    {t('schedule.commercialWalkthroughTitle')}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                    {t('schedule.commercialWalkthroughDesc')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Pillars grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                {((t('schedule.commercialPillars', { returnObjects: true }) as string[]) || []).map((pillar, i) => (
+                  <div key={i} className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-emerald-200/80 text-xs font-bold text-slate-800">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{pillar}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Free Text Input: Business Name & Space Details (Indispensable) */}
+              <div className="space-y-2 pt-2 border-t border-emerald-100">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="schedule-business-info" className="block text-sm font-black text-slate-900">
+                    {t('schedule.businessInfoLabel')} <span className="text-emerald-600">*</span>
+                  </label>
+                  <span className="text-[11px] font-bold text-slate-400">
+                    {businessInfo.length > 0 ? `${businessInfo.length} chars` : 'Required'}
+                  </span>
+                </div>
+                <textarea
+                  id="schedule-business-info"
+                  rows={4}
+                  value={businessInfo}
+                  onChange={(e) => setBusinessInfo(e.target.value)}
+                  placeholder={t('schedule.businessInfoPlaceholder')}
+                  className="w-full rounded-xl border border-slate-300 bg-white p-3.5 text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 transition-all shadow-xs"
+                />
+                <p className="text-[11px] text-slate-500 font-medium">
+                  {t('schedule.businessInfoHelp')}
+                </p>
+                {businessInfo.trim().length > 0 && businessInfo.trim().length < 5 && (
+                  <p className="text-xs text-rose-600 font-semibold flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    <span>{t('schedule.errBusinessInfo')}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Step 1 Bottom Bar for Commercial */}
+              <div className="pt-4 border-t border-emerald-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="w-full sm:w-auto bg-white border border-emerald-200 rounded-xl px-4 py-2.5 flex items-center justify-between sm:justify-start gap-4 shadow-xs">
+                  <div>
+                    <span className="text-[11px] text-slate-500 font-semibold block">{t('schedule.estimatedBase')}</span>
+                    <span className="text-base sm:text-lg font-black text-emerald-700">
+                      $0.00 <span className="text-xs font-bold text-slate-500">({t('schedule.commercialWalkthroughBadge')})</span>
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  size="md"
+                  disabled={businessInfo.trim().length < 5}
+                  onClick={() => setStep(2)}
+                  className="w-full sm:w-auto min-h-[44px] px-8 text-xs sm:text-sm font-black hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
+                >
+                  <span>{t('schedule.step2')}</span>
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          ) : isCustomQuote ? (
             <div className="bg-linear-to-b from-emerald-50/60 to-white border-2 border-emerald-300 rounded-2xl p-5 sm:p-7 space-y-5 animate-fade-in">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
@@ -1752,80 +1910,82 @@ export function Schedule() {
             </div>
           </div>
 
-          {/* Priced Add-ons (Fixed 4 Optional Add-ons as per Spec) */}
-          <div className="space-y-3 pt-3 border-t border-slate-100">
-            <div>
-              <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-emerald-600" />
-                <span>{t('schedule.addonsTitle')}</span>
-              </label>
-              <p className="text-xs text-slate-600 font-medium">
-                {t('schedule.addonsSubtitle')}
-              </p>
-            </div>
+          {/* Priced Add-ons (Only for Residential & STR) */}
+          {!isCommercial && (
+            <div className="space-y-3 pt-3 border-t border-slate-100">
+              <div>
+                <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <span>{t('schedule.addonsTitle')}</span>
+                </label>
+                <p className="text-xs text-slate-600 font-medium">
+                  {t('schedule.addonsSubtitle')}
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[...addons]
-                .filter((addon) => {
-                  if (addon.code === 'off_site_laundry') return isSTR;
-                  return true;
-                })
-                .sort((a, b) => {
-                  if (isSTR) {
-                    const strCodes = ['off_site_laundry', 'pets', 'hot_tub', 'patio_grill'];
-                    const aIsStr = strCodes.includes(a.code);
-                    const bIsStr = strCodes.includes(b.code);
-                    if (aIsStr && !bIsStr) return -1;
-                    if (!aIsStr && bIsStr) return 1;
-                  }
-                  return 0;
-                })
-                .map((addon) => {
-                const isChecked = !!selectedAddonCodes[addon.code];
-                const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
-                const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
-                const displayPrice = addon.code === 'off_site_laundry' ? currentOffSiteFee : Number(addon.price);
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[...addons]
+                  .filter((addon) => {
+                    if (addon.code === 'off_site_laundry') return isSTR;
+                    return true;
+                  })
+                  .sort((a, b) => {
+                    if (isSTR) {
+                      const strCodes = ['off_site_laundry', 'pets', 'hot_tub', 'patio_grill'];
+                      const aIsStr = strCodes.includes(a.code);
+                      const bIsStr = strCodes.includes(b.code);
+                      if (aIsStr && !bIsStr) return -1;
+                      if (!aIsStr && bIsStr) return 1;
+                    }
+                    return 0;
+                  })
+                  .map((addon) => {
+                  const isChecked = !!selectedAddonCodes[addon.code];
+                  const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
+                  const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
+                  const displayPrice = addon.code === 'off_site_laundry' ? currentOffSiteFee : Number(addon.price);
 
-                return (
-                  <div
-                    key={addon.code}
-                    onClick={() => {
-                      const nextVal = !isChecked;
-                      setSelectedAddonCodes({
-                        ...selectedAddonCodes,
-                        [addon.code]: nextVal,
-                      });
-                    }}
-                    className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
-                      isChecked
-                        ? 'border-emerald-600 bg-emerald-50/60 shadow-xs ring-2 ring-emerald-600/20'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
+                  return (
                     <div
-                      className={`w-5 h-5 rounded-md border mt-0.5 flex items-center justify-center shrink-0 transition-all duration-200 ${
+                      key={addon.code}
+                      onClick={() => {
+                        const nextVal = !isChecked;
+                        setSelectedAddonCodes({
+                          ...selectedAddonCodes,
+                          [addon.code]: nextVal,
+                        });
+                      }}
+                      className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
                         isChecked
-                          ? 'border-emerald-600 bg-emerald-600 text-white scale-105'
-                          : 'border-slate-300 bg-white'
+                          ? 'border-emerald-600 bg-emerald-50/60 shadow-xs ring-2 ring-emerald-600/20'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      {isChecked && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-                    </div>
-                    <div className="flex-1 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                          <span className="text-sm shrink-0" aria-hidden="true">{ADDON_ICONS[addon.code] || '✨'}</span>
-                          <span>{localizedName}</span>
-                        </span>
-                        <span className="font-black text-emerald-700 text-xs sm:text-sm">+${displayPrice.toFixed(2)}</span>
+                      <div
+                        className={`w-5 h-5 rounded-md border mt-0.5 flex items-center justify-center shrink-0 transition-all duration-200 ${
+                          isChecked
+                            ? 'border-emerald-600 bg-emerald-600 text-white scale-105'
+                            : 'border-slate-300 bg-white'
+                        }`}
+                      >
+                        {isChecked && <Check className="w-3.5 h-3.5 animate-pop-in" />}
                       </div>
-                      <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
+                      <div className="flex-1 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                            <span className="text-sm shrink-0" aria-hidden="true">{ADDON_ICONS[addon.code] || '✨'}</span>
+                            <span>{localizedName}</span>
+                          </span>
+                          <span className="font-black text-emerald-700 text-xs sm:text-sm">+${displayPrice.toFixed(2)}</span>
+                        </div>
+                        <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Special Instructions */}
           <div className="space-y-1.5 pt-2">
@@ -1902,27 +2062,40 @@ export function Schedule() {
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.serviceTypeLabel')}:</span>
                 <span className="font-bold text-slate-900 text-right">
-                  {serviceType === 'deep'
+                  {isCommercial
+                    ? t('schedule.serviceCommercial')
+                    : serviceType === 'deep'
                     ? t('schedule.serviceDeep')
                     : isSTR
                     ? t('schedule.serviceStr')
                     : t('schedule.serviceStandard')}
                 </span>
               </div>
-              <div className="flex justify-between items-start gap-2">
-                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.dimensions')}:</span>
-                <span className="font-bold text-slate-900 text-right">
-                  {isSTR
-                    ? `${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')} • ${selectedAddonCodes['off_site_laundry'] ? (i18n.language?.startsWith('es') ? 'Lavandería externa (Add-on)' : 'Off-site laundry (Add-on)') : (i18n.language?.startsWith('es') ? 'Lavado en propiedad' : 'On-site laundry')}`
-                    : `${selectedTier.label} • ${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')}`}
-                </span>
-              </div>
-              <div className="flex justify-between items-start gap-2">
-                <span className="text-slate-600 font-semibold shrink-0">{t('schedule.frequencyTitle')}:</span>
-                <span className="font-bold text-slate-900 text-right">
-                  {t(freqOption.nameKey)}
-                </span>
-              </div>
+              {isCommercial ? (
+                <div className="flex justify-between items-start gap-2">
+                  <span className="text-slate-600 font-semibold shrink-0">{t('schedule.businessInfoLabel')}:</span>
+                  <span className="font-bold text-slate-900 text-right truncate max-w-[240px]">
+                    {businessInfo}
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="text-slate-600 font-semibold shrink-0">{t('schedule.dimensions')}:</span>
+                    <span className="font-bold text-slate-900 text-right">
+                      {isSTR
+                        ? `${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')} • ${selectedAddonCodes['off_site_laundry'] ? (i18n.language?.startsWith('es') ? 'Lavandería externa (Add-on)' : 'Off-site laundry (Add-on)') : (i18n.language?.startsWith('es') ? 'Lavado en propiedad' : 'On-site laundry')}`
+                        : `${selectedTier.label} • ${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="text-slate-600 font-semibold shrink-0">{t('schedule.frequencyTitle')}:</span>
+                    <span className="font-bold text-slate-900 text-right">
+                      {t(freqOption.nameKey)}
+                    </span>
+                  </div>
+                </>
+              )}
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.scheduledDate')}:</span>
                 <span className="font-bold text-slate-900 text-right">{selectedDate}</span>
@@ -1980,82 +2153,110 @@ export function Schedule() {
               <span>{t('schedule.costBreakdown')}</span>
             </h3>
 
-            {/* Base Turnover or Tier Price */}
-            {isSTR ? (
-              <>
+            {isCommercial ? (
+              <div className="space-y-3">
                 <div className="flex justify-between text-slate-700 text-xs font-medium">
-                  <span>
-                    {t('schedule.baseTierPrice')} ({bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`} • {t('schedule.strIncludedBaths')} {strCalc.includedBathrooms} {t('schedule.baths')}):
-                  </span>
-                  <span className="font-bold text-slate-900">${strCalc.basePrice.toFixed(2)}</span>
+                  <span>{i18n.language?.startsWith('es') ? 'Visita Presencial de Evaluación (15 min)' : 'On-Site Assessment (15-min Walkthrough)'}:</span>
+                  <span className="font-bold text-emerald-700">{i18n.language?.startsWith('es') ? 'Gratis ($0.00)' : 'Free ($0.00)'}</span>
                 </div>
-
-                {strCalc.extraBathrooms > 0 && (
-                  <div className="flex justify-between text-slate-700 text-xs font-medium">
-                    <span>
-                      {t('schedule.extraBathFee')} ({strCalc.extraBathrooms} x ${STR_EXTRA_BATHROOM_PRICE}):
+                <div className="flex justify-between text-slate-700 text-xs font-medium">
+                  <span>{i18n.language?.startsWith('es') ? 'Cotización Detallada a Medida' : 'Custom Written Proposal (Itemized)'}:</span>
+                  <span className="font-bold text-emerald-700">{i18n.language?.startsWith('es') ? 'Incluida (Mismo Día)' : 'Included (Same-Day)'}</span>
+                </div>
+                <div className="pt-3 border-t-2 border-emerald-100 flex justify-between items-baseline">
+                  <div>
+                    <span className="font-black text-slate-900 text-sm sm:text-base">{t('schedule.totalDue')}:</span>
+                    <span className="text-[11px] text-emerald-700 font-bold block">
+                      {t('schedule.commercialSummaryNotice')}
                     </span>
-                    <span className="font-bold text-slate-900">+${strCalc.extraBathroomFee.toFixed(2)}</span>
+                  </div>
+                  <span className="font-black text-xl sm:text-2xl text-emerald-700">$0.00</span>
+                </div>
+                <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-emerald-950 text-xs font-semibold flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span>{t('schedule.commercialNoPriceNotice')}</span>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Base Turnover or Tier Price */}
+                {isSTR ? (
+                  <>
+                    <div className="flex justify-between text-slate-700 text-xs font-medium">
+                      <span>
+                        {t('schedule.baseTierPrice')} ({bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`} • {t('schedule.strIncludedBaths')} {strCalc.includedBathrooms} {t('schedule.baths')}):
+                      </span>
+                      <span className="font-bold text-slate-900">${strCalc.basePrice.toFixed(2)}</span>
+                    </div>
+
+                    {strCalc.extraBathrooms > 0 && (
+                      <div className="flex justify-between text-slate-700 text-xs font-medium">
+                        <span>
+                          {t('schedule.extraBathFee')} ({strCalc.extraBathrooms} x ${STR_EXTRA_BATHROOM_PRICE}):
+                        </span>
+                        <span className="font-bold text-slate-900">+${strCalc.extraBathroomFee.toFixed(2)}</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex justify-between text-slate-700 text-xs font-medium">
+                    <span>{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
+                    <span className="font-bold text-slate-900">${baseTierPrice.toFixed(2)}</span>
                   </div>
                 )}
-              </>
-            ) : (
-              <div className="flex justify-between text-slate-700 text-xs font-medium">
-                <span>{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
-                <span className="font-bold text-slate-900">${baseTierPrice.toFixed(2)}</span>
-              </div>
-            )}
 
-            {/* Recurring Frequency Discount */}
-            {discountPercent > 0 && (
-              <div className="flex justify-between text-emerald-800 text-xs font-bold bg-emerald-50/80 p-2 rounded-xl">
-                <span>{t('schedule.frequencyDiscount')} ({t(freqOption.nameKey)}):</span>
-                <span>-${frequencyDiscount.toFixed(2)}</span>
-              </div>
-            )}
-
-            {/* Off-Site Laundry Add-on (for STR when selected) */}
-            {isSTR && isOffSiteSelected && (
-              <div className="flex justify-between text-slate-700 text-xs font-medium">
-                <span>{t('schedule.offSiteLaundryAddonTitle')}:</span>
-                <span className="font-bold text-slate-900">+${currentOffSiteFee.toFixed(2)}</span>
-              </div>
-            )}
-
-            {/* Other Addons for STR */}
-            {isSTR && regularAddonsTotal > 0 && (
-              <div className="flex justify-between text-slate-700 text-xs font-medium">
-                <span>{t('schedule.addonsFee')}:</span>
-                <span className="font-bold text-slate-900">+${regularAddonsTotal.toFixed(2)}</span>
-              </div>
-            )}
-
-            {/* Addons for non-STR */}
-            {!isSTR && addonsTotal > 0 && (
-              <div className="flex justify-between text-slate-700 text-xs font-medium">
-                <span>{t('schedule.addonsFee')}:</span>
-                <span className="font-bold text-slate-900">+${addonsTotal.toFixed(2)}</span>
-              </div>
-            )}
-
-            {/* Total Due */}
-            <div className="pt-3 border-t-2 border-emerald-100 flex justify-between items-baseline">
-              <div>
-                <span className="font-black text-slate-900 text-sm sm:text-base">{t('schedule.totalDue')}:</span>
+                {/* Recurring Frequency Discount */}
                 {discountPercent > 0 && (
-                  <span className="text-[11px] text-emerald-700 font-bold block">
-                    Includes {discountPercent}% recurring discount
-                  </span>
+                  <div className="flex justify-between text-emerald-800 text-xs font-bold bg-emerald-50/80 p-2 rounded-xl">
+                    <span>{t('schedule.frequencyDiscount')} ({t(freqOption.nameKey)}):</span>
+                    <span>-${frequencyDiscount.toFixed(2)}</span>
+                  </div>
                 )}
-              </div>
-              <span className="font-black text-xl sm:text-2xl text-emerald-700">${totalPrice.toFixed(2)}</span>
-            </div>
 
-            {/* Estimated Price Transparency Notice */}
-            <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-emerald-950 text-xs font-semibold flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
-              <span>{t('schedule.estimatedPriceNotice')}</span>
-            </div>
+                {/* Off-Site Laundry Add-on (for STR when selected) */}
+                {isSTR && isOffSiteSelected && (
+                  <div className="flex justify-between text-slate-700 text-xs font-medium">
+                    <span>{t('schedule.offSiteLaundryAddonTitle')}:</span>
+                    <span className="font-bold text-slate-900">+${currentOffSiteFee.toFixed(2)}</span>
+                  </div>
+                )}
+
+                {/* Other Addons for STR */}
+                {isSTR && regularAddonsTotal > 0 && (
+                  <div className="flex justify-between text-slate-700 text-xs font-medium">
+                    <span>{t('schedule.addonsFee')}:</span>
+                    <span className="font-bold text-slate-900">+${regularAddonsTotal.toFixed(2)}</span>
+                  </div>
+                )}
+
+                {/* Addons for non-STR */}
+                {!isSTR && addonsTotal > 0 && (
+                  <div className="flex justify-between text-slate-700 text-xs font-medium">
+                    <span>{t('schedule.addonsFee')}:</span>
+                    <span className="font-bold text-slate-900">+${addonsTotal.toFixed(2)}</span>
+                  </div>
+                )}
+
+                {/* Total Due */}
+                <div className="pt-3 border-t-2 border-emerald-100 flex justify-between items-baseline">
+                  <div>
+                    <span className="font-black text-slate-900 text-sm sm:text-base">{t('schedule.totalDue')}:</span>
+                    {discountPercent > 0 && (
+                      <span className="text-[11px] text-emerald-700 font-bold block">
+                        Includes {discountPercent}% recurring discount
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-black text-xl sm:text-2xl text-emerald-700">${totalPrice.toFixed(2)}</span>
+                </div>
+
+                {/* Estimated Price Transparency Notice */}
+                <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-emerald-950 text-xs font-semibold flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span>{t('schedule.estimatedPriceNotice')}</span>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Terms Agreement Checkbox */}
@@ -2090,7 +2291,13 @@ export function Schedule() {
               className="flex-1 sm:flex-initial sm:px-8 min-h-[44px] text-xs sm:text-sm font-black shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200"
             >
               <Sparkles className="w-4 h-4 mr-1.5 shrink-0 animate-float" />
-              <span className="truncate">{isSubmitting ? t('schedule.submitting') : t('schedule.submitOrder')}</span>
+              <span className="truncate">
+                {isSubmitting
+                  ? t('schedule.submitting')
+                  : isCommercial
+                  ? t('schedule.commercialScheduleBtn')
+                  : t('schedule.submitOrder')}
+              </span>
             </Button>
           </div>
         </Card>
