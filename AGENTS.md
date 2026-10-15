@@ -50,30 +50,52 @@ LaundryGo/
 │   │   │   └── management/commands/test_email.py # Diagnóstico SMTP y conectividad en vivo
 │   │   ├── users/                  # Autenticación JWT, modelo de usuario y autovinculación de pedidos
 │   │   ├── orders/                 # Tarifas por libra, órdenes de lavandería, suscripciones y emails (LaundryGo)
-│   │   └── cleaning/               # Tarifas $/sqft, recargos de dificultad, órdenes y emails (GPC & ESL)
-│   │       ├── models.py           # CleaningServiceRate, CleaningAddon, CleaningOrder (con campo brand y prefijos GPC-#/ESL-#)
-│   │       ├── serializers.py      # Cálculo en vivo de base ($99 min), addons y delivery fee
-│   │       ├── views.py            # Endpoints públicos y protegidos de limpieza
+│   │   └── cleaning/               # Tarifas $/sqft, niveles escalados, add-ons, órdenes y emails (GPC & ESL)
+│   │       ├── models.py           # CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
+│   │       ├── serializers.py      # Cálculo en vivo de base (tiers sqft y matriz STR habitaciones), addons y delivery fee
+│   │       ├── views.py            # Endpoints públicos y protegidos (/rates/, /tiers/, /addons/, /orders/, etc.)
 │   │       ├── emails.py           # Notificaciones transaccionales bilingües adaptativas por marca (GPC / ESL)
-│   │       ├── admin.py            # Integración con Django Unfold, filtros por marca y badges
+│   │       ├── admin.py            # Integración con Django Unfold (list_editable para edición en vivo de tiers)
 │   │       ├── urls.py             # Enrutador /api/v1/cleaning/...
-│   │       ├── test_cleaning.py    # Suite de pruebas pytest para GoPropertyCare y Evolving Solutions
-│   │       └── management/commands/seed_cleaning_rates.py # Pobla tarifas residenciales y comerciales ($0.10 a $0.35)
+│   │       ├── test_cleaning.py    # Suite de pruebas pytest para GoPropertyCare y Evolving Solutions (16 tests)
+│   │       └── management/commands/seed_cleaning_rates.py # Pobla tarifas, add-ons y los 18 tiers de metraje
 │   ├── config/                     # Configuración global Django (settings, urls, wsgi)
 │   ├── requirements/               # Dependencias (base.txt, development.txt)
 │   ├── db.sqlite3                  # Base de datos SQLite local para desarrollo
 │   └── manage.py                   # CLI de administración de Django
 ├── frontend/                       # Frontend 1: LaundryGo (React 19 + Vite 8 + Tailwind v4 - Puerto 5173)
 │   ├── .env.example                # Plantilla frontend (VITE_API_URL)
-│   ├── public/locales/             # Traducciones i18n (en/common.json, es/common.json)
-│   ├── src/                        # Código fuente LaundryGo (Hero azul, calculadora por lbs, 4 pasos)
+│   ├── public/
+│   │   ├── locales/                # Traducciones i18n (en/common.json, es/common.json)
+│   │   ├── robots.txt              # Reglas de indexación SEO
+│   │   └── sitemap.xml             # Mapa del sitio XML para buscadores
+│   ├── scripts/
+│   │   └── prerender.js            # Generador estático SSG post-build para SEO (/about, /schedule, /login)
+│   ├── src/
+│   │   ├── components/common/SEO.tsx # Sincronizador dinámico de metadatos, OpenGraph y JSON-LD
+│   │   └── pages/                  # Hero azul, fondo de agua interactivo con oleaje dinámico, calculadora por lbs
 │   ├── package.json
 │   └── vite.config.ts
 ├── frontend-gopropertycare/        # Frontend 2: GoPropertyCare (React 19 + Vite 8 + Tailwind v4 - Puerto 5174)
 │   ├── public/
 │   │   ├── logo.png                # Logotipo oficial (casa verde, escoba, cubeta con espuma y toallas)
-│   │   └── locales/                # Traducciones i18n bilingües de GoPropertyCare
-│   ├── src/                        # Código fuente GoPropertyCare (tokens verdes, calculadora sq ft residencial, agendamiento)
+│   │   ├── locales/                # Traducciones i18n bilingües de GoPropertyCare
+│   │   ├── images/services/        # Fotografías optimizadas de servicios (standard, deep, move-in/out, str)
+│   │   ├── robots.txt              # Reglas de indexación SEO
+│   │   └── sitemap.xml             # Mapa del sitio XML para buscadores
+│   ├── scripts/
+│   │   └── prerender.js            # Generador estático SSG post-build para SEO (/, /about, /services, /schedule, /login)
+│   ├── src/
+│   │   ├── components/common/SEO.tsx # Gestor SEO dinámico (títulos, descripciones y canonicals)
+│   │   ├── constants/
+│   │   │   ├── pricingTiers.ts     # Matriz de 18 niveles residenciales ($155 a $480)
+│   │   │   ├── strPricing.ts       # Matriz STR por recuento de habitaciones y baños ($90 a $330)
+│   │   │   └── cleaningAddons.ts   # Add-ons activos (horno, refri, persianas, ventanas, lavandería off-site, etc.)
+│   │   └── pages/
+│   │       ├── Home.tsx            # Portada sin precios fijos, enfoque en propuestas de valor y confianza
+│   │       ├── Services.tsx        # Página de checklists detallados habitación por habitación
+│   │       ├── About.tsx           # Historia corporativa, personal 100% asegurado y mapa de cobertura
+│   │       └── Schedule.tsx        # Cotizador y flujo de reserva en 4 pasos con cálculo en tiempo real
 │   ├── package.json
 │   └── vite.config.ts
 ├── frontend-evolvingsolutions/     # Frontend 3: Evolving Solutions LLC (React 19 + Vite 8 + Tailwind v4 - Puerto 5175)
@@ -188,13 +210,25 @@ LaundryGo/
 - **Tecnología**: React 19, Vite 8, TypeScript, Tailwind CSS v4.
 - **Puerto Local**: `5173`.
 - **Estética**: Azules vivos (`--color-brand-600: #2563eb`) y grises Slate con Glassmorphism.
+- **Efecto Visual de Fondo (Agua Reactiva)**: Corriente dinámica de agua en la parte baja con oleaje animado SVG que se eleva suavemente conforme el usuario desciende en la página (alcanzando hasta un 86vh en el footer). En la página de agendamiento (`/schedule`), el nivel del agua asciende automáticamente en sincronía con el avance de los 4 pasos del pedido. El diseño integra el cuerpo del agua con el mismo gradiente de las olas sin bordes rectos artificiales.
+- **SEO & Prerenderizado Estático (SSG)**: Componente dinámico `<SEO>` que sincroniza `title`, `meta description`, canonicals y OpenGraph/Twitter Cards por ruta. Script post-compilación `scripts/prerender.js` que genera archivos estáticos con metadatos y esquemas JSON-LD LocalBusiness para `/`, `/about`, `/schedule` y `/login`.
 
 ### Frontend 2: GoPropertyCare (`/frontend-gopropertycare`)
 - **Tecnología**: React 19, Vite 8, TypeScript, Tailwind CSS v4.
 - **Puerto Local**: `5174`.
 - **Logotipo**: Casa verde con escoba, cubeta con espuma y toallas plegadas (`public/logo.png`).
 - **Estética**: Blanco y verdes bosque/esmeralda (`--color-brand-*` desde `#f0fdf4` hasta `#052e16`).
-- **Enfoque**: Limpieza residencial personalizada (*Standard Cleaning* y *Move-In / Move-Out*) y preparación de alojamientos turísticos (*Short-Term Rental Turnover* para Airbnb y VRBO). Dispone de páginas separadas para presentación corporativa (`/about`) y desglose de servicios habitación por habitación con checklists e imágenes (`/services`). Sistema de reservas en 4 pasos con cálculo transparente en tiempo real y soporte para prerenderizado estático (SSG) de rutas clave.
+- **Efecto Visual de Fondo (Partículas Ambientales)**: Sistema de partículas sutiles flotantes que imitan micro-partículas de polvo en tonos verdes esmeralda acordes a la paleta, aportando dinamismo visual sin sobrecargar el rendimiento.
+- **Enfoque de Negocio y Páginas Clave**:
+  - *Home (`/`)*: Portada orientada a la confianza y la propuesta de valor sin exponer tecnicismos ni tasas por pie cuadrado. Destaca los 3 servicios principales, garantías de personal asegurado y testimonios.
+  - *Página de Servicios (`/services`)*: Desglose habitación por habitación con checklists rigurosos para Cocina, Baños, Dormitorios y Áreas Comunes para Standard Cleaning, Move-In/Move-Out y Short-Term Rental Turnover, con soporte de fotografías optimizadas y fallback visual SVG.
+  - *Página Corporativa (`/about`)*: Historia y estándares de GoPropertyCare, política de personal 100% asegurado, suministros amigables con mascotas y niños, y áreas de atención metropolitana.
+  - *Flujo de Cotización y Reserva en 4 Pasos (`/schedule`)*:
+    - **Paso 1 (Servicio y Dimensiones)**: Selección entre *Standard Cleaning*, *Deep / Move-In / Move-Out* o *Short-Term Rental Turnover*. Para residenciales, selección de metraje mediante menú desplegable de 18 niveles transparentes ($155 a $480 standard; $235 a $890 deep; captura de cotización a medida para > 6,100 sq ft). Para alquileres temporales (STR), configurador inteligente por habitaciones (Studio a 5 Habs de $90 a $330) y baños con lavado de blancos en unidad incluido ($0.00) o add-on de lavandería externa off-site escalado. Selección de frecuencia con descuentos transparentes.
+    - **Paso 2 (Fecha y Hora)**: Calendario interactivo con regla de agendamiento para el mismo día (si se reserva antes de las 12:00 PM con margen de 3 horas) y selector de hora exacta de llegada.
+    - **Paso 3 (Ubicación, Acceso y Add-ons)**: Captura de dirección mediante inputs de texto limpios, método de acceso (alguien en casa, teclado, lockbox, etc.) y selección de extras (horno, refrigerador, persianas, ventanas, mascotas, jacuzzi, patio/parrilla).
+    - **Paso 4 (Revisión y Confirmación)**: Resumen íntegro y despacho de reserva validado contra el backend.
+- **SEO & SSG**: Generación estática post-compilación en `scripts/prerender.js` para 5 rutas clave (`/`, `/about`, `/services`, `/schedule`, `/login`) con `sitemap.xml` y `robots.txt`.
 
 ### Frontend 3: Evolving Solutions LLC (`/frontend-evolvingsolutions`)
 - **Tecnología**: React 19, Vite 8, TypeScript, Tailwind CSS v4.
@@ -212,9 +246,18 @@ LaundryGo/
    - **Zona Outer (Recargo - $25.00)**: Aurora, Thornton, Centennial, Highlands Ranch.
 2. **Reglas Específicas de GoPropertyCare**:
    - **Mismo Día con Cutoff de 12:00 PM**: Reservas para el mismo día disponibles únicamente si se efectúan antes de las 12:00 PM local y seleccionando una hora con al menos 3 horas de margen respecto a la hora actual. A partir de las 12:00 PM, las reservas se habilitan a partir de mañana.
-   - **Precios Escalonados Upfront**: 18 niveles para Standard ($155 a $480) y Move-In/Out ($235 a $890); más de 6,100 sq ft activa captura de leads para cotización a medida.
-   - **Rotación STR Escalada por Habitaciones**: Base de $90 (Studio/1 Hab), $135 (2 Habs), $185 (3 Habs), $255 (4 Habs), $330 (5 Habs) con $25 por baño extra. El Add-on de lavandería externa escala a +$45, +$70, +$95, +$120 y +$145 respectivamente.
+   - **Precios Escalonados Upfront (Residencial)**: 18 niveles para Standard ($155 a $480) y Move-In/Out ($235 a $890). Metrajes superiores a 6,100 sq ft activan el formulario de captura para cotización a medida.
+   - **Rotación STR Unificada (Airbnb / VRBO)**: Basada en el recuento de habitaciones y baños en lugar de metraje, con lavado en la propiedad incluido por defecto ($0.00 extra):
+     - Studio / 1 Hab: $90 (1 baño incluido, recargo off-site $45)
+     - 2 Habs: $135 (2 baños incluidos, recargo off-site $70)
+     - 3 Habs: $185 (2 baños incluidos, recargo off-site $95)
+     - 4 Habs: $255 (3 baños incluidos, recargo off-site $120)
+     - 5 Habs: $330 (4 baños incluidos, recargo off-site $145)
+     - 6+ Habs o > 3,500 sq ft: Activa cotización personalizada a medida.
+     - Baños adicionales excedentes: +$25.00 por cada baño por encima del cupo incluido.
+     - Add-on de lavandería externa (Off-Site): Escala según las habitaciones de la propiedad para anfitriones sin lavadora/secadora propia o requerimiento de retiro y reposición externa.
    - **Descuentos por Frecuencia Recurrente**: 20% semanal, 15% quincenal (biweekly), 10% mensual y 0% pago único (one-time).
+   - **Gestión Administrativa en Vivo**: El panel Django Unfold permite modificar los precios de los 18 tiers de manera directa en tabla (`list_editable`), impactando de inmediato en el backend y frontend.
 3. **Reglas Específicas de Evolving Solutions LLC**:
    - **Antelación de 24 Horas**: Todas las visitas se agendan con al menos 24 horas de antelación para coordinación de cuadrillas y equipos industriales.
    - **Orden Mínima de Visita**: **$99.00**. Si $\text{sqft} \times \text{tarifa} < \$99.00$, se cobra el piso de $99.00.
