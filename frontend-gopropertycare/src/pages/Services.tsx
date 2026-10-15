@@ -14,6 +14,8 @@ import {
   Layers,
   CheckCircle2,
   Phone,
+  HelpCircle,
+  ChevronDown,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -53,6 +55,46 @@ function ImageWithFallback({
   );
 }
 
+function MiniFAQ({ items }: { items: { q: string; a: string }[] }) {
+  const { t } = useTranslation();
+  if (!items || items.length === 0) return null;
+
+  return (
+    <div className="pt-4 border-t border-slate-200/80 space-y-2.5">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+          <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+          <span>{t('faq.miniFaq.title', 'Quick Questions')}</span>
+        </h4>
+        <Link
+          to="/faq"
+          className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1 transition-colors"
+        >
+          <span>{t('faq.miniFaq.viewFullFaq', 'View Full FAQ')}</span>
+          <ArrowRight className="w-3 h-3" />
+        </Link>
+      </div>
+
+      <div className="space-y-2">
+        {items.map((item, idx) => (
+          <details
+            key={idx}
+            className="group rounded-xl border border-slate-200/90 bg-white/90 p-2.5 transition-all open:border-emerald-300 open:bg-emerald-50/20"
+          >
+            <summary className="flex items-center justify-between gap-2 cursor-pointer list-none font-bold text-xs text-slate-900 select-none">
+              <span>{item.q}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-open:rotate-180 transition-transform shrink-0" />
+            </summary>
+            <p className="mt-2 text-xs text-slate-600 leading-relaxed font-medium pl-0.5 border-t border-emerald-100/50 pt-1.5">
+              {item.a}
+            </p>
+          </details>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Services() {
   const { t } = useTranslation();
 
@@ -72,6 +114,11 @@ export function Services() {
   const strBathrooms = (t('about.servicesIncluded.str_turnover.bathrooms', { returnObjects: true }) as string[]) || [];
   const strKitchen = (t('about.servicesIncluded.str_turnover.kitchen', { returnObjects: true }) as string[]) || [];
   const strLiving = (t('about.servicesIncluded.str_turnover.living', { returnObjects: true }) as string[]) || [];
+
+  const standardMiniFaq = (t('faq.miniFaq.standard', { returnObjects: true }) as { q: string; a: string }[]) || [];
+  const deepMiniFaq = (t('faq.miniFaq.deep', { returnObjects: true }) as { q: string; a: string }[]) || [];
+  const moveInMiniFaq = (t('faq.miniFaq.move_in_out', { returnObjects: true }) as { q: string; a: string }[]) || [];
+  const strMiniFaq = (t('faq.miniFaq.str_turnover', { returnObjects: true }) as { q: string; a: string }[]) || [];
 
   return (
     <div className="flex flex-col gap-10 sm:gap-14 py-4 sm:py-6 max-w-6xl mx-auto">
@@ -199,6 +246,8 @@ export function Services() {
                 </div>
               </div>
 
+              <MiniFAQ items={standardMiniFaq} />
+
               <div className="pt-2 flex justify-end">
                 <Link to="/schedule?tier=residential">
                   <Button size="md" className="font-extrabold shadow-sm hover:scale-102 transition-transform">
@@ -251,6 +300,8 @@ export function Services() {
                   ))}
                 </ul>
               </div>
+
+              <MiniFAQ items={deepMiniFaq} />
 
               <div className="pt-2 flex justify-end">
                 <Link to="/schedule?tier=deep">
@@ -356,6 +407,8 @@ export function Services() {
                 </div>
               </div>
 
+              <MiniFAQ items={moveInMiniFaq} />
+
               <div className="pt-2 flex justify-end">
                 <Link to="/schedule?tier=move_in_out">
                   <Button size="md" className="font-extrabold shadow-sm hover:scale-102 transition-transform">
@@ -459,6 +512,8 @@ export function Services() {
                   </ul>
                 </div>
               </div>
+
+              <MiniFAQ items={strMiniFaq} />
 
               {/* Custom Note Callout from Document */}
               <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-emerald-950 text-xs font-semibold flex items-center gap-2">

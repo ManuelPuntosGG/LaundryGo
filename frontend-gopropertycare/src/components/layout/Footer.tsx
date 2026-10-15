@@ -96,6 +96,11 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/faq" className="text-slate-600 hover:text-emerald-700 font-semibold transition-colors">
+                    {t('nav.faq', 'FAQ')}
+                  </Link>
+                </li>
+                <li>
                   <Link to="/schedule" className="text-slate-600 hover:text-emerald-700 font-semibold transition-colors">
                     {t('nav.schedule')}
                   </Link>

@@ -211,6 +211,55 @@ const routes = [
       </main>
     `,
   },
+  {
+    path: '/faq',
+    title: 'Frequently Asked Questions — GoPropertyCare Denver & Boulder',
+    description: 'Find answers about residential, commercial, and Airbnb cleaning services, pricing, insurance, supplies, policies, and 100% satisfaction guarantee.',
+    canonical: 'https://gopropertycare.com/faq',
+    heading: 'Frequently Asked Questions',
+    subheading: 'Everything you need to know about our cleaning and property care services in Denver & Boulder.',
+    contentHtml: `
+      <main class="w-full max-w-4xl mx-auto px-4 py-8">
+        <header class="text-center space-y-3 mb-8">
+          <span class="inline-block px-4 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider">Help &amp; Information Center</span>
+          <h1 class="text-3xl sm:text-4xl font-black text-slate-900">Frequently Asked Questions</h1>
+          <p class="text-sm sm:text-base text-slate-600">Everything you need to know about our residential, turnover, and commercial cleaning services across Denver and Boulder.</p>
+        </header>
+        <section class="space-y-6">
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h2 class="text-xl font-bold text-slate-900 mb-3">General Questions</h2>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">What areas do you serve?</p>
+            <p class="text-xs text-slate-500 mb-4">We proudly serve Denver, Englewood, Wheat Ridge, Arvada, Westminster, Thornton, Broomfield, Boulder, Aurora, Centennial, Castle Rock, and Highlands Ranch.</p>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">Are you insured?</p>
+            <p class="text-xs text-slate-500 mb-4">Yes, GoPropertyCare is fully insured. Your property and peace of mind are completely protected.</p>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">Do you offer a satisfaction guarantee?</p>
+            <p class="text-xs text-slate-500">If something was missed, let us know within 6 hours and our team will return to fix it at no extra charge.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h2 class="text-xl font-bold text-slate-900 mb-3">Residential Cleaning Questions</h2>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">How much does residential cleaning cost?</p>
+            <p class="text-xs text-slate-500 mb-4">Transparent upfront pricing is calculated instantly on our website by square footage or bedroom/bathroom count.</p>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">Do I need to be home?</p>
+            <p class="text-xs text-slate-500">No. Leave access instructions (lockbox, keypad, front desk) and our insured team takes care of the rest.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h2 class="text-xl font-bold text-slate-900 mb-3">Commercial Cleaning Questions</h2>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">How does commercial pricing work?</p>
+            <p class="text-xs text-slate-500 mb-4">We provide custom quotes after a quick 15-minute walkthrough, delivered same-day.</p>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">Can you clean outside business hours?</p>
+            <p class="text-xs text-slate-500">Yes: evenings, early mornings, weekends, or holidays to never disrupt your operations.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h2 class="text-xl font-bold text-slate-900 mb-3">Payments and Policies</h2>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">What is your cancellation policy?</p>
+            <p class="text-xs text-slate-500 mb-4">Cancel or reschedule at no cost up to 24 hours prior to your scheduled service date.</p>
+            <p class="text-sm text-slate-600 mb-2 font-semibold">How can I contact you?</p>
+            <p class="text-xs text-slate-500">Call or text (720) 590-8632 or email info@gopropertycare.com (24/7 availability).</p>
+          </div>
+        </section>
+      </main>
+    `,
+  },
 ];
 
 console.log('[prerender] Starting marketing pages prerendering for GoPropertyCare...');

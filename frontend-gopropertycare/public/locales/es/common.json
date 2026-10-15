@@ -11,6 +11,7 @@
     "home": "Inicio",
     "services": "Servicios",
     "about": "Nosotros",
+    "faq": "FAQ",
     "schedule": "Agendar Servicio",
     "login": "Iniciar Sesión",
     "register": "Registrarse",
@@ -684,6 +685,270 @@
     "contactArea": "Contacto y Cobertura",
     "rights": "Todos los derechos reservados.",
     "localNote": "Denver, Colorado y Áreas Vecinas"
+  },
+  "faq": {
+    "badge": "Centro de Ayuda e Información",
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Todo lo que necesitas saber sobre nuestros servicios de limpieza residencial, rotación de propiedades y cuidado comercial en Denver y Boulder.",
+    "searchPlaceholder": "Buscar preguntas, servicios o políticas...",
+    "clearSearch": "Limpiar búsqueda",
+    "resultsFound": "{{count}} preguntas encontradas",
+    "noResults": "No se encontraron preguntas para",
+    "noResultsSuggestion": "Intenta buscar palabras clave como \"depósito\", \"suministros\", \"seguro\" o \"mascotas\".",
+    "viewAll": "Ver todas las preguntas",
+    "expandAll": "Expandir Todo",
+    "collapseAll": "Contraer Todo",
+    "jumpMenuTitle": "Explorar por categoría",
+    "categories": {
+      "all": "Todas las Preguntas",
+      "general": "Preguntas Generales",
+      "residential": "Limpieza Residencial",
+      "commercial": "Limpieza Comercial",
+      "policies": "Pagos y Políticas"
+    },
+    "items": {
+      "general": [
+        {
+          "q": "¿Qué áreas atienden?",
+          "a": "Atendemos con orgullo toda el área metropolitana de Denver y Boulder, incluyendo Denver, Englewood, Wheat Ridge, Arvada, Westminster, Thornton, Broomfield, Aurora, Centennial, Castle Rock y Highlands Ranch."
+        },
+        {
+          "q": "¿Limpian tanto hogares como negocios?",
+          "a": "Sí. Ofrecemos limpieza residencial integral (estándar, profunda, mudanzas y turnovers para alquileres temporales) y limpieza comercial (oficinas, HOAs y complejos de edificios, instalaciones médicas/dentales y locales comerciales)."
+        },
+        {
+          "q": "¿Están asegurados?",
+          "a": "Sí, GoPropertyCare cuenta con cobertura total de seguros. Tu propiedad, pertenencias y tranquilidad están 100% protegidas en cada visita."
+        },
+        {
+          "q": "¿Quién limpiará mi propiedad?",
+          "a": "Un equipo capacitado, verificado y con verificación de antecedentes de GoPropertyCare. Nunca subcontratamos nuestro personal de limpieza."
+        },
+        {
+          "q": "¿Traen sus propios suministros y equipos?",
+          "a": "Sí, llegamos totalmente equipados con herramientas profesionales, aspiradoras con filtro HEPA, paños de microfibra limpios y productos de limpieza de alta calidad. Si prefieres que usemos productos de tu elección, solo indícalo al reservar."
+        },
+        {
+          "q": "¿Utilizan productos ecológicos y seguros para mascotas?",
+          "a": "Sí. Nuestros productos principales son seguros para niños, familias y mascotas, a la vez que son sumamente efectivos contra la grasa y la suciedad."
+        },
+        {
+          "q": "¿Ofrecen garantía de satisfacción?",
+          "a": "¡Absolutamente! Si algo no quedó perfecto o se omitió algún detalle, avísanos dentro de las 6 horas posteriores a la finalización y nuestro equipo regresará a corregirlo sin costo adicional."
+        },
+        {
+          "q": "¿Cómo puedo contactarlos?",
+          "a": "Puedes comunicarte con nuestro equipo las 24 horas del día, los 7 días de la semana, por teléfono o mensaje al (720) 590-8632, o por correo electrónico a info@gopropertycare.com."
+        }
+      ],
+      "residential": [
+        {
+          "q": "¿Cuánto cuesta la limpieza residencial?",
+          "a": "Ves tu precio exacto al instante en nuestro sitio web. Simplemente selecciona tu servicio, ingresa el tamaño de tu propiedad, habitaciones y baños, y obtén el total transparente antes de pagar. Sin esperas de cotización."
+        },
+        {
+          "q": "¿Cómo reservo y pago?",
+          "a": "Reservar toma menos de 60 segundos en línea: elige tu servicio, selecciona la fecha y franja horaria de tu preferencia y paga de forma segura por internet."
+        },
+        {
+          "q": "¿Cuál es la diferencia entre limpieza estándar y profunda?",
+          "a": "La limpieza estándar mantiene tu hogar fresco y ordenado de forma periódica (desempolvado, aspirado, trapeado, superficies y retiro de basura). La limpieza profunda abarca el trabajo detallado que las visitas regulares no incluyen: rodapiés, marcos de puertas, interior de microondas, exteriores minuciosos de electrodomésticos y suciedad acumulada."
+        },
+        {
+          "q": "¿Con qué frecuencia debo programar mi limpieza?",
+          "a": "Ofrecemos frecuencias semanal (20% de descuento), quincenal (15% de descuento) y mensual (10% de descuento), además de citas únicas. Elige la que mejor se adapte a tu hogar y presupuesto, y cámbiala cuando desees."
+        },
+        {
+          "q": "¿Necesito estar en casa durante la limpieza?",
+          "a": "No. La mayoría de los clientes dejan instrucciones de acceso al reservar (código de caja de llaves, código de cerradura inteligente, portería o dejando una llave). Nuestro equipo asegura la propiedad al salir."
+        },
+        {
+          "q": "¿Cómo debo prepararme para la limpieza?",
+          "a": "Por favor recoge artículos personales, ropa y juguetes de pisos y mesadas, asegura objetos de valor y documentos confidenciales, e infórmanos sobre áreas prioritarias, mascotas o accesos al reservar."
+        },
+        {
+          "q": "¿Limpian hogares con mascotas?",
+          "a": "¡Sí, nos encantan las mascotas! Infórmanos sobre tus mascotas al agendar y mantenlas en una habitación cómoda y segura durante la visita para que estén tranquilas mientras trabajamos."
+        },
+        {
+          "q": "¿Cuánto tiempo tomará la limpieza?",
+          "a": "Depende del tamaño y las condiciones iniciales de tu hogar, así como del servicio elegido. Si las condiciones escapan al alcance estándar, te lo comunicaremos durante la primera hora de estar en tu propiedad."
+        },
+        {
+          "q": "¿Una limpieza de mudanza me garantizará recuperar mi depósito de seguridad?",
+          "a": "Limpiamos bajo listas de verificación profesionales de mudanza (incluyendo el interior de gabinetes y cajones). Sin embargo, las decisiones finales sobre depósitos corresponden a tu arrendador, por lo que no podemos garantizar legalmente un reembolso."
+        },
+        {
+          "q": "¿Limpian alquileres temporales entre huéspedes?",
+          "a": "Sí. Nos especializamos en rotaciones de Airbnb y VRBO: disponibilidad el mismo día, preparación 5 estrellas, servicio de lavandería dentro o fuera de la propiedad, reposición de suministros y confirmación fotográfica."
+        },
+        {
+          "q": "¿Ofrecen servicios adicionales?",
+          "a": "¡Sí! Puedes agregar limpieza interior de horno, interior de refrigerador, ventanas interiores, persianas, lavandería fuera de la propiedad, tratamiento de pelos de mascotas y limpieza de patios/balcones."
+        },
+        {
+          "q": "¿Ofrecen descuentos por servicio recurrente?",
+          "a": "Sí: ahorra 20% en servicio semanal, 15% en quincenal y 10% en mensual. El descuento se aplica automáticamente en el cotizador."
+        },
+        {
+          "q": "¿Debo dejar propina?",
+          "a": "Las propinas nunca son obligatorias pero siempre son profundamente apreciadas por nuestro equipo de limpieza. El 100% de las propinas va directamente a los especialistas que atendieron tu hogar."
+        }
+      ],
+      "commercial": [
+        {
+          "q": "¿Cómo funciona la cotización comercial?",
+          "a": "Cada espacio comercial es diferente. Elaboramos una cotización personalizada y transparente tras un breve recorrido. El precio depende de los pies cuadrados, el tipo de instalación, la frecuencia requerida y el alcance del trabajo."
+        },
+        {
+          "q": "¿Qué es un recorrido o walkthrough?",
+          "a": "Una breve visita presencial de 15 minutos donde conocemos tu espacio, conversamos sobre tus necesidades, horarios y prioridades, y te enviamos una propuesta escrita formal en el mismo día."
+        },
+        {
+          "q": "¿Cómo solicito un walkthrough?",
+          "a": "Completando el formulario en nuestro sitio web, llamando o enviando un mensaje al (720) 590-8632, o escribiendo a info@gopropertycare.com."
+        },
+        {
+          "q": "¿Qué tan pronto puede comenzar el servicio después del recorrido?",
+          "a": "En la fecha que prefieras, típicamente dentro de las 24 a 48 horas posteriores a la aprobación de la propuesta."
+        },
+        {
+          "q": "¿Tengo que firmar un contrato a largo plazo?",
+          "a": "Trabajamos con acuerdos mes a mes flexibles con un aviso previo de cancelación de 30 días. Sin ataduras ni contratos forzosos a largo plazo."
+        },
+        {
+          "q": "¿Pueden limpiar fuera del horario laboral?",
+          "a": "Sí. Nos adaptamos a los horarios de tu negocio: tardes, noches, madrugadas, fines de semana o feriados, para no interrumpir tus operaciones diarias."
+        },
+        {
+          "q": "¿Qué tipos de propiedades comerciales limpian?",
+          "a": "Oficinas corporativas, tiendas y boutiques, áreas comunes y casas club de HOAs, complejos residenciales multifamiliares, gimnasios y centros médicos/dentales."
+        },
+        {
+          "q": "¿Limpian consultorios médicos y dentales?",
+          "a": "Sí. Nuestro equipo está capacitado en protocolos contra patógenos transmitidos por la sangre y utiliza desinfectantes de grado hospitalario aprobados por la EPA con paños diferenciados por color para evitar contaminación cruzada."
+        },
+        {
+          "q": "¿Quién será mi punto de contacto?",
+          "a": "Se te asignará un Gerente de Cuenta dedicado de GoPropertyCare como contacto único, disponible 24/7 para ajustes, solicitudes o consultas."
+        },
+        {
+          "q": "¿Cómo aseguran que el trabajo se mantenga con calidad constante?",
+          "a": "Seguimos listas de verificación estrictas, realizamos auditorías de supervisión presencial y enviamos reportes fotográficos con fecha y hora después de cada visita."
+        },
+        {
+          "q": "¿Podemos cambiar el alcance o la frecuencia después? ¿Trabajan con juntas de HOA?",
+          "a": "Sí, el alcance y la frecuencia se pueden modificar en cualquier momento con al menos 15 días de preaviso. También trabajamos directamente con administradores de propiedades y juntas de HOA, proporcionando contratos claros, calendarios fijos y reportes detallados."
+        }
+      ],
+      "policies": [
+        {
+          "q": "¿Qué métodos de pago aceptan?",
+          "a": "Para reservas residenciales aceptamos todas las tarjetas de crédito y débito principales (Visa, MasterCard, American Express, Discover) y billeteras digitales (Apple Pay, Google Pay). Para cuentas comerciales recurrentes aceptamos transferencias ACH y facturación corporativa."
+        },
+        {
+          "q": "¿Cuándo se me cobra el servicio?",
+          "a": "Las limpiezas residenciales se cobran o autorizan al momento de la reserva online. Las cuentas comerciales recurrentes se facturan quincenal o mensualmente."
+        },
+        {
+          "q": "¿Mi información de pago está segura?",
+          "a": "Sí. Todos los pagos se procesan de manera segura a través de Stripe con encriptación de 256 bits de extremo a extremo. Nunca almacenamos los datos de tus tarjetas en nuestros servidores."
+        },
+        {
+          "q": "¿Cuál es su política de cancelación y reprogramación?",
+          "a": "Puedes cancelar o reprogramar sin costo alguno hasta con 24 horas de anticipación a la fecha y franja horaria programada."
+        },
+        {
+          "q": "¿Qué sucede si no hay nadie en casa o el equipo no puede ingresar?",
+          "a": "Si nuestro equipo llega y no puede acceder a la propiedad (bloqueo/lockout) o no se proporcionó método de entrada, se cobra el 100% del servicio para compensar el tiempo reservado del personal y costos de traslado, salvo emergencias comprobables."
+        },
+        {
+          "q": "¿Cuál es su política de reembolso?",
+          "a": "No realizamos reembolsos monetarios. En su lugar, respaldamos cada servicio con nuestra Garantía de Satisfacción 100%: si algo no quedó perfecto, notifícalo dentro de las 6 horas y regresaremos a corregirlo sin costo."
+        },
+        {
+          "q": "¿Qué hago si no quedo conforme con la limpieza?",
+          "a": "Para limpiezas residenciales, infórmanos dentro de las 6 horas posteriores a la finalización del trabajo. Evaluaremos tus comentarios y enviaremos a nuestro personal a solucionar los puntos observados de inmediato."
+        },
+        {
+          "q": "¿Qué ocurre si algo se daña accidentalmente?",
+          "a": "GoPropertyCare cuenta con seguro integral. Contáctanos lo antes posible con fotos (dentro de las 24 horas posteriores al trabajo realizado), y nuestra gerencia lo revisará y resolverá oportunamente."
+        },
+        {
+          "q": "¿Qué sucede en caso de mal tiempo?",
+          "a": "El clima de Colorado puede ser impredecible. Si condiciones de nieve severa o carreteras peligrosas impiden llegar a tiempo, te avisaremos con anticipación para coordinar una reprogramación prioritaria inmediata."
+        }
+      ]
+    },
+    "miniFaq": {
+      "title": "Preguntas Rápidas",
+      "viewFullFaq": "¿Tienes más dudas? Consulta nuestra sección completa de FAQ",
+      "standard": [
+        {
+          "q": "¿Qué incluye una limpieza estándar?",
+          "a": "Limpiamos cocinas, baños, dormitorios y salas de estar: desempolvado, aspirado, trapeado, desinfección de superficies y retiro de basura."
+        },
+        {
+          "q": "¿Con qué frecuencia debo programarla?",
+          "a": "Semanal, quincenal o mensual. Elige la frecuencia que mejor se adapte a tu hogar y presupuesto; puedes modificarla cuando quieras."
+        },
+        {
+          "q": "¿Necesito estar en casa?",
+          "a": "No. Puedes dejar instrucciones de acceso (caja de llaves, código de puerta o conserjería) y nuestro equipo asegurado se encarga del resto."
+        }
+      ],
+      "deep": [
+        {
+          "q": "¿Cuál es la diferencia entre limpieza estándar y profunda?",
+          "a": "La limpieza profunda abarca el trabajo minucioso que una visita regular pasa por alto: rodapiés, interior del microondas, frentes detallados de electrodomésticos y suciedad acumulada."
+        },
+        {
+          "q": "¿Cuánto tiempo toma?",
+          "a": "Depende del tamaño y estado de tu hogar. Si las condiciones escapan al alcance previsto, te lo comunicaremos dentro de la primera hora en tu propiedad."
+        },
+        {
+          "q": "¿Cuándo debería programar una?",
+          "a": "Antes de iniciar un servicio recurrente, en cambios de estación o antes y después de recibir invitados y eventos."
+        }
+      ],
+      "move_in_out": [
+        {
+          "q": "¿Esto me ayudará a recuperar mi depósito de seguridad?",
+          "a": "Limpiamos bajo los estándares rigurosos de mudanza para entrega, aunque la decisión final del depósito corresponde al propietario o arrendador."
+        },
+        {
+          "q": "¿La casa debe estar vacía?",
+          "a": "La limpieza es mucho más rápida y profunda cuando la vivienda está desocupada y las pertenencias ya han sido embaladas."
+        },
+        {
+          "q": "¿Están incluidos los interiores de gabinetes y electrodomésticos?",
+          "a": "¡Los interiores de gabinetes y cajones sí están incluidos! El interior de refrigerador y horno se pueden añadir fácilmente como servicios extra."
+        }
+      ],
+      "str_turnover": [
+        {
+          "q": "¿Pueden limpiar entre huéspedes el mismo día?",
+          "a": "¡Sí, absolutamente! Nos especializamos en rotaciones rápidas el mismo día entre la salida de la mañana y la llegada de la tarde."
+        },
+        {
+          "q": "¿Se encargan de sábanas, toallas y reposición?",
+          "a": "Sí: lavado dentro o fuera de la propiedad, tendido de camas con presentación de hotel y reposición de insumos para los huéspedes."
+        },
+        {
+          "q": "¿Sabré cuándo ha terminado la limpieza?",
+          "a": "Sí. Te notificamos vía mensaje al instante con confirmación fotográfica en cuanto tu propiedad esté 100% lista para los próximos huéspedes."
+        }
+      ]
+    },
+    "supportCard": {
+      "badge": "Soporte Dedicado 24/7",
+      "title": "¿Aún tienes preguntas sobre nuestros servicios?",
+      "subtitle": "Nuestros especialistas en cuidado de propiedades en Denver y Boulder están disponibles las 24 horas, los 7 días de la semana.",
+      "callUs": "Llamar o SMS: (720) 590-8632",
+      "emailUs": "Escribir a info@gopropertycare.com",
+      "bookOnline": "Reservar Servicio Residencial",
+      "requestWalkthrough": "Recorrido Comercial"
+    }
   },
   "common": {
     "loading": "Cargando...",

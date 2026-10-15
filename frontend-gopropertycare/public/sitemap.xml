@@ -38,6 +38,15 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://gopropertycare.com/faq</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gopropertycare.com/faq" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://gopropertycare.com/faq?lng=es" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gopropertycare.com/faq" />
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://gopropertycare.com/login</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://gopropertycare.com/login" />
     <xhtml:link rel="alternate" hreflang="es" href="https://gopropertycare.com/login?lng=es" />

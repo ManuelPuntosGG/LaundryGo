@@ -11,6 +11,7 @@
     "home": "Home",
     "services": "Services",
     "about": "About Us",
+    "faq": "FAQ",
     "schedule": "Book Service",
     "login": "Login",
     "register": "Register",
@@ -684,6 +685,270 @@
     "contactArea": "Contact & Service Area",
     "rights": "All rights reserved.",
     "localNote": "Denver, Colorado & Surrounding Areas"
+  },
+  "faq": {
+    "badge": "Help & Information Center",
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about our residential, turnover, and commercial cleaning services across Denver and Boulder.",
+    "searchPlaceholder": "Search questions, services, or policies...",
+    "clearSearch": "Clear search",
+    "resultsFound": "{{count}} questions found",
+    "noResults": "No questions matched your search for",
+    "noResultsSuggestion": "Try searching for terms like \"supplies\", \"deposit\", \"insurance\", or \"pets\".",
+    "viewAll": "View all questions",
+    "expandAll": "Expand All",
+    "collapseAll": "Collapse All",
+    "jumpMenuTitle": "Browse by category",
+    "categories": {
+      "all": "All Questions",
+      "general": "General Questions",
+      "residential": "Residential Cleaning",
+      "commercial": "Commercial Cleaning",
+      "policies": "Payments & Policies"
+    },
+    "items": {
+      "general": [
+        {
+          "q": "What areas do you serve?",
+          "a": "We proudly serve the entire Denver metropolitan area and surrounding communities, including Denver, Englewood, Wheat Ridge, Arvada, Westminster, Thornton, Broomfield, Boulder, Aurora, Centennial, Castle Rock, and Highlands Ranch."
+        },
+        {
+          "q": "Do you clean both homes and businesses?",
+          "a": "Yes. We offer comprehensive residential cleaning (standard, deep, move-in/move-out, and short-term rental turnovers) and commercial cleaning (offices, HOAs, multi-unit building complexes, medical and dental facilities, and retail businesses)."
+        },
+        {
+          "q": "Are you insured?",
+          "a": "Yes, GoPropertyCare is fully insured. Your property, furnishings, and peace of mind are completely protected on every visit."
+        },
+        {
+          "q": "Who will be cleaning my property?",
+          "a": "A trained, vetted, and background-checked GoPropertyCare team. We never subcontract our cleaning staff to third parties."
+        },
+        {
+          "q": "Do you bring your own supplies and equipment?",
+          "a": "Yes, we arrive fully equipped with professional tools, HEPA filtration vacuums, fresh microfiber cloths, and commercial-grade cleaning products. If you prefer that we use specific products of your own, just let us know when booking."
+        },
+        {
+          "q": "Do you use eco-friendly or pet-safe products?",
+          "a": "Yes. Our core cleaning solutions are selected to be safe for children, families, and pets while remaining tough on grease and grime."
+        },
+        {
+          "q": "Do you offer a satisfaction guarantee?",
+          "a": "Yes! If something was missed or not up to standard, notify us within 6 hours of job completion and our team will promptly return to reclean the area at no additional charge."
+        },
+        {
+          "q": "How can I contact you?",
+          "a": "You can reach our team 24/7 by phone or text at (720) 590-8632, or by email at info@gopropertycare.com."
+        }
+      ],
+      "residential": [
+        {
+          "q": "How much does residential cleaning cost?",
+          "a": "You see your exact price instantly on our website. Simply select your service, enter your home size, bedrooms, and bathrooms, and receive your transparent upfront total before booking. No waiting for a quote."
+        },
+        {
+          "q": "How do I book and pay?",
+          "a": "Booking takes less than 60 seconds online: choose your service, pick your desired date and time slot, enter your property details, and pay securely online."
+        },
+        {
+          "q": "What's the difference between standard and deep cleaning?",
+          "a": "A standard cleaning keeps your home consistently fresh on a recurring schedule (dusting, vacuuming, mopping, surfaces, and trash). A deep clean covers the extra detail work regular visits skip, such as baseboards, door frames, inside microwave, detailed appliance exteriors, and scrubbing built-up grime."
+        },
+        {
+          "q": "How often should I schedule my cleaning?",
+          "a": "We offer Weekly (20% discount), Biweekly (15% discount), and Monthly (10% discount) recurring options, as well as one-time bookings. Pick the frequency that fits your household and budget, and adjust anytime."
+        },
+        {
+          "q": "Do I need to be home during the cleaning?",
+          "a": "No. Most clients provide entry instructions during checkout, such as a lockbox code, smart lock keypad code, concierge access, or leaving a key. Our team locks up securely when finished."
+        },
+        {
+          "q": "How should I prepare for my cleaning?",
+          "a": "Please pick up personal items, clothing, and toys from floors and counters, secure sensitive valuables, and let us know about any priority focus areas, pets, or entry instructions when booking."
+        },
+        {
+          "q": "Do you clean homes with pets?",
+          "a": "Yes, we are pet-friendly! Please let us know about your pets when you book, and keep them in a comfortable, secure room during the cleaning visit so they stay calm and safe."
+        },
+        {
+          "q": "How long will my cleaning take?",
+          "a": "It depends on the size and initial condition of your home and the chosen service. If conditions are out of scope upon arrival, we communicate this with you within the first hour of being at your property."
+        },
+        {
+          "q": "Will a move-out cleaning get my security deposit back?",
+          "a": "We clean strictly to rigorous property manager move-out checklists (including inside cabinets and drawers). However, final deposit refund decisions belong solely to your landlord or property management company, so we cannot guarantee a refund."
+        },
+        {
+          "q": "Do you clean short term rentals between guests?",
+          "a": "Yes. We specialize in Airbnb and VRBO turnovers, including same-day availability, unit staging, on-site or off-site laundry services, restocking supplies, and photo confirmation upon completion."
+        },
+        {
+          "q": "Do you offer add-on services?",
+          "a": "Yes! We offer oven interior detailing, refrigerator interior cleaning, interior window cleaning, blinds detailing, off-site laundry turnover, pet hair detailing, and patio/balcony cleaning."
+        },
+        {
+          "q": "Do you offer discounts for recurring service?",
+          "a": "Yes, we offer recurring savings: 20% off for Weekly cleaning, 15% off for Biweekly cleaning, and 10% off for Monthly cleaning, applied automatically at checkout."
+        },
+        {
+          "q": "Do I need to tip?",
+          "a": "Tips are never required, but always greatly appreciated by our hardworking cleaning crews. 100% of tips go directly to the cleaners who serviced your home."
+        }
+      ],
+      "commercial": [
+        {
+          "q": "How does commercial pricing work?",
+          "a": "Every commercial space is unique. We provide a transparent custom quote after a quick walkthrough. Pricing factors in square footage, facility type, cleaning frequency, and specific scope of work."
+        },
+        {
+          "q": "What is a walkthrough?",
+          "a": "A short 15-minute on-site visit where we tour your facility, discuss your operating hours, sanitary standards, and priorities, followed by a formal written quote delivered same-day."
+        },
+        {
+          "q": "How do I request a walkthrough?",
+          "a": "You can fill out the contact form on our website, call or text us at (720) 590-8632, or email info@gopropertycare.com."
+        },
+        {
+          "q": "How soon can service start after the walkthrough?",
+          "a": "Service can begin on your desired date, typically within 24 to 48 hours following proposal approval."
+        },
+        {
+          "q": "Do I have to sign a contract?",
+          "a": "We operate on flexible month-to-month service agreements with a straightforward 30-day cancellation notice. No restrictive long-term commitments required."
+        },
+        {
+          "q": "Can you clean outside business hours?",
+          "a": "Yes. We schedule around your operations, including evenings, early mornings, weekends, and holidays, so your day-to-day business is never disrupted."
+        },
+        {
+          "q": "What types of properties do you clean?",
+          "a": "Corporate offices, retail stores and boutiques, HOA common areas and clubhouses, multi-unit residential communities, fitness centers, and medical/dental practices."
+        },
+        {
+          "q": "Do you clean medical and dental offices?",
+          "a": "Yes. Our team is trained in bloodborne pathogen protocols and uses EPA-registered hospital-grade disinfectants with color-coded microfiber tools to prevent cross-contamination."
+        },
+        {
+          "q": "Who is my point of contact?",
+          "a": "You receive a dedicated GoPropertyCare Account Manager as your single point of contact, available 24/7 for scheduling, adjustments, or questions."
+        },
+        {
+          "q": "How do you make sure the work stays consistent?",
+          "a": "We adhere to strict operational checklists, conduct on-site supervisor quality audits, and provide timestamped photo completion reports after every visit."
+        },
+        {
+          "q": "Can we change the scope or frequency later? Can you work with HOA boards?",
+          "a": "Yes, scope or frequency can be adjusted at any time with at least 15 days notice. We also work directly with HOA boards and property managers, providing written scopes, consistent schedules, and transparent itemized reports."
+        }
+      ],
+      "policies": [
+        {
+          "q": "What payment methods do you accept?",
+          "a": "For residential bookings, we accept all major debit and credit cards (Visa, MasterCard, American Express, Discover) and digital wallets (Apple Pay, Google Pay). Recurring commercial cleaning accounts are billed via invoice and support ACH bank transfer."
+        },
+        {
+          "q": "When am I charged?",
+          "a": "Residential cleaning bookings are charged or authorized at the time of online scheduling. Recurring commercial accounts are billed on a biweekly or monthly invoicing cycle."
+        },
+        {
+          "q": "Is my payment information secure?",
+          "a": "Yes. Payments are processed securely through Stripe with end-to-end 256-bit encryption. We never store credit card or banking details on our servers."
+        },
+        {
+          "q": "What is your cancellation and rescheduling policy?",
+          "a": "You can cancel or reschedule at no cost up to 24 hours prior to your scheduled service date and arrival window."
+        },
+        {
+          "q": "What happens if no one is home or the team cannot get in?",
+          "a": "If our crew arrives and cannot access the property (lockout) or no entry method is provided, a 100% lockout fee is charged to compensate the crew's reserved time and dispatch costs, unless verifiable emergencies occur."
+        },
+        {
+          "q": "What is your refund policy?",
+          "a": "We do not provide monetary refunds. Instead, we uphold our 100% Satisfaction Guarantee: if any area was missed, notify us within 6 hours of service and our team will return to reclean it at no cost."
+        },
+        {
+          "q": "What if I'm not satisfied with my cleaning?",
+          "a": "For residential cleanings, please let us know within 6 hours after work is performed. We will review your feedback and immediately send a team to fix any missed items."
+        },
+        {
+          "q": "What if something gets damaged?",
+          "a": "GoPropertyCare is fully insured. Contact us as soon as possible with photos (within 24 hours after service is completed), and our management will review and resolve it promptly."
+        },
+        {
+          "q": "What happens in bad weather?",
+          "a": "Colorado weather can be unpredictable. If severe weather or hazardous road conditions prevent our team from arriving on time, we will notify you in advance to coordinate an immediate reschedule."
+        }
+      ]
+    },
+    "miniFaq": {
+      "title": "Quick Questions",
+      "viewFullFaq": "Have more questions? Read our full FAQ directory",
+      "standard": [
+        {
+          "q": "What does a standard cleaning include?",
+          "a": "We clean kitchens, bathrooms, bedrooms, and living areas: dusting, vacuuming, mopping, wiping surfaces, and taking out the trash."
+        },
+        {
+          "q": "How often should I schedule it?",
+          "a": "Weekly, every two weeks, or monthly. Pick the frequency that fits your home and budget, and you can change it anytime."
+        },
+        {
+          "q": "Do I need to be home?",
+          "a": "No. You can leave access instructions (lockbox, keypad, or front desk) and our insured team handles the rest."
+        }
+      ],
+      "deep": [
+        {
+          "q": "What's the difference between standard and deep cleaning?",
+          "a": "A deep clean covers the extra detail work a regular visit skips, such as baseboards, inside microwave, detailed appliance exteriors, and scrubbing built-up grime."
+        },
+        {
+          "q": "How long does it take?",
+          "a": "It depends on the size and condition of your home. If conditions are out of scope, we will communicate with you in the first hour of being at your property."
+        },
+        {
+          "q": "When should I book one?",
+          "a": "Before your first recurring service, at the change of seasons, or before and after hosting guests and events."
+        }
+      ],
+      "move_in_out": [
+        {
+          "q": "Will this help me get my security deposit back?",
+          "a": "We clean to strict move-out checklists, but final deposit decisions belong to your landlord, so we cannot guarantee a refund."
+        },
+        {
+          "q": "Does the home need to be empty?",
+          "a": "Cleaning is fastest and most thorough when the home is empty and personal belongings have already been packed."
+        },
+        {
+          "q": "Are the inside of cabinets and appliances included?",
+          "a": "Inside cabinets and drawers are included! Inside refrigerator and oven detailing are available as convenient add-ons."
+        }
+      ],
+      "str_turnover": [
+        {
+          "q": "Can you clean between guests on the same day?",
+          "a": "Yes, absolutely! We specialize in fast, same-day turnovers between morning check-out and afternoon check-in."
+        },
+        {
+          "q": "Do you handle linens and restocking?",
+          "a": "Yes: on-site or off-site laundry, bed making, unit staging, and restocking guest supplies (paper towels, soaps, toiletries)."
+        },
+        {
+          "q": "Will I know when the turnover is finished?",
+          "a": "Yes. We send an instant message notification along with photo verification once your property is 5-star guest-ready."
+        }
+      ]
+    },
+    "supportCard": {
+      "badge": "24/7 Dedicated Support",
+      "title": "Still have questions about our services?",
+      "subtitle": "Our local Denver & Boulder property care specialists are available 24 hours a day, 7 days a week.",
+      "callUs": "Call or Text (720) 590-8632",
+      "emailUs": "Email info@gopropertycare.com",
+      "bookOnline": "Book Residential Service",
+      "requestWalkthrough": "Commercial Walkthrough"
+    }
   },
   "common": {
     "loading": "Loading...",

@@ -72,6 +72,20 @@ export function Navbar() {
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 rounded-full animate-fade-in" />
               )}
             </Link>
+
+            <Link
+              to="/faq"
+              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+                isActive('/faq')
+                  ? 'text-emerald-700'
+                  : 'text-slate-700 hover:text-emerald-700'
+              }`}
+            >
+              {t('nav.faq', 'FAQ')}
+              {isActive('/faq') && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 rounded-full animate-fade-in" />
+              )}
+            </Link>
           </div>
 
           <div className="h-5 w-px bg-slate-200" />
@@ -174,6 +188,15 @@ export function Navbar() {
               }`}
             >
               {t('nav.about')}
+            </Link>
+            <Link
+              to="/faq"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center h-11 px-4 rounded-xl text-sm font-bold transition-colors ${
+                isActive('/faq') ? 'bg-emerald-50 text-emerald-800 font-extrabold border border-emerald-200' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {t('nav.faq', 'FAQ')}
             </Link>
             <Link
               to="/schedule"

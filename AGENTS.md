@@ -84,7 +84,7 @@ LaundryGo/
 │   │   ├── robots.txt              # Reglas de indexación SEO
 │   │   └── sitemap.xml             # Mapa del sitio XML para buscadores
 │   ├── scripts/
-│   │   └── prerender.js            # Generador estático SSG post-build para SEO (/, /about, /services, /schedule, /login)
+│   │   └── prerender.js            # Generador estático SSG post-build para SEO (/, /about, /services, /schedule, /login, /faq)
 │   ├── src/
 │   │   ├── components/common/SEO.tsx # Gestor SEO dinámico (títulos, descripciones y canonicals)
 │   │   ├── constants/
@@ -93,8 +93,9 @@ LaundryGo/
 │   │   │   └── cleaningAddons.ts   # Add-ons activos (horno, refri, persianas, ventanas, lavandería off-site, etc.)
 │   │   └── pages/
 │   │       ├── Home.tsx            # Portada sin precios fijos, enfoque en propuestas de valor y confianza
-│   │       ├── Services.tsx        # Página de checklists detallados habitación por habitación
+│   │       ├── Services.tsx        # Página de checklists detallados habitación por habitación y Mini-FAQs
 │   │       ├── About.tsx           # Historia corporativa, personal 100% asegurado y mapa de cobertura
+│   │       ├── FAQ.tsx             # Centro de ayuda y FAQ en 4 categorías con buscador y tarjeta 24/7
 │   │       └── Schedule.tsx        # Cotizador y flujo de reserva en 4 pasos con cálculo en tiempo real
 │   ├── package.json
 │   └── vite.config.ts
@@ -221,14 +222,15 @@ LaundryGo/
 - **Efecto Visual de Fondo (Partículas Ambientales)**: Sistema de partículas sutiles flotantes que imitan micro-partículas de polvo en tonos verdes esmeralda acordes a la paleta, aportando dinamismo visual sin sobrecargar el rendimiento.
 - **Enfoque de Negocio y Páginas Clave**:
   - *Home (`/`)*: Portada orientada a la confianza y la propuesta de valor sin exponer tecnicismos ni tasas por pie cuadrado. Destaca los 3 servicios principales, garantías de personal asegurado y testimonios.
-  - *Página de Servicios (`/services`)*: Desglose habitación por habitación con checklists rigurosos para Cocina, Baños, Dormitorios y Áreas Comunes para Standard Cleaning, Move-In/Move-Out y Short-Term Rental Turnover, con soporte de fotografías optimizadas y fallback visual SVG.
+  - *Página de Servicios (`/services`)*: Desglose habitación por habitación con checklists rigurosos para Cocina, Baños, Dormitorios y Áreas Comunes para Standard Cleaning, Move-In/Move-Out y Short-Term Rental Turnover, con soporte de fotografías optimizadas, fallback visual SVG y **Mini-FAQs contextuales** de 3 preguntas al pie de cada servicio con enlace a la FAQ completa.
   - *Página Corporativa (`/about`)*: Historia y estándares de GoPropertyCare, política de personal 100% asegurado, suministros amigables con mascotas y niños, y áreas de atención metropolitana.
+  - *Página de Preguntas Frecuentes (`/faq`)*: Centro integral de ayuda bilingüe estructurado en las 4 categorías del cliente (General con 8 Q&As, Residencial con 13 Q&As, Comercial con 11 Q&As y Pagos y Políticas con 9 Q&As) con buscador dinámico en tiempo real, selector de categorías por píldoras, acordeones accesibles, marcado estructurado JSON-LD `FAQPage` y tarjeta de contacto y soporte 24/7 (`(720) 590-8632` / `info@gopropertycare.com`).
   - *Flujo de Cotización y Reserva en 4 Pasos (`/schedule`)*:
     - **Paso 1 (Servicio y Dimensiones)**: Selección entre *Standard Cleaning*, *Deep / Move-In / Move-Out* o *Short-Term Rental Turnover*. Para residenciales, selección de metraje mediante menú desplegable de 18 niveles transparentes ($155 a $480 standard; $235 a $890 deep; captura de cotización a medida para > 6,100 sq ft). Para alquileres temporales (STR), configurador inteligente por habitaciones (Studio a 5 Habs de $90 a $330) y baños con lavado de blancos en unidad incluido ($0.00) o add-on de lavandería externa off-site escalado. Selección de frecuencia con descuentos transparentes.
     - **Paso 2 (Fecha y Hora)**: Calendario interactivo con regla de agendamiento para el mismo día (si se reserva antes de las 12:00 PM con margen de 3 horas) y selector de hora exacta de llegada.
     - **Paso 3 (Ubicación, Acceso y Add-ons)**: Captura de dirección mediante inputs de texto limpios, método de acceso (alguien en casa, teclado, lockbox, etc.) y selección de extras (horno, refrigerador, persianas, ventanas, mascotas, jacuzzi, patio/parrilla).
     - **Paso 4 (Revisión y Confirmación)**: Resumen íntegro y despacho de reserva validado contra el backend.
-- **SEO & SSG**: Generación estática post-compilación en `scripts/prerender.js` para 5 rutas clave (`/`, `/about`, `/services`, `/schedule`, `/login`) con `sitemap.xml` y `robots.txt`.
+- **SEO & SSG**: Generación estática post-compilación en `scripts/prerender.js` para 6 rutas clave (`/`, `/about`, `/services`, `/schedule`, `/login`, `/faq`) con `sitemap.xml` y `robots.txt`.
 
 ### Frontend 3: Evolving Solutions LLC (`/frontend-evolvingsolutions`)
 - **Tecnología**: React 19, Vite 8, TypeScript, Tailwind CSS v4.

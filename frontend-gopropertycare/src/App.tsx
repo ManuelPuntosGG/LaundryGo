@@ -10,6 +10,7 @@ import { ScrollToTop } from '@/components/layout/ScrollToTop';
 const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })));
 const Services = lazy(() => import('@/pages/Services').then((m) => ({ default: m.Services })));
 const About = lazy(() => import('@/pages/About').then((m) => ({ default: m.About })));
+const FAQ = lazy(() => import('@/pages/FAQ').then((m) => ({ default: m.FAQ })));
 const Schedule = lazy(() => import('@/pages/Schedule').then((m) => ({ default: m.Schedule })));
 const Auth = lazy(() => import('@/pages/Auth').then((m) => ({ default: m.Auth })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
@@ -35,6 +36,7 @@ function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />
         <Route path="/about" element={<About />} />
+        <Route path="/faq" element={<FAQ />} />
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/login" element={<Auth />} />
         <Route
