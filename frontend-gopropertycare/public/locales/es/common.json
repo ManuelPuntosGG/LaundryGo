@@ -1088,6 +1088,36 @@
       "requestWalkthrough": "Recorrido Comercial"
     }
   },
+  "commercialModal": {
+    "title": "Solicitar Walkthrough Comercial",
+    "subtitle": "Completa el formulario para coordinar tu visita de evaluación presencial de 15 minutos sin costo. Recibirás tu propuesta personalizada por escrito el mismo día hábil ($0.00 anticipo).",
+    "badge": "100% Gratuito • Sin Compromiso",
+    "nameLabel": "Nombre Completo",
+    "namePlaceholder": "ej., Carlos Pérez",
+    "phoneLabel": "Teléfono",
+    "phonePlaceholder": "ej., (720) 555-0199",
+    "emailLabel": "Correo Electrónico Corporativo",
+    "emailPlaceholder": "ej., carlos@empresa.com",
+    "zipCodeLabel": "Código Postal del Inmueble",
+    "zipCodePlaceholder": "ej., 80202",
+    "detailsLabel": "Detalles del Negocio o Espacio",
+    "detailsPlaceholder": "Describe las características del espacio (tipo de negocio, metraje aproximado, número de baños, frecuencia deseada o requerimientos especiales)...",
+    "submitBtn": "Enviar Solicitud de Walkthrough",
+    "submittingBtn": "Enviando...",
+    "closeBtn": "Cerrar",
+    "allFieldsRequired": "Todos los campos son obligatorios.",
+    "errors": {
+      "nameRequired": "El nombre es obligatorio.",
+      "phoneRequired": "El teléfono es obligatorio.",
+      "emailRequired": "El correo electrónico es obligatorio.",
+      "emailInvalid": "Por favor ingresa un correo electrónico válido.",
+      "zipCodeRequired": "El código postal es obligatorio.",
+      "detailsRequired": "Por favor describe los detalles y requerimientos de tu espacio."
+    },
+    "successTitle": "¡Solicitud de Walkthrough Recibida!",
+    "successMessage": "¡Gracias! Un asesor de nuestro equipo comercial se comunicará contigo el mismo día hábil para coordinar la visita de 15 minutos y elaborar tu presupuesto a medida.",
+    "successDoneBtn": "Entendido"
+  },
   "common": {
     "loading": "Cargando...",
     "error": "Ocurrió un error. Por favor intenta de nuevo.",

@@ -26,6 +26,7 @@ import {
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { SEO } from '@/components/common/SEO';
+import { CommercialWalkthroughModal } from '@/components/common/CommercialWalkthroughModal';
 
 function ImageWithFallback({
   src,
@@ -117,6 +118,7 @@ export function Services() {
       ? 'commercial'
       : 'residential';
   });
+  const [isWalkthroughModalOpen, setIsWalkthroughModalOpen] = useState(false);
 
   const handleTabChange = (newTab: 'residential' | 'commercial') => {
     setActiveTab(newTab);
@@ -215,14 +217,23 @@ export function Services() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Link to={activeTab === 'commercial' ? '/schedule?tier=commercial' : '/schedule'} className="w-full sm:w-auto inline-flex">
-            <Button size="lg" className="w-full sm:w-auto font-black px-8 shadow-md shadow-emerald-600/20 hover:scale-102 transition-transform">
-              {activeTab === 'commercial'
-                ? t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')
-                : t('servicesPage.scheduleBtn', 'Schedule Online')}
+          {activeTab === 'commercial' ? (
+            <Button
+              size="lg"
+              onClick={() => setIsWalkthroughModalOpen(true)}
+              className="w-full sm:w-auto font-black px-8 shadow-md shadow-emerald-600/20 hover:scale-102 transition-transform cursor-pointer"
+            >
+              {t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}
               <ArrowRight className="w-4.5 h-4.5 ml-1.5 shrink-0" />
             </Button>
-          </Link>
+          ) : (
+            <Link to="/schedule" className="w-full sm:w-auto inline-flex">
+              <Button size="lg" className="w-full sm:w-auto font-black px-8 shadow-md shadow-emerald-600/20 hover:scale-102 transition-transform">
+                {t('servicesPage.scheduleBtn', 'Schedule Online')}
+                <ArrowRight className="w-4.5 h-4.5 ml-1.5 shrink-0" />
+              </Button>
+            </Link>
+          )}
           <Link to="/about" className="w-full sm:w-auto inline-flex">
             <Button variant="outline" size="lg" className="w-full sm:w-auto font-bold px-6 hover:scale-102 transition-transform">
               {t('servicesPage.viewAboutBtn', 'About Our Company')}
@@ -256,11 +267,6 @@ export function Services() {
             >
               <Building2 className="w-4 h-4" />
               <span>{t('servicesPage.tabCommercial', 'Commercial Cleaning')}</span>
-              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                activeTab === 'commercial' ? 'bg-emerald-800 text-emerald-100' : 'bg-emerald-100 text-emerald-800'
-              }`}>
-                Walkthrough
-              </span>
             </button>
           </div>
         </div>
@@ -269,7 +275,7 @@ export function Services() {
       {/* COMMERCIAL SECTION */}
       {activeTab === 'commercial' && (
         <section className="space-y-8 sm:space-y-10 animate-fade-in">
-          {/* Walkthrough Announcement Banner */}
+          {/* Walkthrough Announcement Banner (Top CTA) */}
           <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-2 max-w-2xl">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30">
@@ -283,19 +289,18 @@ export function Services() {
                 {t('servicesPage.commercialSubheading')}
               </p>
             </div>
-            <Link to="/schedule?tier=commercial" className="w-full md:w-auto shrink-0">
-              <Button
-                variant="white"
-                size="lg"
-                className="w-full md:w-auto font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-6 hover:scale-102 transition-transform"
-              >
-                <Calendar className="w-4 h-4 mr-2 text-emerald-700" />
-                <span>{t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
-              </Button>
-            </Link>
+            <Button
+              variant="white"
+              size="lg"
+              onClick={() => setIsWalkthroughModalOpen(true)}
+              className="w-full md:w-auto font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-6 hover:scale-102 transition-transform cursor-pointer shrink-0"
+            >
+              <Calendar className="w-4 h-4 mr-2 text-emerald-700" />
+              <span>{t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
+            </Button>
           </div>
 
-          {/* 4 Commercial Cards */}
+          {/* 4 Commercial Cards (Simplified without redundant card buttons) */}
           <div className="space-y-8 sm:space-y-10">
             {commercialCards.map((card) => {
               const Icon = card.icon;
@@ -305,7 +310,7 @@ export function Services() {
                   className="p-6 sm:p-8 border-2 border-slate-200/90 hover:border-emerald-300 transition-all shadow-sm space-y-6"
                 >
                   {/* Card Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div className="border-b border-slate-100 pb-4">
                     <div className="flex items-start sm:items-center gap-3">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 shadow-inner">
                         <Icon className="w-6 h-6" />
@@ -319,12 +324,6 @@ export function Services() {
                         </h3>
                       </div>
                     </div>
-                    <Link to="/schedule?tier=commercial" className="self-start sm:self-auto shrink-0">
-                      <Button size="sm" className="font-extrabold shadow-xs hover:scale-102 transition-transform">
-                        <Calendar className="w-3.5 h-3.5 mr-1.5" />
-                        <span>{t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
-                      </Button>
-                    </Link>
                   </div>
 
                   {/* Description */}
@@ -351,18 +350,10 @@ export function Services() {
                   {/* Mini FAQ */}
                   <MiniFAQ items={card.data.miniFaq} />
 
-                  {/* Bottom Card Row */}
-                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
-                    <div className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{i18n.language?.startsWith('es') ? '15 min de visita presencial • Cotización el mismo día' : '15-min walkthrough • Same-day custom quote'}</span>
-                    </div>
-                    <Link to="/schedule?tier=commercial">
-                      <Button size="md" className="font-black shadow-xs hover:scale-102 transition-transform">
-                        <span>{t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
-                        <ArrowRight className="w-4 h-4 ml-1.5" />
-                      </Button>
-                    </Link>
+                  {/* Bottom Card Row (Information only) */}
+                  <div className="pt-2 flex items-center gap-2 text-xs font-medium text-slate-500 border-t border-slate-100">
+                    <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>{i18n.language?.startsWith('es') ? '15 min de visita presencial • Cotización personalizada entregada el mismo día hábil' : '15-min on-site walkthrough • Same-day custom itemized proposal'}</span>
                   </div>
                 </Card>
               );
@@ -769,20 +760,32 @@ export function Services() {
               : t('servicesPage.cta.subtitle', 'Choose your space, pick your date, and let our insured team handle the rest.')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to={activeTab === 'commercial' ? '/schedule?tier=commercial' : '/schedule'}>
+            {activeTab === 'commercial' ? (
               <Button
                 variant="white"
                 size="lg"
-                className="font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200"
+                onClick={() => setIsWalkthroughModalOpen(true)}
+                className="font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200 cursor-pointer"
               >
                 <Sparkles className="w-5 h-5 mr-2 text-emerald-600" />
                 <span className="text-emerald-950 font-black">
-                  {activeTab === 'commercial'
-                    ? t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')
-                    : t('servicesPage.cta.scheduleBtn', 'Book Your Cleaning')}
+                  {t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}
                 </span>
               </Button>
-            </Link>
+            ) : (
+              <Link to="/schedule">
+                <Button
+                  variant="white"
+                  size="lg"
+                  className="font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200"
+                >
+                  <Sparkles className="w-5 h-5 mr-2 text-emerald-600" />
+                  <span className="text-emerald-950 font-black">
+                    {t('servicesPage.cta.scheduleBtn', 'Book Your Cleaning')}
+                  </span>
+                </Button>
+              </Link>
+            )}
             <a
               href="tel:7205908632"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-2 border-emerald-400/80 text-white font-bold text-sm bg-emerald-900/40 hover:bg-emerald-800/60 hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
@@ -793,6 +796,12 @@ export function Services() {
           </div>
         </Card>
       </section>
+
+      {/* Commercial Walkthrough Modal */}
+      <CommercialWalkthroughModal
+        isOpen={isWalkthroughModalOpen}
+        onClose={() => setIsWalkthroughModalOpen(false)}
+      />
     </div>
   );
 }

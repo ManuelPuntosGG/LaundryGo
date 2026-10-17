@@ -7,6 +7,7 @@ from .views import (
     CleaningOrderDetailView,
     CleaningOrderCancelView,
     CleaningAvailableDatesView,
+    CommercialWalkthroughInquiryView,
 )
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
     path('orders/<int:pk>/', CleaningOrderDetailView.as_view(), name='cleaning-order-detail'),
     path('orders/<int:pk>/cancel/', CleaningOrderCancelView.as_view(), name='cleaning-order-cancel'),
     path('schedule/available-dates/', CleaningAvailableDatesView.as_view(), name='cleaning-available-dates'),
+    path('walkthrough-inquiry/', CommercialWalkthroughInquiryView.as_view(), name='cleaning-walkthrough-inquiry'),
 ]

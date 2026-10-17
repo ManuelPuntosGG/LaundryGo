@@ -16,6 +16,7 @@ from .serializers import (
 from .emails import (
     send_cleaning_order_confirmation_email,
     send_cleaning_order_cancellation_email,
+    send_commercial_walkthrough_inquiry_email,
 )
 
 
@@ -155,3 +156,55 @@ class CleaningAvailableDatesView(APIView):
             })
 
         return Response(dates)
+
+
+class CommercialWalkthroughInquiryView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        data = request.data or {}
+        name = str(data.get('name', '')).strip()
+        phone = str(data.get('phone', '')).strip()
+        email = str(data.get('email', '')).strip()
+        zip_code = str(data.get('zip_code', '')).strip()
+        details = str(data.get('details', '')).strip()
+        language = str(data.get('language', 'en')).strip()
+
+        errors = {}
+        if not name:
+            errors['name'] = 'Name is required / El nombre es obligatorio.'
+        if not phone:
+            errors['phone'] = 'Phone is required / El teléfono es obligatorio.'
+        if not email:
+            errors['email'] = 'Email is required / El correo electrónico es obligatorio.'
+        elif '@' not in email or '.' not in email:
+            errors['email'] = 'Please enter a valid email / Por favor ingrese un correo válido.'
+        if not zip_code:
+            errors['zip_code'] = 'ZIP Code is required / El código postal es obligatorio.'
+        if not details:
+            errors['details'] = 'Details are required / Los detalles del espacio son obligatorios.'
+
+        if errors:
+            return Response(
+                {'errors': errors, 'detail': 'Missing or invalid required fields.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        inquiry_data = {
+            'name': name,
+            'phone': phone,
+            'email': email,
+            'zip_code': zip_code,
+            'details': details,
+            'language': language,
+        }
+
+        send_commercial_walkthrough_inquiry_email(inquiry_data)
+
+        return Response(
+            {
+                'success': True,
+                'message': 'Walkthrough inquiry submitted successfully. Our team will contact you shortly.',
+            },
+            status=status.HTTP_201_CREATED,
+        )

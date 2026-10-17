@@ -569,4 +569,49 @@ class TestCleaningPricingTiers:
         assert Decimal(str(data['addons_total'])) == Decimal('70.00')
         assert Decimal(str(data['total_price'])) == Decimal('206.00')
 
+    def test_commercial_walkthrough_inquiry_success(self, api_client):
+        payload = {
+            'name': 'Sarah Connor',
+            'phone': '720-555-9876',
+            'email': 'sarah@techoffice.com',
+            'zip_code': '80202',
+            'details': 'Office space 3,500 sq ft, 2 floors, 4 restrooms, weekly janitorial needed.',
+            'language': 'en',
+        }
+        resp = api_client.post('/api/v1/cleaning/walkthrough-inquiry/', payload, format='json')
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data.get('success') is True
+        assert 'Walkthrough inquiry submitted successfully' in data.get('message', '')
+
+    def test_commercial_walkthrough_inquiry_missing_fields(self, api_client):
+        payload = {
+            'name': '',
+            'phone': '',
+            'email': '',
+            'zip_code': '',
+            'details': '',
+        }
+        resp = api_client.post('/api/v1/cleaning/walkthrough-inquiry/', payload, format='json')
+        assert resp.status_code == 400
+        errors = resp.json().get('errors', {})
+        assert 'name' in errors
+        assert 'phone' in errors
+        assert 'email' in errors
+        assert 'zip_code' in errors
+        assert 'details' in errors
+
+    def test_commercial_walkthrough_inquiry_invalid_email(self, api_client):
+        payload = {
+            'name': 'Sarah Connor',
+            'phone': '720-555-9876',
+            'email': 'not-an-email',
+            'zip_code': '80202',
+            'details': 'Office space 3,500 sq ft',
+        }
+        resp = api_client.post('/api/v1/cleaning/walkthrough-inquiry/', payload, format='json')
+        assert resp.status_code == 400
+        errors = resp.json().get('errors', {})
+        assert 'email' in errors
+
 

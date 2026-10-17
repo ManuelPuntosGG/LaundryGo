@@ -1088,6 +1088,36 @@
       "requestWalkthrough": "Commercial Walkthrough"
     }
   },
+  "commercialModal": {
+    "title": "Request a Commercial Walkthrough",
+    "subtitle": "Fill out the form below to coordinate your free 15-minute on-site assessment. We will deliver an itemized written proposal the same business day ($0.00 upfront).",
+    "badge": "100% Free • Zero Obligation",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "e.g., Sarah Connor",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "e.g., (720) 555-0199",
+    "emailLabel": "Work or Business Email",
+    "emailPlaceholder": "e.g., sarah@company.com",
+    "zipCodeLabel": "Property ZIP Code",
+    "zipCodePlaceholder": "e.g., 80202",
+    "detailsLabel": "Business Space & Requirements",
+    "detailsPlaceholder": "Describe your space (type of business, approximate square footage, number of restrooms, preferred frequency or any special needs)...",
+    "submitBtn": "Submit Walkthrough Request",
+    "submittingBtn": "Submitting...",
+    "closeBtn": "Close",
+    "allFieldsRequired": "All fields are mandatory.",
+    "errors": {
+      "nameRequired": "Name is required.",
+      "phoneRequired": "Phone number is required.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Please enter a valid email address.",
+      "zipCodeRequired": "ZIP code is required.",
+      "detailsRequired": "Please describe your facility details and requirements."
+    },
+    "successTitle": "Walkthrough Request Received!",
+    "successMessage": "Thank you! Our commercial accounts manager will contact you within the same business day to coordinate your 15-minute walkthrough and prepare your tailored proposal.",
+    "successDoneBtn": "Done"
+  },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred. Please try again.",

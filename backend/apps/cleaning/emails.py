@@ -406,3 +406,224 @@ The {company_name} Team
 
     thread = threading.Thread(target=_send, daemon=True)
     thread.start()
+
+
+def send_commercial_walkthrough_inquiry_email(data):
+    """
+    Asynchronously sends commercial walkthrough inquiry notification to the company email
+    (info@gopropertycare.com) and a confirmation email to the prospect.
+    """
+    def _send():
+        try:
+            name = data.get('name', '').strip()
+            phone = data.get('phone', '').strip()
+            email = data.get('email', '').strip()
+            zip_code = data.get('zip_code', '').strip()
+            details = data.get('details', '').strip()
+            language = data.get('language', 'en') or 'en'
+            is_spanish = str(language).lower().startswith('es')
+
+            company_name = "GoPropertyCare"
+            company_email = "info@gopropertycare.com"
+            admin_email = getattr(settings, 'ADMIN_EMAIL', company_email)
+            from_email = f"{company_name} <{company_email}>"
+
+            # 1. Email to Company (admin)
+            admin_subject = f"[New Commercial Walkthrough Inquiry] {name} - ZIP {zip_code}"
+            admin_text = f"""New Commercial Cleaning Walkthrough Inquiry:
+
+Client Name: {name}
+Phone: {phone}
+Email: {email}
+ZIP Code: {zip_code}
+Details / Requirements:
+{details}
+
+This inquiry was submitted via the GoPropertyCare website.
+Please contact the customer to confirm the 15-minute walkthrough.
+"""
+            admin_html = f"""<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0fdf4; margin: 0; padding: 24px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #dcfce7; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+    <tr>
+      <td style="background: #166534; padding: 24px; text-align: center; color: #ffffff;">
+        <h1 style="margin: 0; font-size: 20px; font-weight: 800;">GoPropertyCare • Commercial Walkthrough</h1>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #bbf7d0;">New Inquiry Received from Website</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 24px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+          <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 14px; color: #1e293b;">
+            <tr>
+              <td style="font-weight: bold; width: 130px; color: #64748b;">Client Name:</td>
+              <td style="font-weight: 800; color: #0f172a;">{name}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold; color: #64748b;">Phone:</td>
+              <td><a href="tel:{phone}" style="color: #15803d; font-weight: bold; text-decoration: none;">{phone}</a></td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold; color: #64748b;">Email:</td>
+              <td><a href="mailto:{email}" style="color: #15803d; font-weight: bold; text-decoration: none;">{email}</a></td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold; color: #64748b;">ZIP Code:</td>
+              <td style="font-weight: bold; color: #0f172a;">{zip_code}</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Business Space & Requirements:</h3>
+        <div style="background: #ffffff; border-left: 4px solid #16a34a; padding: 12px 16px; font-size: 14px; color: #334155; line-height: 1.6; background-color: #f0fdf4; border-radius: 0 8px 8px 0;">
+          {details}
+        </div>
+
+        <p style="margin-top: 24px; font-size: 12px; color: #64748b; text-align: center;">
+          A notification has also been sent to the client to confirm receipt.
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+            send_mail_worker(
+                subject=admin_subject,
+                text_content=admin_text,
+                html_content=admin_html,
+                recipients=[admin_email, company_email],
+                reply_to=email,
+                from_email=from_email,
+            )
+
+            # 2. Confirmation email to the Prospect
+            if email:
+                if is_spanish:
+                    client_subject = "Hemos recibido tu solicitud de Walkthrough Comercial | GoPropertyCare"
+                    client_text = f"""Hola {name},
+
+Gracias por contactar a GoPropertyCare. Hemos recibido tu solicitud para una visita de evaluacion presencial (Walkthrough) de 15 minutos para tu espacio comercial.
+
+Datos recibidos:
+- Nombre: {name}
+- Telefono: {phone}
+- Codigo Postal: {zip_code}
+- Detalles: {details}
+
+Un asesor de nuestro equipo comercial se comunicara contigo el mismo dia habil para coordinar la fecha y hora de la visita de 15 minutos y entregarte una propuesta personalizada y por escrito sin ningun costo ni compromiso ($0.00 anticipo).
+
+Atentamente,
+Equipo de GoPropertyCare
+Telefono: (720) 590-8632
+Email: info@gopropertycare.com
+"""
+                    client_html = f"""<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0fdf4; margin: 0; padding: 24px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #dcfce7; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+    <tr>
+      <td style="background: #166534; padding: 24px; text-align: center; color: #ffffff;">
+        <h1 style="margin: 0; font-size: 20px; font-weight: 800;">GoPropertyCare</h1>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #bbf7d0;">Solicitud de Walkthrough Comercial Recibida</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 24px;">
+        <p style="font-size: 15px; color: #1e293b; margin-top: 0;">Hola <strong>{name}</strong>,</p>
+        <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+          ¡Gracias por tu interes en nuestros servicios de limpieza comercial! Hemos recibido tus datos y requerimientos.
+        </p>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #0f172a; text-transform: uppercase;">Resumen de tu solicitud:</h4>
+          <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>Telefono:</strong> {phone}</p>
+          <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>Codigo Postal:</strong> {zip_code}</p>
+          <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>Detalles:</strong> {details}</p>
+        </div>
+        <p style="font-size: 14px; color: #15803d; font-weight: bold; line-height: 1.6;">
+          ¿Que sigue ahora?
+        </p>
+        <p style="font-size: 13px; color: #475569; line-height: 1.6;">
+          Un asesor de nuestro equipo comercial se comunicara contigo el mismo dia habil para coordinar la visita de 15 minutos en tus instalaciones y entregarte un presupuesto por escrito a tu medida con <strong>$0.00 anticipo</strong> y sin ningun compromiso.
+        </p>
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center;">
+          GoPropertyCare • (720) 590-8632 • info@gopropertycare.com • Denver Metropolitan Area & Boulder, CO
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+                else:
+                    client_subject = "We Received Your Commercial Walkthrough Request | GoPropertyCare"
+                    client_text = f"""Hello {name},
+
+Thank you for reaching out to GoPropertyCare. We have received your request for a 15-minute on-site assessment (Walkthrough) for your commercial space.
+
+Inquiry details:
+- Name: {name}
+- Phone: {phone}
+- ZIP Code: {zip_code}
+- Details: {details}
+
+A commercial account manager from our team will contact you within the same business day to coordinate the 15-minute visit and deliver your custom written proposal with zero obligation ($0.00 upfront).
+
+Best regards,
+GoPropertyCare Team
+Phone: (720) 590-8632
+Email: info@gopropertycare.com
+"""
+                    client_html = f"""<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0fdf4; margin: 0; padding: 24px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #dcfce7; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+    <tr>
+      <td style="background: #166534; padding: 24px; text-align: center; color: #ffffff;">
+        <h1 style="margin: 0; font-size: 20px; font-weight: 800;">GoPropertyCare</h1>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #bbf7d0;">Commercial Walkthrough Request Received</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 24px;">
+        <p style="font-size: 15px; color: #1e293b; margin-top: 0;">Hello <strong>{name}</strong>,</p>
+        <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+          Thank you for your interest in GoPropertyCare! We have received your facility details and commercial cleaning requirements.
+        </p>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #0f172a; text-transform: uppercase;">Summary of your request:</h4>
+          <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>Phone:</strong> {phone}</p>
+          <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>ZIP Code:</strong> {zip_code}</p>
+          <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>Details:</strong> {details}</p>
+        </div>
+        <p style="font-size: 14px; color: #15803d; font-weight: bold; line-height: 1.6;">
+          What happens next?
+        </p>
+        <p style="font-size: 13px; color: #475569; line-height: 1.6;">
+          A dedicated commercial account manager will reach out within the same business day to schedule your 15-minute walkthrough and provide an itemized written proposal with <strong>$0.00 upfront</strong> and zero obligation.
+        </p>
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center;">
+          GoPropertyCare • (720) 590-8632 • info@gopropertycare.com • Denver Metropolitan Area & Boulder, CO
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+                send_mail_worker(
+                    subject=client_subject,
+                    text_content=client_text,
+                    html_content=client_html,
+                    recipients=[email],
+                    reply_to=company_email,
+                    from_email=from_email,
+                )
+
+            logger.info(f"[EMAIL SUCCESS - GoPropertyCare] Commercial walkthrough inquiry emails sent for {name} ({email})")
+        except Exception as e:
+            logger.error(f"[EMAIL FAILURE - GoPropertyCare] Commercial walkthrough inquiry email failed: {e}", exc_info=True)
+
+    thread = threading.Thread(target=_send, daemon=True)
+    thread.start()
+
