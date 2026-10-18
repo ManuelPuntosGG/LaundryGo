@@ -144,7 +144,7 @@ export function CommercialWalkthroughModal({ isOpen, onClose }: CommercialWalkth
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30 mb-2">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{t('commercialModal.badge', '100% Free • Zero Obligation')}</span>
+            <span>{t('commercialModal.badge', 'Same-Day Quote')}</span>
           </div>
 
           <h2 id="commercial-modal-title" className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
@@ -217,7 +217,7 @@ export function CommercialWalkthroughModal({ isOpen, onClose }: CommercialWalkth
                   required
                 />
                 <Input
-                  label={t('commercialModal.emailLabel', 'Work or Business Email') + ' *'}
+                  label={t('commercialModal.emailLabel', 'Email') + ' *'}
                   placeholder={t('commercialModal.emailPlaceholder', 'e.g., sarah@company.com')}
                   type="email"
                   value={email}
@@ -232,7 +232,7 @@ export function CommercialWalkthroughModal({ isOpen, onClose }: CommercialWalkth
 
               {/* Property ZIP Code */}
               <Input
-                label={t('commercialModal.zipCodeLabel', 'Property ZIP Code') + ' *'}
+                label={t('commercialModal.zipCodeLabel', 'ZIP Code') + ' *'}
                 placeholder={t('commercialModal.zipCodePlaceholder', 'e.g., 80202')}
                 value={zipCode}
                 onChange={(e) => {
