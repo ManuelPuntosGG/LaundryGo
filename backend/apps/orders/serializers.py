@@ -16,6 +16,11 @@ class OrderSerializer(serializers.ModelSerializer):
     customer_name = serializers.ReadOnlyField()
     customer_email = serializers.ReadOnlyField()
 
+    base_price = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    total_price = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    surcharge_amount = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    final_total_price = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+
     class Meta:
         model = Order
         fields = (
@@ -23,9 +28,11 @@ class OrderSerializer(serializers.ModelSerializer):
             'street_address', 'city', 'zip_code', 'delivery_zone', 'delivery_fee',
             'service_rate', 'service_name', 'service_type', 'rate_per_lb',
             'pickup_date', 'pickup_time_slot', 'order_details', 'pickup_instructions',
+            'base_price', 'total_price', 'surcharge_amount', 'surcharge_concept',
+            'final_total_price', 'payment_status', 'stripe_payment_link_url',
             'status', 'language', 'customer_name', 'customer_email', 'created_at', 'updated_at'
         )
-        read_only_fields = ('id', 'user', 'status', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'user', 'status', 'payment_status', 'stripe_payment_link_url', 'created_at', 'updated_at')
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
@@ -53,6 +60,8 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     zip_code = serializers.CharField(required=False, allow_blank=True, default='')
     delivery_zone = serializers.CharField(required=False, allow_blank=True, default='inner')
     delivery_fee = serializers.DecimalField(max_digits=6, decimal_places=2, required=False, default=0.00)
+    base_price = serializers.DecimalField(max_digits=8, decimal_places=2, required=False)
+    addons_subtotal = serializers.DecimalField(max_digits=8, decimal_places=2, required=False, default=0.00, write_only=True)
     language = serializers.CharField(required=False, default='en')
 
     class Meta:
@@ -62,7 +71,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'order_details', 'pickup_instructions',
             'guest_email', 'guest_first_name', 'guest_last_name', 'guest_phone',
             'street_address', 'city', 'zip_code', 'delivery_zone', 'delivery_fee',
-            'language', 'frequency'
+            'base_price', 'addons_subtotal', 'language', 'frequency'
         )
         read_only_fields = ('id',)
 
@@ -114,7 +123,9 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        from decimal import Decimal
         frequency = validated_data.pop('frequency', 'oneTime')
+        addons_subtotal = validated_data.pop('addons_subtotal', Decimal('0.00')) or Decimal('0.00')
         user = self.context['request'].user
         if user.is_authenticated:
             validated_data['user'] = user
@@ -127,6 +138,16 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             validated_data['language'] = 'es' if accept_lang.startswith('es') or 'es-' in accept_lang else 'en'
         elif lang:
             validated_data['language'] = 'es' if str(lang).lower().startswith('es') else 'en'
+
+        if 'base_price' not in validated_data or not validated_data.get('base_price'):
+            rate = validated_data.get('service_rate')
+            rate_per_lb = rate.rate_per_lb if rate else Decimal('2.25')
+            estimated_base = max(Decimal('40.00'), (rate_per_lb * Decimal('20.00')).quantize(Decimal('0.01')))
+            validated_data['base_price'] = (estimated_base + Decimal(str(addons_subtotal))).quantize(Decimal('0.01'))
+        deliv_fee = Decimal(str(validated_data.get('delivery_fee', Decimal('0.00')) or Decimal('0.00'))).quantize(Decimal('0.01'))
+        validated_data['total_price'] = validated_data['base_price'] + deliv_fee
+        validated_data['payment_status'] = 'unpaid'
+        validated_data['status'] = 'pending'
 
         order = super().create(validated_data)
 

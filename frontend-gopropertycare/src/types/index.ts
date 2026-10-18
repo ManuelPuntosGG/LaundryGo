@@ -73,6 +73,12 @@ export interface CleaningOrder {
   base_price: string | number;
   addons_total: string | number;
   total_price: string | number;
+  deposit_amount?: string | number;
+  remaining_balance?: string | number;
+  surcharge_amount?: string | number;
+  surcharge_concept?: string;
+  final_total_charged?: string | number;
+  payment_status?: 'unpaid' | 'deposit_paid' | 'fully_paid' | 'refunded' | 'failed';
   status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
   language: string;
   created_at: string;

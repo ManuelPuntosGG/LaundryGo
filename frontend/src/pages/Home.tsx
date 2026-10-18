@@ -18,12 +18,15 @@ import {
   Scale,
   Leaf,
   Award,
+  Layers,
+  RefreshCw,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import api from '@/api';
 import type { ServiceRate } from '@/types';
 import { SEO } from '@/components/common/SEO';
+import { BEDDING_ADDONS } from '@/constants/addons';
 
 function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -285,9 +288,9 @@ export function Home() {
       {/* 3. Pricing Tiers & Interactive Estimator */}
       <section id="services" className="flex flex-col gap-6 w-full scroll-mt-20">
         <div className="text-center max-w-xl mx-auto space-y-1.5">
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-1">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-1 tabular-nums">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5" />
+              <RefreshCw className="w-3.5 h-3.5" />
               {t('home.pricing.recurringDiscountBadge')}
             </span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold shadow-2xs">
@@ -326,12 +329,12 @@ export function Home() {
 
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">{service.name}</h3>
-                  <div className="flex items-baseline gap-1 mt-0.5">
+                  <div className="flex items-baseline gap-1 mt-0.5 tabular-nums">
                     <span className="text-2xl sm:text-3xl font-black text-blue-600">{service.price}</span>
                   </div>
                 </div>
 
-                <div className="inline-flex items-center gap-1.5 text-slate-700 text-xs font-semibold bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200">
+                <div className="inline-flex items-center gap-1.5 text-slate-700 text-xs font-semibold bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 tabular-nums">
                   <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                   <span>{service.delivery}</span>
                 </div>
@@ -364,9 +367,9 @@ export function Home() {
               </h3>
               <p className="text-slate-500 text-xs">{t('home.estimator.subtitle')}</p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shrink-0 shadow-2xs">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shrink-0 shadow-2xs tabular-nums">
               <span>{t('home.estimator.weightLabel')}:</span>
-              <span className="text-blue-600 font-black text-sm">{estimatedLbs} lbs</span>
+              <span className="text-blue-600 font-black text-sm tabular-nums">{estimatedLbs} lbs</span>
             </div>
           </div>
 
@@ -381,7 +384,7 @@ export function Home() {
                 key={preset.lbs}
                 type="button"
                 onClick={() => setEstimatedLbs(preset.lbs)}
-                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer tabular-nums ${
                   estimatedLbs === preset.lbs
                     ? 'bg-blue-50 border-blue-600 shadow-2xs ring-1 ring-blue-600/20'
                     : 'bg-white border-slate-200 hover:border-slate-300'
@@ -403,7 +406,7 @@ export function Home() {
               onChange={(e) => setEstimatedLbs(parseInt(e.target.value, 10))}
               className="w-full accent-blue-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
             />
-            <div className="flex justify-between text-[10px] text-slate-400 font-semibold px-1">
+            <div className="flex justify-between text-[10px] text-slate-400 font-semibold px-1 tabular-nums">
               <span>10 lbs</span>
               <span>45 lbs</span>
               <span>80 lbs</span>
@@ -411,16 +414,44 @@ export function Home() {
           </div>
 
           {/* Price Preview Strip */}
-          <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+          <div className="grid grid-cols-3 gap-2 pt-1 text-center tabular-nums">
             {services.map((srv, idx) => {
               const total = Math.max(40, estimatedLbs * srv.rate);
               return (
                 <div key={idx} className="p-2 rounded-xl bg-white border border-slate-200 shadow-2xs">
                   <p className="text-[10px] font-bold uppercase text-slate-500 truncate">{srv.name}</p>
-                  <p className="text-base sm:text-lg font-black text-slate-900">${total.toFixed(2)}</p>
+                  <p className="text-base sm:text-lg font-black text-slate-900 tabular-nums">${total.toFixed(2)}</p>
                 </div>
               );
             })}
+          </div>
+
+          {/* Bedding & Bulky Pieces Strip */}
+          <div className="pt-3 border-t border-slate-200/80 space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-800">
+                <Layers className="w-4 h-4 text-blue-600 shrink-0" />
+                <span>{t('schedule.beddingCategory')}</span>
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">
+                {t('schedule.beddingSubtitle')}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              {BEDDING_ADDONS.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-2.5 rounded-xl bg-white border border-slate-200/90 flex flex-col justify-between gap-1 shadow-2xs"
+                >
+                  <p className="text-[11px] font-bold text-slate-700 leading-tight">
+                    {t(`schedule.${item.i18nKey}`, { defaultValue: item.name })}
+                  </p>
+                  <p className="text-xs font-black text-blue-600 tabular-nums">
+                    ${item.price.toFixed(2)}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </Card>
       </section>

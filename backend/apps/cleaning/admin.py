@@ -1,7 +1,10 @@
 from django.contrib import admin
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from unfold.admin import ModelAdmin
 from unfold.decorators import display, action
+from unfold.enums import ActionVariant
 from .models import CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
 
 
@@ -177,10 +180,12 @@ class CleaningOrderAdmin(ModelAdmin):
         'scheduled_display',
         'zone_badge',
         'total_display',
+        'payment_status_badge',
         'status_badge',
     )
     list_filter = (
         'brand',
+        'payment_status',
         'status',
         'delivery_zone',
         'service_rate',
@@ -201,6 +206,8 @@ class CleaningOrderAdmin(ModelAdmin):
         'street_address',
         'city',
         'zip_code',
+        'stripe_customer_id',
+        'stripe_payment_method_id',
     )
     readonly_fields = (
         'created_at',
@@ -209,6 +216,13 @@ class CleaningOrderAdmin(ModelAdmin):
         'addons_total',
         'delivery_fee',
         'total_price',
+        'deposit_amount',
+        'remaining_balance',
+        'final_total_charged',
+        'stripe_customer_id',
+        'stripe_payment_method_id',
+        'stripe_deposit_intent_id',
+        'stripe_final_intent_id',
     )
     ordering = ('-created_at',)
 
@@ -249,6 +263,16 @@ class CleaningOrderAdmin(ModelAdmin):
             'fields': (
                 ('base_price', 'addons_total'),
                 'total_price',
+            ),
+        }),
+        (_('Payment & Surcharges (GoPropertyCare)'), {
+            'fields': (
+                'payment_status',
+                ('deposit_amount', 'remaining_balance'),
+                ('surcharge_amount', 'surcharge_concept'),
+                'final_total_charged',
+                ('stripe_customer_id', 'stripe_payment_method_id'),
+                ('stripe_deposit_intent_id', 'stripe_final_intent_id'),
             ),
         }),
         (_('Order Status'), {
@@ -307,7 +331,25 @@ class CleaningOrderAdmin(ModelAdmin):
 
     @display(description=_('Total'))
     def total_display(self, obj):
-        return f"${obj.total_price:.2f}"
+        total = (
+            float(obj.final_total_charged)
+            if obj.final_total_charged is not None
+            else (float(obj.total_price or 0) + float(obj.surcharge_amount or 0))
+        )
+        return f"${total:.2f}"
+
+    @display(
+        description=_('Payment Status'),
+        label={
+            'unpaid': 'warning',
+            'deposit_paid': 'info',
+            'fully_paid': 'success',
+            'charge_failed': 'danger',
+            'refunded': 'secondary',
+        }
+    )
+    def payment_status_badge(self, obj):
+        return obj.payment_status, obj.get_payment_status_display()
 
     @display(
         description=_('Status'),
@@ -322,17 +364,153 @@ class CleaningOrderAdmin(ModelAdmin):
     def status_badge(self, obj):
         return obj.status, obj.get_status_display()
 
-    # Bulk status update actions
+    # Bulk status update and payment actions
     actions = [
-        'mark_confirmed',
+        'accept_and_charge_deposit',
+        'complete_and_charge_order',
         'mark_in_progress',
         'mark_completed',
         'mark_cancelled',
     ]
+    actions_submit_line = [
+        'accept_gpc_order_submit',
+        'close_gpc_order_submit',
+    ]
+    actions_detail = [
+        'accept_gpc_order_detail',
+        'close_gpc_order_detail',
+    ]
 
-    @action(description=_('Mark selected orders as Confirmed'))
-    def mark_confirmed(self, request, queryset):
-        queryset.update(status='confirmed')
+    # Submit-line actions (Saves form changes including surcharge_amount/surcharge_concept, then runs action)
+    @action(
+        description=_('Accept Order & Charge 25% Deposit'),
+        permissions=['change'],
+        variant=ActionVariant.PRIMARY,
+    )
+    def accept_gpc_order_submit(self, request, obj):
+        from apps.core.payments import charge_gpc_deposit
+        if obj.brand != 'gopropertycare':
+            obj.status = 'confirmed'
+            obj.save(update_fields=['status'])
+            self.message_user(request, f"Order ESL-#{obj.id} accepted and set as Confirmed.")
+            return
+        if obj.payment_status in ('deposit_paid', 'fully_paid'):
+            self.message_user(request, f"Order GPC-#{obj.id} is already confirmed or deposit already paid.", level='warning')
+            return
+        try:
+            charge_gpc_deposit(obj)
+            self.message_user(
+                request,
+                f"Order GPC-#{obj.id} accepted & confirmed! 25% deposit (${obj.deposit_amount:.2f}) charged and confirmation email sent."
+            )
+        except Exception as exc:
+            self.message_user(request, f"Error accepting GPC-#{obj.id}: {exc}", level='error')
+
+    @action(
+        description=_('Close Order & Charge Remaining 75% (+ Surcharge)'),
+        permissions=['change'],
+        variant=ActionVariant.SUCCESS,
+    )
+    def close_gpc_order_submit(self, request, obj):
+        from apps.core.payments import charge_gpc_remaining_balance
+        if obj.brand != 'gopropertycare':
+            obj.status = 'completed'
+            obj.save(update_fields=['status'])
+            self.message_user(request, f"Order ESL-#{obj.id} closed and marked as Completed.")
+            return
+        try:
+            res = charge_gpc_remaining_balance(obj)
+            self.message_user(
+                request,
+                f"Order GPC-#{obj.id} closed & finalized! Charged ${res.get('amount_charged', 0):.2f} (Final Total: ${obj.final_total_charged:.2f}) and sent receipt email."
+            )
+        except Exception as exc:
+            self.message_user(request, f"Error closing GPC-#{obj.id}: {exc}", level='error')
+
+    # Detail header actions
+    @action(
+        description=_('Accept Order & Charge 25% Deposit'),
+        url_path='accept-charge-deposit',
+        permissions=['change'],
+        variant=ActionVariant.PRIMARY,
+    )
+    def accept_gpc_order_detail(self, request, object_id):
+        from apps.core.payments import charge_gpc_deposit
+        obj = self.get_object(request, object_id)
+        if obj:
+            if obj.brand != 'gopropertycare':
+                obj.status = 'confirmed'
+                obj.save(update_fields=['status'])
+                self.message_user(request, f"Order ESL-#{obj.id} accepted and set as Confirmed.")
+            elif obj.payment_status in ('deposit_paid', 'fully_paid'):
+                self.message_user(request, f"Order GPC-#{obj.id} is already confirmed or deposit already paid.", level='warning')
+            else:
+                try:
+                    charge_gpc_deposit(obj)
+                    self.message_user(
+                        request,
+                        f"Order GPC-#{obj.id} accepted! 25% deposit (${obj.deposit_amount:.2f}) charged and email sent."
+                    )
+                except Exception as exc:
+                    self.message_user(request, f"Error accepting GPC-#{obj.id}: {exc}", level='error')
+        return redirect(reverse('admin:cleaning_cleaningorder_change', args=[object_id]))
+
+    @action(
+        description=_('Close Order & Charge 75% (+ Surcharge)'),
+        url_path='close-charge-balance',
+        permissions=['change'],
+        variant=ActionVariant.SUCCESS,
+    )
+    def close_gpc_order_detail(self, request, object_id):
+        from apps.core.payments import charge_gpc_remaining_balance
+        obj = self.get_object(request, object_id)
+        if obj:
+            if obj.brand != 'gopropertycare':
+                obj.status = 'completed'
+                obj.save(update_fields=['status'])
+                self.message_user(request, f"Order ESL-#{obj.id} closed and marked as Completed.")
+            else:
+                try:
+                    res = charge_gpc_remaining_balance(obj)
+                    self.message_user(
+                        request,
+                        f"Order GPC-#{obj.id} closed & finalized! Charged ${res.get('amount_charged', 0):.2f} and sent receipt email."
+                    )
+                except Exception as exc:
+                    self.message_user(request, f"Error closing GPC-#{obj.id}: {exc}", level='error')
+        return redirect(reverse('admin:cleaning_cleaningorder_change', args=[object_id]))
+
+    @action(description=_('1. Accept Order & Charge 25% Deposit (GoPropertyCare)'), permissions=['change'])
+    def accept_and_charge_deposit(self, request, queryset):
+        from apps.core.payments import charge_gpc_deposit
+        success_count = 0
+        for order in queryset:
+            if order.brand != 'gopropertycare':
+                self.message_user(request, f"Order #{order.id} belongs to {order.brand}, not GoPropertyCare.", level='warning')
+                continue
+            if order.payment_status in ('deposit_paid', 'fully_paid'):
+                self.message_user(request, f"Order GPC-#{order.id} is already confirmed or deposit already paid.", level='warning')
+                continue
+            try:
+                charge_gpc_deposit(order)
+                success_count += 1
+            except Exception as exc:
+                self.message_user(request, f"Error accepting GPC-#{order.id}: {exc}", level='error')
+        if success_count > 0:
+            self.message_user(request, f"Successfully accepted and charged 25% deposit for {success_count} GoPropertyCare order(s).")
+
+    @action(description=_('2. Close Order & Charge Remaining 75% (+ Surcharge)'), permissions=['change'])
+    def complete_and_charge_order(self, request, queryset):
+        from apps.core.payments import charge_gpc_remaining_balance
+        success_count = 0
+        for order in queryset:
+            try:
+                charge_gpc_remaining_balance(order)
+                success_count += 1
+            except Exception as exc:
+                self.message_user(request, f"Error processing GPC-#{order.id}: {exc}", level='error')
+        if success_count > 0:
+            self.message_user(request, f"Successfully charged remaining balance and closed {success_count} order(s).")
 
     @action(description=_('Mark selected orders as In Progress'))
     def mark_in_progress(self, request, queryset):

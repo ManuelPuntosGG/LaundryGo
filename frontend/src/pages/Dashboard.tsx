@@ -18,7 +18,9 @@ import {
   MapPin,
   FileText,
   X,
-  Sparkles,
+  CreditCard,
+  ExternalLink,
+  DollarSign,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -139,7 +141,7 @@ export function Dashboard() {
       setTimeout(() => setFeedback(null), 5000);
     } catch (error: any) {
       console.error('Failed to cancel order:', error);
-      const msg = error.response?.data?.detail || error.message || 'Error';
+      const msg = error.response?.data?.detail || error.message || t('common.error');
       setFeedback({
         type: 'error',
         message: t('dashboard.cancelError', { message: msg }),
@@ -162,19 +164,38 @@ export function Dashboard() {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { bg: string; text: string; dot: string; border: string }> = {
-      pending: { bg: 'bg-amber-50/90', text: 'text-amber-700', dot: 'bg-amber-500', border: 'border-amber-200' },
-      confirmed: { bg: 'bg-blue-50/90', text: 'text-blue-700', dot: 'bg-blue-500', border: 'border-blue-200' },
-      processing: { bg: 'bg-indigo-50/90', text: 'text-indigo-700', dot: 'bg-indigo-500', border: 'border-indigo-200' },
-      ready: { bg: 'bg-emerald-50/90', text: 'text-emerald-700', dot: 'bg-emerald-500', border: 'border-emerald-200' },
-      delivered: { bg: 'bg-emerald-50/90', text: 'text-emerald-700', dot: 'bg-emerald-500', border: 'border-emerald-200' },
-      cancelled: { bg: 'bg-rose-50/90', text: 'text-rose-700', dot: 'bg-rose-500', border: 'border-rose-200' },
+    const badges: Record<string, { bg: string; text: string; dot: string; border: string; label: string }> = {
+      pending: { bg: 'bg-amber-50/90', text: 'text-amber-700', dot: 'bg-amber-500', border: 'border-amber-200', label: t('dashboard.statusPending') },
+      confirmed: { bg: 'bg-blue-50/90', text: 'text-blue-700', dot: 'bg-blue-500', border: 'border-blue-200', label: t('dashboard.statusConfirmed') },
+      picked_up: { bg: 'bg-sky-50/90', text: 'text-sky-700', dot: 'bg-sky-500', border: 'border-sky-200', label: t('dashboard.statusPickedUp') },
+      processing: { bg: 'bg-indigo-50/90', text: 'text-indigo-700', dot: 'bg-indigo-500', border: 'border-indigo-200', label: t('dashboard.statusProcessing') },
+      ready: { bg: 'bg-emerald-50/90', text: 'text-emerald-700', dot: 'bg-emerald-500', border: 'border-emerald-200', label: t('dashboard.statusReady') },
+      delivered: { bg: 'bg-emerald-50/90', text: 'text-emerald-700', dot: 'bg-emerald-500', border: 'border-emerald-200', label: t('dashboard.statusDelivered') },
+      cancelled: { bg: 'bg-rose-50/90', text: 'text-rose-700', dot: 'bg-rose-500', border: 'border-rose-200', label: t('dashboard.statusCancelled') },
     };
-    const style = badges[status] || { bg: 'bg-slate-50', text: 'text-slate-700', dot: 'bg-slate-400', border: 'border-slate-200' };
+    const style = badges[status] || { bg: 'bg-slate-50', text: 'text-slate-700', dot: 'bg-slate-400', border: 'border-slate-200', label: status };
     return (
       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-extrabold uppercase tracking-wider ${style.bg} ${style.text} ${style.border}`}>
         <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-        {status}
+        {style.label}
+      </span>
+    );
+  };
+
+  const getPaymentStatusBadge = (paymentStatus?: string) => {
+    const status = paymentStatus || 'unpaid';
+    const badges: Record<string, { bg: string; text: string; border: string; label: string }> = {
+      unpaid: { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-200', label: t('dashboard.paymentStatusUnpaid') },
+      payment_link_sent: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', label: t('dashboard.paymentStatusLinkSent') },
+      paid: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', label: t('dashboard.paymentStatusPaid') },
+      refunded: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', label: t('dashboard.paymentStatusRefunded') },
+      failed: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', label: t('dashboard.paymentStatusFailed') },
+    };
+    const style = badges[status] || badges.unpaid;
+    return (
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[11px] font-bold ${style.bg} ${style.text} ${style.border}`}>
+        <CreditCard className="w-3 h-3 shrink-0" />
+        <span>{style.label}</span>
       </span>
     );
   };
@@ -251,7 +272,7 @@ export function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200/80">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1">
-            {t('dashboard.welcome', { name: user?.first_name || user?.email?.split('@')[0] || 'Customer' })}
+            {t('dashboard.welcome', { name: user?.first_name || user?.email?.split('@')[0] || t('dashboard.customerFallback') })}
           </h1>
           <p className="text-slate-600 text-sm sm:text-base">
             {t('dashboard.subheader')}
@@ -273,7 +294,7 @@ export function Dashboard() {
           </div>
           <div>
             <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-0.5">{t('dashboard.totalOrders')}</p>
-            <p className="text-3xl font-extrabold text-slate-900">{orders.length}</p>
+            <p className="text-3xl font-extrabold text-slate-900 tabular-nums">{orders.length}</p>
           </div>
         </Card>
 
@@ -283,7 +304,7 @@ export function Dashboard() {
           </div>
           <div>
             <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-0.5">{t('dashboard.activeRecurring')}</p>
-            <p className="text-3xl font-extrabold text-slate-900">
+            <p className="text-3xl font-extrabold text-slate-900 tabular-nums">
               {recurring.filter((r) => r.is_active).length}
             </p>
           </div>
@@ -320,26 +341,32 @@ export function Dashboard() {
             <div className="space-y-4">
               {orders.map((order) => {
                 const canCancel = order.status === 'pending' || order.status === 'confirmed';
+                const hasSurcharge = Number(order.surcharge_amount) > 0;
+                const displayFinalTotal = Number(order.final_total_price) > 0
+                  ? Number(order.final_total_price)
+                  : Number(order.total_price) || 0;
+                const showPaymentLink = Boolean(order.stripe_payment_link_url && order.payment_status !== 'paid');
 
                 return (
                   <Card key={order.id} variant="default" className="p-5 space-y-4 shadow-2xs hover:shadow-md transition-all">
-                    {/* 1. Header: Order Number & Service on Left, Status Badge on Right */}
+                    {/* 1. Header: Order Number & Service on Left, Status & Payment Badges on Right */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
                             <Package className="w-4 h-4" />
                           </div>
-                          <span className="text-slate-900 font-extrabold text-lg">
+                          <span className="text-slate-900 font-extrabold text-lg tabular-nums">
                             {t('dashboard.orderNumber', { id: order.id })}
                           </span>
                         </div>
-                        <p className="text-slate-500 text-xs font-semibold pl-10">
+                        <p className="text-slate-500 text-xs font-semibold pl-10 tabular-nums">
                           {t('dashboard.service')}: <span className="text-slate-900 font-bold">{order.service_name || 'Standard ($2.25/lb)'}</span>
                         </p>
                       </div>
-                      <div className="shrink-0">
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
                         {getStatusBadge(order.status)}
+                        {getPaymentStatusBadge(order.payment_status)}
                       </div>
                     </div>
 
@@ -349,28 +376,73 @@ export function Dashboard() {
                         <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
                         <div>
                           <p className="text-[10px] uppercase font-bold text-slate-400">{t('schedule.date')}</p>
-                          <p className="font-bold text-slate-900">{order.pickup_date}</p>
+                          <p className="font-bold text-slate-900 tabular-nums">{order.pickup_date}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-blue-600 shrink-0" />
                         <div>
                           <p className="text-[10px] uppercase font-bold text-slate-400">{t('schedule.timeSlot')}</p>
-                          <p className="font-bold text-slate-900">
-                            {order.pickup_time_slot === 'morning' ? '8-11 AM' : '12-4 PM'}
+                          <p className="font-bold text-slate-900 tabular-nums">
+                            {order.pickup_time_slot === 'morning' ? t('schedule.morningSlot') : t('schedule.afternoonSlot')}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[10px] uppercase font-bold text-slate-400">Location</p>
+                          <p className="text-[10px] uppercase font-bold text-slate-400">{t('dashboard.locationLabel')}</p>
                           <p className="font-bold text-slate-900 truncate" title={order.city || 'Denver'}>
                             {order.city || 'Denver'}
                           </p>
                         </div>
                       </div>
                     </div>
+
+                    {/* Financial Summary Capsule when price or surcharge exists */}
+                    {(displayFinalTotal > 0 || hasSurcharge) && (
+                      <div className="bg-slate-50/90 px-3.5 py-2.5 rounded-xl border border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs tabular-nums">
+                        <div className="flex items-center gap-1.5 text-slate-600 font-semibold">
+                          <DollarSign className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                          <span>{t('dashboard.finalTotalLabel')}:</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {hasSurcharge && (
+                            <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                              +${Number(order.surcharge_amount).toFixed(2)} {order.surcharge_concept || t('dashboard.surchargeLabel')}
+                            </span>
+                          )}
+                          <span className="font-black text-slate-900 text-sm">
+                            ${displayFinalTotal.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stripe Payment Link Prominent Banner on Card */}
+                    {showPaymentLink && (
+                      <div className="p-3.5 rounded-2xl bg-blue-600 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <p className="text-xs font-extrabold flex items-center gap-1.5">
+                            <CreditCard className="w-4 h-4 shrink-0" />
+                            <span>{t('dashboard.paymentReadyBannerTitle')}</span>
+                          </p>
+                          <p className="text-[11px] text-blue-100 leading-snug">
+                            {t('dashboard.paymentReadyBannerDesc')}
+                          </p>
+                        </div>
+                        <a
+                          href={order.stripe_payment_link_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-white text-blue-700 hover:bg-blue-50 text-xs font-extrabold shrink-0 shadow-2xs transition-colors tabular-nums"
+                        >
+                          <span>{t('dashboard.payWithStripeBtn')}</span>
+                          {displayFinalTotal > 0 && <span>(${displayFinalTotal.toFixed(2)})</span>}
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    )}
 
                     {/* 3. Note/Details quote box if present */}
                     {order.order_details && (
@@ -395,7 +467,11 @@ export function Dashboard() {
                           </button>
                         ) : (
                           <span className="text-[11px] text-slate-400 font-medium">
-                            {order.status === 'delivered' ? 'Completed' : order.status === 'cancelled' ? 'Cancelled' : 'In Progress'}
+                            {order.status === 'delivered'
+                              ? t('dashboard.statusCompleted')
+                              : order.status === 'cancelled'
+                              ? t('dashboard.statusCancelled')
+                              : t('dashboard.statusInProgress')}
                           </span>
                         )}
                       </div>
@@ -450,13 +526,13 @@ export function Dashboard() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-                        <Sparkles className="w-4 h-4" />
+                        <RefreshCw className="w-4 h-4" />
                       </div>
                       <div>
                         <h3 className="text-slate-900 font-extrabold text-base capitalize">
-                          {t(`schedule.${schedule.frequency}`, { defaultValue: schedule.frequency })} Plan
+                          {t(`schedule.${schedule.frequency}`, { defaultValue: schedule.frequency })} {t('dashboard.planSuffix')}
                         </h3>
-                        <p className="text-emerald-700 text-xs font-bold">7.5% Recurring Discount Active</p>
+                        <p className="text-emerald-700 text-xs font-bold tabular-nums">{t('dashboard.recurringDiscountActive')}</p>
                       </div>
                     </div>
 
@@ -477,7 +553,7 @@ export function Dashboard() {
                     <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
                     <div>
                       <p className="text-[10px] uppercase font-bold text-slate-400">{t('dashboard.nextPickup')}</p>
-                      <p className="font-bold text-slate-900">{schedule.next_pickup_date}</p>
+                      <p className="font-bold text-slate-900 tabular-nums">{schedule.next_pickup_date}</p>
                     </div>
                   </div>
 
@@ -539,10 +615,13 @@ export function Dashboard() {
                   <Package className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-extrabold text-slate-900">
+                  <h3 className="text-xl font-extrabold text-slate-900 tabular-nums">
                     {t('dashboard.orderDetailsTitle', { id: selectedOrderForDetails.id })}
                   </h3>
-                  <div className="mt-1">{getStatusBadge(selectedOrderForDetails.status)}</div>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    {getStatusBadge(selectedOrderForDetails.status)}
+                    {getPaymentStatusBadge(selectedOrderForDetails.payment_status)}
+                  </div>
                 </div>
               </div>
               <button
@@ -553,10 +632,35 @@ export function Dashboard() {
               </button>
             </div>
 
+            {/* Prominent Stripe Payment CTA inside Modal */}
+            {selectedOrderForDetails.stripe_payment_link_url &&
+              selectedOrderForDetails.payment_status !== 'paid' && (
+                <div className="p-4 rounded-2xl bg-blue-600 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                  <div className="space-y-1">
+                    <p className="text-sm font-extrabold flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 shrink-0" />
+                      <span>{t('dashboard.paymentReadyBannerTitle')}</span>
+                    </p>
+                    <p className="text-xs text-blue-100 leading-relaxed">
+                      {t('dashboard.paymentReadyBannerDesc')}
+                    </p>
+                  </div>
+                  <a
+                    href={selectedOrderForDetails.stripe_payment_link_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 text-xs font-extrabold shrink-0 shadow-xs transition-colors tabular-nums"
+                  >
+                    <span>{t('dashboard.payWithStripeBtn')}</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
+
             {/* Details List */}
             <div className="space-y-4 text-xs sm:text-sm">
               {/* Pickup & Service Speed */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 tabular-nums">
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-semibold">{t('dashboard.serviceSpeed')}:</span>
                   <span className="font-extrabold text-slate-900">
@@ -575,6 +679,77 @@ export function Dashboard() {
                 </div>
               </div>
 
+              {/* Financial Breakdown Card */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 tabular-nums">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                  <DollarSign className="w-4 h-4 text-blue-600" />
+                  <span>{t('common.total')}</span>
+                </p>
+
+                {selectedOrderForDetails.base_price !== undefined && (
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-500 font-semibold">{t('dashboard.basePriceLabel')}:</span>
+                    <span className="font-bold text-slate-900">
+                      ${Number(selectedOrderForDetails.base_price).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-500 font-semibold">{t('dashboard.deliveryFee')}:</span>
+                  <span
+                    className={`font-extrabold ${
+                      parseFloat(String(selectedOrderForDetails.delivery_fee || 0)) === 0
+                        ? 'text-emerald-700'
+                        : 'text-blue-700'
+                    }`}
+                  >
+                    {parseFloat(String(selectedOrderForDetails.delivery_fee || 0)) === 0
+                      ? t('dashboard.freeCentralDenver')
+                      : t('dashboard.outerDenverZone', { fee: selectedOrderForDetails.delivery_fee })}
+                  </span>
+                </div>
+
+                {selectedOrderForDetails.total_price !== undefined && (
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-500 font-semibold">{t('dashboard.quotedTotalLabel')}:</span>
+                    <span className="font-bold text-slate-900">
+                      ${Number(selectedOrderForDetails.total_price).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+
+                {Number(selectedOrderForDetails.surcharge_amount) > 0 && (
+                  <div className="flex justify-between items-center text-xs text-amber-800 bg-amber-50/90 px-2.5 py-1.5 rounded-lg border border-amber-200">
+                    <span className="font-semibold">
+                      {t('dashboard.surchargeLabel')}
+                      {selectedOrderForDetails.surcharge_concept
+                        ? ` (${selectedOrderForDetails.surcharge_concept})`
+                        : ''}
+                      :
+                    </span>
+                    <span className="font-extrabold">
+                      +${Number(selectedOrderForDetails.surcharge_amount).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+
+                {(selectedOrderForDetails.final_total_price !== undefined ||
+                  selectedOrderForDetails.total_price !== undefined) && (
+                  <div className="pt-2 border-t border-slate-200/80 flex justify-between items-center text-sm">
+                    <span className="text-slate-900 font-extrabold">{t('dashboard.finalTotalLabel')}:</span>
+                    <span className="font-black text-blue-600 text-base">
+                      $
+                      {(
+                        Number(selectedOrderForDetails.final_total_price) > 0
+                          ? Number(selectedOrderForDetails.final_total_price)
+                          : Number(selectedOrderForDetails.total_price || 0)
+                      ).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
               {/* Delivery Address & Zone */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
@@ -582,25 +757,11 @@ export function Dashboard() {
                   {t('dashboard.pickupAddress')}
                 </p>
                 <p className="font-semibold text-slate-900">
-                  {selectedOrderForDetails.street_address || 'Address provided on profile'}
+                  {selectedOrderForDetails.street_address || t('dashboard.addressOnProfile')}
                 </p>
-                <p className="text-slate-600">
+                <p className="text-slate-600 tabular-nums">
                   {selectedOrderForDetails.city} {selectedOrderForDetails.zip_code}
                 </p>
-                <div className="pt-2 border-t border-slate-200/80 flex justify-between items-center text-xs">
-                  <span className="text-slate-500 font-semibold">{t('dashboard.deliveryFee')}:</span>
-                  <span
-                    className={`font-extrabold ${
-                      parseFloat(String(selectedOrderForDetails.delivery_fee)) === 0
-                        ? 'text-emerald-700'
-                        : 'text-blue-700'
-                    }`}
-                  >
-                    {parseFloat(String(selectedOrderForDetails.delivery_fee)) === 0
-                      ? '$0.00 (FREE Central Denver)'
-                      : `+$${selectedOrderForDetails.delivery_fee} (Outer Denver Zone)`}
-                  </span>
-                </div>
               </div>
 
               {/* Items / Addons */}
@@ -609,7 +770,7 @@ export function Dashboard() {
                   <FileText className="w-4 h-4 text-blue-600" />
                   {t('dashboard.itemsAndAddons')}
                 </p>
-                <p className="text-slate-800 whitespace-pre-line font-medium leading-relaxed">
+                <p className="text-slate-800 whitespace-pre-line font-medium leading-relaxed tabular-nums">
                   {selectedOrderForDetails.order_details || t('dashboard.noneSpecified')}
                 </p>
               </div>
@@ -652,7 +813,7 @@ export function Dashboard() {
                 onClick={() => setSelectedOrderForDetails(null)}
                 className="ml-auto font-bold"
               >
-                {t('common.cancel')}
+                {t('common.close')}
               </Button>
             </div>
           </div>

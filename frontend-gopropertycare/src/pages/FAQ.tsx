@@ -7,7 +7,6 @@ import {
   ChevronDown,
   Phone,
   Mail,
-  Sparkles,
   HelpCircle,
   Home,
   Building2,
@@ -197,7 +196,7 @@ export function FAQ() {
       {/* Hero Header */}
       <section className="text-center max-w-3xl mx-auto space-y-4">
         <span className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+          <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
           {t('faq.badge', 'Help & Information Center')}
         </span>
 

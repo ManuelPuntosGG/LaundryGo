@@ -2,7 +2,6 @@ import { useState, useEffect, useId } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Sparkles,
   Clock,
   MapPin,
   CheckCircle2,
@@ -22,6 +21,17 @@ import {
   Calendar as CalendarIcon,
   Send,
   Building2,
+  CreditCard,
+  ShieldCheck,
+  Flame,
+  Snowflake,
+  LayoutGrid,
+  Grid2X2,
+  Heart,
+  Waves,
+  Utensils,
+  Shirt,
+  type LucideIcon,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -50,18 +60,18 @@ import {
 
 type Step = 1 | 2 | 3 | 4;
 
-const ADDON_ICONS: Record<string, string> = {
-  oven: '🔍',
-  inside_fridge: '🧊',
-  blinds: '🪟',
-  inside_windows: '🖼️',
-  pets: '🐾',
-  str_pets: '🐾',
-  hot_tub: '♨️',
-  str_hot_tub: '♨️',
-  patio_grill: '🥩',
-  str_patio_grill: '🥩',
-  off_site_laundry: '🧺',
+const ADDON_ICONS: Record<string, LucideIcon> = {
+  oven: Flame,
+  inside_fridge: Snowflake,
+  blinds: LayoutGrid,
+  inside_windows: Grid2X2,
+  pets: Heart,
+  str_pets: Heart,
+  hot_tub: Waves,
+  str_hot_tub: Waves,
+  patio_grill: Utensils,
+  str_patio_grill: Utensils,
+  off_site_laundry: Shirt,
 };
 
 const TIME_SLOTS = [
@@ -271,6 +281,23 @@ export function Schedule() {
   const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Payment / Card on file state (25% Deposit + 75% Completion Hold)
+  const [cardName, setCardName] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvc, setCardCvc] = useState('');
+
+  const formatCardNumber = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 16);
+    return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+  };
+
+  const formatCardExpiry = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  };
+
   // Pre-fill user data if auth loads asynchronously
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -425,6 +452,8 @@ export function Schedule() {
   const addonsTotal = regularAddonsTotal + (isOffSiteSelected ? currentOffSiteFee : 0);
 
   const totalPrice = discountedBasePrice + addonsTotal;
+  const depositAmount = Math.round(totalPrice * 0.25 * 100) / 100;
+  const remainingBalance = Math.round((totalPrice - depositAmount) * 100) / 100;
 
   const representativeSqft = isCustomQuote
     ? (parseInt(customQuoteSqft, 10) || (isSTR ? 4000 : 6500))
@@ -449,6 +478,41 @@ export function Schedule() {
     isAddressValid &&
     isCityValid &&
     isZipValid;
+
+  // Card Validation (Step 4)
+  const isCardNameValid = cardName.trim().length >= 2;
+  const cardDigits = cardNumber.replace(/\D/g, '');
+  const isCardNumberValid = cardDigits.length === 15 || cardDigits.length === 16;
+
+  const validateCardExpiry = (val: string): { isValid: boolean; isPast: boolean } => {
+    const digits = val.replace(/\D/g, '');
+    if (digits.length !== 4) return { isValid: false, isPast: false };
+    const month = parseInt(digits.slice(0, 2), 10);
+    const year = 2000 + parseInt(digits.slice(2, 4), 10);
+    if (isNaN(month) || month < 1 || month > 12 || isNaN(year)) {
+      return { isValid: false, isPast: false };
+    }
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    if (year < currentYear || (year === currentYear && month < currentMonth)) {
+      return { isValid: false, isPast: true };
+    }
+    return { isValid: true, isPast: false };
+  };
+
+  const expiryValidation = validateCardExpiry(cardExpiry);
+  const isCardExpiryValid = expiryValidation.isValid;
+  const isCardExpiryPast = expiryValidation.isPast;
+
+  const cvcDigits = cardCvc.replace(/\D/g, '');
+  const isCardCvcValid = cvcDigits.length === 3 || cvcDigits.length === 4;
+
+  const isCardValid =
+    isCardNameValid &&
+    isCardNumberValid &&
+    isCardExpiryValid &&
+    isCardCvcValid;
 
   // Calendar Helpers
   const calendarLocale = i18n.language?.startsWith('es') ? 'es' : 'en';
@@ -513,7 +577,16 @@ export function Schedule() {
 
   // Submit standard booking
   const handleSubmitBooking = async () => {
-    if (!agreedToTerms) return;
+    if (!isCardValid || !agreedToTerms) {
+      setTouchedFields((prev) => ({
+        ...prev,
+        cc_name: true,
+        cc_number: true,
+        cc_exp: true,
+        cc_csc: true,
+      }));
+      return;
+    }
     setIsSubmitting(true);
     setErrorMessage('');
 
@@ -560,6 +633,7 @@ export function Schedule() {
       time_slot: selectedTimeSlot,
       special_instructions: formattedInstructions,
       language: i18n.language?.startsWith('es') ? 'es' : 'en',
+      payment_method_id: `pm_card_${cardDigits.slice(-4)}`,
     };
 
     try {
@@ -642,7 +716,7 @@ export function Schedule() {
       <div className="max-w-2xl mx-auto py-8 sm:py-12 px-4 animate-fade-in-up">
         <Card className="p-6 sm:p-10 text-center border-emerald-200/90 shadow-xl space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner animate-pop-in">
-            <CheckCircle2 className="w-9 h-9 animate-float" />
+            <CheckCircle2 className="w-9 h-9" />
           </div>
 
           <div className="space-y-2">
@@ -662,7 +736,7 @@ export function Schedule() {
           <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 text-left text-xs sm:text-sm space-y-3">
             <div className="flex justify-between pb-2 border-b border-slate-200">
               <span className="text-slate-500 font-semibold">{t('schedule.orderNumber')}</span>
-              <span className="font-black text-emerald-800">GPC-#{createdOrderId}</span>
+              <span className="font-black text-emerald-800 tabular-nums">GPC-#{createdOrderId}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.serviceTypeLabel')}</span>
@@ -678,7 +752,7 @@ export function Schedule() {
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.dimensions')}</span>
-              <span className="font-bold text-slate-900">
+              <span className="font-bold text-slate-900 tabular-nums">
                 {selectedTier.label}
               </span>
             </div>
@@ -690,7 +764,7 @@ export function Schedule() {
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.scheduledVisit')}</span>
-              <span className="font-bold text-slate-900">{selectedDate} @ {selectedTimeSlot}</span>
+              <span className="font-bold text-slate-900 tabular-nums">{selectedDate} @ {selectedTimeSlot}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500 font-semibold">{t('schedule.addressLabel')}</span>
@@ -699,9 +773,23 @@ export function Schedule() {
               </span>
             </div>
             {!customQuoteSubmitted ? (
-              <div className="flex justify-between pt-2 border-t border-slate-200">
-                <span className="text-slate-900 font-extrabold text-sm sm:text-base">{t('schedule.total')}</span>
-                <span className="font-black text-emerald-700 text-base sm:text-lg">${totalPrice.toFixed(2)}</span>
+              <div className="pt-3 border-t border-slate-200 space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-600 font-semibold">{t('schedule.depositDueToday')} (25%):</span>
+                  <span className="font-bold text-amber-800 text-sm sm:text-base tabular-nums">${depositAmount.toFixed(2)} <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">({t('schedule.depositPendingApprovalBadge')})</span></span>
+                </div>
+                <div className="flex justify-between items-center text-xs text-slate-500">
+                  <span>{t('schedule.balanceDueUponCompletion')} (75%):</span>
+                  <span className="font-semibold text-slate-700 tabular-nums">${remainingBalance.toFixed(2)} <span className="text-[11px] font-normal text-slate-500">({t('schedule.balancePendingBadge')})</span></span>
+                </div>
+                <div className="flex justify-between items-center text-xs text-emerald-800 font-bold bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+                  <span>{t('schedule.chargedTodayBadge')}</span>
+                  <span className="text-sm font-black tabular-nums">$0.00</span>
+                </div>
+                <div className="flex justify-between items-baseline pt-1.5 border-t border-slate-100">
+                  <span className="text-slate-900 font-extrabold text-sm sm:text-base">{t('schedule.total')}</span>
+                  <span className="font-black text-emerald-700 text-base sm:text-lg tabular-nums">${totalPrice.toFixed(2)}</span>
+                </div>
               </div>
             ) : null}
           </div>
@@ -845,7 +933,7 @@ export function Schedule() {
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-                  <span className="text-base sm:text-lg font-black text-slate-900">
+                  <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
                     ${selectedTier.standardPrice.toFixed(2)}
                   </span>
                 </div>
@@ -882,7 +970,7 @@ export function Schedule() {
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-                  <span className="text-base sm:text-lg font-black text-slate-900">
+                  <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
                     ${selectedTier.deepPrice.toFixed(2)}
                   </span>
                 </div>
@@ -921,7 +1009,7 @@ export function Schedule() {
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-                  <span className="text-base sm:text-lg font-black text-slate-900">
+                  <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
                     ${(isSTR ? getSTRTierByBedrooms(bedrooms).basePrice : selectedTier.strOnSitePrice).toFixed(2)}
                   </span>
                 </div>
@@ -962,6 +1050,7 @@ export function Schedule() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <Input
                     label={`${t('auth.firstName')} *`}
+                    autoComplete="given-name"
                     value={formData.first_name}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                     onBlur={() => setTouchedFields({ ...touchedFields, first_name: true })}
@@ -971,12 +1060,15 @@ export function Schedule() {
                   />
                   <Input
                     label={t('auth.lastName')}
+                    autoComplete="family-name"
                     value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                     placeholder={t('auth.lastName')}
                   />
                   <Input
                     label={`${t('auth.phone')} *`}
+                    type="tel"
+                    autoComplete="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     onBlur={() => setTouchedFields({ ...touchedFields, phone: true })}
@@ -987,6 +1079,7 @@ export function Schedule() {
                   <Input
                     label={`${t('auth.emailLabel')} *`}
                     type="email"
+                    autoComplete="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     onBlur={() => setTouchedFields({ ...touchedFields, email: true })}
@@ -1010,12 +1103,13 @@ export function Schedule() {
                       value={customQuoteSqft}
                       onChange={(e) => setCustomQuoteSqft(e.target.value)}
                       placeholder={isSTR ? 'e.g. 4200' : 'e.g. 7500'}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs tabular-nums"
                     />
                   </div>
 
                   <Input
                     label={`${t('schedule.cityLabel')} *`}
+                    autoComplete="address-level2"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     placeholder={t('schedule.cityPlaceholder')}
@@ -1067,7 +1161,7 @@ export function Schedule() {
                     <label htmlFor={tierSelectId} className="block text-sm font-extrabold text-slate-900">
                       {t('schedule.tierDropdownLabel')}
                     </label>
-                    <span className="text-xs text-slate-500 font-bold self-start sm:self-auto">
+                    <span className="text-xs text-slate-500 font-bold self-start sm:self-auto tabular-nums">
                       {selectedTier.label}
                     </span>
                   </div>
@@ -1081,7 +1175,7 @@ export function Schedule() {
                         const found = pricingTiers.find((t) => t.tier === tNum);
                         if (found) setSelectedTier(found);
                       }}
-                      className="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 shadow-2xs appearance-none cursor-pointer pr-10 hover:border-slate-400 transition-all"
+                      className="w-full bg-white border-2 border-slate-300 rounded-xl px-4 py-3.5 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 shadow-2xs appearance-none cursor-pointer pr-10 hover:border-slate-400 transition-all tabular-nums"
                     >
                       {pricingTiers.map((tier) => (
                         <option key={tier.tier} value={tier.tier}>
@@ -1109,7 +1203,7 @@ export function Schedule() {
                 <div className="space-y-5 animate-fade-in">
                   {/* Estimated Price Notice Banner (Paso 5 del documento STR) */}
                   <div className="bg-emerald-50/80 border-2 border-emerald-200/90 rounded-2xl p-4 sm:p-5 flex items-start gap-3 shadow-2xs">
-                    <Sparkles className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5 animate-float" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
                     <div className="space-y-1">
                       <h4 className="text-xs sm:text-sm font-black text-emerald-950">
                         {t('schedule.strTurnoverTitle')}
@@ -1127,7 +1221,7 @@ export function Schedule() {
                         <Bed className="w-4 h-4 text-emerald-600" />
                         <span>{t('schedule.bedroomsLabel')}</span>
                       </label>
-                      <span className="text-[11px] text-slate-500 font-bold">
+                      <span className="text-[11px] text-slate-500 font-bold tabular-nums">
                         {bedrooms === 0 ? t('schedule.studio') : bedrooms >= 6 ? '6+ Beds (Custom)' : `${bedrooms} ${t('schedule.beds')}`}
                       </span>
                     </div>
@@ -1150,14 +1244,14 @@ export function Schedule() {
                               <span className="text-xs sm:text-sm font-black text-slate-900 block truncate">
                                 {tier.bedrooms === 0 ? t('schedule.studio') : tier.labelKey}
                               </span>
-                              <span className="text-[10px] text-slate-500 font-medium block truncate">
+                              <span className="text-[10px] text-slate-500 font-medium block truncate tabular-nums">
                                 {tier.bedrooms >= 6
                                   ? '> 3,500 sq ft'
                                   : `~${tier.maxSqftHint.toLocaleString()} sq ft`}
                               </span>
                             </div>
                             <div className="pt-2 mt-1.5 border-t border-slate-100/80 flex items-center justify-between">
-                              <span className="text-xs font-black text-emerald-800">
+                              <span className="text-xs font-black text-emerald-800 tabular-nums">
                                 {tier.isCustomQuote ? 'Custom' : `$${tier.basePrice}`}
                               </span>
                               {isSelected && <Check className="w-3 h-3 text-emerald-700" />}
@@ -1175,7 +1269,7 @@ export function Schedule() {
                         <Bath className="w-4 h-4 text-emerald-600" />
                         <span>{t('schedule.bathroomsLabel')}</span>
                       </label>
-                      <span className="text-[11px] text-slate-500 font-bold">
+                      <span className="text-[11px] text-slate-500 font-bold tabular-nums">
                         {bathrooms} {t('schedule.baths')} ({strCalc.includedBathrooms} {t('schedule.strIncludedBaths')})
                       </span>
                     </div>
@@ -1186,7 +1280,7 @@ export function Schedule() {
                           key={num}
                           type="button"
                           onClick={() => setBathrooms(num)}
-                          className={`min-h-[40px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
+                          className={`min-h-[40px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center tabular-nums ${
                             bathrooms === num
                               ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
                               : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
@@ -1198,15 +1292,15 @@ export function Schedule() {
                     </div>
 
                     <div className="flex items-center justify-between text-xs pt-0.5">
-                      <span className="text-slate-500 font-medium">
+                      <span className="text-slate-500 font-medium tabular-nums">
                         {strCalc.includedBathrooms} {t('schedule.baths')} {t('schedule.strIncludedBaths')}
                       </span>
                       {strCalc.extraBathrooms > 0 ? (
-                        <span className="text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        <span className="text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 tabular-nums">
                           +{strCalc.extraBathrooms} {t('schedule.extraBathFee')} (+${strCalc.extraBathroomFee.toFixed(2)})
                         </span>
                       ) : (
-                        <span className="text-slate-400 font-medium text-[11px]">
+                        <span className="text-slate-400 font-medium text-[11px] tabular-nums">
                           {t('schedule.strExtraBaths')}
                         </span>
                       )}
@@ -1253,17 +1347,17 @@ export function Schedule() {
                       <div className="flex-1 text-xs">
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                            <span className="text-sm shrink-0" aria-hidden="true">🧺</span>
+                            <Shirt className="w-4 h-4 text-emerald-600 shrink-0" />
                             <span>{t('schedule.offSiteLaundryAddonTitle')}</span>
                           </span>
-                          <span className="font-black text-emerald-800 text-xs sm:text-sm whitespace-nowrap">
+                          <span className="font-black text-emerald-800 text-xs sm:text-sm whitespace-nowrap tabular-nums">
                             +${currentOffSiteFee.toFixed(2)}
                           </span>
                         </div>
                         <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-1 leading-relaxed">
                           {t('schedule.offSiteLaundryAddonDesc')}
                         </p>
-                        <p className="text-[11px] font-semibold mt-1.5 text-slate-500">
+                        <p className="text-[11px] font-semibold mt-1.5 text-slate-500 tabular-nums">
                           {selectedAddonCodes['off_site_laundry']
                             ? (i18n.language?.startsWith('es')
                                 ? `✓ Tarifa escalada para ${bedrooms === 0 ? 'Studio' : `${bedrooms} hab`}: +$${currentOffSiteFee.toFixed(2)}`
@@ -1313,11 +1407,11 @@ export function Schedule() {
                         </div>
 
                         <div className="pt-2 mt-2 border-t border-slate-100/80">
-                          <span className="text-xs font-black text-slate-900 block">
+                          <span className="text-xs font-black text-slate-900 block tabular-nums">
                             ${freqNet.toFixed(2)}
                           </span>
                           {freq.discountPercent > 0 && (
-                            <span className="text-[10px] text-emerald-700 font-bold block">
+                            <span className="text-[10px] text-emerald-700 font-bold block tabular-nums">
                               -{freq.discountPercent}% saved
                             </span>
                           )}
@@ -1351,7 +1445,7 @@ export function Schedule() {
                             key={num}
                             type="button"
                             onClick={() => setBedrooms(num)}
-                            className={`min-h-[40px] py-1.5 px-1 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
+                            className={`min-h-[40px] py-1.5 px-1 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center tabular-nums ${
                               bedrooms === num
                                 ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
                                 : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
@@ -1375,7 +1469,7 @@ export function Schedule() {
                             key={num}
                             type="button"
                             onClick={() => setBathrooms(num)}
-                            className={`min-h-[40px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center ${
+                            className={`min-h-[40px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center tabular-nums ${
                               bathrooms === num
                                 ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
                                 : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
@@ -1396,11 +1490,11 @@ export function Schedule() {
                   <div>
                     <span className="text-[11px] text-slate-500 font-semibold block">{t('schedule.estimatedBase')}</span>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-lg sm:text-xl font-black text-slate-900">
+                      <span className="text-lg sm:text-xl font-black text-slate-900 tabular-nums">
                         ${discountedBasePrice.toFixed(2)}
                       </span>
                       {discountPercent > 0 && (
-                        <span className="text-xs text-slate-400 line-through">
+                        <span className="text-xs text-slate-400 line-through tabular-nums">
                           ${baseTierPrice.toFixed(2)}
                         </span>
                       )}
@@ -1590,7 +1684,7 @@ export function Schedule() {
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex flex-col items-end text-right">
                 <span className="text-[10px] text-slate-500 font-bold uppercase">{t('schedule.totalDue')}</span>
-                <span className="text-sm font-black text-slate-900">${totalPrice.toFixed(2)}</span>
+                <span className="text-sm font-black text-slate-900 tabular-nums">${totalPrice.toFixed(2)}</span>
               </div>
               <Button
                 size="md"
@@ -1637,6 +1731,7 @@ export function Schedule() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Input
               label={`${t('schedule.addressLabel')} *`}
+              autoComplete="street-address"
               value={formData.street_address}
               onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, street_address: true })}
@@ -1646,6 +1741,7 @@ export function Schedule() {
 
             <Input
               label={`${t('schedule.cityLabel')} *`}
+              autoComplete="address-level2"
               value={formData.city}
               onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, city: true })}
@@ -1655,6 +1751,7 @@ export function Schedule() {
 
             <Input
               label={`${t('schedule.zipLabel')} *`}
+              autoComplete="postal-code"
               value={formData.zip_code}
               onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, zip_code: true })}
@@ -1664,6 +1761,7 @@ export function Schedule() {
 
             <Input
               label={`${t('auth.firstName')} *`}
+              autoComplete="given-name"
               value={formData.first_name}
               onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, first_name: true })}
@@ -1673,6 +1771,7 @@ export function Schedule() {
 
             <Input
               label={`${t('auth.lastName')} *`}
+              autoComplete="family-name"
               value={formData.last_name}
               onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, last_name: true })}
@@ -1682,6 +1781,8 @@ export function Schedule() {
 
             <Input
               label={`${t('auth.phone')} *`}
+              type="tel"
+              autoComplete="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, phone: true })}
@@ -1692,6 +1793,7 @@ export function Schedule() {
             <Input
               label={`${t('auth.emailLabel')} *`}
               type="email"
+              autoComplete="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               onBlur={() => setTouchedFields({ ...touchedFields, email: true })}
@@ -1760,7 +1862,7 @@ export function Schedule() {
           <div className="space-y-3 pt-3 border-t border-slate-100">
             <div>
               <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>{t('schedule.addonsTitle')}</span>
               </label>
               <p className="text-xs text-slate-600 font-medium">
@@ -1789,6 +1891,7 @@ export function Schedule() {
                 const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
                 const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
                 const displayPrice = addon.code === 'off_site_laundry' ? currentOffSiteFee : Number(addon.price);
+                const AddonIcon = ADDON_ICONS[addon.code] || Check;
 
                 return (
                   <div
@@ -1818,10 +1921,10 @@ export function Schedule() {
                     <div className="flex-1 text-xs">
                       <div className="flex items-center justify-between">
                         <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                          <span className="text-sm shrink-0" aria-hidden="true">{ADDON_ICONS[addon.code] || '✨'}</span>
+                          <AddonIcon className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
                           <span>{localizedName}</span>
                         </span>
-                        <span className="font-black text-emerald-700 text-xs sm:text-sm">+${displayPrice.toFixed(2)}</span>
+                        <span className="font-black text-emerald-700 text-xs sm:text-sm tabular-nums">+${displayPrice.toFixed(2)}</span>
                       </div>
                       <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
                     </div>
@@ -1860,12 +1963,18 @@ export function Schedule() {
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex flex-col items-end text-right">
                 <span className="text-[10px] text-slate-500 font-bold uppercase">{t('schedule.totalDue')}</span>
-                <span className="text-sm font-black text-slate-900">${totalPrice.toFixed(2)}</span>
+                <span className="text-sm font-black text-slate-900 tabular-nums">${totalPrice.toFixed(2)}</span>
               </div>
               <Button
                 size="md"
                 disabled={!canProceedFromStep3}
-                onClick={() => setStep(4)}
+                onClick={() => {
+                  if (!cardName.trim()) {
+                    const fullName = `${formData.first_name} ${formData.last_name}`.trim();
+                    if (fullName) setCardName(fullName);
+                  }
+                  setStep(4);
+                }}
                 className="flex-1 sm:flex-initial sm:px-6 min-h-[44px] text-xs sm:text-sm font-extrabold hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
               >
                 <span className="truncate">{t('schedule.step4')}</span>
@@ -1929,11 +2038,11 @@ export function Schedule() {
               </div>
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.scheduledDate')}:</span>
-                <span className="font-bold text-slate-900 text-right">{selectedDate}</span>
+                <span className="font-bold text-slate-900 text-right tabular-nums">{selectedDate}</span>
               </div>
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.timeSlotLabel')}:</span>
-                <span className="font-bold text-slate-900 text-right">{selectedTimeSlot}</span>
+                <span className="font-bold text-slate-900 text-right tabular-nums">{selectedTimeSlot}</span>
               </div>
             </div>
 
@@ -1949,7 +2058,7 @@ export function Schedule() {
               </div>
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('auth.phone')}:</span>
-                <span className="font-bold text-slate-900 text-right">{formData.phone}</span>
+                <span className="font-bold text-slate-900 text-right tabular-nums">{formData.phone}</span>
               </div>
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.addressLabel')}:</span>
@@ -1991,7 +2100,7 @@ export function Schedule() {
                   <span>
                     {t('schedule.baseTierPrice')} ({bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`} • {t('schedule.strIncludedBaths')} {strCalc.includedBathrooms} {t('schedule.baths')}):
                   </span>
-                  <span className="font-bold text-slate-900">${strCalc.basePrice.toFixed(2)}</span>
+                  <span className="font-bold text-slate-900 tabular-nums">${strCalc.basePrice.toFixed(2)}</span>
                 </div>
 
                 {strCalc.extraBathrooms > 0 && (
@@ -1999,14 +2108,14 @@ export function Schedule() {
                     <span>
                       {t('schedule.extraBathFee')} ({strCalc.extraBathrooms} x ${STR_EXTRA_BATHROOM_PRICE}):
                     </span>
-                    <span className="font-bold text-slate-900">+${strCalc.extraBathroomFee.toFixed(2)}</span>
+                    <span className="font-bold text-slate-900 tabular-nums">+${strCalc.extraBathroomFee.toFixed(2)}</span>
                   </div>
                 )}
               </>
             ) : (
               <div className="flex justify-between text-slate-700 text-xs font-medium">
                 <span>{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
-                <span className="font-bold text-slate-900">${baseTierPrice.toFixed(2)}</span>
+                <span className="font-bold text-slate-900 tabular-nums">${baseTierPrice.toFixed(2)}</span>
               </div>
             )}
 
@@ -2014,7 +2123,7 @@ export function Schedule() {
             {discountPercent > 0 && (
               <div className="flex justify-between text-emerald-800 text-xs font-bold bg-emerald-50/80 p-2 rounded-xl">
                 <span>{t('schedule.frequencyDiscount')} ({t(freqOption.nameKey)}):</span>
-                <span>-${frequencyDiscount.toFixed(2)}</span>
+                <span className="tabular-nums">-${frequencyDiscount.toFixed(2)}</span>
               </div>
             )}
 
@@ -2022,7 +2131,7 @@ export function Schedule() {
             {isSTR && isOffSiteSelected && (
               <div className="flex justify-between text-slate-700 text-xs font-medium">
                 <span>{t('schedule.offSiteLaundryAddonTitle')}:</span>
-                <span className="font-bold text-slate-900">+${currentOffSiteFee.toFixed(2)}</span>
+                <span className="font-bold text-slate-900 tabular-nums">+${currentOffSiteFee.toFixed(2)}</span>
               </div>
             )}
 
@@ -2030,7 +2139,7 @@ export function Schedule() {
             {isSTR && regularAddonsTotal > 0 && (
               <div className="flex justify-between text-slate-700 text-xs font-medium">
                 <span>{t('schedule.addonsFee')}:</span>
-                <span className="font-bold text-slate-900">+${regularAddonsTotal.toFixed(2)}</span>
+                <span className="font-bold text-slate-900 tabular-nums">+${regularAddonsTotal.toFixed(2)}</span>
               </div>
             )}
 
@@ -2038,27 +2147,179 @@ export function Schedule() {
             {!isSTR && addonsTotal > 0 && (
               <div className="flex justify-between text-slate-700 text-xs font-medium">
                 <span>{t('schedule.addonsFee')}:</span>
-                <span className="font-bold text-slate-900">+${addonsTotal.toFixed(2)}</span>
+                <span className="font-bold text-slate-900 tabular-nums">+${addonsTotal.toFixed(2)}</span>
               </div>
             )}
 
-            {/* Total Due */}
+            {/* Total Estimated Service Quote */}
             <div className="pt-3 border-t-2 border-emerald-100 flex justify-between items-baseline">
               <div>
-                <span className="font-black text-slate-900 text-sm sm:text-base">{t('schedule.totalDue')}:</span>
+                <span className="font-black text-slate-900 text-sm sm:text-base">{t('schedule.totalEstimatedQuote')}:</span>
                 {discountPercent > 0 && (
                   <span className="text-[11px] text-emerald-700 font-bold block">
                     Includes {discountPercent}% recurring discount
                   </span>
                 )}
               </div>
-              <span className="font-black text-xl sm:text-2xl text-emerald-700">${totalPrice.toFixed(2)}</span>
+              <span className="font-bold text-slate-700 text-base sm:text-lg tabular-nums">${totalPrice.toFixed(2)}</span>
+            </div>
+
+            {/* 25% Deposit Due Today vs 75% Balance Upon Completion Breakdown */}
+            <div className="bg-emerald-50/90 border-2 border-emerald-300/80 rounded-2xl p-4 sm:p-5 space-y-3">
+              <div className="flex justify-between items-baseline">
+                <div>
+                  <span className="font-black text-emerald-950 text-sm sm:text-base block">{t('schedule.depositDueToday')} (25%):</span>
+                  <span className="text-[11px] text-emerald-700 font-semibold">{t('schedule.depositChargedNow')}</span>
+                </div>
+                <span className="font-black text-2xl sm:text-3xl text-emerald-700 tabular-nums">${depositAmount.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center pt-2.5 border-t border-emerald-200 text-xs text-slate-600 font-medium">
+                <div>
+                  <span className="font-bold text-slate-800 block">{t('schedule.balanceDueUponCompletion')} (75%):</span>
+                  <span className="text-[11px] text-slate-500">{t('schedule.balanceDueUponCompletionHelp')}</span>
+                </div>
+                <span className="font-bold text-slate-900 text-sm sm:text-base tabular-nums">${remainingBalance.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-emerald-200/60 text-xs">
+                <span className="font-extrabold text-emerald-900">{t('schedule.dueTodayLabel')}</span>
+                <span className="font-black text-base text-emerald-800 tabular-nums">$0.00</span>
+              </div>
             </div>
 
             {/* Estimated Price Transparency Notice */}
-            <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-emerald-950 text-xs font-semibold flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-xs font-medium flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
               <span>{t('schedule.estimatedPriceNotice')}</span>
+            </div>
+          </div>
+
+          {/* Card on File Section (Stripe 256-bit Secure Vault) */}
+          <div className="bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-emerald-600" />
+                {t('schedule.paymentMethodTitle')}
+              </span>
+              <div className="flex items-center gap-1.5 text-[11px] text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Stripe 256-bit SSL</span>
+              </div>
+            </div>
+            <p className="text-xs text-slate-600 font-medium leading-relaxed">
+              {t('schedule.cardOnFileInfo')}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {/* Cardholder Name */}
+              <div className="sm:col-span-2">
+                <label htmlFor="cc-name" className="block text-[11px] font-bold text-slate-700 mb-1">
+                  {t('schedule.cardholderNameLabel')} *
+                </label>
+                <input
+                  id="cc-name"
+                  name="cc-name"
+                  type="text"
+                  autoComplete="cc-name"
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value)}
+                  onBlur={() => setTouchedFields({ ...touchedFields, cc_name: true })}
+                  placeholder={t('schedule.cardholderNamePlaceholder')}
+                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none focus:bg-white ${
+                    touchedFields.cc_name && !isCardNameValid
+                      ? 'border-rose-500 focus:border-rose-600'
+                      : 'border-slate-300 focus:border-emerald-600'
+                  }`}
+                />
+                {touchedFields.cc_name && !isCardNameValid && (
+                  <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardNameRequired')}</p>
+                )}
+              </div>
+
+              {/* Card Number */}
+              <div className="flex flex-col justify-end">
+                <label htmlFor="cc-number" className="block text-[11px] font-bold text-slate-700 mb-1">
+                  {t('schedule.cardNumber')} *
+                </label>
+                <input
+                  id="cc-number"
+                  name="cc-number"
+                  type="text"
+                  autoComplete="cc-number"
+                  inputMode="numeric"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                  onBlur={() => setTouchedFields({ ...touchedFields, cc_number: true })}
+                  placeholder="4242 •••• •••• 4242"
+                  maxLength={19}
+                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white ${
+                    touchedFields.cc_number && !isCardNumberValid
+                      ? 'border-rose-500 focus:border-rose-600'
+                      : 'border-slate-300 focus:border-emerald-600'
+                  }`}
+                />
+                {touchedFields.cc_number && !isCardNumberValid && (
+                  <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardNumberInvalid')}</p>
+                )}
+              </div>
+
+              {/* Expiry & CVC */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col justify-end">
+                  <label htmlFor="cc-exp" className="block text-[11px] font-bold text-slate-700">
+                    {t('schedule.cardExpiry')} *
+                  </label>
+                  <span id="exp-hint" className="block text-[10px] text-slate-500 font-medium mb-1">
+                    {t('schedule.cardFormatHint')}
+                  </span>
+                  <input
+                    id="cc-exp"
+                    name="cc-exp"
+                    type="text"
+                    autoComplete="cc-exp"
+                    aria-describedby="exp-hint"
+                    inputMode="numeric"
+                    value={cardExpiry}
+                    onChange={(e) => setCardExpiry(formatCardExpiry(e.target.value))}
+                    onBlur={() => setTouchedFields({ ...touchedFields, cc_exp: true })}
+                    placeholder="MM / YY"
+                    maxLength={7}
+                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
+                      touchedFields.cc_exp && !isCardExpiryValid
+                        ? 'border-rose-500 focus:border-rose-600'
+                        : 'border-slate-300 focus:border-emerald-600'
+                    }`}
+                  />
+                  {touchedFields.cc_exp && !isCardExpiryValid && (
+                    <p className="mt-1 text-[11px] text-rose-600 font-semibold">
+                      {isCardExpiryPast ? t('schedule.cardExpiryPast') : t('schedule.cardExpiryInvalid')}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col justify-end">
+                  <label htmlFor="cc-csc" className="block text-[11px] font-bold text-slate-700 mb-1">
+                    {t('schedule.cardCvc')} *
+                  </label>
+                  <input
+                    id="cc-csc"
+                    name="cc-csc"
+                    type="text"
+                    autoComplete="cc-csc"
+                    inputMode="numeric"
+                    value={cardCvc}
+                    onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    onBlur={() => setTouchedFields({ ...touchedFields, cc_csc: true })}
+                    placeholder="CVC"
+                    maxLength={4}
+                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
+                      touchedFields.cc_csc && !isCardCvcValid
+                        ? 'border-rose-500 focus:border-rose-600'
+                        : 'border-slate-300 focus:border-emerald-600'
+                    }`}
+                  />
+                  {touchedFields.cc_csc && !isCardCvcValid && (
+                    <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardCvcInvalid')}</p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -2089,15 +2350,15 @@ export function Schedule() {
             </Button>
             <Button
               size="md"
-              disabled={!agreedToTerms || isSubmitting}
+              disabled={!agreedToTerms || !isCardValid || isSubmitting}
               onClick={handleSubmitBooking}
-              className="flex-1 sm:flex-initial sm:px-8 min-h-[44px] text-xs sm:text-sm font-black shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200"
+              className="flex-1 sm:flex-initial sm:px-8 min-h-[44px] text-xs sm:text-sm font-black shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200 tabular-nums"
             >
-              <Sparkles className="w-4 h-4 mr-1.5 shrink-0 animate-float" />
+              <CreditCard className="w-4 h-4 mr-1.5 shrink-0" />
               <span className="truncate">
                 {isSubmitting
                   ? t('schedule.submitting')
-                  : t('schedule.submitOrder')}
+                  : `${t('schedule.payDepositAndBook')} • 25% ($${depositAmount.toFixed(2)}) ${i18n.language?.startsWith('es') ? 'al confirmar' : 'upon approval'}`}
               </span>
             </Button>
           </div>

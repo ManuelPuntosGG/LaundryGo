@@ -12,21 +12,32 @@ from apps.core.emails import (
 )
 
 
+def _build_laundry_recipients(customer_email):
+    company_email = "info@thelaundrygo.com"
+    admin_email = getattr(settings, "ADMIN_EMAIL", company_email) or company_email
+    recipients = []
+    for addr in (customer_email, company_email, admin_email):
+        clean_addr = (addr or "").strip()
+        if clean_addr and all(clean_addr.lower() != r.lower() for r in recipients):
+            recipients.append(clean_addr)
+    return recipients
+
+
 def send_order_confirmation_email(order, language=None):
     """
-    Dispatches order confirmation email to customer and notification to admin,
+    Dispatches order request confirmation email to customer and copy to company/admin,
     rendered in the customer's preferred language (English or Spanish).
     """
     try:
         customer_email = (order.customer_email or "").strip()
-        customer_name = order.customer_name or "Valued Customer"
+        customer_name = (order.customer_name or "").strip() or "Valued Customer"
         phone = order.guest_phone or (order.user.phone if order.user else "N/A")
         service_name = order.service_rate.name if order.service_rate else "Standard"
         rate_per_lb = order.service_rate.rate_per_lb if order.service_rate else "2.25"
+        quoted_total = float(order.total_price or 40.00)
+        base_price = float(order.base_price or max(0.0, quoted_total - float(order.delivery_fee or 0)))
 
-        recipients = [settings.ADMIN_EMAIL]
-        if customer_email and customer_email.lower() != settings.ADMIN_EMAIL.lower():
-            recipients.append(customer_email)
+        recipients = _build_laundry_recipients(customer_email)
 
         # Detect language (Order attribute, explicit argument, or default English)
         lang = (language or getattr(order, 'language', None) or 'en').strip().lower()
@@ -41,28 +52,30 @@ def send_order_confirmation_email(order, language=None):
             delivery_fee_str = (
                 "GRATIS ($0.00)"
                 if float(order.delivery_fee or 0) == 0
-                else f"${order.delivery_fee}"
+                else f"${float(order.delivery_fee):.2f}"
             )
             zone_display = "Zona Central (Denver / Boulder)" if order.delivery_zone == 'inner' else "Zona Exterior (Recargo)"
             instructions = order.pickup_instructions or 'Ninguna especificada'
-            subject = f"🔔 Confirmación de Pedido LaundryGo #{order.id}"
+            subject = f"🔔 Solicitud de Pedido LaundryGo #{order.id}"
 
             text_content = (
-                f"¡Gracias por tu pedido con LaundryGo!\n\n"
-                f"DATOS DE LA ORDEN #{order.id}\n"
+                f"¡Gracias por tu solicitud de servicio con LaundryGo!\n\n"
+                f"DATOS DE LA SOLICITUD DE ORDEN #{order.id}\n"
                 f"----------------------------------------\n"
                 f"• Cliente: {customer_name}\n"
                 f"• Correo: {customer_email or 'N/A'}\n"
                 f"• Teléfono: {phone}\n"
                 f"• Dirección: {order.street_address}, {order.city} {order.zip_code}\n"
                 f"• Tarifa de Entrega: {delivery_fee_str} ({zone_display})\n\n"
-                f"DETALLES DEL SERVICIO\n"
+                f"DETALLES DEL SERVICIO Y COTIZACIÓN\n"
                 f"----------------------------------------\n"
                 f"• Servicio: {service_name} (${rate_per_lb}/lb)\n"
                 f"• Fecha de Recolección: {order.pickup_date}\n"
                 f"• Horario de Recolección: {time_slot}\n"
                 f"• Detalles / Add-ons: {order.order_details}\n"
-                f"• Instrucciones Especiales: {instructions}\n\n"
+                f"• Instrucciones Especiales: {instructions}\n"
+                f"• Monto Base Estimado: ${base_price:.2f}\n"
+                f"• Total Cotizado de la Solicitud: ${quoted_total:.2f} ($0.00 cobrado hoy)\n\n"
                 f"Si tienes alguna pregunta, puedes responder directamente a este correo o llamarnos al (720) 590-8632.\n\n"
                 f"Equipo LaundryGo Denver"
             )
@@ -97,14 +110,15 @@ def send_order_confirmation_email(order, language=None):
                   <p>Servicio Premium de Lavandería en Denver &bull; Recolección y Entrega</p>
                 </div>
                 <div class="content">
-                  <span class="badge">ORDEN #{order.id} CONFIRMADA</span>
-                  <p style="margin: 0 0 16px 0; font-size: 15px;">Hola <strong>{customer_name}</strong>, hemos recibido tu solicitud de recolección.</p>
+                  <span class="badge">SOLICITUD DE ORDEN #{order.id} RECIBIDA</span>
+                  <p style="margin: 0 0 16px 0; font-size: 15px;">Hola <strong>{customer_name}</strong>, hemos recibido tu solicitud de recolección. Nuestro equipo confirmará tu orden a la brevedad.</p>
                   
-                  <div class="section-title">📅 Horario de Recolección</div>
+                  <div class="section-title">📅 Horario y Servicio</div>
                   <table class="table-details">
                     <tr><td class="label">Fecha Programada:</td><td class="value">{order.pickup_date}</td></tr>
                     <tr><td class="label">Franja Horaria:</td><td class="value">{time_slot}</td></tr>
                     <tr><td class="label">Servicio:</td><td class="value">{service_name} (${rate_per_lb}/lb)</td></tr>
+                    <tr><td class="label">Total Cotizado:</td><td class="value">${quoted_total:.2f} ($0.00 cobrado hoy)</td></tr>
                   </table>
 
                   <div class="section-title">📍 Ubicación de Recolección</div>
@@ -138,28 +152,30 @@ def send_order_confirmation_email(order, language=None):
             delivery_fee_str = (
                 "FREE ($0.00)"
                 if float(order.delivery_fee or 0) == 0
-                else f"${order.delivery_fee}"
+                else f"${float(order.delivery_fee):.2f}"
             )
             zone_display = "Downtown Denver / Boulder Zone (FREE)" if order.delivery_zone == 'inner' else "Outer Metro Zone ($25 Fee)"
             instructions = order.pickup_instructions or 'None specified'
-            subject = f"🔔 LaundryGo Order Confirmation #{order.id}"
+            subject = f"🔔 LaundryGo Order Request #{order.id}"
 
             text_content = (
-                f"Thank you for your order with LaundryGo!\n\n"
-                f"ORDER DETAILS #{order.id}\n"
+                f"Thank you for your order request with LaundryGo!\n\n"
+                f"ORDER REQUEST DETAILS #{order.id}\n"
                 f"----------------------------------------\n"
                 f"• Customer: {customer_name}\n"
                 f"• Email: {customer_email or 'N/A'}\n"
                 f"• Phone: {phone}\n"
                 f"• Address: {order.street_address}, {order.city} {order.zip_code}\n"
                 f"• Delivery Fee: {delivery_fee_str} ({zone_display})\n\n"
-                f"SERVICE DETAILS\n"
+                f"SERVICE & QUOTE DETAILS\n"
                 f"----------------------------------------\n"
                 f"• Speed: {service_name} (${rate_per_lb}/lb)\n"
                 f"• Pickup Date: {order.pickup_date}\n"
                 f"• Pickup Window: {time_slot}\n"
                 f"• Order Details / Add-ons: {order.order_details}\n"
-                f"• Special Instructions: {instructions}\n\n"
+                f"• Special Instructions: {instructions}\n"
+                f"• Estimated Base Amount: ${base_price:.2f}\n"
+                f"• Quoted Request Total: ${quoted_total:.2f} ($0.00 charged today)\n\n"
                 f"If you have any questions, reply directly to this email or call us at (720) 590-8632.\n\n"
                 f"The LaundryGo Denver Team"
             )
@@ -194,14 +210,15 @@ def send_order_confirmation_email(order, language=None):
                   <p>Premium Laundry Service in Denver &bull; Pickup &amp; Delivery</p>
                 </div>
                 <div class="content">
-                  <span class="badge">ORDER #{order.id} CONFIRMED</span>
-                  <p style="margin: 0 0 16px 0; font-size: 15px;">Hello <strong>{customer_name}</strong>, we have received your laundry pickup request.</p>
+                  <span class="badge">ORDER REQUEST #{order.id} RECEIVED</span>
+                  <p style="margin: 0 0 16px 0; font-size: 15px;">Hello <strong>{customer_name}</strong>, we have received your laundry pickup request. Our team will review and confirm your order shortly.</p>
                   
-                  <div class="section-title">📅 Pickup Schedule</div>
+                  <div class="section-title">📅 Pickup Schedule &amp; Quote</div>
                   <table class="table-details">
                     <tr><td class="label">Scheduled Date:</td><td class="value">{order.pickup_date}</td></tr>
                     <tr><td class="label">Pickup Window:</td><td class="value">{time_slot}</td></tr>
                     <tr><td class="label">Service Speed:</td><td class="value">{service_name} (${rate_per_lb}/lb)</td></tr>
+                    <tr><td class="label">Quoted Total:</td><td class="value">${quoted_total:.2f} ($0.00 charged today)</td></tr>
                   </table>
 
                   <div class="section-title">📍 Pickup Location</div>
@@ -229,11 +246,111 @@ def send_order_confirmation_email(order, language=None):
         threading.Thread(
             target=_send_mail_worker,
             args=(subject, text_content, html_content, recipients),
-            kwargs={"reply_to": settings.ADMIN_EMAIL},
+            kwargs={"reply_to": "info@thelaundrygo.com", "from_email": "LaundryGo <info@thelaundrygo.com>"},
             daemon=True,
         ).start()
     except Exception as e:
         logger.error(f"Error preparing order confirmation email #{order.id}: {e}", exc_info=True)
+
+
+def send_order_accepted_email(order, language=None):
+    """
+    Dispatches notification email to customer and copy to company when Admin accepts
+    a LaundryGo order in the admin panel (status = 'confirmed').
+    """
+    try:
+        customer_email = (order.customer_email or "").strip()
+        customer_name = (order.customer_name or "").strip() or "Valued Customer"
+        service_name = order.service_rate.name if order.service_rate else "Standard"
+        quoted_total = float(order.total_price or 40.00)
+        recipients = _build_laundry_recipients(customer_email)
+
+        lang = (language or getattr(order, 'language', None) or 'en').strip().lower()
+        is_spanish = lang.startswith('es')
+
+        if is_spanish:
+            time_slot = (
+                "Mañana (8:00 AM - 11:00 AM)"
+                if order.pickup_time_slot == 'morning'
+                else "Tarde (12:00 PM - 4:00 PM)"
+            )
+            subject = f"✅ Orden LaundryGo #{order.id} Aceptada y Confirmada"
+            text_content = (
+                f"¡Hola {customer_name}!\n\n"
+                f"Tu solicitud de orden #{order.id} ha sido aceptada y confirmada por nuestro equipo operativo.\n\n"
+                f"RESUMEN DE TU RECOLECCIÓN CONFIRMADA\n"
+                f"----------------------------------------\n"
+                f"• Orden: #{order.id} (Aceptada / Abierta)\n"
+                f"• Servicio: {service_name}\n"
+                f"• Fecha de Recolección: {order.pickup_date} ({time_slot})\n"
+                f"• Dirección: {order.street_address}, {order.city} {order.zip_code}\n"
+                f"• Monto Cotizado de la Solicitud: ${quoted_total:.2f}\n\n"
+                f"Una vez realizado el servicio, recibirás por correo el enlace de pago seguro de Stripe con el monto final.\n\n"
+                f"Equipo LaundryGo Denver • (720) 590-8632\n"
+            )
+            html_content = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 14px; overflow: hidden; border: 1px solid #bfdbfe;">
+    <div style="background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); padding: 26px 24px; text-align: center; color: #ffffff;">
+      <h1 style="margin: 0; font-size: 22px; font-weight: 800;">✅ ¡Orden #{order.id} Aceptada y Confirmada!</h1>
+    </div>
+    <div style="padding: 26px 24px; color: #1e293b; font-size: 14px; line-height: 1.6;">
+      <p>Hola <strong>{customer_name}</strong>,</p>
+      <p>Tu orden <strong>#{order.id}</strong> ha sido revisada y aceptada por nuestro equipo. Tu recolección está programada para el <strong>{order.pickup_date} ({time_slot})</strong> en <strong>{order.street_address}, {order.city} {order.zip_code}</strong>.</p>
+      <p><strong>Servicio:</strong> {service_name} &bull; <strong>Monto Cotizado:</strong> ${quoted_total:.2f}</p>
+      <p>Al finalizar el servicio, te enviaremos un enlace de pago seguro de Stripe para completar tu pago.</p>
+    </div>
+  </div>
+</body>
+</html>"""
+        else:
+            time_slot = (
+                "Morning (8:00 AM - 11:00 AM)"
+                if order.pickup_time_slot == 'morning'
+                else "Afternoon (12:00 PM - 4:00 PM)"
+            )
+            subject = f"✅ LaundryGo Order #{order.id} Accepted & Confirmed"
+            text_content = (
+                f"Hello {customer_name}!\n\n"
+                f"Your order request #{order.id} has been accepted and confirmed by our operations team.\n\n"
+                f"CONFIRMED PICKUP SUMMARY\n"
+                f"----------------------------------------\n"
+                f"• Order: #{order.id} (Accepted / Open)\n"
+                f"• Service: {service_name}\n"
+                f"• Pickup Date: {order.pickup_date} ({time_slot})\n"
+                f"• Address: {order.street_address}, {order.city} {order.zip_code}\n"
+                f"• Quoted Request Amount: ${quoted_total:.2f}\n\n"
+                f"Once your laundry service is completed, we will send you a secure Stripe payment link for the final total.\n\n"
+                f"The LaundryGo Denver Team • (720) 590-8632\n"
+            )
+            html_content = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 14px; overflow: hidden; border: 1px solid #bfdbfe;">
+    <div style="background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); padding: 26px 24px; text-align: center; color: #ffffff;">
+      <h1 style="margin: 0; font-size: 22px; font-weight: 800;">✅ Order #{order.id} Accepted &amp; Confirmed!</h1>
+    </div>
+    <div style="padding: 26px 24px; color: #1e293b; font-size: 14px; line-height: 1.6;">
+      <p>Hello <strong>{customer_name}</strong>,</p>
+      <p>Your order <strong>#{order.id}</strong> has been reviewed and accepted by our team. Your pickup is confirmed for <strong>{order.pickup_date} ({time_slot})</strong> at <strong>{order.street_address}, {order.city} {order.zip_code}</strong>.</p>
+      <p><strong>Service:</strong> {service_name} &bull; <strong>Quoted Amount:</strong> ${quoted_total:.2f}</p>
+      <p>Once your service is completed, we will email you a secure Stripe payment link to finalize payment.</p>
+    </div>
+  </div>
+</body>
+</html>"""
+
+        threading.Thread(
+            target=_send_mail_worker,
+            args=(subject, text_content, html_content, recipients),
+            kwargs={"reply_to": "info@thelaundrygo.com", "from_email": "LaundryGo <info@thelaundrygo.com>"},
+            daemon=True,
+        ).start()
+    except Exception as e:
+        logger.error(f"Error preparing order accepted email #{order.id}: {e}", exc_info=True)
 
 
 def send_order_cancellation_email(order, language=None):
@@ -243,12 +360,10 @@ def send_order_cancellation_email(order, language=None):
     """
     try:
         customer_email = (order.customer_email or "").strip()
-        customer_name = order.customer_name or "Valued Customer"
+        customer_name = (order.customer_name or "").strip() or "Valued Customer"
         service_name = order.service_rate.name if order.service_rate else "Standard"
 
-        recipients = [settings.ADMIN_EMAIL]
-        if customer_email and customer_email.lower() != settings.ADMIN_EMAIL.lower():
-            recipients.append(customer_email)
+        recipients = _build_laundry_recipients(customer_email)
 
         # Detect language (Order attribute, explicit argument, or default English)
         lang = (language or getattr(order, 'language', None) or 'en').strip().lower()
@@ -363,8 +478,222 @@ def send_order_cancellation_email(order, language=None):
         threading.Thread(
             target=_send_mail_worker,
             args=(subject, text_content, html_content, recipients),
-            kwargs={"reply_to": settings.ADMIN_EMAIL},
+            kwargs={"reply_to": "info@thelaundrygo.com", "from_email": "LaundryGo <info@thelaundrygo.com>"},
             daemon=True,
         ).start()
     except Exception as e:
         logger.error(f"Error preparing cancellation email #{order.id}: {e}", exc_info=True)
+
+
+def send_laundry_payment_link_email(order, language=None):
+    """
+    Sends bilingual email notification with Stripe Checkout / Payment Link
+    to the customer and a copy to the company for order final payment
+    (quoted price of the request + optional surcharge) upon closing the order.
+    """
+    try:
+        customer_email = (order.customer_email or "").strip()
+        customer_name = (order.customer_name or "").strip() or "Valued Customer"
+        service_name = order.service_rate.name if order.service_rate else "Wash & Fold"
+        pay_url = order.stripe_payment_link_url or "https://thelaundrygo.com"
+
+        delivery_fee = float(order.delivery_fee or 0)
+        surcharge = float(order.surcharge_amount or 0)
+        surcharge_concept = order.surcharge_concept or ""
+        raw_base = float(order.base_price or 0)
+        raw_total = float(order.total_price or 0)
+
+        service_base = raw_base if raw_base > 0 else max(0.0, raw_total - delivery_fee)
+        quoted_total = raw_total if raw_total > 0 else (service_base + delivery_fee)
+        final_total = float(order.final_total_price or (quoted_total + surcharge))
+
+        recipients = _build_laundry_recipients(customer_email)
+
+        lang = (language or getattr(order, 'language', None) or 'en').strip().lower()
+        is_spanish = lang.startswith('es')
+
+        if is_spanish:
+            subject = f"🔔 Tu Pedido LaundryGo #{order.id} está Listo - Enlace de Pago Seguro"
+            text_content = (
+                f"¡Hola {customer_name}!\n\n"
+                f"Tu ropa ha sido lavada, secada, doblada y pesada. Tu orden #{order.id} ha sido finalizada.\n\n"
+                f"DESGLOSE DE TU PEDIDO\n"
+                f"----------------------------------------\n"
+                f"• Servicio: {service_name}\n"
+                f"• Monto Base de Lavandería: ${service_base:.2f}\n"
+                f"{f'• Tarifa de Entrega (Zona Exterior): +${delivery_fee:.2f}\n' if delivery_fee > 0 else ''}"
+                f"• Precio Cotizado de la Solicitud: ${quoted_total:.2f}\n"
+                f"{f'• Sobrecargo / Ajuste: +${surcharge:.2f} ({surcharge_concept})\n' if surcharge > 0 else ''}"
+                f"• TOTAL DEL SERVICIO A PAGAR: ${final_total:.2f}\n\n"
+                f"Para completar tu pago de forma segura vía Stripe con tarjeta, Apple Pay o Google Pay, ingresa al siguiente enlace:\n"
+                f"{pay_url}\n\n"
+                f"¡Gracias por tu preferencia!\n"
+                f"El Equipo de LaundryGo\n"
+                f"Denver, Colorado • (720) 590-8632\n"
+            )
+
+            html_content = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0fdf4; margin: 0; padding: 20px; }}
+  .container {{ max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #bfdbfe; }}
+  .header {{ background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); padding: 28px 24px; text-align: center; color: #ffffff; }}
+  .header h1 {{ margin: 0; font-size: 22px; font-weight: 800; }}
+  .content {{ padding: 28px 24px; }}
+  .table-box {{ width: 100%; border-collapse: collapse; margin: 20px 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }}
+  .table-box td {{ padding: 10px 14px; font-size: 14px; }}
+  .btn-pay {{ display: block; width: fit-content; margin: 24px auto; background-color: #2563eb; color: #ffffff !important; padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: 800; text-decoration: none; text-align: center; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }}
+  .footer {{ background: #f8fafc; padding: 18px 24px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧺 ¡Tu Ropa está Lista!</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #dbeafe;">LaundryGo &bull; Orden Cerrada y Enlace de Pago Seguro</p>
+    </div>
+    <div class="content">
+      <p style="font-size: 15px; color: #1e293b; margin-top: 0;">Hola <strong>{customer_name}</strong>,</p>
+      <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+        Tu pedido <strong>#{order.id}</strong> ha sido completado y finalizado. A continuación puedes consultar el desglose total (precio cotizado + sobrecargos) y realizar tu pago en línea vía Stripe:
+      </p>
+
+      <table class="table-box">
+        <tr>
+          <td style="color: #64748b; font-weight: 600;">Servicio:</td>
+          <td style="color: #0f172a; font-weight: 700; text-align: right;">{service_name}</td>
+        </tr>
+        <tr>
+          <td style="color: #64748b; font-weight: 600;">Monto Base:</td>
+          <td style="color: #0f172a; font-weight: 600; text-align: right;">${service_base:.2f}</td>
+        </tr>
+        {f'''<tr>
+          <td style="color: #64748b; font-weight: 600;">Tarifa de Entrega (Zona Exterior):</td>
+          <td style="color: #0f172a; font-weight: 600; text-align: right;">+${delivery_fee:.2f}</td>
+        </tr>''' if delivery_fee > 0 else ''}
+        <tr>
+          <td style="color: #64748b; font-weight: 600;">Precio Cotizado de la Solicitud:</td>
+          <td style="color: #0f172a; font-weight: 700; text-align: right;">${quoted_total:.2f}</td>
+        </tr>
+        {f'''<tr>
+          <td style="color: #b91c1c; font-weight: 600;">Ajuste / Sobrecargo ({surcharge_concept or "Extra"}):</td>
+          <td style="color: #b91c1c; font-weight: 700; text-align: right;">+${surcharge:.2f}</td>
+        </tr>''' if surcharge > 0 else ''}
+        <tr style="border-top: 2px solid #cbd5e1; background: #eff6ff;">
+          <td style="color: #1e3a8a; font-size: 16px; font-weight: 800;">TOTAL A PAGAR:</td>
+          <td style="color: #1d4ed8; font-size: 18px; font-weight: 800; text-align: right;">${final_total:.2f}</td>
+        </tr>
+      </table>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{pay_url}" class="btn-pay" target="_blank">💳 Pagar mi Pedido (${final_total:.2f})</a>
+      </div>
+
+      <p style="font-size: 13px; color: #64748b; text-align: center; line-height: 1.5;">
+        Aceptamos tarjetas de crédito/débito, Apple Pay y Google Pay mediante la pasarela segura de Stripe.
+      </p>
+    </div>
+    <div class="footer">
+      LaundryGo Denver &bull; (720) 590-8632 &bull; <a href="mailto:info@thelaundrygo.com" style="color: #2563eb;">info@thelaundrygo.com</a>
+    </div>
+  </div>
+</body>
+</html>"""
+        else:
+            subject = f"🔔 Your LaundryGo Order #{order.id} is Ready - Secure Payment Link"
+            text_content = (
+                f"Hello {customer_name}!\n\n"
+                f"Your laundry has been washed, dried, folded, and weighed. Your order #{order.id} is finalized and ready.\n\n"
+                f"ORDER BREAKDOWN\n"
+                f"----------------------------------------\n"
+                f"• Service: {service_name}\n"
+                f"• Base Laundry Amount: ${service_base:.2f}\n"
+                f"{f'• Delivery Fee (Outer Zone): +${delivery_fee:.2f}\n' if delivery_fee > 0 else ''}"
+                f"• Quoted Request Price: ${quoted_total:.2f}\n"
+                f"{f'• Surcharge / Weight Adjustment: +${surcharge:.2f} ({surcharge_concept})\n' if surcharge > 0 else ''}"
+                f"• TOTAL SERVICE AMOUNT DUE: ${final_total:.2f}\n\n"
+                f"To complete your payment securely via Stripe with Credit/Debit Card, Apple Pay, or Google Pay, please visit:\n"
+                f"{pay_url}\n\n"
+                f"Thank you for choosing LaundryGo!\n"
+                f"The LaundryGo Team\n"
+                f"Denver, Colorado • (720) 590-8632\n"
+            )
+
+            html_content = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; }}
+  .container {{ max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #bfdbfe; }}
+  .header {{ background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); padding: 28px 24px; text-align: center; color: #ffffff; }}
+  .header h1 {{ margin: 0; font-size: 22px; font-weight: 800; }}
+  .content {{ padding: 28px 24px; }}
+  .table-box {{ width: 100%; border-collapse: collapse; margin: 20px 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }}
+  .table-box td {{ padding: 10px 14px; font-size: 14px; }}
+  .btn-pay {{ display: block; width: fit-content; margin: 24px auto; background-color: #2563eb; color: #ffffff !important; padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: 800; text-decoration: none; text-align: center; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }}
+  .footer {{ background: #f8fafc; padding: 18px 24px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧺 Your Laundry is Ready!</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #dbeafe;">LaundryGo &bull; Order Finalized &amp; Secure Payment Link</p>
+    </div>
+    <div class="content">
+      <p style="font-size: 15px; color: #1e293b; margin-top: 0;">Hello <strong>{customer_name}</strong>,</p>
+      <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+        Your order <strong>#{order.id}</strong> has been completed and finalized. Below is your itemized breakdown (quoted price + surcharges). Please use the button below to complete payment via Stripe:
+      </p>
+
+      <table class="table-box">
+        <tr>
+          <td style="color: #64748b; font-weight: 600;">Service:</td>
+          <td style="color: #0f172a; font-weight: 700; text-align: right;">{service_name}</td>
+        </tr>
+        <tr>
+          <td style="color: #64748b; font-weight: 600;">Base Amount:</td>
+          <td style="color: #0f172a; font-weight: 600; text-align: right;">${service_base:.2f}</td>
+        </tr>
+        {f'''<tr>
+          <td style="color: #64748b; font-weight: 600;">Delivery Fee (Outer Zone):</td>
+          <td style="color: #0f172a; font-weight: 600; text-align: right;">+${delivery_fee:.2f}</td>
+        </tr>''' if delivery_fee > 0 else ''}
+        <tr>
+          <td style="color: #64748b; font-weight: 600;">Quoted Request Price:</td>
+          <td style="color: #0f172a; font-weight: 700; text-align: right;">${quoted_total:.2f}</td>
+        </tr>
+        {f'''<tr>
+          <td style="color: #b91c1c; font-weight: 600;">Adjustment / Surcharge ({surcharge_concept or "Extra"}):</td>
+          <td style="color: #b91c1c; font-weight: 700; text-align: right;">+${surcharge:.2f}</td>
+        </tr>''' if surcharge > 0 else ''}
+        <tr style="border-top: 2px solid #cbd5e1; background: #eff6ff;">
+          <td style="color: #1e3a8a; font-size: 16px; font-weight: 800;">TOTAL DUE:</td>
+          <td style="color: #1d4ed8; font-size: 18px; font-weight: 800; text-align: right;">${final_total:.2f}</td>
+        </tr>
+      </table>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{pay_url}" class="btn-pay" target="_blank">💳 Pay for Order (${final_total:.2f})</a>
+      </div>
+
+      <p style="font-size: 13px; color: #64748b; text-align: center; line-height: 1.5;">
+        We securely accept all major credit/debit cards, Apple Pay, and Google Pay powered by Stripe.
+      </p>
+    </div>
+    <div class="footer">
+      LaundryGo Denver &bull; (720) 590-8632 &bull; <a href="mailto:info@thelaundrygo.com" style="color: #2563eb;">info@thelaundrygo.com</a>
+    </div>
+  </div>
+</body>
+</html>"""
+
+        threading.Thread(
+            target=_send_mail_worker,
+            args=(subject, text_content, html_content, recipients),
+            kwargs={"reply_to": "info@thelaundrygo.com", "from_email": "LaundryGo <info@thelaundrygo.com>"},
+            daemon=True,
+        ).start()
+    except Exception as e:
+        logger.error(f"Error preparing payment link email for Order #{order.id}: {e}", exc_info=True)

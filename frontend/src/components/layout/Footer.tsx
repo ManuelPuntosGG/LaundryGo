@@ -113,13 +113,19 @@ export function Footer() {
               <ul className="space-y-2.5 text-sm text-slate-600">
                 <li className="flex items-center justify-center md:justify-end gap-2">
                   <Mail className="w-4 h-4 text-blue-600 shrink-0" />
-                  <a href="mailto:info@thelaundrygo.com" className="hover:text-blue-600 font-medium transition-colors">
+                  <a
+                    href="mailto:info@thelaundrygo.com"
+                    className="hover:text-blue-600 hover:underline font-medium transition-colors"
+                  >
                     info@thelaundrygo.com
                   </a>
                 </li>
                 <li className="flex items-center justify-center md:justify-end gap-2">
                   <Phone className="w-4 h-4 text-blue-600 shrink-0" />
-                  <a href="tel:7205908632" className="hover:text-blue-600 font-medium transition-colors">
+                  <a
+                    href="tel:7205908632"
+                    className="hover:text-blue-600 hover:underline font-medium transition-colors tabular-nums"
+                  >
                     (720) 590-8632
                   </a>
                 </li>

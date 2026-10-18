@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Sparkles,
   ShieldCheck,
   Leaf,
   CheckCircle2,
@@ -14,6 +13,7 @@ import {
   HeartHandshake,
   UserCheck,
   Compass,
+  Calendar,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -60,7 +60,6 @@ export function About() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link to="/services" className="w-full sm:w-auto inline-flex">
             <Button size="lg" className="w-full sm:w-auto font-black px-8 shadow-md shadow-emerald-600/20 hover:scale-102 transition-transform">
-              <Sparkles className="w-4.5 h-4.5 mr-1.5 shrink-0" />
               {t('about.contactInfo.exploreServicesBtn', 'View Our Services')}
               <ArrowRight className="w-4.5 h-4.5 ml-1.5 shrink-0" />
             </Button>
@@ -80,7 +79,7 @@ export function About() {
             <img
               src="/logo.png"
               alt="GoPropertyCare Mascot & Logo"
-              className="w-44 sm:w-52 h-auto object-contain drop-shadow-md rounded-2xl bg-white p-3 border border-slate-100 animate-float"
+              className="w-44 sm:w-52 h-auto object-contain drop-shadow-md rounded-2xl bg-white p-3 border border-slate-100"
             />
           </div>
           <div className="w-full md:w-2/3 space-y-4">
@@ -188,7 +187,7 @@ export function About() {
                 <h3 className="font-extrabold text-slate-900 text-base">
                   {t('about.contactInfo.phoneLabel', 'Direct Phone')}
                 </h3>
-                <p className="text-lg font-black text-emerald-700 mt-1">
+                <p className="text-lg font-black text-emerald-700 mt-1 tabular-nums">
                   (720) 590-8632
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
@@ -198,7 +197,7 @@ export function About() {
             </div>
             <a
               href="tel:7205908632"
-              className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors tabular-nums"
             >
               <Phone className="w-4 h-4" />
               <span>{t('about.contactInfo.callBtn', 'Call (720) 590-8632')}</span>
@@ -362,7 +361,7 @@ export function About() {
                 size="lg"
                 className="border-2 border-emerald-400 text-white hover:bg-emerald-800/60 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200"
               >
-                <Sparkles className="w-5 h-5 mr-2 text-emerald-300" />
+                <Calendar className="w-5 h-5 mr-2 text-emerald-300" />
                 <span>{t('about.cta.scheduleBtn', 'Book Online')}</span>
               </Button>
             </Link>

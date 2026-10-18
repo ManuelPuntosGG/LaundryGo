@@ -329,6 +329,11 @@ ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@thelaundrygo.com')
 RESEND_API_KEY = config('RESEND_API_KEY', default='').strip().strip('\'"')
 SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='').strip().strip('\'"')
 
+# Stripe Payment Gateway Configuration
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='').strip().strip('\'"')
+STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='').strip().strip('\'"')
+STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='').strip().strip('\'"')
+
 # Django Unfold Configuration
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _

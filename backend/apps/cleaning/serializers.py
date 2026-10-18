@@ -74,6 +74,11 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
     base_price = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True)
     addons_total = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True)
     total_price = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True)
+    deposit_amount = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    remaining_balance = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    surcharge_amount = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    final_total_charged = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    payment_method_id = serializers.CharField(required=False, allow_blank=True, write_only=True)
 
     class Meta:
         model = CleaningOrder
@@ -105,6 +110,13 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
             'base_price',
             'addons_total',
             'total_price',
+            'deposit_amount',
+            'remaining_balance',
+            'surcharge_amount',
+            'surcharge_concept',
+            'final_total_charged',
+            'payment_status',
+            'payment_method_id',
             'status',
             'brand',
             'language',
@@ -117,6 +129,10 @@ class CleaningOrderSerializer(serializers.ModelSerializer):
             'base_price',
             'addons_total',
             'total_price',
+            'deposit_amount',
+            'remaining_balance',
+            'final_total_charged',
+            'payment_status',
             'delivery_fee',
             'created_at',
             'updated_at',
@@ -156,6 +172,11 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         queryset=CleaningServiceRate.objects.filter(is_active=True),
         source='service_rate'
     )
+    deposit_amount = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    remaining_balance = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    surcharge_amount = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    final_total_charged = serializers.DecimalField(max_digits=8, decimal_places=2, coerce_to_string=True, required=False)
+    payment_method_id = serializers.CharField(required=False, allow_blank=True, write_only=True)
 
     class Meta:
         model = CleaningOrder
@@ -186,6 +207,13 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
             'base_price',
             'addons_total',
             'total_price',
+            'deposit_amount',
+            'remaining_balance',
+            'surcharge_amount',
+            'surcharge_concept',
+            'final_total_charged',
+            'payment_status',
+            'payment_method_id',
             'status',
             'language',
             'created_at',
@@ -196,6 +224,10 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
             'base_price',
             'addons_total',
             'total_price',
+            'deposit_amount',
+            'remaining_balance',
+            'final_total_charged',
+            'payment_status',
             'status',
             'created_at',
         )
@@ -373,6 +405,8 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
             accept_lang = request.headers.get('Accept-Language', 'en').lower()
             language = 'es' if accept_lang.startswith('es') else 'en'
 
+        payment_method_id = validated_data.pop('payment_method_id', None)
+
         order = CleaningOrder.objects.create(
             user=user,
             delivery_fee=delivery_fee,
@@ -382,5 +416,19 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
             language=language or 'en',
             **validated_data
         )
+
+        # Calculate 25% deposit and 75% remaining balance
+        deposit_val = (order.total_price * Decimal('0.25')).quantize(Decimal('0.01'))
+        order.deposit_amount = deposit_val
+        order.remaining_balance = order.total_price - deposit_val
+        order.save(update_fields=['deposit_amount', 'remaining_balance'])
+
+        if order.brand == 'gopropertycare':
+            from apps.core.payments import vault_gpc_payment_method
+            try:
+                vault_gpc_payment_method(order, payment_method_id=payment_method_id)
+            except Exception as pay_err:
+                import logging
+                logging.getLogger(__name__).warning(f"Card vaulting processing for GPC-#{order.id}: {pay_err}")
 
         return order

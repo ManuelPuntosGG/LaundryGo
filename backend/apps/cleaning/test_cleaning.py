@@ -615,3 +615,90 @@ class TestCleaningPricingTiers:
         assert 'email' in errors
 
 
+@pytest.mark.django_db
+class TestGoPropertyCarePayments:
+    def test_gpc_order_creates_pending_unpaid_and_admin_accepts(self, api_client, regular_rate):
+        from apps.core.payments import charge_gpc_deposit
+
+        tomorrow = (timezone.now() + timedelta(days=1)).date()
+        payload = {
+            'brand': 'gopropertycare',
+            'service_rate_id': regular_rate.id,
+            'square_feet': 1000,
+            'service_date': tomorrow.isoformat(),
+            'time_slot': 'morning',
+            'street_address': '1234 Larimer St',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'guest_first_name': 'Carlos',
+            'guest_last_name': 'Santana',
+            'guest_email': 'carlos@example.com',
+            'guest_phone': '303-555-0199',
+            'delivery_zone': 'inner',
+            'bedrooms': 2,
+            'bathrooms': '1.0',
+            'is_occupied': True,
+        }
+        resp = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+        assert resp.status_code == 201
+        data = resp.json()
+
+        total = Decimal(str(data['total_price']))
+        deposit = Decimal(str(data['deposit_amount']))
+        remaining = Decimal(str(data['remaining_balance']))
+
+        assert deposit == (total * Decimal('0.25')).quantize(Decimal('0.01'))
+        assert remaining == total - deposit
+        # Initially $0 charged, status is pending and payment_status is unpaid
+        assert data['payment_status'] == 'unpaid'
+        assert data['status'] == 'pending'
+
+        # Admin accepts the order and charges the 25% deposit
+        order = CleaningOrder.objects.get(id=data['id'])
+        result = charge_gpc_deposit(order)
+        assert result['status'] == 'succeeded'
+
+        order.refresh_from_db()
+        assert order.payment_status == 'deposit_paid'
+        assert order.status == 'confirmed'
+
+    def test_gpc_charge_remaining_balance_with_surcharge(self, regular_rate):
+        from apps.core.payments import charge_gpc_deposit, charge_gpc_remaining_balance
+
+        tomorrow = (timezone.now() + timedelta(days=1)).date()
+        order = CleaningOrder.objects.create(
+            brand='gopropertycare',
+            service_rate=regular_rate,
+            square_feet=1000,
+            total_price=Decimal('200.00'),
+            base_price=Decimal('200.00'),
+            service_date=tomorrow,
+            time_slot='morning',
+            guest_email='gpc-client@example.com',
+            guest_first_name='John',
+            guest_last_name='Doe',
+            surcharge_amount=Decimal('45.00'),
+            surcharge_concept='Limpieza intensiva de horno no declarado',
+        )
+        assert order.deposit_amount == Decimal('50.00')
+        assert order.remaining_balance == Decimal('150.00')
+        assert order.payment_status == 'unpaid'
+
+        # Admin accepts and charges deposit
+        charge_gpc_deposit(order)
+        order.refresh_from_db()
+        assert order.payment_status == 'deposit_paid'
+        assert order.status == 'confirmed'
+
+        # Admin finalizes service and charges remaining balance + surcharge
+        result = charge_gpc_remaining_balance(order)
+        assert result['status'] == 'succeeded'
+        assert result['amount_charged'] == 195.00  # 150 + 45
+
+        order.refresh_from_db()
+        assert order.payment_status == 'fully_paid'
+        assert order.status == 'completed'
+        assert order.final_total_charged == Decimal('245.00')  # 50 + 150 + 45
+
+
+

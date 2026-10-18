@@ -33,7 +33,7 @@ export function Navbar() {
           <div className="flex items-center gap-6">
             <Link
               to="/"
-              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+              className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
                 isActive('/')
                   ? 'text-blue-600'
                   : 'text-slate-600 hover:text-slate-900'
@@ -47,7 +47,7 @@ export function Navbar() {
 
             <Link
               to="/about"
-              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+              className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
                 isActive('/about')
                   ? 'text-blue-600'
                   : 'text-slate-600 hover:text-slate-900'

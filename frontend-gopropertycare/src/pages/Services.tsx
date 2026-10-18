@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Sparkles,
   ArrowRight,
   Home,
   Check,
@@ -44,7 +43,7 @@ function ImageWithFallback({
   if (hasError) {
     return (
       <div className={`bg-linear-to-br from-emerald-50 via-emerald-100/60 to-emerald-200/40 flex flex-col items-center justify-center text-emerald-700 ${className}`}>
-        <FallbackIcon className="w-14 h-14 opacity-70 mb-2 animate-float" />
+        <FallbackIcon className="w-14 h-14 opacity-70 mb-2" />
         <span className="text-xs font-black tracking-wider uppercase text-emerald-800">GoPropertyCare</span>
       </div>
     );
@@ -279,7 +278,7 @@ export function Services() {
           <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-2 max-w-2xl">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30">
-                <Sparkles className="w-3.5 h-3.5" />
+                <Building2 className="w-3.5 h-3.5" />
                 <span>{t('servicesPage.commercialBadge', 'Custom Quotes & Tailored Operations')}</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white">
@@ -480,7 +479,7 @@ export function Services() {
                 src="/images/services/deep.jpg"
                 alt={t('about.servicesIncluded.deep.headline')}
                 className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                fallbackIcon={Sparkles}
+                fallbackIcon={Layers}
               />
             </div>
 
@@ -728,7 +727,7 @@ export function Services() {
 
               {/* Custom Note Callout from Document */}
               <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-emerald-950 text-xs font-semibold flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                 <span>{t('about.servicesIncluded.customRequestNote')}</span>
               </div>
 
@@ -767,7 +766,7 @@ export function Services() {
                 onClick={() => setIsWalkthroughModalOpen(true)}
                 className="font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200 cursor-pointer"
               >
-                <Sparkles className="w-5 h-5 mr-2 text-emerald-600" />
+                <Calendar className="w-5 h-5 mr-2 text-emerald-600" />
                 <span className="text-emerald-950 font-black">
                   {t('servicesPage.requestWalkthroughBtn', 'Request a Walkthrough')}
                 </span>
@@ -779,7 +778,7 @@ export function Services() {
                   size="lg"
                   className="font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200"
                 >
-                  <Sparkles className="w-5 h-5 mr-2 text-emerald-600" />
+                  <Calendar className="w-5 h-5 mr-2 text-emerald-600" />
                   <span className="text-emerald-950 font-black">
                     {t('servicesPage.cta.scheduleBtn', 'Book Your Cleaning')}
                   </span>

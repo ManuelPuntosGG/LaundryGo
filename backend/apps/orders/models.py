@@ -74,6 +74,58 @@ class Order(TimeStampedModel):
     pickup_time_slot = models.CharField(max_length=20, choices=TIME_SLOT_CHOICES)
     order_details = models.TextField(help_text='Details about the laundry order')
     pickup_instructions = models.TextField(blank=True, help_text='Special instructions for pickup')
+
+    # Financial & Stripe Payment Link Tracking
+    PAYMENT_STATUS_CHOICES = [
+        ('unpaid', 'Unpaid / Pendiente'),
+        ('payment_link_sent', 'Payment Link Sent / Enlace Enviado'),
+        ('paid', 'Paid / Pagado'),
+        ('failed', 'Payment Failed / Fallido'),
+        ('refunded', 'Refunded / Reembolsado'),
+    ]
+
+    base_price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0.00,
+        help_text='Base laundry price'
+    )
+    total_price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0.00,
+        help_text='Estimated or weighed laundry total'
+    )
+    surcharge_amount = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0.00,
+        help_text='Optional surcharge for extra weight, special stains or supplies'
+    )
+    surcharge_concept = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Reason or description for surcharge'
+    )
+    final_total_price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text='Final total amount charged via Stripe payment link'
+    )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='unpaid'
+    )
+    stripe_payment_link_url = models.URLField(
+        max_length=500,
+        blank=True,
+        help_text='Stripe Checkout or Payment Link URL'
+    )
+    stripe_checkout_session_id = models.CharField(max_length=255, blank=True)
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='en', blank=True)
 
@@ -85,6 +137,29 @@ class Order(TimeStampedModel):
     def __str__(self):
         customer = self.user.email if self.user else self.guest_email
         return f'Order #{self.id} - {customer} - {self.pickup_date}'
+
+    def save(self, *args, **kwargs):
+        from decimal import Decimal
+        deliv = Decimal(str(self.delivery_fee or '0.00')).quantize(Decimal('0.01'))
+        surch = Decimal(str(self.surcharge_amount or '0.00')).quantize(Decimal('0.01'))
+        base = Decimal(str(self.base_price or '0.00')).quantize(Decimal('0.01'))
+        tot = Decimal(str(self.total_price or '0.00')).quantize(Decimal('0.01'))
+
+        if base <= Decimal('0.00') and tot > Decimal('0.00'):
+            base = max(Decimal('0.00'), tot - deliv)
+            self.base_price = base
+        elif base <= Decimal('0.00') and tot <= Decimal('0.00') and self.service_rate_id:
+            rate_per_lb = Decimal(str(self.service_rate.rate_per_lb)) if self.service_rate else Decimal('2.25')
+            base = max(Decimal('40.00'), (rate_per_lb * Decimal('20.00')).quantize(Decimal('0.01')))
+            self.base_price = base
+            tot = base + deliv
+            self.total_price = tot
+        elif base > Decimal('0.00'):
+            tot = base + deliv
+            self.total_price = tot
+
+        self.final_total_price = (self.total_price or Decimal('0.00')) + surch
+        super().save(*args, **kwargs)
 
     @property
     def customer_name(self):

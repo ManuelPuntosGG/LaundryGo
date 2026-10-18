@@ -45,7 +45,14 @@ export interface Order {
   pickup_time_slot: 'morning' | 'afternoon';
   order_details: string;
   pickup_instructions: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'ready' | 'delivered' | 'cancelled';
+  base_price?: string | number;
+  total_price?: string | number;
+  surcharge_amount?: string | number;
+  surcharge_concept?: string;
+  final_total_price?: string | number;
+  payment_status?: 'unpaid' | 'payment_link_sent' | 'paid' | 'refunded' | 'failed';
+  stripe_payment_link_url?: string;
+  status: 'pending' | 'confirmed' | 'picked_up' | 'processing' | 'ready' | 'delivered' | 'cancelled';
   language?: 'en' | 'es';
   customer_name: string;
   customer_email: string;

@@ -402,4 +402,75 @@ class OrderManagementTests(TestCase):
         send_order_cancellation_email(order_es)
         time.sleep(0.3)
 
+    def test_laundry_order_creation_and_payment_link_generation(self):
+        """Test $0 upfront booking and admin payment link generation with surcharge and outer zone fee."""
+        from decimal import Decimal
+        from apps.core.payments import accept_laundry_order, create_laundry_payment_link
+
+        today = timezone.localtime(timezone.now()).date()
+        order = Order.objects.create(
+            user=self.user,
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='morning',
+            order_details='15 lbs daily laundry',
+            delivery_zone='outer',
+            delivery_fee=Decimal('25.00'),
+            base_price=Decimal('45.00'),
+            total_price=Decimal('70.00'),
+            status='pending',
+        )
+        self.assertEqual(order.payment_status, 'unpaid')
+        self.assertEqual(order.status, 'pending')
+
+        # Step 2: Admin accepts the order
+        accept_laundry_order(order)
+        order.refresh_from_db()
+        self.assertEqual(order.status, 'confirmed')
+
+        # Step 3 & 4: Admin adds surcharge and closes the order
+        order.surcharge_amount = Decimal('12.50')
+        order.surcharge_concept = '3.5 lbs adicionales y tratamiento de cuello'
+        order.save()
+
+        link_url = create_laundry_payment_link(order)
+        self.assertTrue(link_url.startswith('https://checkout.stripe.com/'))
+
+        order.refresh_from_db()
+        self.assertEqual(order.status, 'delivered')
+        self.assertEqual(order.payment_status, 'payment_link_sent')
+        # Verify no double-counting of delivery_fee: 45.00 base + 25.00 delivery = 70.00 quoted + 12.50 surcharge = 82.50
+        self.assertEqual(order.total_price, Decimal('70.00'))
+        self.assertEqual(order.final_total_price, Decimal('82.50'))
+        self.assertEqual(order.stripe_payment_link_url, link_url)
+
+    def test_stripe_webhook_marks_laundry_order_paid(self):
+        """Test Stripe Webhook checkout.session.completed updates order payment_status to paid."""
+        today = timezone.localtime(timezone.now()).date()
+        order = Order.objects.create(
+            user=self.user,
+            service_rate=self.standard_rate,
+            pickup_date=today,
+            pickup_time_slot='morning',
+            order_details='Laundry order',
+            payment_status='payment_link_sent',
+        )
+
+        webhook_payload = {
+            'type': 'checkout.session.completed',
+            'data': {
+                'object': {
+                    'metadata': {
+                        'order_id': str(order.id),
+                        'brand': 'laundrygo',
+                    }
+                }
+            }
+        }
+        resp = self.client.post('/api/v1/payments/stripe-webhook/', webhook_payload, format='json')
+        self.assertEqual(resp.status_code, 200)
+
+        order.refresh_from_db()
+        self.assertEqual(order.payment_status, 'paid')
+
 

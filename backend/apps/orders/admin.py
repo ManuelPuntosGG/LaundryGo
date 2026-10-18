@@ -1,7 +1,10 @@
 from django.contrib import admin
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from unfold.admin import ModelAdmin
 from unfold.decorators import display, action
+from unfold.enums import ActionVariant
 from .models import ServiceRate, Order, RecurringSchedule
 
 
@@ -67,13 +70,15 @@ class OrderAdmin(ModelAdmin):
     list_display = (
         'order_id_display',
         'status_badge',
+        'payment_status_badge',
+        'total_price_display',
         'customer_display',
         'service_rate_display',
         'pickup_schedule_display',
         'delivery_zone_badge',
         'created_at_display',
     )
-    list_filter = ('status', 'delivery_zone', 'service_rate', 'pickup_time_slot', 'pickup_date')
+    list_filter = ('status', 'payment_status', 'delivery_zone', 'service_rate', 'pickup_time_slot', 'pickup_date')
     list_filter_submit = True
     search_fields = (
         'id',
@@ -86,16 +91,26 @@ class OrderAdmin(ModelAdmin):
         'guest_phone',
         'street_address',
         'zip_code',
+        'stripe_checkout_session_id',
     )
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at', 'final_total_price', 'stripe_checkout_session_id')
     date_hierarchy = 'pickup_date'
     ordering = ('-created_at',)
     actions = [
         'mark_confirmed',
+        'finalize_and_send_payment_link',
         'mark_processing',
         'mark_ready',
         'mark_delivered',
         'mark_cancelled',
+    ]
+    actions_submit_line = [
+        'accept_order_submit',
+        'close_order_submit',
+    ]
+    actions_detail = [
+        'accept_order_detail',
+        'close_order_detail',
     ]
 
     fieldsets = (
@@ -118,6 +133,16 @@ class OrderAdmin(ModelAdmin):
                 'street_address',
                 ('city', 'zip_code'),
                 ('delivery_zone', 'delivery_fee'),
+            ),
+        }),
+        (_('Pricing, Surcharges & Stripe Payment Link'), {
+            'fields': (
+                'payment_status',
+                ('base_price', 'total_price'),
+                ('surcharge_amount', 'surcharge_concept'),
+                'final_total_price',
+                'stripe_payment_link_url',
+                'stripe_checkout_session_id',
             ),
         }),
         (_('Wash Details & Special Instructions'), {
@@ -149,6 +174,119 @@ class OrderAdmin(ModelAdmin):
     )
     def status_badge(self, obj):
         return obj.status, obj.get_status_display()
+
+    @display(
+        description=_('Payment Status'),
+        label={
+            'unpaid': 'warning',
+            'payment_link_sent': 'info',
+            'paid': 'success',
+            'failed': 'danger',
+            'refunded': 'secondary',
+        }
+    )
+    def payment_status_badge(self, obj):
+        return obj.payment_status, obj.get_payment_status_display()
+
+    @display(description=_('Total Price'))
+    def total_price_display(self, obj):
+        total = (
+            float(obj.final_total_price)
+            if obj.final_total_price is not None
+            else (float(obj.total_price or 0) + float(obj.surcharge_amount or 0))
+        )
+        return f"${total:.2f}"
+
+    # Submit-line actions (Saves form changes including surcharge_amount/surcharge_concept, then runs action)
+    @action(
+        description=_('Accept Order (Confirm & Open)'),
+        permissions=['change'],
+        variant=ActionVariant.PRIMARY,
+    )
+    def accept_order_submit(self, request, obj):
+        from apps.core.payments import accept_laundry_order
+        try:
+            accept_laundry_order(obj)
+            self.message_user(request, f"Order #{obj.id} accepted and set as Confirmed & Open. Notification email sent.")
+        except Exception as exc:
+            self.message_user(request, f"Error accepting Order #{obj.id}: {exc}", level='error')
+
+    @action(
+        description=_('Close Order & Send Stripe Payment Link'),
+        permissions=['change'],
+        variant=ActionVariant.SUCCESS,
+    )
+    def close_order_submit(self, request, obj):
+        from apps.core.payments import create_laundry_payment_link
+        try:
+            create_laundry_payment_link(obj)
+            self.message_user(
+                request,
+                f"Order #{obj.id} closed and finalized (Total: ${obj.final_total_price:.2f}). Stripe payment link sent to customer and company."
+            )
+        except Exception as exc:
+            self.message_user(request, f"Error closing Order #{obj.id}: {exc}", level='error')
+
+    # Detail header actions
+    @action(
+        description=_('Accept Order'),
+        url_path='accept-order',
+        permissions=['change'],
+        variant=ActionVariant.PRIMARY,
+    )
+    def accept_order_detail(self, request, object_id):
+        from apps.core.payments import accept_laundry_order
+        obj = self.get_object(request, object_id)
+        if obj:
+            try:
+                accept_laundry_order(obj)
+                self.message_user(request, f"Order #{obj.id} accepted and set as Confirmed & Open.")
+            except Exception as exc:
+                self.message_user(request, f"Error accepting Order #{obj.id}: {exc}", level='error')
+        return redirect(reverse('admin:orders_order_change', args=[object_id]))
+
+    @action(
+        description=_('Close Order & Send Payment Link'),
+        url_path='close-order-link',
+        permissions=['change'],
+        variant=ActionVariant.SUCCESS,
+    )
+    def close_order_detail(self, request, object_id):
+        from apps.core.payments import create_laundry_payment_link
+        obj = self.get_object(request, object_id)
+        if obj:
+            try:
+                create_laundry_payment_link(obj)
+                self.message_user(
+                    request,
+                    f"Order #{obj.id} closed and finalized (Total: ${obj.final_total_price:.2f}). Stripe payment link sent."
+                )
+            except Exception as exc:
+                self.message_user(request, f"Error closing Order #{obj.id}: {exc}", level='error')
+        return redirect(reverse('admin:orders_order_change', args=[object_id]))
+
+    # Changelist Bulk Actions
+    @action(description=_('1. Accept Order (Mark Confirmed & Open)'), permissions=['change'])
+    def mark_confirmed(self, request, queryset):
+        from apps.core.payments import accept_laundry_order
+        count = 0
+        for order in queryset:
+            accept_laundry_order(order)
+            count += 1
+        self.message_user(request, f'{count} order(s) accepted, marked as Confirmed, and notified by email.')
+
+    @action(description=_('2. Close Order & Send Stripe Payment Link to Customer'), permissions=['change'])
+    def finalize_and_send_payment_link(self, request, queryset):
+        from apps.core.payments import create_laundry_payment_link
+        success_count = 0
+        for order in queryset:
+            try:
+                create_laundry_payment_link(order)
+                success_count += 1
+            except Exception as exc:
+                self.message_user(request, f"Error generating link for Order #{order.id}: {exc}", level='error')
+        if success_count > 0:
+            self.message_user(request, f"Closed {success_count} order(s) and sent Stripe payment link to customer and company.")
 
     @display(description=_('Customer'))
     def customer_display(self, obj):
@@ -184,12 +322,6 @@ class OrderAdmin(ModelAdmin):
         if not obj.created_at:
             return '—'
         return obj.created_at.strftime('%b %d, %Y %I:%M %p')
-
-    # Bulk Actions
-    @action(description=_('Mark selected orders as Confirmed'), permissions=['change'])
-    def mark_confirmed(self, request, queryset):
-        count = queryset.update(status='confirmed')
-        self.message_user(request, f'{count} order(s) marked as Confirmed.')
 
     @action(description=_('Mark selected orders as In Processing'), permissions=['change'])
     def mark_processing(self, request, queryset):

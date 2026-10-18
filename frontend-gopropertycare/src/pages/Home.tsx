@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Sparkles,
   ShieldCheck,
   CheckCircle2,
   MapPin,
@@ -67,7 +66,7 @@ export function Home() {
       case 'str_off_site':
         return Star;
       default:
-        return Sparkles;
+        return HomeIcon;
     }
   };
 
@@ -123,7 +122,7 @@ export function Home() {
             className="w-full sm:w-auto shadow-md hover:shadow-lg hover:shadow-emerald-600/25 transition-all duration-300 hover:scale-102 active:scale-98"
             onClick={() => navigate('/schedule')}
           >
-            <Sparkles className="w-5 h-5 mr-2 animate-float" />
+            <Calendar className="w-5 h-5 mr-2" />
             {t('home.hero.cta')}
           </Button>
 
@@ -179,7 +178,7 @@ export function Home() {
 
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-800 text-white text-xs font-extrabold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
+              <ShieldCheck className="w-3.5 h-3.5" />
               <span>{t('home.letter.badge')}</span>
             </div>
 

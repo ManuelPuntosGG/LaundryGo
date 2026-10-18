@@ -27,7 +27,7 @@
       "bonded": "Satisfaction Guaranteed"
     },
     "hero": {
-      "title": "Profesional Cleaning & Maintenance Solutions",
+      "title": "Professional Cleaning & Maintenance Solutions",
       "subtitle": "Top-tier residential and commercial cleaning solutions tailored to homeowners, real estate professionals, and property managers throughout the Denver metropolitan area.",
       "cta": "Schedule My Service",
       "secondaryCta": "Estimate Price"
@@ -716,8 +716,24 @@
     "errEmail": "Valid email address required",
     "back": "Back",
     "continue": "Continue",
-    "successTitle": "You're All Set! Service Booked",
-    "successSubtitle": "We have received your booking. Full confirmation details have been sent to your email.",
+    "totalEstimatedQuote": "Total Estimated Service Quote",
+    "depositDueToday": "Initial 25% Deposit",
+    "depositChargedNow": "Charged only once our team verifies crew availability and accepts your booking",
+    "balanceDueUponCompletion": "75% Balance Due Upon Completion",
+    "balanceDueUponCompletionHelp": "Charged automatically to your card on file once the cleaning is finished",
+    "dueTodayLabel": "Due Today: $0.00 (Card Vaulted on File)",
+    "paymentMethodTitle": "Payment Method (Stripe Card on File)",
+    "cardOnFileInfo": "Your credit or debit card is securely registered on file via Stripe 256-bit SSL encryption with $0.00 charged today. Our team will verify crew availability and accept your booking; your 25% deposit will only be processed upon admin approval.",
+    "cardNumber": "Card Number",
+    "cardExpiry": "MM / YY",
+    "cardCvc": "CVC",
+    "payDepositAndBook": "Request Booking ($0 Charged Today)",
+    "depositPaidBadge": "Paid (25% Deposit)",
+    "depositPendingApprovalBadge": "Pending Admin Approval",
+    "chargedTodayBadge": "Charged Today: $0.00",
+    "balancePendingBadge": "Due Upon Completion (75%)",
+    "successTitle": "Booking Request Received!",
+    "successSubtitle": "We have received your booking request. Our operations team is verifying crew availability and will accept and confirm your appointment shortly. Your card is safely on file ($0.00 charged today) and the 25% deposit will only be processed upon approval.",
     "orderNumber": "Order Number",
     "backHome": "Back to Home",
     "viewDashboard": "View in My Account",
@@ -759,7 +775,15 @@
       "Tailored Operations (After-Hours & Weekends)",
       "Fully Insured Personnel"
     ],
-    "commercialSummaryNotice": "Free Walkthrough • Written Proposal Delivered Same-Day"
+    "commercialSummaryNotice": "Free Walkthrough • Written Proposal Delivered Same-Day",
+    "cardholderNameLabel": "Cardholder Name",
+    "cardholderNamePlaceholder": "Name as it appears on card",
+    "cardFormatHint": "Format: MM/YY",
+    "cardNameRequired": "Cardholder name is required",
+    "cardNumberInvalid": "Please enter a valid 15 or 16-digit card number",
+    "cardExpiryInvalid": "Enter a valid expiration date (MM/YY)",
+    "cardExpiryPast": "This card expiration date is in the past",
+    "cardCvcInvalid": "Enter a valid 3 or 4-digit security code (CVC)"
   },
   "auth": {
     "loginTitle": "Welcome Back to GoPropertyCare",
@@ -813,7 +837,22 @@
     "statusConfirmed": "Confirmed",
     "statusInProgress": "In Progress",
     "statusCompleted": "Completed",
-    "statusCancelled": "Cancelled"
+    "statusCancelled": "Cancelled",
+    "paymentUnpaid": "Card Vaulted ($0 Charged • Pending Approval)",
+    "paymentDepositPaid": "Accepted • 25% Deposit Paid",
+    "paymentFullyPaid": "Closed • 100% Paid in Full",
+    "paymentRefunded": "Refunded",
+    "paymentFailed": "Payment Failed",
+    "quotedTotalLabel": "Quoted Request Price",
+    "deposit25Label": "25% Initial Deposit (Upon Admin Acceptance)",
+    "remaining75Label": "75% Remaining Balance (Upon Order Closing)",
+    "surchargeLabel": "Additional Adjustment / Surcharge",
+    "finalChargedLabel": "Final Total Charged",
+    "cancelModalTitle": "Cancel Cleaning Reservation?",
+    "cancelModalDesc": "Are you sure you want to cancel this reservation? If you cancel more than 24 hours before your appointment, no cancellation fee applies.",
+    "cancelModalConfirm": "Yes, Cancel Booking",
+    "cancelModalKeep": "Keep Booking",
+    "cancelSuccessBanner": "Your booking has been cancelled."
   },
   "footer": {
     "description": "Comprehensive cleaning solutions for residential, commercial, post-construction, and short-term rental turnovers in Denver and Boulder.",
@@ -986,7 +1025,7 @@
         },
         {
           "q": "When am I charged?",
-          "a": "Residential cleaning bookings are charged or authorized at the time of online scheduling. Recurring commercial accounts are billed on a biweekly or monthly invoicing cycle."
+          "a": "$0.00 is charged when you submit your booking request online (your card is securely saved on file via Stripe). Once our operations admin confirms crew availability and accepts your order, a 25% deposit is charged to lock in your appointment. The remaining 75% balance (plus any optional agreed surcharges) is charged automatically when the admin closes the completed order. Recurring commercial accounts are billed on a biweekly or monthly invoicing cycle."
         },
         {
           "q": "Is my payment information secure?",

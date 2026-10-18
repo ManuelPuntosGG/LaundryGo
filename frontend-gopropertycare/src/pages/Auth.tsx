@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LogIn, UserPlus, Sparkles, AlertCircle } from 'lucide-react';
+import { LogIn, UserPlus, ShieldCheck, AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -110,7 +110,7 @@ export function Auth() {
       <Card className="p-6 sm:p-8 border-emerald-100 shadow-xl space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
-            <Sparkles className="w-6 h-6 animate-float" />
+            <ShieldCheck className="w-6 h-6" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">
             {tab === 'login' ? t('auth.loginTitle') : t('auth.registerTitle')}
@@ -167,6 +167,7 @@ export function Auth() {
             <Input
               label={t('auth.emailLabel')}
               type="email"
+              autoComplete="email"
               value={loginData.email}
               onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
               placeholder="you@example.com"
@@ -175,6 +176,7 @@ export function Auth() {
             <Input
               label={t('auth.passwordLabel')}
               type="password"
+              autoComplete="current-password"
               value={loginData.password}
               onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
               placeholder="••••••••"
@@ -190,12 +192,14 @@ export function Auth() {
             <div className="grid grid-cols-2 gap-3">
               <Input
                 label={t('auth.firstName')}
+                autoComplete="given-name"
                 value={registerData.first_name}
                 onChange={(e) => setRegisterData({ ...registerData, first_name: e.target.value })}
                 required
               />
               <Input
                 label={t('auth.lastName')}
+                autoComplete="family-name"
                 value={registerData.last_name}
                 onChange={(e) => setRegisterData({ ...registerData, last_name: e.target.value })}
                 required
@@ -204,6 +208,7 @@ export function Auth() {
             <Input
               label={t('auth.emailLabel')}
               type="email"
+              autoComplete="email"
               value={registerData.email}
               onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
               required
@@ -211,12 +216,14 @@ export function Auth() {
             <Input
               label={t('auth.phone')}
               type="tel"
+              autoComplete="tel"
               value={registerData.phone}
               onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
               placeholder="(720) 000-0000"
             />
             <Input
               label={t('auth.street')}
+              autoComplete="street-address"
               value={registerData.street_address}
               onChange={(e) => setRegisterData({ ...registerData, street_address: e.target.value })}
               placeholder="1234 Main St"
@@ -227,6 +234,7 @@ export function Auth() {
                 {t('auth.city')}
               </label>
               <select
+                autoComplete="address-level2"
                 value={registerData.city}
                 onChange={(e) => setRegisterData({ ...registerData, city: e.target.value })}
                 className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-600"
@@ -241,6 +249,7 @@ export function Auth() {
 
             <Input
               label={t('auth.zip')}
+              autoComplete="postal-code"
               value={registerData.zip_code}
               onChange={(e) => setRegisterData({ ...registerData, zip_code: e.target.value })}
               placeholder="80202"
@@ -249,6 +258,7 @@ export function Auth() {
             <Input
               label={t('auth.passwordLabel')}
               type="password"
+              autoComplete="new-password"
               value={registerData.password}
               onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
               required
@@ -256,6 +266,7 @@ export function Auth() {
             <Input
               label={t('auth.confirmPasswordLabel')}
               type="password"
+              autoComplete="new-password"
               value={registerData.password_confirm}
               onChange={(e) => setRegisterData({ ...registerData, password_confirm: e.target.value })}
               required

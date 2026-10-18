@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, User, LogOut, LayoutDashboard, Sparkles } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, Calendar } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { useAuthContext } from '@/providers/AuthProvider';
 
@@ -33,7 +33,7 @@ export function Navbar() {
           <div className="flex items-center gap-6">
             <Link
               to="/"
-              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+              className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
                 isActive('/')
                   ? 'text-emerald-700'
                   : 'text-slate-700 hover:text-emerald-700'
@@ -47,7 +47,7 @@ export function Navbar() {
 
             <Link
               to="/services"
-              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+              className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
                 isActive('/services')
                   ? 'text-emerald-700'
                   : 'text-slate-700 hover:text-emerald-700'
@@ -61,7 +61,7 @@ export function Navbar() {
 
             <Link
               to="/about"
-              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+              className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
                 isActive('/about')
                   ? 'text-emerald-700'
                   : 'text-slate-700 hover:text-emerald-700'
@@ -75,7 +75,7 @@ export function Navbar() {
 
             <Link
               to="/faq"
-              className={`text-sm font-bold transition-all relative py-1.5 whitespace-nowrap hover:scale-105 ${
+              className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
                 isActive('/faq')
                   ? 'text-emerald-700'
                   : 'text-slate-700 hover:text-emerald-700'
@@ -110,7 +110,7 @@ export function Navbar() {
                 to="/schedule"
                 className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
               >
-                <Sparkles className="w-4 h-4" />
+                <Calendar className="w-4 h-4" />
                 {t('nav.schedule')}
               </Link>
 
@@ -139,7 +139,7 @@ export function Navbar() {
                 to="/schedule"
                 className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
               >
-                <Sparkles className="w-4 h-4" />
+                <Calendar className="w-4 h-4" />
                 {t('nav.schedule')}
               </Link>
             </div>
@@ -203,7 +203,7 @@ export function Navbar() {
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center justify-center gap-2 h-11 px-4 rounded-xl text-sm font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all active:scale-98"
             >
-              <Sparkles className="w-4 h-4" />
+              <Calendar className="w-4 h-4" />
               <span>{t('nav.schedule')}</span>
             </Link>
           </div>

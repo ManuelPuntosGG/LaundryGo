@@ -172,14 +172,11 @@ export function Auth() {
       />
       <div className="flex flex-col items-center text-center mb-6">
         <Link to="/" className="inline-block group mb-2 transition-transform active:scale-95">
-          <div className="relative">
-            <div className="absolute -inset-2 bg-blue-500/20 rounded-full blur-lg group-hover:blur-xl transition-all" />
-            <img
-              src="/logo.png"
-              alt="LaundryGo"
-              className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-md group-hover:scale-105 transition-transform relative z-10 mx-auto"
-            />
-          </div>
+          <img
+            src="/logo.png"
+            alt="LaundryGo"
+            className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-sm group-hover:scale-105 transition-transform mx-auto"
+          />
         </Link>
         <span className="text-slate-900 font-extrabold text-xl sm:text-2xl tracking-tight">
           {t('app.name')}

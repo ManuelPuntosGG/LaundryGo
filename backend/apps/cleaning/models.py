@@ -240,8 +240,69 @@ class CleaningOrder(TimeStampedModel):
     addons_total = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     total_price = models.DecimalField(max_digits=8, decimal_places=2, default=99.00)
 
+    # 25% Deposit, 75% Remaining & Surcharge Financial Tracking
+    PAYMENT_STATUS_CHOICES = [
+        ('unpaid', 'Unpaid / Pendiente'),
+        ('deposit_paid', 'Deposit Paid (25%) / Anticipo Pagado'),
+        ('fully_paid', 'Fully Paid (100%) / Pagado Completo'),
+        ('charge_failed', 'Charge Failed / Cobro Fallido'),
+        ('refunded', 'Refunded / Reembolsado'),
+    ]
+
+    deposit_amount = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0.00,
+        help_text='Initial 25% deposit amount charged at booking'
+    )
+    remaining_balance = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0.00,
+        help_text='Remaining 75% balance to be charged upon completion'
+    )
+    surcharge_amount = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0.00,
+        help_text='Optional surcharge added by admin for unforeseen conditions'
+    )
+    surcharge_concept = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Reason or description for surcharge'
+    )
+    final_total_charged = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text='Total amount charged: deposit + remaining balance + surcharge'
+    )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='unpaid'
+    )
+    stripe_customer_id = models.CharField(max_length=255, blank=True)
+    stripe_payment_method_id = models.CharField(max_length=255, blank=True)
+    stripe_deposit_intent_id = models.CharField(max_length=255, blank=True)
+    stripe_final_intent_id = models.CharField(max_length=255, blank=True)
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='en', blank=True)
+
+    def save(self, *args, **kwargs):
+        from decimal import Decimal
+        if self.total_price:
+            tot = Decimal(str(self.total_price)).quantize(Decimal('0.01'))
+            if self.payment_status == 'unpaid' or self.deposit_amount == 0 or self.remaining_balance == 0:
+                self.deposit_amount = (tot * Decimal('0.25')).quantize(Decimal('0.01'))
+                self.remaining_balance = tot - self.deposit_amount
+            if self.payment_status == 'fully_paid':
+                surch = Decimal(str(self.surcharge_amount or '0.00')).quantize(Decimal('0.01'))
+                self.final_total_charged = (self.deposit_amount or Decimal('0.00')) + (self.remaining_balance or Decimal('0.00')) + surch
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Cleaning Order'

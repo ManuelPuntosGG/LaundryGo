@@ -11,7 +11,6 @@ import {
   ChevronRight,
   CheckCircle2,
   AlertCircle,
-  Sparkles,
   MapPin,
   DollarSign,
   PhoneCall,
@@ -20,6 +19,8 @@ import {
   Layers,
   ShieldCheck,
   Package,
+  RefreshCw,
+  CreditCard,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -182,9 +183,9 @@ export function Schedule() {
     return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
   };
 
-  // Validation helpers
-  const isFirstNameValid = (val: string) => val.trim().length >= 2 && /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]+$/.test(val.trim());
-  const isLastNameValid = (val: string) => val.trim().length >= 2 && /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]+$/.test(val.trim());
+  // Validation helpers (Unicode-friendly per autofill-address-form)
+  const isFirstNameValid = (val: string) => val.trim().length >= 2 && /^[\p{L}\s'-]+$/u.test(val.trim());
+  const isLastNameValid = (val: string) => val.trim().length >= 2 && /^[\p{L}\s'-]+$/u.test(val.trim());
   const isPhoneValid = (val: string) => {
     const digits = val.replace(/\D/g, '');
     return digits.length === 10 || (digits.length === 11 && digits.startsWith('1'));
@@ -293,14 +294,10 @@ export function Schedule() {
       const isGoFurtherAllowed = canSelectGoFurther(selectedDate);
       if (!isGoFurtherAllowed) {
         setSelectedRate(standardRate.id);
-        setStepError(
-          i18n.language?.startsWith('es')
-            ? 'El servicio mismo día no está disponible hoy después de las 12:00 PM. Se seleccionó automáticamente el servicio Estándar.'
-            : 'Same-day express service is not available after 12:00 PM for today. Service automatically set to Standard.'
-        );
+        setStepError(t('schedule.goFurtherAfterNoon'));
       }
     }
-  }, [selectedDate, selectedRate, rates, canSelectGoFurther, i18n.language]);
+  }, [selectedDate, selectedRate, rates, canSelectGoFurther, t]);
 
   const availableDateSet = new Set(safeDates.map((d) => d.date));
   const todayStr = getLocalTodayStr();
@@ -498,6 +495,7 @@ export function Schedule() {
         zip_code: formData.zip_code.trim(),
         delivery_zone: selectedLocation.zone,
         delivery_fee: selectedLocation.fee,
+        addons_subtotal: addonsSubtotal,
         language: i18n.language?.startsWith('es') ? 'es' : 'en',
       });
 
@@ -842,14 +840,22 @@ export function Schedule() {
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                       {t('schedule.frequency')}
                     </label>
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full border transition-all ${
+                    <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border transition-all tabular-nums ${
                       selectedFrequency !== 'oneTime' && selectedFrequency !== ''
                         ? 'bg-blue-100 text-blue-800 border-blue-200 shadow-2xs'
                         : 'bg-slate-100 text-slate-700 border-slate-200'
                     }`}>
-                      {selectedFrequency !== 'oneTime' && selectedFrequency !== ''
-                        ? `🔄 ${t('schedule.recurringActive')}`
-                        : `📦 ${t('schedule.oneTimeDefault')}`}
+                      {selectedFrequency !== 'oneTime' && selectedFrequency !== '' ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+                          <span>{t('schedule.recurringActive')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Package className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                          <span>{t('schedule.oneTimeDefault')}</span>
+                        </>
+                      )}
                     </span>
                   </div>
 
@@ -879,8 +885,8 @@ export function Schedule() {
                   </div>
 
                   {selectedFrequency !== 'oneTime' && selectedFrequency !== '' && (
-                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-fade-in shadow-2xs">
-                      <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-fade-in shadow-2xs tabular-nums">
+                      <RefreshCw className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span className="font-semibold">{t('schedule.recurringDiscountBenefit')}</span>
                     </div>
                   )}
@@ -901,28 +907,30 @@ export function Schedule() {
                     <div className="p-3 px-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between text-xs gap-2 font-medium">
                       <div className="flex items-center gap-2 truncate">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span className="truncate">Logged in as <strong>{user?.first_name || user?.email}</strong></span>
+                        <span className="truncate">
+                          {t('schedule.loggedInAs')} <strong>{user?.first_name || user?.email}</strong>
+                        </span>
                       </div>
                       <Link to="/dashboard" className="text-emerald-700 font-bold hover:underline shrink-0 text-xs">
-                        Dashboard &rarr;
+                        {t('schedule.dashboardLink')} &rarr;
                       </Link>
                     </div>
 
                     {isProfileIncomplete && (
                       <div className="p-3 px-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 font-medium">
                         <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                        <span>Please complete your street address and phone number for pickup delivery.</span>
+                        <span>{t('schedule.completeStreetAddressPrompt')}</span>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="p-3 px-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 flex items-center justify-between text-xs gap-2 font-medium">
                     <div className="flex items-center gap-2 truncate">
-                      <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
-                      <span className="truncate">Ordering as Guest. Want to save your info?</span>
+                      <UserIcon className="w-4 h-4 text-blue-600 shrink-0" />
+                      <span className="truncate">{t('schedule.orderingAsGuestPrompt')}</span>
                     </div>
                     <Link to="/login" className="text-blue-700 font-bold hover:underline shrink-0 text-xs">
-                      Log In &rarr;
+                      {t('schedule.logInLink')} &rarr;
                     </Link>
                   </div>
                 )}
@@ -931,6 +939,9 @@ export function Schedule() {
                   {/* First Name & Last Name (Responsive 1-col on mobile, 2-col on desktop) */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <Input
+                      id="schedule-first-name"
+                      name="first_name"
+                      autoComplete="given-name"
                       label={t('schedule.firstName')}
                       value={formData.first_name}
                       onChange={(e) => setFormData({ ...formData, first_name: formatCapitalized(e.target.value) })}
@@ -943,6 +954,9 @@ export function Schedule() {
                       required
                     />
                     <Input
+                      id="schedule-last-name"
+                      name="last_name"
+                      autoComplete="family-name"
                       label={t('schedule.lastName')}
                       value={formData.last_name}
                       onChange={(e) => setFormData({ ...formData, last_name: formatCapitalized(e.target.value) })}
@@ -959,8 +973,11 @@ export function Schedule() {
                   {/* Phone & Email (Responsive 1-col on mobile, 2-col on desktop) */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <Input
+                      id="schedule-phone"
+                      name="phone"
                       label={t('schedule.phone')}
                       type="tel"
+                      autoComplete="tel"
                       placeholder="(720) 590-8632"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) })}
@@ -973,8 +990,11 @@ export function Schedule() {
                       required
                     />
                     <Input
+                      id="schedule-email"
+                      name="email"
                       label={t('schedule.email')}
                       type="email"
+                      autoComplete="email"
                       placeholder="your@email.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -996,7 +1016,10 @@ export function Schedule() {
                     </h3>
 
                     <Input
-                      label="Street Address *"
+                      id="schedule-street-address"
+                      name="street_address"
+                      autoComplete="street-address"
+                      label={`${t('schedule.streetAddress')} *`}
                       placeholder="1234 Blake St, Apt 4B"
                       value={formData.street_address}
                       onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
@@ -1011,17 +1034,23 @@ export function Schedule() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                       <div className="sm:col-span-2">
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label
+                          htmlFor="schedule-city"
+                          className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5"
+                        >
                           {t('schedule.cityLocation')} *
                         </label>
                         <select
+                          id="schedule-city"
+                          name="city"
+                          autoComplete="address-level2"
                           value={formData.city}
                           onChange={(e) => handleLocationChange(e.target.value)}
                           className="w-full min-h-[44px] bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm shadow-2xs"
                         >
                           {DENVER_LOCATIONS.map((loc) => (
                             <option key={loc.name} value={loc.name}>
-                              {loc.name} ({loc.fee === 0 ? 'FREE' : '+$25'})
+                              {loc.name} ({loc.fee === 0 ? t('schedule.freeBadge') : '+$25'})
                             </option>
                           ))}
                         </select>
@@ -1029,6 +1058,10 @@ export function Schedule() {
 
                       <div className="sm:col-span-1">
                         <Input
+                          id="schedule-zip"
+                          name="zip_code"
+                          autoComplete="postal-code"
+                          inputMode="numeric"
                           label={t('schedule.zipCode')}
                           placeholder="80202"
                           value={formData.zip_code}
@@ -1045,7 +1078,7 @@ export function Schedule() {
 
                     {/* Delivery Fee Notice Badge */}
                     <div
-                      className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
+                      className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all tabular-nums ${
                         selectedLocation.fee === 0
                           ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                           : 'bg-amber-50 border-amber-200 text-amber-900'
@@ -1104,7 +1137,7 @@ export function Schedule() {
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                       {t('schedule.selectServiceSpeed')}
                     </label>
-                    <span className="text-xs text-slate-500 font-medium">
+                    <span className="text-xs text-slate-500 font-medium tabular-nums">
                       {t('schedule.minimumOrderNotice')}
                     </span>
                   </div>
@@ -1137,7 +1170,7 @@ export function Schedule() {
                             <p className="text-slate-500 text-xs leading-relaxed">{rate.description}</p>
                           </div>
 
-                          <div className="flex items-baseline gap-1 pt-2 border-t border-slate-200/80 w-full justify-between">
+                          <div className="flex items-baseline gap-1 pt-2 border-t border-slate-200/80 w-full justify-between tabular-nums">
                             <span className="text-xl font-black text-blue-600">${rate.rate_per_lb}</span>
                             <span className="text-xs text-slate-500 font-semibold">/ lb</span>
                           </div>
@@ -1158,7 +1191,7 @@ export function Schedule() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                     <div>
                       <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-                        <Sparkles className="w-4 h-4 text-blue-600" />
+                        <Layers className="w-4 h-4 text-blue-600" />
                         <span>{t('schedule.addonsTitle')}</span>
                       </h3>
                       <p className="text-slate-500 text-xs">
@@ -1193,14 +1226,14 @@ export function Schedule() {
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-1">
                                 <span className="font-bold text-xs sm:text-sm text-slate-900">
-                                  {t(addon.i18nKey, { defaultValue: addon.name })}
+                                  {t(`schedule.${addon.i18nKey}`, { defaultValue: t(addon.i18nKey, { defaultValue: addon.name }) })}
                                 </span>
-                                <span className="text-xs font-extrabold text-blue-600 shrink-0">
+                                <span className="text-xs font-extrabold text-blue-600 shrink-0 tabular-nums">
                                   +${addon.price.toFixed(2)}{t('schedule.perOrder')}
                                 </span>
                               </div>
                               <p className="text-xs text-slate-500 mt-0.5 leading-snug">
-                                {t(addon.descriptionKey, { defaultValue: addon.name })}
+                                {t(`schedule.${addon.descriptionKey}`, { defaultValue: t(addon.descriptionKey, { defaultValue: addon.name }) })}
                               </p>
                             </div>
                           </label>
@@ -1229,9 +1262,9 @@ export function Schedule() {
                           >
                             <div className="min-w-0 pr-1">
                               <p className="font-bold text-xs sm:text-sm text-slate-900 truncate">
-                                {t(item.i18nKey, { defaultValue: item.name })}
+                                {t(`schedule.${item.i18nKey}`, { defaultValue: t(item.i18nKey, { defaultValue: item.name }) })}
                               </p>
-                              <p className="text-xs font-extrabold text-blue-600 mt-0.5">
+                              <p className="text-xs font-extrabold text-blue-600 mt-0.5 tabular-nums">
                                 ${item.price.toFixed(2)} <span className="text-xs text-slate-500 font-normal">{t('schedule.each')}</span>
                               </p>
                             </div>
@@ -1251,7 +1284,7 @@ export function Schedule() {
                               >
                                 <Minus className="w-4 h-4" />
                               </button>
-                              <span className="w-7 text-center font-extrabold text-sm text-slate-900">
+                              <span className="w-7 text-center font-extrabold text-sm text-slate-900 tabular-nums">
                                 {qty}
                               </span>
                               <button
@@ -1310,7 +1343,7 @@ export function Schedule() {
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200">
+                  <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200 tabular-nums">
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-0.5">{t('schedule.pickupDate')}</p>
                     <p className="text-slate-900 font-extrabold text-sm sm:text-base">{selectedDate}</p>
                     <p className="text-slate-600 text-xs capitalize font-medium">
@@ -1318,7 +1351,7 @@ export function Schedule() {
                     </p>
                   </div>
 
-                  <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200">
+                  <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200 tabular-nums">
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-0.5">{t('schedule.serviceLabel')}</p>
                     <p className="text-slate-900 font-extrabold text-sm sm:text-base">
                       {currentServiceRate?.name}
@@ -1343,10 +1376,10 @@ export function Schedule() {
 
                 {/* Add-ons Itemized Breakdown */}
                 {addonsSubtotal > 0 && (
-                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2 text-xs sm:text-sm">
+                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2 text-xs sm:text-sm tabular-nums">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                       <p className="text-slate-800 font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                        <Layers className="w-3.5 h-3.5 text-blue-600" />
                         <span>{t('schedule.addonsTitle')}</span>
                       </p>
                       <span className="font-extrabold text-blue-700">${addonsSubtotal.toFixed(2)}</span>
@@ -1354,7 +1387,7 @@ export function Schedule() {
                     <div className="space-y-1 pt-1">
                       {CHECKBOX_ADDONS.filter((a) => selectedCheckboxAddons[a.id]).map((a) => (
                         <div key={a.id} className="flex items-center justify-between text-slate-700 text-xs">
-                          <span>• {t(a.i18nKey, { defaultValue: a.name })}</span>
+                          <span>• {t(`schedule.${a.i18nKey}`, { defaultValue: t(a.i18nKey, { defaultValue: a.name }) })}</span>
                           <span className="font-bold">+${a.price.toFixed(2)}</span>
                         </div>
                       ))}
@@ -1362,7 +1395,7 @@ export function Schedule() {
                         const qty = selectedBeddingQuantities[b.id];
                         return (
                           <div key={b.id} className="flex items-center justify-between text-slate-700 text-xs">
-                            <span>• {qty}x {t(b.i18nKey, { defaultValue: b.name })}</span>
+                            <span>• {qty}x {t(`schedule.${b.i18nKey}`, { defaultValue: t(b.i18nKey, { defaultValue: b.name }) })}</span>
                             <span className="font-bold">+${(b.price * qty).toFixed(2)}</span>
                           </div>
                         );
@@ -1371,12 +1404,13 @@ export function Schedule() {
                   </div>
                 )}
 
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-1.5 text-xs sm:text-sm">
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-1.5 text-xs sm:text-sm tabular-nums">
                   <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">{t('schedule.customerDetails')}</p>
                   <p className="text-slate-900 font-extrabold">{formData.first_name} {formData.last_name}</p>
                   <p className="text-slate-600">{formData.email} • {formData.phone}</p>
-                  <p className="text-slate-800 font-medium pt-1">
-                    📍 {formData.street_address}, {formData.city} {formData.zip_code}
+                  <p className="text-slate-800 font-medium pt-1 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <span>{formData.street_address}, {formData.city} {formData.zip_code}</span>
                   </p>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-2 border-t border-slate-200 mt-2">
                     <span className="text-xs font-bold text-blue-700">
@@ -1385,6 +1419,54 @@ export function Schedule() {
                     <span className="text-xs text-slate-500">
                       {t('schedule.minimumOrderNotice')}
                     </span>
+                  </div>
+                </div>
+
+                {/* 4-Step Approval & Payment Workflow Card */}
+                <div className="rounded-2xl bg-blue-50/70 border border-blue-200/90 p-4 sm:p-5 space-y-3.5">
+                  <div className="flex items-center gap-2 text-blue-950">
+                    <CreditCard className="w-4 h-4 text-blue-600 shrink-0" />
+                    <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">
+                      {t('schedule.paymentFlowTitle')}
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      {
+                        num: '01',
+                        title: t('schedule.paymentFlowStep1Title'),
+                        desc: t('schedule.paymentFlowStep1Desc'),
+                      },
+                      {
+                        num: '02',
+                        title: t('schedule.paymentFlowStep2Title'),
+                        desc: t('schedule.paymentFlowStep2Desc'),
+                      },
+                      {
+                        num: '03',
+                        title: t('schedule.paymentFlowStep3Title'),
+                        desc: t('schedule.paymentFlowStep3Desc'),
+                      },
+                      {
+                        num: '04',
+                        title: t('schedule.paymentFlowStep4Title'),
+                        desc: t('schedule.paymentFlowStep4Desc'),
+                      },
+                    ].map((item) => (
+                      <div
+                        key={item.num}
+                        className="bg-white/95 rounded-xl p-3 border border-blue-100 flex items-start gap-2.5 shadow-2xs"
+                      >
+                        <span className="w-6 h-6 rounded-lg bg-blue-600 text-white text-[11px] font-black flex items-center justify-center shrink-0 tabular-nums">
+                          {item.num}
+                        </span>
+                        <div className="space-y-0.5 min-w-0">
+                          <p className="text-xs font-extrabold text-slate-900">{item.title}</p>
+                          <p className="text-[11px] text-slate-600 leading-relaxed">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -1446,13 +1528,13 @@ export function Schedule() {
                 <Package className="w-4 h-4 text-blue-600" />
                 <span>{t('schedule.liveSummaryTitle')}</span>
               </h3>
-              <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
-                Step {step} of 4
+              <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-bold tabular-nums">
+                {t('schedule.stepOf4', { step })}
               </span>
             </div>
 
             {/* Selected Service Speed */}
-            <div className="space-y-2 text-xs">
+            <div className="space-y-2 text-xs tabular-nums">
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 font-semibold">{t('schedule.serviceLabel')}:</span>
                 <span className="font-bold text-slate-900">
@@ -1464,7 +1546,9 @@ export function Schedule() {
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 font-semibold">{t('schedule.pickupDate')}:</span>
                 <span className="font-bold text-slate-900 text-right">
-                  {selectedDate ? `${selectedDate} (${selectedTimeSlot === 'morning' ? '8-11 AM' : '12-4 PM'})` : 'Select date'}
+                  {selectedDate
+                    ? `${selectedDate} (${selectedTimeSlot === 'morning' ? t('schedule.morningSlot') : t('schedule.afternoonSlot')})`
+                    : t('schedule.selectDatePrompt')}
                 </span>
               </div>
 
@@ -1472,7 +1556,7 @@ export function Schedule() {
               <div className="flex justify-between items-center">
                 <span className="text-slate-500 font-semibold">{t('schedule.deliveryFeeLabel')}:</span>
                 <span className={`font-bold ${selectedLocation.fee === 0 ? 'text-emerald-700' : 'text-blue-700'}`}>
-                  {selectedLocation.fee === 0 ? '$0.00 (FREE)' : '+$25.00'}
+                  {selectedLocation.fee === 0 ? t('schedule.freeFee') : '+$25.00'}
                 </span>
               </div>
 
@@ -1487,9 +1571,9 @@ export function Schedule() {
 
             {/* Recurring 7.5% Note */}
             {selectedFrequency !== 'oneTime' && selectedFrequency !== '' && (
-              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>7.5% OFF Recurring Active</span>
+              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-1.5 tabular-nums">
+                <RefreshCw className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>{t('schedule.recurringActive')}</span>
               </div>
             )}
 
@@ -1497,11 +1581,11 @@ export function Schedule() {
             <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 space-y-1.5">
               <p className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>Pay upon exact scale weighing</span>
+                <span>{t('schedule.payUponWeight')}</span>
               </p>
               <p className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Free cancellation up to 2h before</span>
+                <span>{t('schedule.freeCancellationNote')}</span>
               </p>
             </div>
           </Card>
@@ -1510,12 +1594,17 @@ export function Schedule() {
 
       {/* Sticky Mobile Floating Action Bar */}
       <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 p-3 px-4 flex items-center justify-between lg:hidden shadow-lg animate-fade-in">
-        <div className="min-w-0 pr-2">
+        <div className="min-w-0 pr-2 tabular-nums">
           <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-            Step {step} of 4 • {currentServiceRate?.name || 'Standard'}
+            {t('schedule.stepOf4', { step })} • {currentServiceRate?.name || 'Standard'}
           </p>
           <p className="text-xs font-black text-slate-900 truncate">
-            {selectedDate ? selectedDate : 'Select Date'} • {addonsSubtotal > 0 ? `+$${addonsSubtotal.toFixed(2)} addons` : selectedLocation.fee === 0 ? 'Free Delivery' : '+$25 Fee'}
+            {selectedDate ? selectedDate : t('schedule.selectDatePrompt')} •{' '}
+            {addonsSubtotal > 0
+              ? `+$${addonsSubtotal.toFixed(2)} ${t('schedule.addonsCountSuffix')}`
+              : selectedLocation.fee === 0
+              ? t('schedule.freeDeliveryLabel')
+              : '+$25.00'}
           </p>
         </div>
         <div>

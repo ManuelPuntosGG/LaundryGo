@@ -10,6 +10,7 @@ Este repositorio aloja una arquitectura desacoplada y multi-tenant que sirve a *
 
 1. **LaundryGo (`thelaundrygo.com`)**:
    - **Modelo de Negocio**: Lavado de ropa a domicilio cobrado por libra ($2.25, $2.45, $3.85/lb) con opciones de entrega en 2 días (*Standard*), día siguiente (*Go*) o mismo día express (*GoFurther* antes de las 12:00 PM). Permite pedidos puntuales o suscripciones recurrentes con 7.5% de descuento (*Daily*, *Weekly*, *Biweekly*, *Monthly*). Orden mínima de $40.00.
+   - **Flujo de Pagos**: **$0.00 de anticipo** al agendar (`payment_status = 'unpaid'`). El cobro final se realiza una vez completado el servicio tras pesar y lavar la ropa. El administrador finaliza el pedido en el panel Django Unfold, con opción de aplicar un sobrecargo (*surcharge*) por libras excedentes o manchas especiales, y genera un enlace de pago seguro de Stripe Checkout que se despacha automáticamente por correo bilingüe al cliente.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en azules y grises slate). Puerto local `5173`.
 2. **GoPropertyCare (`gopropertycare.com`)**:
    - **Modelo de Negocio**: Soluciones integrales de limpieza y mantenimiento residencial y turnover vacacional para propietarios, anfitriones de Airbnb/VRBO y administradores de propiedades en el área metropolitana de Denver y Boulder. Ofrece **3 servicios especializados principales**:
@@ -22,6 +23,7 @@ Este repositorio aloja una arquitectura desacoplada y multi-tenant que sirve a *
      - *Detalle Consultivo y Métodos de Acceso*: Recuento exacto de habitaciones y baños, estado de ocupación (habitada/amueblada vs vacía), método de entrada a la vivienda (*alguien en casa*, *código de teclado/teclera*, *caja de llaves/lockbox*, *abierta/sin cerradura* u *otro método*) y notas de acceso.
      - *Regla de Agendamiento Mismo Día*: Citas habilitadas para el mismo día si se reservan **antes de las 12:00 PM** con un margen mínimo de **3 horas** respecto a la hora actual; posterior a las 12:00 PM, citas disponibles a partir de mañana.
      - *Descuentos por Frecuencia*: Semanal (20%), Quincenal / Biweekly (15%), Mensual (10%), Una vez (0%).
+     - *Flujo de Pagos (Reserva $0.00 + Aprobación Admin 25% + Balance 75%)*: Al reservar en `/schedule`, se registra la tarjeta del cliente de forma segura (*Card on File* con `setup_future_usage='off_session'`) con **$0.00 cobrado al agendar** (`payment_status = 'unpaid'`, `status = 'pending'`). El administrador evalúa la disponibilidad de cuadrilla en el panel Django Unfold y, si hay cupo, ejecuta la acción **Accept Order & Charge 25% Deposit**, realizando el cargo off-session del 25% y enviando la confirmación oficial. Si no hay disponibilidad, puede cancelar la orden sin incurrir en reembolsos ni costos de procesamiento. Una vez finalizado el trabajo, el administrador cierra la orden y ejecuta el débito automático *off-session* del 75% restante más el sobrecargo opcional, enviando el recibo detallado por correo.
      - *Personal 100% Asegurado (Insured)*, listas de control rigurosas, suministros aptos para familias y mascotas, y equipos puntuales.
    - **Frontend**: Single Page Application en React 19 + Vite 8 + Tailwind CSS v4 (paleta en blanco y verdes bosque/esmeralda). Puerto local `5174`. Incluye página separada de presentación corporativa (`/about`), página dedicada con selector de pestañas (Residencial vs Comercial) y listas de control detalladas (`/services`), centro integral de preguntas frecuentes (`/faq`), y flujo dinámico de cotización y agendamiento (`/schedule`).
 3. **Evolving Solutions LLC (`evolvingsolutionsllc.com`)**:
@@ -46,8 +48,10 @@ LaundryGo/
 │   ├── .python-version             # Versión de Python local (3.12.8)
 │   ├── build.sh                    # Script de compilación, migración y seed data en Render
 │   ├── apps/                       # Aplicaciones modulares activas de Django
-│   │   ├── core/                   # Modelos base abstractos (TimeStampedModel), HealthCheck, despachador central de emails
+│   │   ├── core/                   # Modelos base abstractos (TimeStampedModel), HealthCheck, despachador central de emails, pasarela Stripe
 │   │   │   ├── emails.py           # Despachador resiliente unificado (SMTP + fallbacks HTTPS Resend/SendGrid)
+│   │   │   ├── payments.py         # Módulo de integración Stripe (depósitos 25%, cobros off-session 75%, payment links y modo mock)
+│   │   │   ├── views.py            # HealthCheck y Stripe Webhook (/api/v1/stripe/webhook/)
 │   │   │   └── management/commands/test_email.py # Diagnóstico SMTP y conectividad en vivo
 │   │   ├── users/                  # Autenticación JWT, modelo de usuario y autovinculación de pedidos
 │   │   ├── orders/                 # Tarifas por libra, órdenes de lavandería, suscripciones y emails (LaundryGo)
@@ -129,6 +133,11 @@ LaundryGo/
   - Cabeceras `X_FRAME_OPTIONS = 'SAMEORIGIN'` y protección XSS/Sniffing activa.
   - CORS configurado de forma estricta: `CORS_ALLOW_ALL_ORIGINS = DEBUG` (solo permisivo en desarrollo local; en producción se exige coincidencia con lista blanca o expresiones regulares de `thelaundrygo.com`, `gopropertycare.com`, `evolvingsolutionsllc.com` y `*.onrender.com` con `CORS_ALLOW_CREDENTIALS = True`).
 - **Despacho Resiliente de Emails (`apps.core.emails`)**: Módulo unificado con `send_mail_worker` que intenta primero SMTP estándar y, en caso de fallo, activa automáticamente fallbacks mediante API REST HTTPS (Resend y SendGrid), permitiendo remitentes dedicados para cada marca (`info@thelaundrygo.com`, `info@gopropertycare.com` e `info@evolvingsolutionsllc.com`).
+- **Pasarela de Pagos Stripe (`apps.core.payments`)**:
+  - Gestión híbrida adaptada por marca con la librería oficial `stripe>=8.0.0`.
+  - Configuración vía variables de entorno: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, y `STRIPE_WEBHOOK_SECRET`.
+  - **Modo Simulación / Mock Defensivo**: Si las claves no están presentes en el entorno o contienen prefijos de prueba (`mock_`, `test_dummy`), el módulo opera de forma completamente autónoma retornando IDs y URLs simuladas (`pi_mock_...`, `cs_mock_...`), permitiendo que el entorno local y la suite de pruebas automatizadas se ejecuten con 100% de éxito y cero dependencias de red externas.
+  - **Stripe Webhook (`/api/v1/stripe/webhook/`)**: Endpoint público CSRF-exempt que escucha eventos `checkout.session.completed` y `payment_intent.succeeded` para actualizar automáticamente el estado a `paid` / `deposit_paid` y registrar los metadatos de transacción.
 - **Variables de Entorno**: Gestionadas con `python-decouple` desde `backend/.env`.
 
 ### Modelo de Usuarios y Autenticación (`apps.users`)
@@ -170,21 +179,41 @@ LaundryGo/
      - `brand`: `'gopropertycare'` o `'evolvingsolutions'`.
      - Prefijo de visualización dinámico: `GPC-#{id}` para GoPropertyCare y `ESL-#{id}` para Evolving Solutions LLC.
      - `square_feet`, `bedrooms`, `bathrooms`, `is_occupied`, `entry_method`, `entry_notes`, `service_rate`, `selected_addons` (JSON), `service_date`, `time_slot`, dirección en Denver/Boulder, zona (`inner` $0 / `outer` $25), `frequency`, `base_price`, `addons_total`, `delivery_fee`, `total_price`, `special_instructions`, `status` e idioma `language` (`'en'` o `'es'`).
+     - **Campos Financieros y de Pasarela Stripe**:
+       - `deposit_amount`: Depósito del 25% cobrado al momento de la reserva ($25\% \times \text{total\_price}$).
+       - `remaining_balance`: Balance restante del 75% pendiente a cobrar tras la finalización del servicio.
+       - `surcharge_amount`: Monto de sobrecargo opcional en USD configurable por el administrador.
+       - `surcharge_concept`: Concepto o motivo descriptivo del sobrecargo (ej. suciedad extrema, horas extra).
+       - `final_total_charged`: Total neto efectivamente cobrado al cliente (`deposit_amount` + `remaining_balance` + `surcharge_amount`).
+       - `payment_status`: Estado del pago (`unpaid`, `deposit_paid`, `fully_paid`, `refunded`, `failed`).
+       - `stripe_customer_id`: Identificador de cliente en Stripe para el usuario o huésped.
+       - `stripe_payment_method_id`: Método de pago / tarjeta tokenizada guardada en Stripe (*Card on File* con `setup_future_usage='off_session'`).
+       - `stripe_deposit_intent_id`: ID del PaymentIntent de Stripe del depósito inicial del 25%.
+       - `stripe_final_intent_id`: ID del PaymentIntent de Stripe del cobro final del 75% + sobrecargo.
 
 - **Reglas de Agendamiento y Validación**:
   - **Mismo día condicional**: En GoPropertyCare y LaundryGo se permite reservar para el mismo día si la orden se crea antes de las **12:00 PM** local, con una antelación mínima de **3 horas** respecto a la hora de llegada elegida. Posterior a las 12:00 PM, se exige agendar a partir de mañana (+1 día). En Evolving Solutions LLC las visitas se programan con al menos 24 horas de antelación.
   - **Validación de Pertenencia de Marca**: El serializador valida que la tarifa seleccionada pertenezca a la marca correspondiente de la orden (`gopropertycare` o `evolvingsolutions`), garantizando total autonomía entre plataformas.
 
+- **Panel de Administración Django Unfold (`apps.cleaning.admin`)**:
+  - Filtros por marca (`brand`) y estado de pago (`payment_status`).
+  - Badge visual dinámico de estado de pago: `Unpaid` (ámbar), `Deposit Paid (25%)` (azul), `Fully Paid` (verde), `Refunded` (rojo).
+  - Fieldset interactivo *Financials & Surcharge (GoPropertyCare)*: Muestra campos calculados en solo lectura y permite editar `surcharge_amount` y `surcharge_concept`.
+  - Acción de Unfold `accept_and_charge_deposit` (**Accept Order & Charge 25% Deposit**): Permite al administrador verificar la disponibilidad de cuadrilla antes de comprometer fondos. Al ejecutarla, debita el depósito del 25% a la tarjeta registrada en Stripe, actualiza la orden a `status = 'confirmed'` y `payment_status = 'deposit_paid'`, y despacha el correo de confirmación de cita al cliente.
+  - Acción de Unfold `complete_and_charge_order` (**Complete Order & Charge Remaining Balance + Surcharge**): Ejecuta el cargo *off-session* en Stripe del 75% restante más el sobrecargo a la tarjeta guardada, actualiza la orden a `completed` y `fully_paid`, y despacha el correo transaccional de recibo final desglosado.
+
 - **Emails Transaccionales Bilingües (`apps.cleaning.emails`)**:
   - Detectan automáticamente el campo `order.brand`.
   - Si `brand == 'evolvingsolutions'`: Emite notificaciones con membrete corporativo marrón (`#573725`), remitente `Evolving Solutions LLC <info@evolvingsolutionsllc.com>`, referencia `ESL-#{id}`, y mensaje de solicitud de COI / políticas de seguridad en obra.
-  - Si `brand == 'gopropertycare'`: Emite notificaciones con membrete verde (`#16a34a`), remitente `GoPropertyCare <info@gopropertycare.com>`, referencia `GPC-#{id}`.
+  - Si `brand == 'gopropertycare'`: Emite notificaciones de solicitud recibida con membrete verde (`#16a34a`), remitente `GoPropertyCare <info@gopropertycare.com>`, referencia `GPC-#{id}`, indicando que el pedido está en revisión ($0.00 cobrado hoy) y que el depósito del 25% solo se debitará tras la confirmación del administrador.
+  - `send_cleaning_deposit_charged_email`: Emite confirmación oficial cuando el administrador acepta la orden en el panel, confirmando el débito del 25% y desglosando el 75% restante pendiente al finalizar.
+  - `send_cleaning_final_charge_email`: Emite recibo final detallado bilingüe desglosando base, add-ons, tarifa de zona, depósito previo (25%), cargo final (75%), sobrecargo aplicado con su concepto, y total neto facturado.
 
 - **Endpoints de Limpieza** (`/api/v1/cleaning/`):
   - `GET /rates/?brand=<brand>`: Lista de tarifas filtrada por marca comercial.
   - `GET /tiers/?brand=<brand>`: Lista de niveles de precios escalados (CleaningPricingTier) para GoPropertyCare.
   - `GET /addons/?brand=<brand>`: Lista de add-ons filtrada por marca comercial.
-  - `GET|POST /orders/?brand=<brand>`: Lista de órdenes del usuario autenticado filtradas por marca / Creación de orden validada contra la marca.
+  - `GET|POST /orders/?brand=<brand>`: Lista de órdenes del usuario autenticado filtradas por marca / Creación de orden validada contra la marca (crea automáticamente el PaymentIntent del 25% y asocia el método de pago para GoPropertyCare).
   - `GET|PUT|PATCH /orders/<id>/`: Detalle y actualización de reserva.
   - `POST /orders/<id>/cancel/`: Cancelación de orden pendiente.
   - `GET /schedule/available-dates/`: Calendario dinámico de fechas disponibles.
@@ -196,9 +225,28 @@ LaundryGo/
 - **Modelos**:
   1. `ServiceRate`: Tarifas por libra (`standard` - 2 días a $2.25/lb, `go` - siguiente día a $2.45/lb, `gofurther` - mismo día a $3.85/lb).
   2. `Order`: Pedidos de lavado por libra con entrega puerta a puerta.
+     - **Campos Financieros y de Pasarela Stripe**:
+       - `base_price`: Subtotal base estimado calculado a partir de las libras estimadas y la tarifa seleccionada (respetando el mínimo de $40.00).
+       - `total_price`: Total estimado inicial incluyendo tarifa de zona ($0.00 inner / $25.00 outer).
+       - `surcharge_amount`: Monto de sobrecargo configurable por el administrador (por exceso de libras reales, prendas delicadas o manchas difíciles).
+       - `surcharge_concept`: Concepto descriptivo del sobrecargo.
+       - `final_total_price`: Monto total definitivo a facturar (`total_price` + `surcharge_amount`).
+       - `payment_status`: Estado del pago (`unpaid`, `paid`, `refunded`, `failed`).
+       - `stripe_customer_id`: Identificador de cliente en Stripe.
+       - `stripe_payment_link_url`: URL de la sesión de Stripe Checkout generada para el pago del cliente.
+       - `stripe_checkout_session_id`: ID de la sesión de Stripe Checkout.
   3. `RecurringSchedule`: Suscripciones recurrentes (*Daily*, *Weekly*, *Biweekly*, *Monthly*) con 7.5% de descuento.
+
+- **Panel de Administración Django Unfold (`apps.orders.admin`)**:
+  - Filtros por estado (`status`) y estado de pago (`payment_status`).
+  - Badge visual de estado de pago: `Unpaid` (ámbar), `Paid` (verde), `Refunded` (rojo).
+  - Fieldset interactivo *Financials & Surcharge*: Permite revisar los totales y editar `surcharge_amount` y `surcharge_concept`.
+  - Acción de Unfold `finalize_and_send_payment_link` (**Finalize Order & Send Payment Link to Customer**): Actualiza el pedido a `completed`, genera la sesión de Stripe Checkout / Payment Link con el monto final desglosado (base + delivery fee + sobrecargo) y despacha el correo transaccional bilingüe al cliente con el botón de pago seguro.
+
 - **Emails Transaccionales Bilingües (`apps.orders.emails`)**:
-  - Despacho asíncrono con la marca LaundryGo (`info@thelaundrygo.com`).
+  - `send_order_confirmation_email`: Confirmación inicial bilingüe con marca LaundryGo (`info@thelaundrygo.com`), indicando que el pedido se procesará a $0.00 inicial y se enviará el enlace de pago tras el pesado y lavado.
+  - `send_laundry_payment_link_email`: Correo bilingüe con el desglose del total final, concepto de sobrecargo (si aplica) y botón directo a Stripe Checkout para efectuar el pago seguro.
+
 - **Endpoints de Lavandería** (`/api/v1/`):
   - `GET /services/rates/`: Lista de tarifas por libra.
   - `GET|POST /orders/`: Creación y listado de órdenes de lavado.
@@ -214,6 +262,7 @@ LaundryGo/
 - **Puerto Local**: `5173`.
 - **Estética**: Azules vivos (`--color-brand-600: #2563eb`) y grises Slate con Glassmorphism.
 - **Efecto Visual de Fondo (Agua Reactiva)**: Corriente dinámica de agua en la parte baja con oleaje animado SVG que se eleva suavemente conforme el usuario desciende en la página (alcanzando hasta un 86vh en el footer). En la página de agendamiento (`/schedule`), el nivel del agua asciende automáticamente en sincronía con el avance de los 4 pasos del pedido. El diseño integra el cuerpo del agua con el mismo gradiente de las olas sin bordes rectos artificiales.
+- **Flujo de Agendamiento y Notificación de Pago (`/schedule`)**: El usuario agenda su recolección indicando libras estimadas y horario a $0.00 de anticipo. La pantalla de confirmación y los correos bilingües informan con claridad que una vez pesado y lavado el pedido, recibirá un enlace de pago seguro de Stripe para liquidar el servicio antes de la entrega.
 - **SEO & Prerenderizado Estático (SSG)**: Componente dinámico `<SEO>` que sincroniza `title`, `meta description`, canonicals y OpenGraph/Twitter Cards por ruta. Script post-compilación `scripts/prerender.js` que genera archivos estáticos con metadatos y esquemas JSON-LD LocalBusiness para `/`, `/about`, `/schedule` y `/login`.
 
 ### Frontend 2: GoPropertyCare (`/frontend-gopropertycare`)
@@ -233,7 +282,11 @@ LaundryGo/
     - **Paso 1 (Servicio, Dimensiones y Frecuencia)**: Tres opciones residenciales directas: *Standard Cleaning*, *Deep / Move-In / Move-Out*, y *Short-Term Rental Turnover* con matriz de 18 niveles de metraje cuadrado o selector de habitaciones/baños para STR, más descuentos por frecuencia (Semanal 20%, Quincenal 15%, Mensual 10%).
     - **Paso 2 (Fecha y Hora)**: Calendario interactivo con regla de agendamiento para el mismo día (si se reserva antes de las 12:00 PM con margen de 3 horas) y selector de hora exacta de llegada.
     - **Paso 3 (Ubicación, Contacto, Acceso y Add-ons)**: Captura de dirección residencial en Denver/Boulder, método de entrada a la vivienda y add-ons con incidencia en el precio.
-    - **Paso 4 (Revisión y Confirmación)**: Desglose de costos transparente en tiempo real y confirmación de la orden con prefijo `GPC-#{id}`.
+    - **Paso 4 (Revisión, Depósito y Pago Seguro con Stripe)**:
+      - Desglose transparente en vivo: Subtotal base, add-ons, tarifa de zona, total estimado de la reserva, **Depósito del 25% a pagar hoy** y **Balance del 75% a pagar tras la finalización**.
+      - Formulario integrado de captura de tarjeta con insignia de cifrado SSL de 256 bits y respaldo de Stripe (*Card on File* con `setup_future_usage='off_session'`).
+      - Botón de confirmación dinámico ("Pay 25% Deposit ($XX.XX) & Confirm Booking").
+      - Pantalla de éxito con resumen del depósito abonado, balance pendiente, y confirmación de la orden con prefijo `GPC-#{id}`.
 - **SEO & SSG**: Generación estática post-compilación en `scripts/prerender.js` para 6 rutas clave (`/`, `/about`, `/services`, `/schedule`, `/login`, `/faq`) con `sitemap.xml` y `robots.txt`.
 
 ### Frontend 3: Evolving Solutions LLC (`/frontend-evolvingsolutions`)
@@ -276,6 +329,18 @@ LaundryGo/
    - Los pedidos pueden realizarse autenticado o como invitado (`guest_*`). Al registrarse posteriormente con el mismo correo, el sistema auto-vincula el historial de las tres marcas.
 6. **Notificaciones Bilingües**:
    - Cada orden almacena `language: 'en' | 'es'`. Los correos se emiten en el idioma seleccionado por el cliente con el branding y contacto correspondiente a cada una de las 3 marcas.
+7. **Estrategia y Flujo de Pagos por Marca (Integración Stripe)**:
+   - **GoPropertyCare (Flujo en 3 Fases: Tokenización $0.00 -> Aceptación Admin 25% -> Finalización 75% + Sobrecargo)**:
+     - *1. Reserva y Registro Seguro ($0.00 cobrado al agendar)*: Al agendar en `/schedule`, el cliente ingresa su información de tarjeta. El método de pago se tokeniza y adjunta al cliente en Stripe (*Card on File* con `setup_future_usage='off_session'`) con **$0.00 cobrado hoy**. La orden se crea con `status = 'pending'`, `payment_status = 'unpaid'` y se calcula el 25% de depósito y 75% de saldo restante.
+     - *2. Verificación de Cuadrilla & Aprobación Admin*: El administrador inspecciona la orden en Django Unfold para validar la disponibilidad operativa de la fecha y hora seleccionada.
+       - Si hay disponibilidad: Ejecuta la acción **Accept Order & Charge 25% Deposit** (`accept_and_charge_deposit`). Stripe debita el 25% *off-session*, el pedido pasa a `status = 'confirmed'` y `payment_status = 'deposit_paid'`, y se despacha un correo de confirmación oficial con el desglose del depósito cobrado y el 75% restante.
+       - Si NO hay disponibilidad: El administrador cancela la orden directamente sin necesidad de procesar reembolsos ni sufrir comisiones bancarias perdidas.
+     - *3. Finalización del Trabajo & Sobrecargo Opcional*: Cuando la cuadrilla concluye la limpieza, el administrador revisa si hubo servicios adicionales (ej. horno no declarado, horas extra) e ingresa `surcharge_amount` y `surcharge_concept`. Al ejecutar la acción `complete_and_charge_order`, el sistema debita el 75% restante más el sobrecargo *off-session*, marca el pedido como `completed` y `fully_paid`, y emite el recibo final bilingüe.
+   - **LaundryGo (Cobro Post-Servicio mediante Payment Link)**:
+     - *Upfront Booking*: El cliente agenda su recolección con **$0.00 de anticipo** (`payment_status = 'unpaid'`).
+     - *Pesado, Lavado & Sobrecargo*: Tras recolectar la ropa, el operario la pesa en el centro de lavado. Si el pesaje real difiere del estimado o hay cargos adicionales por manchas difíciles, el administrador en Django Unfold asigna `surcharge_amount` y `surcharge_concept`.
+     - *Enlace de Pago Seguro*: Al ejecutar la acción `finalize_and_send_payment_link`, el backend genera una sesión de Stripe Checkout / Payment Link con el desglose exacto (base + tarifa de zona + sobrecargo) y despacha un correo bilingüe con el botón de pago. Al completar la transacción, el webhook de Stripe marca la orden como `paid`.
+   - **Resiliencia & Modo Simulación (Mock)**: Tanto para GoPropertyCare como para LaundryGo, si no se configuran credenciales reales de Stripe o se utilizan claves de prueba/mock, el backend simula todas las respuestas de Stripe sin interrumpir el flujo del usuario ni de las pruebas unitarias.
 
 ---
 
@@ -305,7 +370,7 @@ python manage.py test_email [correo_destino]
 # Servidor de desarrollo Django (puerto 8000)
 python manage.py runserver 8000
 
-# Ejecutar suite de pruebas completa con pytest (37 tests pasando)
+# Ejecutar suite de pruebas completa con pytest (44 tests pasando)
 pytest
 ```
 

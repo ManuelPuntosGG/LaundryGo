@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Calendar,
   Truck,
-  Sparkles,
   Scale,
   ShieldCheck,
   CheckCircle2,
@@ -19,6 +18,7 @@ import {
   HeartHandshake,
   Droplets,
   DollarSign,
+  Building2,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -126,7 +126,7 @@ export function About() {
       description: t('about.process.step4.description'),
       highlight: t('about.process.step4.highlight'),
       image: '/images/about/folding.jpg',
-      fallbackIcon: Sparkles,
+      fallbackIcon: CheckCircle2,
       iconBg: 'bg-amber-50 text-amber-600 border-amber-100',
     },
     {
@@ -229,7 +229,7 @@ export function About() {
               </Link>
               <a href="#process-steps" className="w-full sm:w-auto inline-flex">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto font-bold px-6 hover:scale-102 transition-transform">
-                  <Sparkles className="w-4 h-4 text-blue-600 mr-1.5" />
+                  <ArrowRight className="w-4 h-4 text-blue-600 mr-1.5" />
                   {t('about.hero.secondaryCta')}
                 </Button>
               </a>
@@ -243,7 +243,7 @@ export function About() {
                 src="/images/about/hero.jpg"
                 alt="LaundryGo Denver Service"
                 className="w-full h-64 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-500"
-                fallbackIcon={Sparkles}
+                fallbackIcon={Building2}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent flex flex-col justify-end p-5 text-white">
                 <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-blue-300">
@@ -259,7 +259,7 @@ export function About() {
         </div>
 
         {/* Four Trust Stats Strip */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 pt-6 sm:pt-8 mt-6 border-t border-slate-200/80">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 pt-6 sm:pt-8 mt-6 border-t border-slate-200/80 tabular-nums">
           <div className="p-3 sm:p-3.5 rounded-2xl bg-white/90 border border-slate-200/70 text-center shadow-2xs">
             <p className="text-xl sm:text-2xl font-black text-blue-600">{t('about.mission.stat1Value')}</p>
             <p className="text-xs font-bold text-slate-600 mt-0.5">{t('about.mission.stat1Label')}</p>
@@ -299,7 +299,7 @@ export function About() {
       <section id="process-steps" className="flex flex-col gap-6 scroll-mt-24">
         <div className="text-center max-w-2xl mx-auto space-y-1.5">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-extrabold shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5" />
+            <CheckCircle2 className="w-3.5 h-3.5" />
             {t('about.process.badge')}
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -333,7 +333,7 @@ export function About() {
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                       fallbackIcon={step.fallbackIcon}
                     />
-                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full border border-slate-200 shadow-2xs text-xs font-black text-slate-900 flex items-center gap-1.5">
+                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full border border-slate-200 shadow-2xs text-xs font-black text-slate-900 flex items-center gap-1.5 tabular-nums">
                       <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
                       {step.tag}
                     </div>
@@ -350,7 +350,7 @@ export function About() {
                         <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${step.iconBg}`}>
                           <step.fallbackIcon className="w-5 h-5" />
                         </div>
-                        <span className="text-2xl sm:text-3xl font-black text-slate-300 tracking-tight">
+                        <span className="text-2xl sm:text-3xl font-black text-slate-300 tracking-tight tabular-nums">
                           {step.number}
                         </span>
                       </div>
@@ -462,7 +462,7 @@ export function About() {
         <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
           <a
             href="tel:7205908632"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold hover:bg-blue-100 transition-colors"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold hover:bg-blue-100 transition-colors tabular-nums"
           >
             <Phone className="w-3.5 h-3.5 text-blue-600" />
             <span>(720) 590-8632</span>
@@ -486,11 +486,11 @@ export function About() {
         </div>
       </section>
 
-      {/* 7. Final Call to Action Banner (Homogenized Glassmorphism Card) */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-blue-50/90 via-white to-slate-50/70 border border-blue-200/90 p-8 sm:p-12 text-center shadow-sm">
+      {/* 7. Final Call to Action Banner */}
+      <section className="rounded-3xl bg-white border border-slate-200/90 p-8 sm:p-12 text-center shadow-xs">
         <div className="max-w-2xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/70 border border-blue-200 text-blue-800 text-xs font-extrabold shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-extrabold shadow-2xs">
+            <Building2 className="w-3.5 h-3.5 text-blue-600" />
             <span>LaundryGo Denver</span>
           </div>
 
