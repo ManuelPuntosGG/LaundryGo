@@ -196,7 +196,7 @@ export function Schedule() {
       const parsed = parseInt(sqftParam, 10);
       if (!isNaN(parsed) && parsed >= 100) return getTierBySqft(parsed);
     }
-    return PRICING_TIERS[1]; // Default Tier 2 (1,000 - 1,299 sq ft)
+    return PRICING_TIERS[0]; // Default lowest starting Tier: 500 – 999 sq ft ($155.00)
   });
 
   const [serviceType, setServiceType] = useState<CleaningServiceTierType>(() => {
@@ -217,9 +217,9 @@ export function Schedule() {
 
   const [frequency, setFrequency] = useState<ServiceFrequency>('biweekly'); // Default "Most Popular"
 
-  // Sizing & Consultative Details
-  const [bedrooms, setBedrooms] = useState<number>(2);
-  const [bathrooms, setBathrooms] = useState<number>(2);
+  // Sizing & Consultative Details (Lowest starting configuration: 1 Bed, 1 Bath)
+  const [bedrooms, setBedrooms] = useState<number>(1);
+  const [bathrooms, setBathrooms] = useState<number>(1);
   const isOccupied = true;
 
   // Custom Quote Lead Capture (for Tier 19 > 6,100 sq ft)
@@ -1010,7 +1010,7 @@ export function Schedule() {
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
                   <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
-                    ${(isSTR ? getSTRTierByBedrooms(bedrooms).basePrice : selectedTier.strOnSitePrice).toFixed(2)}
+                    ${strCalc.totalBeforeAddons.toFixed(2)}
                   </span>
                 </div>
               </div>

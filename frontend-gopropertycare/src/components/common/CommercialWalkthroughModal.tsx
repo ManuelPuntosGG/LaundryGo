@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { X, CheckCircle2, AlertCircle, Building2, Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, Building2, Clock, Loader2, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuthContext } from '@/providers/AuthProvider';
@@ -119,20 +120,22 @@ export function CommercialWalkthroughModal({ isOpen, onClose }: CommercialWalkth
     onClose();
   };
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-sm overflow-y-auto animate-fade-in"
       onClick={handleResetAndClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="commercial-modal-title"
     >
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-pop-in"
+        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-pop-in my-auto max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Banner */}
-        <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-950 text-white p-6 relative">
+        <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-950 text-white p-5 sm:p-6 relative shrink-0">
           <button
             type="button"
             onClick={handleResetAndClose}
@@ -143,11 +146,11 @@ export function CommercialWalkthroughModal({ isOpen, onClose }: CommercialWalkth
           </button>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30 mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Clock className="w-3.5 h-3.5" />
             <span>{t('commercialModal.badge', 'Same-Day Quote')}</span>
           </div>
 
-          <h2 id="commercial-modal-title" className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+          <h2 id="commercial-modal-title" className="text-xl sm:text-2xl font-black text-white flex items-center gap-2 pr-8">
             <Building2 className="w-6 h-6 text-emerald-400 shrink-0" />
             <span>{t('commercialModal.title', 'Request a Commercial Walkthrough')}</span>
           </h2>
@@ -158,7 +161,7 @@ export function CommercialWalkthroughModal({ isOpen, onClose }: CommercialWalkth
         </div>
 
         {/* Content Body */}
-        <div className="p-6 max-h-[calc(85vh-140px)] overflow-y-auto">
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1">
           {isSuccess ? (
             <div className="text-center py-6 space-y-4 animate-fade-in">
               <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto shadow-inner">
@@ -311,6 +314,7 @@ export function CommercialWalkthroughModal({ isOpen, onClose }: CommercialWalkth
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

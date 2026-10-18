@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -423,48 +424,55 @@ export function Dashboard() {
         </div>
       )}
 
-      {/* Inline Cancel Reservation Confirmation Modal */}
-      {cancelOrderTarget && (
+      {/* Inline Cancel Reservation Confirmation Modal (Portalized) */}
+      {cancelOrderTarget && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fade-in"
           role="dialog"
           aria-modal="true"
           aria-labelledby="cancel-modal-title"
+          onClick={() => setCancelOrderTarget(null)}
         >
-          <Card className="max-w-md w-full p-6 space-y-4 shadow-xl border-slate-200">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
-                <AlertCircle className="w-5 h-5" />
+          <div
+            className="max-w-md w-full my-auto"
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+          >
+            <Card className="w-full p-6 space-y-4 shadow-2xl border-slate-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+                <div className="space-y-1">
+                  <h3 id="cancel-modal-title" className="text-base font-extrabold text-slate-900">
+                    {t('dashboard.cancelModalTitle')} — <span className="tabular-nums">GPC-#{cancelOrderTarget.id}</span>
+                  </h3>
+                  <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                    {t('dashboard.cancelModalDesc')}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <h3 id="cancel-modal-title" className="text-base font-extrabold text-slate-900">
-                  {t('dashboard.cancelModalTitle')} — <span className="tabular-nums">GPC-#{cancelOrderTarget.id}</span>
-                </h3>
-                <p className="text-xs text-slate-600 font-medium leading-relaxed">
-                  {t('dashboard.cancelModalDesc')}
-                </p>
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isCancelling}
+                  onClick={() => setCancelOrderTarget(null)}
+                >
+                  {t('dashboard.cancelModalKeep')}
+                </Button>
+                <Button
+                  size="sm"
+                  disabled={isCancelling}
+                  onClick={confirmCancelOrder}
+                  className="bg-rose-600 hover:bg-rose-700 text-white border-rose-600"
+                >
+                  {isCancelling ? t('common.loading') : t('dashboard.cancelModalConfirm')}
+                </Button>
               </div>
-            </div>
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={isCancelling}
-                onClick={() => setCancelOrderTarget(null)}
-              >
-                {t('dashboard.cancelModalKeep')}
-              </Button>
-              <Button
-                size="sm"
-                disabled={isCancelling}
-                onClick={confirmCancelOrder}
-                className="bg-rose-600 hover:bg-rose-700 text-white border-rose-600"
-              >
-                {isCancelling ? t('common.loading') : t('dashboard.cancelModalConfirm')}
-              </Button>
-            </div>
-          </Card>
-        </div>
+            </Card>
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Profile Tab */}
