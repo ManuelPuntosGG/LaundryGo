@@ -130,6 +130,88 @@ const routes = [
     `,
   },
   {
+    path: '/residential',
+    title: 'Residential Cleaning Services — GoPropertyCare Denver & Boulder',
+    description: 'Detailed checklists for Standard Cleaning, Deep Cleaning, Move-In / Move-Out, and Short-Term Rental turnovers in Denver and Boulder.',
+    canonical: 'https://gopropertycare.com/residential',
+    heading: 'Residential Cleaning Solutions',
+    subheading: 'Comprehensive room-by-room cleaning checklists designed for homes, lease turnovers, and 5-star Airbnb resets across Denver & Boulder.',
+    contentHtml: `
+      <main class="w-full max-w-6xl mx-auto px-4 py-8">
+        <header class="text-center max-w-3xl mx-auto space-y-4 mb-12">
+          <h1 class="text-4xl font-black text-slate-900 tracking-tight">Residential Cleaning Solutions</h1>
+          <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+            Clear, room-by-room checklists tailored for Denver homes, turnover rentals, and property resets.
+          </p>
+        </header>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Standard Clean</h3>
+            <p class="text-sm text-slate-600">Regular upkeep: kitchen countertops, appliances exteriors, scrubbed bathrooms, vacuumed carpets, and mopped floors.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Deep Clean</h3>
+            <p class="text-sm text-slate-600">Detailed reset: baseboards hand-wiped, tile grout scrubbed, soap scum removed, ceiling fans and vent covers cleaned.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Move-In / Move-Out Clean</h3>
+            <p class="text-sm text-slate-600">Empty home reset: inside cabinets and drawers, oven and fridge deep clean, closets, and full walkthrough readiness.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Short-Term Rental Turnover</h3>
+            <p class="text-sm text-slate-600">Fast guest turnover: fresh bed remaking, sanitized bathrooms, restocked supplies, and 5-star listing presentation.</p>
+          </div>
+        </section>
+
+        <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
+          <p>GoPropertyCare • Denver &amp; Boulder, CO • (720) 590-8632 • info@gopropertycare.com</p>
+        </footer>
+      </main>
+    `,
+  },
+  {
+    path: '/commercial',
+    title: 'Commercial Cleaning & Janitorial Solutions — GoPropertyCare Denver & Boulder',
+    description: 'Dependable, insured commercial cleaning for offices, retail stores, healthcare clinics, and HOA properties across Denver & Boulder. Request a 15-min walkthrough.',
+    canonical: 'https://gopropertycare.com/commercial',
+    heading: 'Commercial Cleaning & Janitorial Solutions',
+    subheading: 'Dependable commercial care for offices, retail stores, clinics, and HOA properties. Custom proposals delivered same-day after a 15-minute walkthrough.',
+    contentHtml: `
+      <main class="w-full max-w-6xl mx-auto px-4 py-8">
+        <header class="text-center max-w-3xl mx-auto space-y-4 mb-12">
+          <h1 class="text-4xl font-black text-slate-900 tracking-tight">Commercial Cleaning &amp; Janitorial Solutions</h1>
+          <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+            Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver &amp; Boulder.
+          </p>
+        </header>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Office Cleaning</h3>
+            <p class="text-sm text-slate-600">Workstations, restrooms, break rooms, and conference rooms disinfected for healthy corporate teams.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Retail Cleaning</h3>
+            <p class="text-sm text-slate-600">Storefront entry glass, fitting rooms, POS areas, and showroom floors polished for immaculate first impressions.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Medical &amp; Dental Cleaning</h3>
+            <p class="text-sm text-slate-600">EPA-registered hospital-grade sanitation, color-coded cloths, and strict infection prevention protocol.</p>
+          </div>
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">HOA &amp; Property Management</h3>
+            <p class="text-sm text-slate-600">Clubhouses, fitness centers, hallways, and lobbies maintained with consistent, scheduled care.</p>
+          </div>
+        </section>
+
+        <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
+          <p>GoPropertyCare • Denver &amp; Boulder, CO • (720) 590-8632 • info@gopropertycare.com</p>
+        </footer>
+      </main>
+    `,
+  },
+  {
     path: '/services',
     title: 'Cleaning Services — GoPropertyCare Denver & Boulder',
     description: 'Detailed checklists for Standard Cleaning, Deep Cleaning, Move-In / Move-Out, and Short-Term Rental turnovers in Denver and Boulder.',

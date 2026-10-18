@@ -9,6 +9,8 @@
   },
   "nav": {
     "home": "Home",
+    "residential": "Residential",
+    "commercial": "Commercial",
     "services": "Services",
     "about": "About Us",
     "faq": "FAQ",
@@ -427,6 +429,32 @@
       "scheduleBtn": "Book Online"
     }
   },
+  "residentialPage": {
+    "badge": "Denver & Boulder, Colorado • Insured Residential Solutions",
+    "title": "Residential Cleaning Solutions",
+    "subtitle": "Comprehensive, room-by-room cleaning checklists designed for homes, lease turnovers, and 5-star Airbnb resets across Denver & Boulder.",
+    "scheduleBtn": "Schedule Online",
+    "viewCommercialBtn": "Commercial Cleaning",
+    "viewAboutBtn": "About Our Company",
+    "cta": {
+      "title": "Ready to Experience Impeccable Property Care?",
+      "subtitle": "Choose your space, pick your date, and let our insured team handle the rest.",
+      "scheduleBtn": "Book Your Cleaning"
+    }
+  },
+  "commercialPage": {
+    "badge": "Custom Quotes & Tailored Operations",
+    "title": "Commercial Cleaning & Janitorial Solutions",
+    "subtitle": "Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver & Boulder. Custom proposals delivered same-day after a 15-minute walkthrough.",
+    "requestWalkthroughBtn": "Request a Walkthrough",
+    "viewResidentialBtn": "Residential Cleaning",
+    "viewAboutBtn": "About Our Company",
+    "cta": {
+      "title": "Schedule Your 15-Minute On-Site Walkthrough",
+      "subtitle": "Tell us about your facility and schedule an on-site visit. Receive your custom itemized proposal the same business day with $0 upfront.",
+      "requestWalkthroughBtn": "Request a Walkthrough"
+    }
+  },
   "servicesPage": {
     "title": "Our Specialized Services",
     "subtitle": "Comprehensive, room-by-room cleaning checklists designed for homes, turnovers, and property resets across Denver & Boulder.",
@@ -628,7 +656,7 @@
     "step2": "Date & Time",
     "step3": "Location & Access",
     "step4": "Confirmation",
-    "step1Title": "Select Property Size & Service",
+    "step1Title": "Select Property Size, Service & Add-ons",
     "sqftLabel": "Property Size (Sq Ft)",
     "sqftHelp": "Approximate total area for cleaning.",
     "tierDropdownLabel": "Select Your Property Size",
@@ -673,7 +701,8 @@
     "sameDayNotice": "Same-day booking is available today until 12:00 PM. Please select an arrival time at least 3 hours from now.",
     "futureDateNotice": "Appointments available from tomorrow onwards with arrival at your selected time.",
     "timeSlotLabel": "Preferred Arrival Time",
-    "step3Title": "Property Address, Access & Extras",
+    "step3Title": "Property Address & Access Instructions",
+    "step3Subtitle": "Where and how our insured cleaning specialists will access your property.",
     "cityLabel": "City",
     "cityPlaceholder": "e.g. Denver, Englewood, Boulder...",
     "errCity": "City required",
@@ -1133,7 +1162,7 @@
   "commercialModal": {
     "title": "Request a Commercial Walkthrough",
     "subtitle": "Fill out the form below to coordinate your free 15-minute on-site assessment. We will deliver an itemized written proposal the same business day ($0.00 upfront).",
-    "badge": "100% Free • Zero Obligation",
+    "badge": "Same-Day Quote",
     "nameLabel": "Full Name",
     "namePlaceholder": "e.g., Sarah Connor",
     "phoneLabel": "Phone Number",

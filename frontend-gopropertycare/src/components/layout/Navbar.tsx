@@ -46,15 +46,29 @@ export function Navbar() {
             </Link>
 
             <Link
-              to="/services"
+              to="/residential"
               className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
-                isActive('/services')
+                isActive('/residential')
                   ? 'text-emerald-700'
                   : 'text-slate-700 hover:text-emerald-700'
               }`}
             >
-              {t('nav.services', 'Services')}
-              {isActive('/services') && (
+              {t('nav.residential', 'Residential')}
+              {isActive('/residential') && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 rounded-full animate-fade-in" />
+              )}
+            </Link>
+
+            <Link
+              to="/commercial"
+              className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
+                isActive('/commercial')
+                  ? 'text-emerald-700'
+                  : 'text-slate-700 hover:text-emerald-700'
+              }`}
+            >
+              {t('nav.commercial', 'Commercial')}
+              {isActive('/commercial') && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 rounded-full animate-fade-in" />
               )}
             </Link>
@@ -172,13 +186,22 @@ export function Navbar() {
               {t('nav.home')}
             </Link>
             <Link
-              to="/services"
+              to="/residential"
               onClick={() => setIsMobileMenuOpen(false)}
               className={`flex items-center h-11 px-4 rounded-xl text-sm font-bold transition-colors ${
-                isActive('/services') ? 'bg-emerald-50 text-emerald-800 font-extrabold border border-emerald-200' : 'text-slate-700 hover:bg-slate-50'
+                isActive('/residential') ? 'bg-emerald-50 text-emerald-800 font-extrabold border border-emerald-200' : 'text-slate-700 hover:bg-slate-50'
               }`}
             >
-              {t('nav.services', 'Services')}
+              {t('nav.residential', 'Residential')}
+            </Link>
+            <Link
+              to="/commercial"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center h-11 px-4 rounded-xl text-sm font-bold transition-colors ${
+                isActive('/commercial') ? 'bg-emerald-50 text-emerald-800 font-extrabold border border-emerald-200' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {t('nav.commercial', 'Commercial')}
             </Link>
             <Link
               to="/about"

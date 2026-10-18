@@ -1306,69 +1306,6 @@ export function Schedule() {
                       )}
                     </div>
                   </div>
-
-                  {/* Off-Site Laundry Service Add-on Option (Documento STR) */}
-                  <div className="space-y-2 pt-2 border-t border-slate-100">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                      <label className="text-xs sm:text-sm font-extrabold text-slate-900">
-                        {i18n.language?.startsWith('es') ? 'Servicio de Lavandería de Ropa Blanca' : 'Linen & Towel Laundry Setup'}
-                      </label>
-                      <span className="text-[11px] text-slate-500 font-bold">
-                        {selectedAddonCodes['off_site_laundry']
-                          ? (i18n.language?.startsWith('es') ? 'Recargo off-site activo' : 'Off-site add-on active')
-                          : (i18n.language?.startsWith('es') ? 'Lavado en propiedad incluido' : 'On-site laundry included')}
-                      </span>
-                    </div>
-
-                    <div
-                      onClick={() => {
-                        const nextVal = !selectedAddonCodes['off_site_laundry'];
-                        setSelectedAddonCodes((prev) => ({
-                          ...prev,
-                          off_site_laundry: nextVal,
-                        }));
-                      }}
-                      className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3 hover:border-emerald-500 active:scale-99 ${
-                        selectedAddonCodes['off_site_laundry']
-                          ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
-                    >
-                      <div
-                        className={`w-5 h-5 rounded-md border mt-0.5 flex items-center justify-center shrink-0 transition-all ${
-                          selectedAddonCodes['off_site_laundry']
-                            ? 'border-emerald-600 bg-emerald-600 text-white scale-105'
-                            : 'border-slate-300 bg-white'
-                        }`}
-                      >
-                        {selectedAddonCodes['off_site_laundry'] && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-                      </div>
-
-                      <div className="flex-1 text-xs">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                            <Shirt className="w-4 h-4 text-emerald-600 shrink-0" />
-                            <span>{t('schedule.offSiteLaundryAddonTitle')}</span>
-                          </span>
-                          <span className="font-black text-emerald-800 text-xs sm:text-sm whitespace-nowrap tabular-nums">
-                            +${currentOffSiteFee.toFixed(2)}
-                          </span>
-                        </div>
-                        <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-1 leading-relaxed">
-                          {t('schedule.offSiteLaundryAddonDesc')}
-                        </p>
-                        <p className="text-[11px] font-semibold mt-1.5 text-slate-500 tabular-nums">
-                          {selectedAddonCodes['off_site_laundry']
-                            ? (i18n.language?.startsWith('es')
-                                ? `✓ Tarifa escalada para ${bedrooms === 0 ? 'Studio' : `${bedrooms} hab`}: +$${currentOffSiteFee.toFixed(2)}`
-                                : `✓ Scaled fee for ${bedrooms === 0 ? 'Studio' : `${bedrooms} bed(s)`}: +$${currentOffSiteFee.toFixed(2)}`)
-                            : (i18n.language?.startsWith('es')
-                                ? '✓ Por defecto: Lavado de sábanas en la unidad ($0.00 adicional)'
-                                : '✓ Default: On-site washer & dryer linen laundering ($0.00 extra)')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -1484,18 +1421,110 @@ export function Schedule() {
                 </div>
               )}
 
+              {/* Priced Add-ons (Integral in Step 1) */}
+              <div className="space-y-3 pt-3 border-t border-slate-100">
+                <div>
+                  <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>{t('schedule.addonsTitle')}</span>
+                  </label>
+                  <p className="text-xs text-slate-600 font-medium">
+                    {t('schedule.addonsSubtitle')}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[...addons]
+                    .filter((addon) => {
+                      if (addon.code === 'off_site_laundry') return isSTR;
+                      return true;
+                    })
+                    .sort((a, b) => {
+                      if (isSTR) {
+                        const strCodes = ['off_site_laundry', 'pets', 'hot_tub', 'patio_grill'];
+                        const aIsStr = strCodes.includes(a.code);
+                        const bIsStr = strCodes.includes(b.code);
+                        if (aIsStr && !bIsStr) return -1;
+                        if (!aIsStr && bIsStr) return 1;
+                      }
+                      return 0;
+                    })
+                    .map((addon) => {
+                    const isChecked = !!selectedAddonCodes[addon.code];
+                    const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
+                    const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
+                    const displayPrice = addon.code === 'off_site_laundry' ? currentOffSiteFee : Number(addon.price);
+                    const AddonIcon = ADDON_ICONS[addon.code] || Check;
+
+                    return (
+                      <div
+                        key={addon.code}
+                        onClick={() => {
+                          const nextVal = !isChecked;
+                          setSelectedAddonCodes({
+                            ...selectedAddonCodes,
+                            [addon.code]: nextVal,
+                          });
+                        }}
+                        className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
+                          isChecked
+                            ? 'border-emerald-600 bg-emerald-50/60 shadow-xs ring-2 ring-emerald-600/20'
+                            : 'border-slate-200 bg-white hover:border-slate-300'
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-md border mt-0.5 flex items-center justify-center shrink-0 transition-all duration-200 ${
+                            isChecked
+                              ? 'border-emerald-600 bg-emerald-600 text-white scale-105'
+                              : 'border-slate-300 bg-white'
+                          }`}
+                        >
+                          {isChecked && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                        </div>
+                        <div className="flex-1 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                              <AddonIcon className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                              <span>{localizedName}</span>
+                            </span>
+                            <span className="font-black text-emerald-700 text-xs sm:text-sm tabular-nums">+${displayPrice.toFixed(2)}</span>
+                          </div>
+                          <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
+                          {addon.code === 'off_site_laundry' && (
+                            <p className="text-[11px] font-semibold mt-1 text-slate-500 tabular-nums">
+                              {isChecked
+                                ? (i18n.language?.startsWith('es')
+                                    ? `✓ Tarifa escalada para ${bedrooms === 0 ? 'Studio' : `${bedrooms} hab`}: +$${currentOffSiteFee.toFixed(2)}`
+                                    : `✓ Scaled fee for ${bedrooms === 0 ? 'Studio' : `${bedrooms} bed(s)`}: +$${currentOffSiteFee.toFixed(2)}`)
+                                : (i18n.language?.startsWith('es')
+                                    ? '✓ Por defecto: Lavado de sábanas en la unidad ($0.00 adicional)'
+                                    : '✓ Default: On-site washer & dryer linen laundering ($0.00 extra)')}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Step 1 Running Summary & Next Button */}
               <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 flex items-center justify-between sm:justify-start gap-4">
                   <div>
-                    <span className="text-[11px] text-slate-500 font-semibold block">{t('schedule.estimatedBase')}</span>
+                    <span className="text-[11px] text-slate-500 font-semibold block">{t('schedule.totalDue')}</span>
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-lg sm:text-xl font-black text-slate-900 tabular-nums">
-                        ${discountedBasePrice.toFixed(2)}
+                        ${totalPrice.toFixed(2)}
                       </span>
+                      {addonsTotal > 0 && (
+                        <span className="text-xs text-slate-500 font-medium tabular-nums">
+                          (${discountedBasePrice.toFixed(2)} base + ${addonsTotal.toFixed(2)} extras)
+                        </span>
+                      )}
                       {discountPercent > 0 && (
                         <span className="text-xs text-slate-400 line-through tabular-nums">
-                          ${baseTierPrice.toFixed(2)}
+                          ${(baseTierPrice + addonsTotal).toFixed(2)}
                         </span>
                       )}
                     </div>
@@ -1855,82 +1884,6 @@ export function Schedule() {
                 placeholder={t('schedule.accessNotesPlaceholder')}
                 className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/10 shadow-2xs font-medium"
               />
-            </div>
-          </div>
-
-          {/* Priced Add-ons */}
-          <div className="space-y-3 pt-3 border-t border-slate-100">
-            <div>
-              <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>{t('schedule.addonsTitle')}</span>
-              </label>
-              <p className="text-xs text-slate-600 font-medium">
-                {t('schedule.addonsSubtitle')}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[...addons]
-                .filter((addon) => {
-                  if (addon.code === 'off_site_laundry') return isSTR;
-                  return true;
-                })
-                .sort((a, b) => {
-                  if (isSTR) {
-                    const strCodes = ['off_site_laundry', 'pets', 'hot_tub', 'patio_grill'];
-                    const aIsStr = strCodes.includes(a.code);
-                    const bIsStr = strCodes.includes(b.code);
-                    if (aIsStr && !bIsStr) return -1;
-                    if (!aIsStr && bIsStr) return 1;
-                  }
-                  return 0;
-                })
-                .map((addon) => {
-                const isChecked = !!selectedAddonCodes[addon.code];
-                const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
-                const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
-                const displayPrice = addon.code === 'off_site_laundry' ? currentOffSiteFee : Number(addon.price);
-                const AddonIcon = ADDON_ICONS[addon.code] || Check;
-
-                return (
-                  <div
-                    key={addon.code}
-                    onClick={() => {
-                      const nextVal = !isChecked;
-                      setSelectedAddonCodes({
-                        ...selectedAddonCodes,
-                        [addon.code]: nextVal,
-                      });
-                    }}
-                    className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
-                      isChecked
-                        ? 'border-emerald-600 bg-emerald-50/60 shadow-xs ring-2 ring-emerald-600/20'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div
-                      className={`w-5 h-5 rounded-md border mt-0.5 flex items-center justify-center shrink-0 transition-all duration-200 ${
-                        isChecked
-                          ? 'border-emerald-600 bg-emerald-600 text-white scale-105'
-                          : 'border-slate-300 bg-white'
-                      }`}
-                    >
-                      {isChecked && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-                    </div>
-                    <div className="flex-1 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                          <AddonIcon className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
-                          <span>{localizedName}</span>
-                        </span>
-                        <span className="font-black text-emerald-700 text-xs sm:text-sm tabular-nums">+${displayPrice.toFixed(2)}</span>
-                      </div>
-                      <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           </div>
 

@@ -8,7 +8,8 @@ import { ScrollToTop } from '@/components/layout/ScrollToTop';
 
 // Code splitting / Lazy-loaded routes for instant initial page paint
 const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })));
-const Services = lazy(() => import('@/pages/Services').then((m) => ({ default: m.Services })));
+const Residential = lazy(() => import('@/pages/Residential').then((m) => ({ default: m.Residential })));
+const Commercial = lazy(() => import('@/pages/Commercial').then((m) => ({ default: m.Commercial })));
 const About = lazy(() => import('@/pages/About').then((m) => ({ default: m.About })));
 const FAQ = lazy(() => import('@/pages/FAQ').then((m) => ({ default: m.FAQ })));
 const Schedule = lazy(() => import('@/pages/Schedule').then((m) => ({ default: m.Schedule })));
@@ -34,7 +35,9 @@ function AppRoutes() {
     <Suspense fallback={<PageSkeleton />}>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/services" element={<Services />} />
+        <Route path="/residential" element={<Residential />} />
+        <Route path="/commercial" element={<Commercial />} />
+        <Route path="/services" element={<Navigate to="/residential" replace />} />
         <Route path="/about" element={<About />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/schedule" element={<Schedule />} />

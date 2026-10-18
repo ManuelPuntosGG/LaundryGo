@@ -343,7 +343,7 @@ export function About() {
             {t('about.cta.subtitle', 'Book your service online in minutes. Enjoy transparent rates and zero surprise fees in Denver & Boulder.')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/services">
+            <Link to="/residential">
               <Button
                 variant="white"
                 size="lg"

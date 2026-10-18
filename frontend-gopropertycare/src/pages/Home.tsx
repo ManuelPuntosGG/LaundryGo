@@ -327,6 +327,30 @@ export function Home() {
             );
           })}
         </div>
+
+        {/* Dedicated Sections Navigation: Residential & Commercial */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto font-bold border-2 border-emerald-300 text-emerald-900 hover:bg-emerald-50 px-6 hover:scale-102 active:scale-98 transition-all"
+            onClick={() => navigate('/residential')}
+          >
+            <HomeIcon className="w-4 h-4 mr-2 text-emerald-700" />
+            <span>{t('residentialPage.title', 'Residential Cleaning Solutions')}</span>
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto font-bold border-2 border-slate-300 text-slate-800 hover:bg-slate-50 px-6 hover:scale-102 active:scale-98 transition-all"
+            onClick={() => navigate('/commercial')}
+          >
+            <Building2 className="w-4 h-4 mr-2 text-emerald-700" />
+            <span>{t('commercialPage.title', 'Commercial Cleaning & Janitorial')}</span>
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
       </section>
 
       {/* How It Works */}

@@ -9,6 +9,8 @@
   },
   "nav": {
     "home": "Inicio",
+    "residential": "Residencial",
+    "commercial": "Comercial",
     "services": "Servicios",
     "about": "Nosotros",
     "faq": "FAQ",
@@ -427,6 +429,32 @@
       "scheduleBtn": "Agendar en Línea"
     }
   },
+  "residentialPage": {
+    "badge": "Denver y Boulder, Colorado • Soluciones Residenciales Aseguradas",
+    "title": "Soluciones de Limpieza Residencial",
+    "subtitle": "Listas de control exhaustivas habitación por habitación diseñadas para residencias, mudanzas y rotación vacacional 5 estrellas en Denver y Boulder.",
+    "scheduleBtn": "Agendar en Línea",
+    "viewCommercialBtn": "Limpieza Comercial",
+    "viewAboutBtn": "Conoce Nuestra Empresa",
+    "cta": {
+      "title": "¿Listo para Experimentar un Cuidado Impecable?",
+      "subtitle": "Elige tu espacio, selecciona la fecha y deja que nuestro equipo asegurado se encargue de todo.",
+      "scheduleBtn": "Agendar Mi Limpieza"
+    }
+  },
+  "commercialPage": {
+    "badge": "Cotizaciones a Medida y Horarios Flexibles",
+    "title": "Soluciones de Limpieza Comercial y Janitorial",
+    "subtitle": "Servicio confiable y personal asegurado para oficinas, comercios, clínicas y comunidades HOA en Denver y Boulder. Propuestas personalizadas entregadas el mismo día tras una visita de 15 minutos.",
+    "requestWalkthroughBtn": "Agendar un Walkthrough",
+    "viewResidentialBtn": "Limpieza Residencial",
+    "viewAboutBtn": "Conoce Nuestra Empresa",
+    "cta": {
+      "title": "Agenda tu Walkthrough Presencial de 15 Minutos",
+      "subtitle": "Cuéntanos sobre tus instalaciones y programa una visita presencial. Recibe tu propuesta detallada el mismo día hábil con $0 de anticipo.",
+      "requestWalkthroughBtn": "Agendar un Walkthrough"
+    }
+  },
   "servicesPage": {
     "title": "Nuestros Servicios Especializados",
     "subtitle": "Listas de control exhaustivas habitación por habitación diseñadas para residencias, rotaciones vacacionales y limpiezas profundas en Denver y Boulder.",
@@ -628,7 +656,7 @@
     "step2": "Fecha y Hora",
     "step3": "Ubicación y Acceso",
     "step4": "Confirmación",
-    "step1Title": "Elige la Dimensión de la Propiedad y el Servicio",
+    "step1Title": "Elige la Dimensión, Servicio y Add-ons",
     "sqftLabel": "Pies Cuadrados del Inmueble (Sq Ft)",
     "sqftHelp": "Indica el tamaño aproximado de las áreas a limpiar.",
     "tierDropdownLabel": "Selecciona el Tamaño de tu Propiedad",
@@ -673,7 +701,8 @@
     "sameDayNotice": "Servicio para el mismo día disponible hoy hasta las 12:00 PM. Por favor selecciona una hora de llegada con al menos 3 horas de diferencia.",
     "futureDateNotice": "Citas disponibles a partir de mañana con llegada puntual a la hora seleccionada.",
     "timeSlotLabel": "Hora Preferida de Llegada",
-    "step3Title": "Dirección de la Propiedad, Acceso y Extras",
+    "step3Title": "Dirección de la Propiedad e Instrucciones de Acceso",
+    "step3Subtitle": "Dónde y cómo nuestros especialistas de limpieza accederán a tu propiedad.",
     "cityLabel": "Ciudad",
     "cityPlaceholder": "ej. Denver, Englewood, Arvada...",
     "errCity": "Ciudad requerida",
