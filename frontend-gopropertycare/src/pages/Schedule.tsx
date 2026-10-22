@@ -45,7 +45,7 @@ import { PROPERTY_ADDONS } from '@/constants/cleaningAddons';
 import { SERVICE_AREAS } from '@/constants/locations';
 import {
   PRICING_TIERS,
-  SERVICE_FREQUENCIES,
+  getServiceFrequencies,
   getTierBySqft,
   getTierPrice,
   type PricingTier,
@@ -202,7 +202,8 @@ export function Schedule() {
   const [serviceType, setServiceType] = useState<CleaningServiceTierType>(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const tierParam = searchParams.get('tier');
-    if (tierParam === 'move_in_out' || tierParam === 'deep') return 'deep';
+    if (tierParam === 'move_in_out') return 'move_in_out';
+    if (tierParam === 'deep') return 'deep';
     if (
       tierParam === 'str' ||
       tierParam === 'short_term_rental' ||
@@ -405,7 +406,8 @@ export function Schedule() {
       if (isSTR) {
         return r.service_type === 'str_on_site' || r.service_type === 'short_term_rental';
       }
-      if (serviceType === 'deep') return r.service_type === 'move_in_out' || r.service_type === 'deep';
+      if (serviceType === 'move_in_out') return r.service_type === 'move_in_out' || r.service_type === 'deep';
+      if (serviceType === 'deep') return r.service_type === 'deep' || r.service_type === 'move_in_out';
       return r.service_type === 'residential' || r.service_type === 'regular';
     }) || rates[0];
 
@@ -436,8 +438,9 @@ export function Schedule() {
     ? strCalc.totalBeforeAddons
     : getTierPrice(selectedTier, serviceType);
 
+  const availableFrequencies = getServiceFrequencies(serviceType);
   const freqOption =
-    SERVICE_FREQUENCIES.find((f) => f.id === frequency) || SERVICE_FREQUENCIES[0];
+    availableFrequencies.find((f) => f.id === frequency) || availableFrequencies[0];
   const discountPercent = freqOption.discountPercent;
   const frequencyDiscount = Math.round(((baseTierPrice * discountPercent) / 100) * 100) / 100;
   const discountedBasePrice = Math.max(0, baseTierPrice - frequencyDiscount);
@@ -745,9 +748,9 @@ export function Schedule() {
                   ? t('schedule.serviceStandard')
                   : serviceType === 'deep'
                   ? t('schedule.serviceDeep')
-                  : isSTR
-                  ? t('schedule.serviceStr')
-                  : t('schedule.serviceStandard')}
+                  : serviceType === 'move_in_out'
+                  ? t('schedule.serviceMoveInOut')
+                  : t('schedule.serviceStr')}
               </span>
             </div>
             <div className="flex justify-between">
@@ -901,7 +904,7 @@ export function Schedule() {
             <label className="block text-sm font-extrabold text-slate-900">
               {t('schedule.serviceTypeLabel')}
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Standard Clean */}
               <div
                 onClick={() => setServiceType('standard')}
@@ -939,7 +942,7 @@ export function Schedule() {
                 </div>
               </div>
 
-              {/* Deep / Move-In / Move-Out Clean */}
+              {/* Deep Clean */}
               <div
                 onClick={() => setServiceType('deep')}
                 className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
@@ -976,11 +979,46 @@ export function Schedule() {
                 </div>
               </div>
 
-              {/* Short-Term Rental Clean (Unified: on-site base, off-site laundry available as Add-on) */}
+              {/* Move-In / Move-Out Clean */}
               <div
-                onClick={() => {
-                  setServiceType('str_on_site');
-                }}
+                onClick={() => setServiceType('move_in_out')}
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
+                  serviceType === 'move_in_out'
+                    ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceMoveInOut')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        serviceType === 'move_in_out'
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {serviceType === 'move_in_out' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium">
+                    {t('schedule.serviceMoveInOutDesc')}
+                  </p>
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
+                  <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
+                    ${selectedTier.deepPrice.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Short-Term Rental Clean */}
+              <div
+                onClick={() => setServiceType('str_on_site')}
                 className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
                   isSTR
                     ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
@@ -1321,7 +1359,7 @@ export function Schedule() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-                  {SERVICE_FREQUENCIES.map((freq) => {
+                  {availableFrequencies.map((freq) => {
                     const isSelected = frequency === freq.id;
                     const freqDisc = Math.round(((baseTierPrice * freq.discountPercent) / 100) * 100) / 100;
                     const freqNet = baseTierPrice - freqDisc;
@@ -1968,11 +2006,13 @@ export function Schedule() {
               <div className="flex justify-between items-start gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.serviceTypeLabel')}:</span>
                 <span className="font-bold text-slate-900 text-right">
-                  {serviceType === 'deep'
+                  {serviceType === 'standard'
+                    ? t('schedule.serviceStandard')
+                    : serviceType === 'deep'
                     ? t('schedule.serviceDeep')
-                    : isSTR
-                    ? t('schedule.serviceStr')
-                    : t('schedule.serviceStandard')}
+                    : serviceType === 'move_in_out'
+                    ? t('schedule.serviceMoveInOut')
+                    : t('schedule.serviceStr')}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-2">

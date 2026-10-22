@@ -159,12 +159,29 @@ GPC_TIER_MATRIX = [
     (5700, 6099, Decimal('480.00'), Decimal('890.00')),
 ]
 
-GPC_FREQUENCY_DISCOUNTS = {
-    'weekly': Decimal('0.20'),
-    'biweekly': Decimal('0.15'),
-    'monthly': Decimal('0.10'),
+GPC_STANDARD_FREQUENCY_DISCOUNTS = {
+    'weekly': Decimal('0.15'),
+    'biweekly': Decimal('0.10'),
+    'monthly': Decimal('0.05'),
     'one_time': Decimal('0.00'),
 }
+
+GPC_DEEP_FREQUENCY_DISCOUNTS = {
+    'monthly': Decimal('0.05'),
+    'weekly': Decimal('0.00'),
+    'biweekly': Decimal('0.00'),
+    'one_time': Decimal('0.00'),
+}
+
+GPC_FREQUENCY_DISCOUNTS = GPC_STANDARD_FREQUENCY_DISCOUNTS
+
+
+def get_gpc_frequency_discount(service_type: str, frequency: str) -> Decimal:
+    if service_type in ('residential', 'regular', 'standard'):
+        return GPC_STANDARD_FREQUENCY_DISCOUNTS.get(frequency, Decimal('0.00'))
+    elif service_type == 'deep':
+        return GPC_DEEP_FREQUENCY_DISCOUNTS.get(frequency, Decimal('0.00'))
+    return Decimal('0.00')
 
 
 class CleaningOrderCreateSerializer(serializers.ModelSerializer):
@@ -368,17 +385,17 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
                         tier_matched = pricing_tier.deep_price
                     else:
                         tier_matched = pricing_tier.standard_price
-                elif service_rate.service_type in ('residential', 'move_in_out'):
+                elif service_rate.service_type in ('residential', 'move_in_out', 'deep'):
                     # Hardcoded fallback matrix if DB tiers are not yet created
                     for min_s, max_s, std_p, deep_p in GPC_TIER_MATRIX:
                         if min_s <= square_feet <= max_s:
-                            tier_matched = deep_p if service_rate.service_type == 'move_in_out' else std_p
+                            tier_matched = deep_p if service_rate.service_type in ('move_in_out', 'deep') else std_p
                             break
                     if not tier_matched and square_feet < 500:
-                        tier_matched = Decimal('235.00') if service_rate.service_type == 'move_in_out' else Decimal('155.00')
+                        tier_matched = Decimal('235.00') if service_rate.service_type in ('move_in_out', 'deep') else Decimal('155.00')
 
         if tier_matched is not None:
-            discount_pct = GPC_FREQUENCY_DISCOUNTS.get(frequency, Decimal('0.00'))
+            discount_pct = get_gpc_frequency_discount(service_rate.service_type, frequency)
             base_price = round(tier_matched * (Decimal('1.00') - discount_pct), 2)
         else:
             # Standard per sqft calculation (Evolving Solutions & custom rates)

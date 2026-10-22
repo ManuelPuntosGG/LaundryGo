@@ -153,7 +153,7 @@ export function Commercial() {
             className="w-full sm:w-auto font-black shadow-md hover:scale-102 active:scale-98 transition-all px-6 cursor-pointer"
           >
             <Calendar className="w-4 h-4 mr-2" />
-            <span>{t('commercialPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
+            <span>{t('commercialPage.requestWalkthroughBtn', 'Get a Quote')}</span>
           </Button>
         </div>
       </section>
@@ -180,7 +180,7 @@ export function Commercial() {
             className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-emerald-400/90 text-white font-black text-sm bg-emerald-900/50 hover:bg-emerald-800/80 hover:border-emerald-300 shadow-lg hover:scale-102 transition-transform cursor-pointer shrink-0"
           >
             <Calendar className="w-4 h-4 mr-1 text-emerald-300" />
-            <span className="text-white font-black">{t('commercialPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
+            <span className="text-white font-black">{t('commercialPage.requestWalkthroughBtn', 'Get a Quote')}</span>
           </button>
         </div>
 
@@ -262,7 +262,7 @@ export function Commercial() {
             >
               <Calendar className="w-5 h-5 mr-1 text-emerald-300" />
               <span className="text-white font-black">
-                {t('commercialPage.cta.requestWalkthroughBtn', 'Request a Walkthrough')}
+                {t('commercialPage.cta.requestWalkthroughBtn', 'Get a Quote')}
               </span>
             </button>
             <a

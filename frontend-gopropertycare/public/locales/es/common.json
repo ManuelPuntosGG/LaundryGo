@@ -446,13 +446,13 @@
     "badge": "Cotizaciones a Medida y Horarios Flexibles",
     "title": "Soluciones de Limpieza Comercial y Janitorial",
     "subtitle": "Servicio confiable y personal asegurado para oficinas, comercios, clínicas y comunidades HOA en Denver. Propuestas personalizadas entregadas el mismo día tras una visita de 15 minutos.",
-    "requestWalkthroughBtn": "Agendar un Walkthrough",
+    "requestWalkthroughBtn": "Solicitar Cotización",
     "viewResidentialBtn": "Limpieza Residencial",
     "viewAboutBtn": "Conoce Nuestra Empresa",
     "cta": {
       "title": "Agenda tu Walkthrough Presencial de 15 Minutos",
       "subtitle": "Cuéntanos sobre tus instalaciones y programa una visita presencial. Recibe tu propuesta detallada el mismo día hábil con $0 de anticipo.",
-      "requestWalkthroughBtn": "Agendar un Walkthrough"
+      "requestWalkthroughBtn": "Solicitar Cotización"
     }
   },
   "servicesPage": {
@@ -676,8 +676,8 @@
     "serviceTypeLabel": "Tipo de Servicio",
     "serviceStandard": "Limpieza Estándar",
     "serviceStandardDesc": "Mantenimiento regular continuo para higiene del hogar",
-    "serviceDeep": "Limpieza Profunda / Mudanza (Move-In / Move-Out)",
-    "serviceDeepDesc": "Desinfección integral a fondo, rodapiés y preparación para inspecciones",
+    "serviceDeep": "Limpieza Profunda",
+    "serviceDeepDesc": "Desinfección integral a fondo, rodapiés y detallado minucioso",
     "serviceStr": "Rotación de Alquiler Vacacional (Airbnb / VRBO)",
     "serviceStrDesc": "Rotación entre huéspedes: desinfección, tendido de camas estilo hotel y reposición de insumos esenciales",
     "serviceStrOnSite": "Alquiler Temporal (Lavado en sitio)",
@@ -814,7 +814,9 @@
     "cardNumberInvalid": "Ingresa un número de tarjeta válido de 15 o 16 dígitos",
     "cardExpiryInvalid": "Ingresa una fecha de vencimiento válida (MM/AA)",
     "cardExpiryPast": "La fecha de vencimiento de esta tarjeta ya expiró",
-    "cardCvcInvalid": "Ingresa un código de seguridad (CVC) válido de 3 o 4 dígitos"
+    "cardCvcInvalid": "Ingresa un código de seguridad (CVC) válido de 3 o 4 dígitos",
+    "serviceMoveInOut": "Limpieza Mudanza (Move-In / Move-Out)",
+    "serviceMoveInOutDesc": "Desinfección exhaustiva para mudanzas, inspecciones y entrega de depósitos"
   },
   "auth": {
     "loginTitle": "Bienvenido a GoPropertyCare",
@@ -964,7 +966,7 @@
         },
         {
           "q": "¿Con qué frecuencia debo programar mi limpieza?",
-          "a": "Ofrecemos frecuencias semanal (20% de descuento), quincenal (15% de descuento) y mensual (10% de descuento), además de citas únicas. Elige la que mejor se adapte a tu hogar y presupuesto, y cámbiala cuando desees."
+          "a": "Ofrecemos frecuencias semanal (15% de descuento), quincenal (10% de descuento) y mensual (5% de descuento) en limpieza estándar, además de 5% mensual en limpieza profunda y citas únicas. Elige la que mejor se adapte a tu hogar y presupuesto, y cámbiala cuando desees."
         },
         {
           "q": "¿Necesito estar en casa durante la limpieza?",
@@ -996,7 +998,7 @@
         },
         {
           "q": "¿Ofrecen descuentos por servicio recurrente?",
-          "a": "Sí: ahorra 20% en servicio semanal, 15% en quincenal y 10% en mensual. El descuento se aplica automáticamente en el cotizador."
+          "a": "Sí: ahorra 15% en servicio semanal, 10% en quincenal y 5% en mensual en nuestra limpieza estándar (más 5% mensual en limpieza profunda), aplicado automáticamente en el cotizador. Los servicios de mudanza y alquiler vacacional se cotizan a tarifa completa."
         },
         {
           "q": "¿Debo dejar propina?",

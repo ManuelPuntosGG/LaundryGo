@@ -18,6 +18,14 @@ class Command(BaseCommand):
                 'description': 'Mantenimiento de hogar personalizado (regular o profundo) adaptado a su estilo de vida.',
             },
             {
+                'name': 'Deep Residential Cleaning',
+                'service_type': 'deep',
+                'brand': 'gopropertycare',
+                'rate_per_sqft': Decimal('0.200'),
+                'min_order_amount': Decimal('99.00'),
+                'description': 'Desinfección profunda y detallada de rodapiés, desinfección a fondo y preparación del hogar.',
+            },
+            {
                 'name': 'Move-In / Move-Out Cleaning',
                 'service_type': 'move_in_out',
                 'brand': 'gopropertycare',

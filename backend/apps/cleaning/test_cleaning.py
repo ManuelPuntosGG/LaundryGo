@@ -531,9 +531,9 @@ class TestCleaningPricingTiers:
         future_date = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
         # 2 bedrooms ($135 base, 2 inc baths, external laundry $70)
         # 3 bathrooms (1 extra bath = +$25) -> baseBeforeDisc = $160.00
-        # biweekly discount: 15% off $160 = $24.00 -> base_price = $136.00
+        # STR has NO frequency discount -> base_price = $160.00
         # off_site_laundry addon: $70.00
-        # Total price: $136.00 + $70.00 = $206.00
+        # Total price: $160.00 + $70.00 = $230.00
         payload = {
             'street_address': '123 STR Test Blvd',
             'city': 'Denver',
@@ -565,9 +565,35 @@ class TestCleaningPricingTiers:
         resp = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
         assert resp.status_code == 201
         data = resp.json()
-        assert Decimal(str(data['base_price'])) == Decimal('136.00')
+        assert Decimal(str(data['base_price'])) == Decimal('160.00')
         assert Decimal(str(data['addons_total'])) == Decimal('70.00')
-        assert Decimal(str(data['total_price'])) == Decimal('206.00')
+        assert Decimal(str(data['total_price'])) == Decimal('230.00')
+
+    def test_frequency_discount_rules_per_service_type(self, api_client):
+        from apps.cleaning.serializers import get_gpc_frequency_discount
+        # Standard: 15% weekly, 10% biweekly, 5% monthly, 0% one_time
+        assert get_gpc_frequency_discount('residential', 'weekly') == Decimal('0.15')
+        assert get_gpc_frequency_discount('residential', 'biweekly') == Decimal('0.10')
+        assert get_gpc_frequency_discount('residential', 'monthly') == Decimal('0.05')
+        assert get_gpc_frequency_discount('residential', 'one_time') == Decimal('0.00')
+
+        # Deep Cleaning: 5% monthly ONLY, 0% for weekly / biweekly / one_time
+        assert get_gpc_frequency_discount('deep', 'monthly') == Decimal('0.05')
+        assert get_gpc_frequency_discount('deep', 'weekly') == Decimal('0.00')
+        assert get_gpc_frequency_discount('deep', 'biweekly') == Decimal('0.00')
+        assert get_gpc_frequency_discount('deep', 'one_time') == Decimal('0.00')
+
+        # Move In/Out: 0% for all frequencies
+        assert get_gpc_frequency_discount('move_in_out', 'weekly') == Decimal('0.00')
+        assert get_gpc_frequency_discount('move_in_out', 'biweekly') == Decimal('0.00')
+        assert get_gpc_frequency_discount('move_in_out', 'monthly') == Decimal('0.00')
+        assert get_gpc_frequency_discount('move_in_out', 'one_time') == Decimal('0.00')
+
+        # STR: 0% for all frequencies
+        assert get_gpc_frequency_discount('str_on_site', 'weekly') == Decimal('0.00')
+        assert get_gpc_frequency_discount('str_on_site', 'biweekly') == Decimal('0.00')
+        assert get_gpc_frequency_discount('str_on_site', 'monthly') == Decimal('0.00')
+        assert get_gpc_frequency_discount('str_on_site', 'one_time') == Decimal('0.00')
 
     def test_commercial_walkthrough_inquiry_success(self, api_client):
         payload = {

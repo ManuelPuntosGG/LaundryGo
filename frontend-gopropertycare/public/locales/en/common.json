@@ -446,13 +446,13 @@
     "badge": "Custom Quotes & Tailored Operations",
     "title": "Commercial Cleaning & Janitorial Solutions",
     "subtitle": "Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver. Custom proposals delivered same-day after a 15-minute walkthrough.",
-    "requestWalkthroughBtn": "Request a Walkthrough",
+    "requestWalkthroughBtn": "Get a Quote",
     "viewResidentialBtn": "Residential Cleaning",
     "viewAboutBtn": "About Our Company",
     "cta": {
       "title": "Schedule Your 15-Minute On-Site Walkthrough",
       "subtitle": "Tell us about your facility and schedule an on-site visit. Receive your custom itemized proposal the same business day with $0 upfront.",
-      "requestWalkthroughBtn": "Request a Walkthrough"
+      "requestWalkthroughBtn": "Get a Quote"
     }
   },
   "servicesPage": {
@@ -676,8 +676,8 @@
     "serviceTypeLabel": "Service Type",
     "serviceStandard": "Standard Clean",
     "serviceStandardDesc": "Regular maintenance for upkeep and hygiene",
-    "serviceDeep": "Deep / Move-In / Move-Out Clean",
-    "serviceDeepDesc": "Thorough reset, baseboards, grout & inspection detailing",
+    "serviceDeep": "Deep Clean",
+    "serviceDeepDesc": "Thorough reset, baseboards, grout & detailed detailing",
     "serviceStr": "Short-Term Rental Turnover",
     "serviceStrDesc": "Airbnb & VRBO turnover: sanitized spaces, fresh hotel-style bed remaking, and guest amenities restocking",
     "serviceStrOnSite": "Short Term Rental (Laundry on site)",
@@ -814,7 +814,9 @@
     "cardNumberInvalid": "Please enter a valid 15 or 16-digit card number",
     "cardExpiryInvalid": "Enter a valid expiration date (MM/YY)",
     "cardExpiryPast": "This card expiration date is in the past",
-    "cardCvcInvalid": "Enter a valid 3 or 4-digit security code (CVC)"
+    "cardCvcInvalid": "Enter a valid 3 or 4-digit security code (CVC)",
+    "serviceMoveInOut": "Move-In / Move-Out Clean",
+    "serviceMoveInOutDesc": "Comprehensive turnover for deposits, sales & vacant inspections"
   },
   "auth": {
     "loginTitle": "Welcome Back to GoPropertyCare",
@@ -964,7 +966,7 @@
         },
         {
           "q": "How often should I schedule my cleaning?",
-          "a": "We offer Weekly (20% discount), Biweekly (15% discount), and Monthly (10% discount) recurring options, as well as one-time bookings. Pick the frequency that fits your household and budget, and adjust anytime."
+          "a": "We offer Weekly (15% discount), Biweekly (10% discount), and Monthly (5% discount) recurring options on standard cleaning, as well as a 5% monthly discount on deep cleaning and one-time bookings. Pick the frequency that fits your household and budget, and adjust anytime."
         },
         {
           "q": "Do I need to be home during the cleaning?",
@@ -996,7 +998,7 @@
         },
         {
           "q": "Do you offer discounts for recurring service?",
-          "a": "Yes, we offer recurring savings: 20% off for Weekly cleaning, 15% off for Biweekly cleaning, and 10% off for Monthly cleaning, applied automatically at checkout."
+          "a": "Yes, we offer recurring savings: 15% off for Weekly cleaning, 10% off for Biweekly cleaning, and 5% off for Monthly cleaning on our standard service (plus 5% off monthly deep cleaning), applied automatically at checkout. Move-in/outs and STR turnovers are priced at standard transparent rates."
         },
         {
           "q": "Do I need to tip?",

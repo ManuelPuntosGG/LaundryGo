@@ -12,7 +12,7 @@ export interface PricingTier {
   isCustomQuote?: boolean;
 }
 
-export type CleaningServiceTierType = 'standard' | 'deep' | 'str_on_site' | 'str_off_site' | 'commercial';
+export type CleaningServiceTierType = 'standard' | 'deep' | 'move_in_out' | 'str_on_site' | 'str_off_site' | 'commercial';
 
 export const PRICING_TIERS: PricingTier[] = [
   { tier: 0, label: '500 – 999 sq ft', minSqft: 500, maxSqft: 999, standardPrice: 155, deepPrice: 235, strOnSitePrice: 205, strOffSitePrice: 270, sqftEquivalent: '500 – 999 sq ft', propertyHint: '500 – 999 sq ft' },
@@ -41,6 +41,7 @@ export const getTierPrice = (tier: PricingTier, type: CleaningServiceTierType): 
     case 'standard':
       return tier.standardPrice;
     case 'deep':
+    case 'move_in_out':
       return tier.deepPrice;
     case 'str_on_site':
       return tier.strOnSitePrice;
@@ -61,12 +62,48 @@ export interface FrequencyOption {
   isPopular?: boolean;
 }
 
-export const SERVICE_FREQUENCIES: FrequencyOption[] = [
-  { id: 'biweekly', nameKey: 'schedule.frequency_biweekly', discountPercent: 15, badge: '15% OFF', isPopular: true },
-  { id: 'weekly', nameKey: 'schedule.frequency_weekly', discountPercent: 20, badge: '20% OFF' },
-  { id: 'monthly', nameKey: 'schedule.frequency_monthly', discountPercent: 10, badge: '10% OFF' },
-  { id: 'one_time', nameKey: 'schedule.frequency_one_time', discountPercent: 0, badge: 'Full Price' },
-];
+export function getFrequencyDiscount(serviceType: CleaningServiceTierType, frequency: ServiceFrequency): number {
+  if (serviceType === 'standard') {
+    if (frequency === 'weekly') return 15;
+    if (frequency === 'biweekly') return 10;
+    if (frequency === 'monthly') return 5;
+    return 0;
+  }
+  if (serviceType === 'deep') {
+    if (frequency === 'monthly') return 5;
+    return 0;
+  }
+  // move_in_out, str_on_site, str_off_site, commercial have no recurring discounts
+  return 0;
+}
+
+export function getServiceFrequencies(serviceType: CleaningServiceTierType): FrequencyOption[] {
+  if (serviceType === 'standard') {
+    return [
+      { id: 'biweekly', nameKey: 'schedule.frequency_biweekly', discountPercent: 10, badge: '10% OFF', isPopular: true },
+      { id: 'weekly', nameKey: 'schedule.frequency_weekly', discountPercent: 15, badge: '15% OFF' },
+      { id: 'monthly', nameKey: 'schedule.frequency_monthly', discountPercent: 5, badge: '5% OFF' },
+      { id: 'one_time', nameKey: 'schedule.frequency_one_time', discountPercent: 0, badge: 'Full Price' },
+    ];
+  }
+  if (serviceType === 'deep') {
+    return [
+      { id: 'one_time', nameKey: 'schedule.frequency_one_time', discountPercent: 0, badge: 'Full Price', isPopular: true },
+      { id: 'monthly', nameKey: 'schedule.frequency_monthly', discountPercent: 5, badge: '5% OFF' },
+      { id: 'biweekly', nameKey: 'schedule.frequency_biweekly', discountPercent: 0, badge: 'Full Price' },
+      { id: 'weekly', nameKey: 'schedule.frequency_weekly', discountPercent: 0, badge: 'Full Price' },
+    ];
+  }
+  // move_in_out, str_on_site, str_off_site, commercial: No recurring discounts
+  return [
+    { id: 'one_time', nameKey: 'schedule.frequency_one_time', discountPercent: 0, badge: 'Full Price', isPopular: true },
+    { id: 'biweekly', nameKey: 'schedule.frequency_biweekly', discountPercent: 0, badge: 'Full Price' },
+    { id: 'weekly', nameKey: 'schedule.frequency_weekly', discountPercent: 0, badge: 'Full Price' },
+    { id: 'monthly', nameKey: 'schedule.frequency_monthly', discountPercent: 0, badge: 'Full Price' },
+  ];
+}
+
+export const SERVICE_FREQUENCIES: FrequencyOption[] = getServiceFrequencies('standard');
 
 export const getTierBySqft = (sqft: number): PricingTier => {
   if (sqft >= 6100) return PRICING_TIERS[PRICING_TIERS.length - 1];
