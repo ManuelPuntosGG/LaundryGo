@@ -182,7 +182,7 @@ export function FAQ() {
         title={t('faq.title', 'Frequently Asked Questions')}
         description={t(
           'faq.subtitle',
-          'Everything you need to know about our residential, turnover, and commercial cleaning services across Denver and Boulder.'
+          'Everything you need to know about our residential, turnover, and commercial cleaning services across Denver.'
         )}
         canonical="https://gopropertycare.com/faq"
       />
@@ -207,7 +207,7 @@ export function FAQ() {
         <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed max-w-2xl mx-auto">
           {t(
             'faq.subtitle',
-            'Everything you need to know about our residential, turnover, and commercial cleaning services across Denver and Boulder.'
+            'Everything you need to know about our residential, turnover, and commercial cleaning services across Denver.'
           )}
         </p>
 
@@ -420,16 +420,16 @@ export function FAQ() {
             <p className="text-emerald-100 text-sm sm:text-base max-w-xl mx-auto font-medium leading-relaxed">
               {t(
                 'faq.supportCard.subtitle',
-                'Our local Denver & Boulder property care specialists are available 24 hours a day, 7 days a week.'
+                'Our local Denver property care specialists are available 24 hours a day, 7 days a week.'
               )}
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <a
                 href="tel:7205908632"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-emerald-950 font-black text-sm hover:bg-emerald-50 hover:scale-102 active:scale-98 transition-all shadow-md"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-emerald-400/80 text-white font-black text-sm bg-emerald-900/50 hover:bg-emerald-800/80 hover:scale-102 active:scale-98 transition-all shadow-md"
               >
-                <Phone className="w-4 h-4 text-emerald-700" />
+                <Phone className="w-4 h-4 text-emerald-300" />
                 <span>{t('faq.supportCard.callUs', 'Call or Text (720) 590-8632')}</span>
               </a>
 

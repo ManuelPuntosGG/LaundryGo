@@ -104,7 +104,7 @@ export function Auth() {
     <div className="max-w-md mx-auto py-8 sm:py-12 animate-fade-in-up">
       <SEO
         title={tab === 'login' ? t('nav.login') : t('nav.register')}
-        description={tab === 'login' ? 'Sign in to your GoPropertyCare portal to manage cleaning appointments.' : 'Create your GoPropertyCare account for residential cleaning across Denver & Boulder.'}
+        description={tab === 'login' ? 'Sign in to your GoPropertyCare portal to manage cleaning appointments.' : 'Create your GoPropertyCare account for residential cleaning across Denver.'}
         canonical="https://gopropertycare.com/login"
       />
       <Card className="p-6 sm:p-8 border-emerald-100 shadow-xl space-y-6">
@@ -116,7 +116,7 @@ export function Auth() {
             {tab === 'login' ? t('auth.loginTitle') : t('auth.registerTitle')}
           </h1>
           <p className="text-xs text-slate-600 font-medium">
-            Unified access to your cleaning bookings across Denver & Boulder.
+            Unified access to your cleaning bookings across Denver.
           </p>
         </div>
 

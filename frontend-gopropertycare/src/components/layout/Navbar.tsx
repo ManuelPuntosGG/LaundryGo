@@ -270,7 +270,7 @@ export function Navbar() {
           {/* Bottom Utilities: Region Info & Language Switcher */}
           <div className="flex items-center justify-between pt-3 border-t border-slate-100">
             <span className="text-xs text-slate-500 font-bold">
-              Denver & Boulder, CO
+              Denver, CO
             </span>
             <LanguageSwitcher />
           </div>

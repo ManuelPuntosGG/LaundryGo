@@ -212,12 +212,12 @@
     "paymentFlowStep2Desc": "Our team reviews your request and confirms your scheduled pickup window.",
     "paymentFlowStep3Title": "Pickup, Weighing & Care",
     "paymentFlowStep3Desc": "We collect your bags, weigh them on calibrated commercial scales, and wash & fold.",
-    "paymentFlowStep4Title": "Order Closed & Stripe Payment Link",
-    "paymentFlowStep4Desc": "Once ready, our admin finalizes the invoice (including any special care surcharges) and sends your secure Stripe Checkout link via email and Dashboard.",
+    "paymentFlowStep4Title": "Final Invoice & Delivery",
+    "paymentFlowStep4Desc": "Once ready, our admin finalizes the invoice (including any special care adjustments) and coordinates delivery with payment upon receipt.",
     "success": {
       "title": "Pickup Request Submitted Successfully!",
       "message": "We have received your order. Our team will process the details and contact you shortly to coordinate your pickup.",
-      "emailNotice": "A confirmation notice has been sent to your email. You will receive a secure Stripe payment link once your laundry is weighed and washed before delivery.",
+      "emailNotice": "A confirmation notice has been sent to your email. You will receive your finalized invoice details once your laundry is weighed and washed before delivery.",
       "returnDashboard": "Return to Dashboard",
       "returnHome": "Return to Home",
       "createAccount": "Create an Account"
@@ -328,17 +328,14 @@
     "freeCentralDenver": "$0.00 (FREE Central Denver)",
     "outerDenverZone": "+${{fee}} (Outer Denver Zone)",
     "paymentStatusUnpaid": "Pending Final Weight ($0 Charged)",
-    "paymentStatusLinkSent": "Invoice Ready • Payment Link Sent",
+    "paymentStatusLinkSent": "Invoice Finalized • Ready for Delivery",
     "paymentStatusPaid": "Paid in Full",
     "paymentStatusRefunded": "Refunded",
     "paymentStatusFailed": "Payment Failed",
     "basePriceLabel": "Wash & Fold Base",
     "quotedTotalLabel": "Subtotal",
     "surchargeLabel": "Special Care / Weight Adjustment",
-    "finalTotalLabel": "Final Total Due",
-    "payWithStripeBtn": "Pay Invoice via Stripe",
-    "paymentReadyBannerTitle": "Your Laundry Order is Finalized & Ready for Payment",
-    "paymentReadyBannerDesc": "Our team has weighed and processed your laundry. Complete your secure payment online via Stripe Checkout."
+    "finalTotalLabel": "Final Total Due"
   },
   "about": {
     "badge": "Our Story & Method in Denver, CO",

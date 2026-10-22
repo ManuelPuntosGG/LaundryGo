@@ -53,21 +53,8 @@ class StripeWebhookView(APIView):
         event_type = event.get('type') if isinstance(event, dict) else getattr(event, 'type', '')
         data_object = event.get('data', {}).get('object', {}) if isinstance(event, dict) else getattr(event.data, 'object', {})
 
-        # 1. Checkout session completed (LaundryGo online payment link paid)
-        if event_type == 'checkout.session.completed':
-            metadata = data_object.get('metadata', {}) if isinstance(data_object, dict) else getattr(data_object, 'metadata', {})
-            order_id = metadata.get('order_id')
-            if order_id:
-                try:
-                    from apps.orders.models import Order
-                    order = Order.objects.get(id=order_id)
-                    order.payment_status = 'paid'
-                    order.save(update_fields=['payment_status'])
-                except Exception:
-                    pass
-
-        # 2. Payment intent succeeded (GoPropertyCare 25% deposit or 75% final charge)
-        elif event_type == 'payment_intent.succeeded':
+        # Payment intent succeeded (GoPropertyCare 25% deposit or 75% final charge)
+        if event_type == 'payment_intent.succeeded':
             metadata = data_object.get('metadata', {}) if isinstance(data_object, dict) else getattr(data_object, 'metadata', {})
             order_id = metadata.get('order_id')
             charge_type = metadata.get('type')

@@ -29,13 +29,13 @@ export function SEO({
     // 2. Default Title & Description
     const defaultTitle =
       currentLang === 'es'
-        ? 'GoPropertyCare — Limpieza Residencial y Cuidado de Propiedades en Denver & Boulder'
-        : 'GoPropertyCare — Residential Cleaning & Property Care in Denver & Boulder';
+        ? 'GoPropertyCare — Limpieza Residencial y Cuidado de Propiedades en Denver'
+        : 'GoPropertyCare — Residential Cleaning & Property Care in Denver';
 
     const defaultDescription =
       currentLang === 'es'
-        ? 'Servicio profesional de limpieza residencial, rotación de Airbnb y entrega de propiedades en Denver y Boulder, CO. Tarifas por pie cuadrado desde $0.125/sqft, 100% asegurado.'
-        : 'Professional residential cleaning, turnover care, and move-in/move-out services across Denver & Boulder, CO. Transparent sq ft pricing from $0.125/sqft, 100% insured.';
+        ? 'Servicio profesional de limpieza residencial, rotación de Airbnb y entrega de propiedades en Denver, CO. Tarifas por pie cuadrado desde $0.125/sqft, 100% asegurado.'
+        : 'Professional residential cleaning, turnover care, and move-in/move-out services across Denver, CO. Transparent sq ft pricing from $0.125/sqft, 100% insured.';
 
     const pageTitle = title ? `${title} | GoPropertyCare` : defaultTitle;
     const pageDescription = description || defaultDescription;

@@ -140,7 +140,7 @@ export function Footer() {
                 </li>
                 <li className="flex items-center justify-center md:justify-end gap-2">
                   <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Denver Metropolitan Area & Boulder, CO</span>
+                  <span>Denver Metropolitan Area, CO</span>
                 </li>
               </ul>
             </div>

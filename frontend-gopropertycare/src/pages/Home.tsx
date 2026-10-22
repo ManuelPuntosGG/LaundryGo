@@ -126,17 +126,6 @@ export function Home() {
             {t('home.hero.cta')}
           </Button>
 
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-full sm:w-auto group hover:scale-102 active:scale-98 transition-all duration-300"
-            onClick={() => {
-              document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
-            {t('home.hero.secondaryCta')}
-            <ArrowRight className="w-4 h-4 ml-2 text-slate-500 group-hover:translate-x-1 transition-transform" />
-          </Button>
         </div>
 
         {/* Social Proof Pills */}
@@ -397,7 +386,7 @@ export function Home() {
         <Card className="p-7 sm:p-10 border-emerald-200/90 bg-emerald-50/30 shadow-md">
           <div className="flex items-center gap-2 text-emerald-800 font-extrabold text-base mb-6">
             <MapPin className="w-5 h-5 text-emerald-600 shrink-0" />
-            <span>{i18n.language?.startsWith('es') ? 'Áreas de Servicio en Denver y Boulder' : 'Denver & Boulder Service Areas'}</span>
+            <span>{i18n.language?.startsWith('es') ? 'Áreas de Servicio en Denver' : 'Denver Service Areas'}</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {SERVICE_AREAS.map((city) => (
@@ -431,7 +420,7 @@ export function Home() {
               <span>•</span>
               <span className="flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-emerald-400" />
-                Denver & Boulder, CO
+                Denver, CO
               </span>
             </div>
           </div>

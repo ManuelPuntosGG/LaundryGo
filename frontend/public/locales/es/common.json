@@ -212,12 +212,12 @@
     "paymentFlowStep2Desc": "Nuestro equipo revisa tu solicitud y confirma tu ventana de recolección programada.",
     "paymentFlowStep3Title": "Recolección, Pesaje y Lavado",
     "paymentFlowStep3Desc": "Recolectamos tus bolsas, las pesamos en básculas calibradas y lavamos y doblamos tu ropa.",
-    "paymentFlowStep4Title": "Cierre de Orden y Enlace de Stripe",
-    "paymentFlowStep4Desc": "Al finalizar, cerramos la orden (incluyendo cualquier ajuste o sobrecargo especial) y te enviamos tu enlace de pago seguro de Stripe por correo y en tu Panel.",
+    "paymentFlowStep4Title": "Factura Final y Entrega",
+    "paymentFlowStep4Desc": "Una vez lista tu ropa, nuestro equipo finaliza la factura (incluyendo cualquier ajuste de cuidado especial) y coordina la entrega con pago al recibir.",
     "success": {
       "title": "¡Solicitud de Recolección Enviada con Éxito!",
       "message": "Hemos recibido tu pedido correctamente. Nuestro equipo procesará los detalles y pronto se pondrá en contacto contigo para gestionar la recolección de tu ropa.",
-      "emailNotice": "Se ha enviado una notificación de confirmación a tu correo electrónico. Recibirás un enlace de pago seguro de Stripe una vez que tu ropa sea pesada y lavada antes de la entrega.",
+      "emailNotice": "Hemos enviado una confirmación a tu correo. Recibirás el detalle y factura final una vez pesada y lavada tu ropa antes de la entrega.",
       "returnDashboard": "Volver al Panel de Control",
       "returnHome": "Volver al Inicio",
       "createAccount": "Crear una Cuenta"
@@ -328,17 +328,14 @@
     "freeCentralDenver": "$0.00 (GRATIS Denver Central)",
     "outerDenverZone": "+${{fee}} (Zona Extendida de Denver)",
     "paymentStatusUnpaid": "Pendiente de Pesaje ($0 Cobrado)",
-    "paymentStatusLinkSent": "Orden Cerrada • Enlace de Pago Enviado",
+    "paymentStatusLinkSent": "Factura Finalizada • Lista para Entrega",
     "paymentStatusPaid": "Pagado en su Totalidad",
     "paymentStatusRefunded": "Reembolsado",
     "paymentStatusFailed": "Pago Fallido",
     "basePriceLabel": "Base de Lavado y Doblado",
     "quotedTotalLabel": "Subtotal Cotizado",
     "surchargeLabel": "Cuidado Especial / Ajuste de Pesaje",
-    "finalTotalLabel": "Total Final a Pagar",
-    "payWithStripeBtn": "Pagar Orden con Stripe",
-    "paymentReadyBannerTitle": "Tu Pedido Está Cerrado y Listo para Pago",
-    "paymentReadyBannerDesc": "Nuestro equipo ha pesado y procesado tu ropa. Completa tu pago seguro en línea mediante Stripe Checkout."
+    "finalTotalLabel": "Total Final a Pagar"
   },
   "about": {
     "badge": "Nuestra Historia y Método en Denver, CO",

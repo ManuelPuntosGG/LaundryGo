@@ -188,11 +188,11 @@
       "minNotice": "Tarifa fija por tier según el tamaño del inmueble. Las dimensiones y cuidados especiales se confirman en tu reserva."
     },
     "coverage": {
-      "title": "Zonas de Cobertura en Denver y Boulder",
+      "title": "Zonas de Cobertura en Denver",
       "subtitle": "Llegamos a tu puerta con puntualidad y garantía en todo el corredor metropolitano.",
-      "innerBadge": "Denver Central y Boulder — Traslado GRATIS",
+      "innerBadge": "Denver Central — Traslado GRATIS",
       "outerBadge": "Área Metropolitana Expandida — Traslado GRATIS",
-      "innerDesc": "Denver (Centro y alrededores), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder y Broomfield.",
+      "innerDesc": "Denver (Centro y alrededores), Lakewood, Englewood, Wheat Ridge, Arvada, Westminster y Broomfield.",
       "outerDesc": "Aurora, Thornton, Centennial y Highlands Ranch — 100% Traslado gratuito incluido en cada servicio."
     },
     "contact": {
@@ -201,11 +201,11 @@
       "phone": "(720) 590-8632",
       "email": "info@gopropertycare.com",
       "hours": "Servicio 24/7 Disponible",
-      "location": "Denver, Colorado y Áreas Vecinas"
+      "location": "Área Metropolitana de Denver, CO"
     }
   },
   "about": {
-    "tagline": "Denver, Colorado y Áreas Vecinas",
+    "tagline": "Especialistas en Cuidado de Propiedades en Denver",
     "title": "Soluciones Integrales para tus Inmuebles",
     "subtitle": "Tu socio confiable en limpieza residencial, comercial, post-construcción y turnovers de alquiler vacacional en Denver.",
     "insuredBadge": "Personal 100% Asegurado (Insured)",
@@ -228,13 +228,13 @@
     },
     "contactInfo": {
       "title": "Contacto Directo y Datos de la Empresa",
-      "subtitle": "Comunícate directamente con nuestro equipo de administración en Denver y Boulder. Estamos para servirte.",
+      "subtitle": "Comunícate directamente con nuestro equipo de administración en Denver. Estamos para servirte.",
       "phoneLabel": "Teléfono Directo",
       "emailLabel": "Correo Electrónico",
       "hoursLabel": "Horario de Atención",
       "hoursValue": "24/7 (Atención y soporte directo para reservaciones)",
       "coverageLabel": "Área de Cobertura",
-      "coverageValue": "Área Metropolitana de Denver y Boulder, Colorado",
+      "coverageValue": "Área Metropolitana de Denver, Colorado",
       "instagramLabel": "Instagram Oficial",
       "callBtn": "Llamar al (720) 590-8632",
       "emailBtn": "Enviar Correo",
@@ -430,9 +430,9 @@
     }
   },
   "residentialPage": {
-    "badge": "Denver y Boulder, Colorado • Soluciones Residenciales Aseguradas",
+    "badge": "Denver, Colorado • Soluciones Residenciales Aseguradas",
     "title": "Soluciones de Limpieza Residencial",
-    "subtitle": "Listas de control exhaustivas habitación por habitación diseñadas para residencias, mudanzas y rotación vacacional 5 estrellas en Denver y Boulder.",
+    "subtitle": "Listas de control exhaustivas habitación por habitación diseñadas para residencias, mudanzas y rotación vacacional 5 estrellas en Denver.",
     "scheduleBtn": "Agendar en Línea",
     "viewCommercialBtn": "Limpieza Comercial",
     "viewAboutBtn": "Conoce Nuestra Empresa",
@@ -445,7 +445,7 @@
   "commercialPage": {
     "badge": "Cotizaciones a Medida y Horarios Flexibles",
     "title": "Soluciones de Limpieza Comercial y Janitorial",
-    "subtitle": "Servicio confiable y personal asegurado para oficinas, comercios, clínicas y comunidades HOA en Denver y Boulder. Propuestas personalizadas entregadas el mismo día tras una visita de 15 minutos.",
+    "subtitle": "Servicio confiable y personal asegurado para oficinas, comercios, clínicas y comunidades HOA en Denver. Propuestas personalizadas entregadas el mismo día tras una visita de 15 minutos.",
     "requestWalkthroughBtn": "Agendar un Walkthrough",
     "viewResidentialBtn": "Limpieza Residencial",
     "viewAboutBtn": "Conoce Nuestra Empresa",
@@ -457,7 +457,7 @@
   },
   "servicesPage": {
     "title": "Nuestros Servicios Especializados",
-    "subtitle": "Listas de control exhaustivas habitación por habitación diseñadas para residencias, rotaciones vacacionales y limpiezas profundas en Denver y Boulder.",
+    "subtitle": "Listas de control exhaustivas habitación por habitación diseñadas para residencias, rotaciones vacacionales y limpiezas profundas en Denver.",
     "viewAboutBtn": "Conoce Nuestra Empresa",
     "scheduleBtn": "Agendar en Línea",
     "customRequestNote": "¿Necesitas algo que no está en la lista? Pregúntanos y te diremos si podemos añadirlo.",
@@ -470,7 +470,7 @@
     "requestWalkthroughBtn": "Agendar un Walkthrough",
     "commercialBadge": "Cotizaciones a Medida y Horarios Flexibles",
     "commercialHeading": "Soluciones de Limpieza Comercial y Mantenimiento",
-    "commercialSubheading": "Servicio confiable y personal asegurado para oficinas, comercios, clínicas y comunidades HOA en Denver y Boulder. Propuestas personalizadas entregadas el mismo día tras una visita de 15 minutos.",
+    "commercialSubheading": "Servicio confiable y personal asegurado para oficinas, comercios, clínicas y comunidades HOA en Denver. Propuestas personalizadas entregadas el mismo día tras una visita de 15 minutos.",
     "cta": {
       "title": "¿Listo para Experimentar un Cuidado Impecable?",
       "subtitle": "Elige tu espacio, selecciona la fecha y deja que nuestro equipo asegurado se encargue de todo.",
@@ -660,7 +660,7 @@
     "sqftLabel": "Pies Cuadrados del Inmueble (Sq Ft)",
     "sqftHelp": "Indica el tamaño aproximado de las áreas a limpiar.",
     "tierDropdownLabel": "Selecciona el Tamaño de tu Propiedad",
-    "tierDropdownHelp": "Tarifas fijas y transparentes adaptadas a propiedades en Denver y Boulder.",
+    "tierDropdownHelp": "Tarifas fijas y transparentes adaptadas a propiedades en Denver.",
     "selectTierOption": "Elige un rango de dimensiones...",
     "customQuoteTitle": "Propiedad Amplia o Comercial (6,100+ sq ft)",
     "customQuoteDesc": "Inmuebles a partir de 6,100 sq ft reciben una cotización y propuesta personalizada por parte de nuestro equipo de especialistas.",
@@ -702,7 +702,7 @@
     "futureDateNotice": "Citas disponibles a partir de mañana con llegada puntual a la hora seleccionada.",
     "timeSlotLabel": "Hora Preferida de Llegada",
     "step3Title": "Dirección de la Propiedad e Instrucciones de Acceso",
-    "step3Subtitle": "Dónde y cómo nuestros especialistas de limpieza accederán a tu propiedad.",
+    "step3Subtitle": "Indica la dirección del inmueble, método de acceso y los extras con costo adicional.",
     "cityLabel": "Ciudad",
     "cityPlaceholder": "ej. Denver, Englewood, Arvada...",
     "errCity": "Ciudad requerida",
@@ -769,7 +769,6 @@
     "orderNumber": "Número de Orden",
     "backHome": "Volver al Inicio",
     "viewDashboard": "Ver en Mi Cuenta",
-    "step3Subtitle": "Indica la dirección del inmueble, método de acceso y los extras con costo adicional.",
     "step4Subtitle": "Revisa los detalles de tu reserva de limpieza antes de confirmar.",
     "minOrderApplied": "Se aplica la tarifa mínima de orden estándar de $99.00 para espacios más pequeños.",
     "inquiryNoCharge": "(Detalles de consulta - sin costo adicional)",
@@ -887,7 +886,7 @@
     "cancelSuccessBanner": "Tu reservación ha sido cancelada."
   },
   "footer": {
-    "description": "Soluciones integrales de limpieza residencial, comercial, post-construcción y turnovers de alquiler vacacional en Denver y Boulder.",
+    "description": "Soluciones integrales de limpieza residencial, comercial, post-construcción y turnovers de alquiler vacacional en Denver.",
     "guarantee": "100% Satisfacción y Tranquilidad",
     "quickLinks": "Enlaces Rápidos",
     "cleaningTiers": "Servicios Especializados",
@@ -898,7 +897,7 @@
   "faq": {
     "badge": "Centro de Ayuda e Información",
     "title": "Preguntas Frecuentes",
-    "subtitle": "Todo lo que necesitas saber sobre nuestros servicios de limpieza residencial, rotación de propiedades y cuidado comercial en Denver y Boulder.",
+    "subtitle": "Todo lo que necesitas saber sobre nuestros servicios de limpieza residencial, rotación de propiedades y cuidado comercial en Denver.",
     "searchPlaceholder": "Buscar preguntas, servicios o políticas...",
     "clearSearch": "Limpiar búsqueda",
     "resultsFound": "{{count}} preguntas encontradas",
@@ -919,7 +918,7 @@
       "general": [
         {
           "q": "¿Qué áreas atienden?",
-          "a": "Atendemos con orgullo toda el área metropolitana de Denver y Boulder, incluyendo Denver, Englewood, Wheat Ridge, Arvada, Westminster, Thornton, Broomfield, Aurora, Centennial, Castle Rock y Highlands Ranch."
+          "a": "Atendemos con orgullo toda el área metropolitana de Denver, incluyendo Denver, Englewood, Wheat Ridge, Arvada, Westminster, Thornton, Broomfield, Aurora, Centennial, Castle Rock y Highlands Ranch."
         },
         {
           "q": "¿Limpian tanto hogares como negocios?",
@@ -1152,7 +1151,7 @@
     "supportCard": {
       "badge": "Soporte Dedicado 24/7",
       "title": "¿Aún tienes preguntas sobre nuestros servicios?",
-      "subtitle": "Nuestros especialistas en cuidado de propiedades en Denver y Boulder están disponibles las 24 horas, los 7 días de la semana.",
+      "subtitle": "Nuestros especialistas en cuidado de propiedades en Denver están disponibles las 24 horas, los 7 días de la semana.",
       "callUs": "Llamar o SMS: (720) 590-8632",
       "emailUs": "Escribir a info@gopropertycare.com",
       "bookOnline": "Reservar Servicio Residencial",

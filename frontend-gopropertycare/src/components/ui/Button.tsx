@@ -32,17 +32,17 @@ export function Button({
   };
 
   let variantStyle = variants[variant];
-  // If consumer specifies custom background class, remove default variant bg
-  if (className.includes('bg-')) {
-    variantStyle = variantStyle.replace(/\bbg-\S+/g, '').replace(/\bhover:bg-\S+/g, '').replace(/\bactive:bg-\S+/g, '');
+  // If consumer specifies custom explicit base background class (not hover: or active:), override default
+  if (/(?:^|\s)bg-\S+/.test(className)) {
+    variantStyle = variantStyle.replace(/(?:^|\s)bg-\S+/g, '');
   }
-  // If consumer specifies custom text class, remove default variant text
-  if (className.includes('text-')) {
-    variantStyle = variantStyle.replace(/\btext-\S+/g, '').replace(/\bhover:text-\S+/g, '').replace(/\bactive:text-\S+/g, '');
+  // If consumer specifies custom explicit base text class (not hover: or active:), override default
+  if (/(?:^|\s)text-\S+/.test(className)) {
+    variantStyle = variantStyle.replace(/(?:^|\s)text-\S+/g, '');
   }
-  // If consumer specifies custom border, remove default variant border
-  if (className.includes('border-') || className.includes('border ')) {
-    variantStyle = variantStyle.replace(/\bborder-\S+/g, '').replace(/\bborder\b/g, '');
+  // If consumer specifies custom explicit base border class, override default
+  if (/(?:^|\s)border(?:-\S+|\s|$)/.test(className)) {
+    variantStyle = variantStyle.replace(/(?:^|\s)border(?:-\S+|\s|$)/g, '');
   }
 
   return (

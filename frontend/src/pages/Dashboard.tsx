@@ -19,7 +19,6 @@ import {
   FileText,
   X,
   CreditCard,
-  ExternalLink,
   DollarSign,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
@@ -345,7 +344,6 @@ export function Dashboard() {
                 const displayFinalTotal = Number(order.final_total_price) > 0
                   ? Number(order.final_total_price)
                   : Number(order.total_price) || 0;
-                const showPaymentLink = Boolean(order.stripe_payment_link_url && order.payment_status !== 'paid');
 
                 return (
                   <Card key={order.id} variant="default" className="p-5 space-y-4 shadow-2xs hover:shadow-md transition-all">
@@ -416,31 +414,6 @@ export function Dashboard() {
                             ${displayFinalTotal.toFixed(2)}
                           </span>
                         </div>
-                      </div>
-                    )}
-
-                    {/* Stripe Payment Link Prominent Banner on Card */}
-                    {showPaymentLink && (
-                      <div className="p-3.5 rounded-2xl bg-blue-600 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
-                        <div className="space-y-0.5">
-                          <p className="text-xs font-extrabold flex items-center gap-1.5">
-                            <CreditCard className="w-4 h-4 shrink-0" />
-                            <span>{t('dashboard.paymentReadyBannerTitle')}</span>
-                          </p>
-                          <p className="text-[11px] text-blue-100 leading-snug">
-                            {t('dashboard.paymentReadyBannerDesc')}
-                          </p>
-                        </div>
-                        <a
-                          href={order.stripe_payment_link_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-white text-blue-700 hover:bg-blue-50 text-xs font-extrabold shrink-0 shadow-2xs transition-colors tabular-nums"
-                        >
-                          <span>{t('dashboard.payWithStripeBtn')}</span>
-                          {displayFinalTotal > 0 && <span>(${displayFinalTotal.toFixed(2)})</span>}
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
                       </div>
                     )}
 
@@ -631,31 +604,6 @@ export function Dashboard() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-
-            {/* Prominent Stripe Payment CTA inside Modal */}
-            {selectedOrderForDetails.stripe_payment_link_url &&
-              selectedOrderForDetails.payment_status !== 'paid' && (
-                <div className="p-4 rounded-2xl bg-blue-600 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
-                  <div className="space-y-1">
-                    <p className="text-sm font-extrabold flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 shrink-0" />
-                      <span>{t('dashboard.paymentReadyBannerTitle')}</span>
-                    </p>
-                    <p className="text-xs text-blue-100 leading-relaxed">
-                      {t('dashboard.paymentReadyBannerDesc')}
-                    </p>
-                  </div>
-                  <a
-                    href={selectedOrderForDetails.stripe_payment_link_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 text-xs font-extrabold shrink-0 shadow-xs transition-colors tabular-nums"
-                  >
-                    <span>{t('dashboard.payWithStripeBtn')}</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              )}
 
             {/* Details List */}
             <div className="space-y-4 text-xs sm:text-sm">

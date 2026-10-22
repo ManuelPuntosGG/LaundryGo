@@ -8,7 +8,6 @@ export const SERVICE_AREAS: string[] = [
   'Westminster',
   'Thornton',
   'Broomfield',
-  'Boulder',
   'Aurora',
   'Centennial',
   'Castle Rock',

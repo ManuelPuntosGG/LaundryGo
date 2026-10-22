@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
-  Home,
   Check,
   CheckCircle2,
   Phone,
@@ -128,8 +127,8 @@ export function Commercial() {
   return (
     <div className="flex flex-col gap-10 sm:gap-14 py-4 sm:py-6 max-w-6xl mx-auto">
       <SEO
-        title={t('commercialPage.title', 'Commercial Cleaning & Janitorial Solutions — GoPropertyCare Denver & Boulder')}
-        description={t('commercialPage.subtitle', 'Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver & Boulder. Request a 15-minute walkthrough.')}
+        title={t('commercialPage.title', 'Commercial Cleaning & Janitorial Solutions — GoPropertyCare Denver')}
+        description={t('commercialPage.subtitle', 'Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver. Request a 15-minute walkthrough.')}
         canonical="https://gopropertycare.com/commercial"
       />
 
@@ -143,7 +142,7 @@ export function Commercial() {
           {t('commercialPage.title', 'Commercial Cleaning & Janitorial Solutions')}
         </h1>
         <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed max-w-2xl mx-auto">
-          {t('commercialPage.subtitle', 'Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver & Boulder. Custom proposals delivered same-day after a 15-minute walkthrough.')}
+          {t('commercialPage.subtitle', 'Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver. Custom proposals delivered same-day after a 15-minute walkthrough.')}
         </p>
 
         {/* Action Buttons */}
@@ -156,17 +155,6 @@ export function Commercial() {
             <Calendar className="w-4 h-4 mr-2" />
             <span>{t('commercialPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
           </Button>
-          <Link to="/residential" className="w-full sm:w-auto inline-flex">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto font-bold border-2 border-slate-300 text-slate-700 hover:text-emerald-800 hover:border-emerald-400 hover:bg-emerald-50/50 px-5">
-              <Home className="w-4 h-4 mr-2 text-emerald-700" />
-              <span>{t('commercialPage.viewResidentialBtn', 'Residential Cleaning')}</span>
-            </Button>
-          </Link>
-          <Link to="/about" className="w-full sm:w-auto inline-flex">
-            <Button variant="ghost" size="lg" className="w-full sm:w-auto font-bold px-5 text-slate-600 hover:text-slate-900">
-              {t('commercialPage.viewAboutBtn', 'About Our Company')}
-            </Button>
-          </Link>
         </div>
       </section>
 
@@ -186,15 +174,14 @@ export function Commercial() {
               {t('commercialPage.subtitle')}
             </p>
           </div>
-          <Button
-            variant="white"
-            size="lg"
+          <button
+            type="button"
             onClick={() => setIsWalkthroughModalOpen(true)}
-            className="w-full md:w-auto font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-6 hover:scale-102 transition-transform cursor-pointer shrink-0"
+            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-emerald-400/90 text-white font-black text-sm bg-emerald-900/50 hover:bg-emerald-800/80 hover:border-emerald-300 shadow-lg hover:scale-102 transition-transform cursor-pointer shrink-0"
           >
-            <Calendar className="w-4 h-4 mr-2 text-emerald-700" />
-            <span>{t('commercialPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
-          </Button>
+            <Calendar className="w-4 h-4 mr-1 text-emerald-300" />
+            <span className="text-white font-black">{t('commercialPage.requestWalkthroughBtn', 'Request a Walkthrough')}</span>
+          </button>
         </div>
 
         {/* 4 Commercial Cards (Simplified without redundant card buttons) */}
@@ -268,35 +255,22 @@ export function Commercial() {
             {t('commercialPage.cta.subtitle', 'Tell us about your facility and schedule an on-site visit. Receive your custom itemized proposal the same business day with $0 upfront.')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              variant="white"
-              size="lg"
+            <button
+              type="button"
               onClick={() => setIsWalkthroughModalOpen(true)}
-              className="w-full sm:w-auto font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border-2 border-emerald-400/90 text-white font-black text-sm bg-emerald-900/50 hover:bg-emerald-800/80 hover:border-emerald-300 shadow-lg hover:scale-102 active:scale-98 transition-all duration-200 cursor-pointer"
             >
-              <Calendar className="w-5 h-5 mr-2 text-emerald-700" />
-              <span className="text-emerald-950 font-black">
+              <Calendar className="w-5 h-5 mr-1 text-emerald-300" />
+              <span className="text-white font-black">
                 {t('commercialPage.cta.requestWalkthroughBtn', 'Request a Walkthrough')}
               </span>
-            </Button>
-            <Link to="/residential">
-              <Button
-                variant="white"
-                size="lg"
-                className="w-full sm:w-auto font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200"
-              >
-                <Home className="w-5 h-5 mr-2 text-emerald-700" />
-                <span className="text-emerald-950 font-black">
-                  {t('commercialPage.viewResidentialBtn', 'Residential Cleaning')}
-                </span>
-              </Button>
-            </Link>
+            </button>
             <a
               href="tel:7205908632"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-emerald-400/80 text-white font-bold text-sm bg-emerald-900/40 hover:bg-emerald-800/60 hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border-2 border-emerald-400/80 text-white font-black text-sm bg-emerald-900/40 hover:bg-emerald-800/60 hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm cursor-pointer"
             >
               <Phone className="w-4 h-4 text-emerald-300" />
-              <span>(720) 590-8632</span>
+              <span className="text-white font-black">(720) 590-8632</span>
             </a>
           </div>
         </Card>

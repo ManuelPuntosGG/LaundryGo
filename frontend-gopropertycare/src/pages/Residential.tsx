@@ -14,7 +14,6 @@ import {
   Phone,
   HelpCircle,
   ChevronDown,
-  Building2,
   Calendar,
   KeyRound,
 } from 'lucide-react';
@@ -124,8 +123,8 @@ export function Residential() {
   return (
     <div className="flex flex-col gap-10 sm:gap-14 py-4 sm:py-6 max-w-6xl mx-auto">
       <SEO
-        title={t('residentialPage.title', 'Residential Cleaning Solutions — GoPropertyCare Denver & Boulder')}
-        description={t('residentialPage.subtitle', 'Comprehensive room-by-room checklists for regular home upkeep, move-in/outs, and 5-star Airbnb turnovers across Denver & Boulder.')}
+        title={t('residentialPage.title', 'Residential Cleaning Solutions — GoPropertyCare Denver')}
+        description={t('residentialPage.subtitle', 'Comprehensive room-by-room checklists for regular home upkeep, move-in/outs, and 5-star Airbnb turnovers across Denver.')}
         canonical="https://gopropertycare.com/residential"
       />
 
@@ -133,13 +132,13 @@ export function Residential() {
       <section className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">
           <Home className="w-4 h-4 text-emerald-700" />
-          <span>{t('residentialPage.badge', 'Denver & Boulder, Colorado • Insured Residential Solutions')}</span>
+          <span>{t('residentialPage.badge', 'Denver, Colorado • Insured Residential Solutions')}</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
           {t('residentialPage.title', 'Residential Cleaning Solutions')}
         </h1>
         <p className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed max-w-2xl mx-auto">
-          {t('residentialPage.subtitle', 'Comprehensive, room-by-room cleaning checklists designed for homes, turnovers, and property resets across Denver & Boulder.')}
+          {t('residentialPage.subtitle', 'Comprehensive, room-by-room cleaning checklists designed for homes, turnovers, and property resets across Denver.')}
         </p>
 
         {/* Action Buttons */}
@@ -150,15 +149,9 @@ export function Residential() {
               <span>{t('residentialPage.scheduleBtn', 'Schedule Online')}</span>
             </Button>
           </Link>
-          <Link to="/commercial" className="w-full sm:w-auto inline-flex">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto font-bold border-2 border-slate-300 text-slate-700 hover:text-emerald-800 hover:border-emerald-400 hover:bg-emerald-50/50 px-5">
-              <Building2 className="w-4 h-4 mr-2 text-emerald-700" />
-              <span>{t('residentialPage.viewCommercialBtn', 'Commercial Cleaning')}</span>
-            </Button>
-          </Link>
           <Link to="/about" className="w-full sm:w-auto inline-flex">
-            <Button variant="ghost" size="lg" className="w-full sm:w-auto font-bold px-5 text-slate-600 hover:text-slate-900">
-              {t('residentialPage.viewAboutBtn', 'About Our Company')}
+            <Button variant="outline" size="lg" className="w-full sm:w-auto font-bold border-2 border-slate-300 text-slate-700 hover:text-emerald-800 hover:border-emerald-400 hover:bg-emerald-50/50 px-5">
+              {t('residentialPage.viewAboutBtn', 'About Us')}
             </Button>
           </Link>
         </div>
@@ -172,7 +165,7 @@ export function Residential() {
             {/* Visual Image Column */}
             <div className="lg:col-span-5 relative h-64 sm:h-72 lg:h-auto min-h-[260px] overflow-hidden">
               <ImageWithFallback
-                src="/images/services/standard.jpg"
+                src="/images/services/standard_clean.jpg"
                 alt={t('about.servicesIncluded.standard.headline')}
                 className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 fallbackIcon={Home}
@@ -553,35 +546,22 @@ export function Residential() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/schedule">
-              <Button
-                variant="white"
-                size="lg"
-                className="w-full sm:w-auto font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200"
+              <button
+                type="button"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border-2 border-emerald-400/90 text-white font-black text-sm bg-emerald-900/50 hover:bg-emerald-800/80 hover:border-emerald-300 hover:scale-102 active:scale-98 transition-all duration-200 shadow-md cursor-pointer"
               >
-                <Home className="w-5 h-5 mr-2 text-emerald-700" />
-                <span className="text-emerald-950 font-black">
+                <Home className="w-5 h-5 mr-1 text-emerald-300" />
+                <span className="text-white font-black">
                   {t('residentialPage.cta.scheduleBtn', 'Book Your Cleaning')}
                 </span>
-              </Button>
-            </Link>
-            <Link to="/commercial">
-              <Button
-                variant="white"
-                size="lg"
-                className="w-full sm:w-auto font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200 cursor-pointer"
-              >
-                <Building2 className="w-5 h-5 mr-2 text-emerald-700" />
-                <span className="text-emerald-950 font-black">
-                  {t('residentialPage.viewCommercialBtn', 'Commercial Cleaning')}
-                </span>
-              </Button>
+              </button>
             </Link>
             <a
               href="tel:7205908632"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-emerald-400/80 text-white font-bold text-sm bg-emerald-900/40 hover:bg-emerald-800/60 hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border-2 border-emerald-400/80 text-white font-black text-sm bg-emerald-900/40 hover:bg-emerald-800/60 hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm cursor-pointer"
             >
               <Phone className="w-4 h-4 text-emerald-300" />
-              <span>(720) 590-8632</span>
+              <span className="text-white font-black">(720) 590-8632</span>
             </a>
           </div>
         </Card>

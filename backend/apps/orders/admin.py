@@ -91,9 +91,8 @@ class OrderAdmin(ModelAdmin):
         'guest_phone',
         'street_address',
         'zip_code',
-        'stripe_checkout_session_id',
     )
-    readonly_fields = ('created_at', 'updated_at', 'final_total_price', 'stripe_checkout_session_id')
+    readonly_fields = ('created_at', 'updated_at', 'final_total_price')
     date_hierarchy = 'pickup_date'
     ordering = ('-created_at',)
     actions = [
@@ -135,14 +134,12 @@ class OrderAdmin(ModelAdmin):
                 ('delivery_zone', 'delivery_fee'),
             ),
         }),
-        (_('Pricing, Surcharges & Stripe Payment Link'), {
+        (_('Pricing & Final Invoice'), {
             'fields': (
                 'payment_status',
                 ('base_price', 'total_price'),
                 ('surcharge_amount', 'surcharge_concept'),
                 'final_total_price',
-                'stripe_payment_link_url',
-                'stripe_checkout_session_id',
             ),
         }),
         (_('Wash Details & Special Instructions'), {
@@ -212,17 +209,17 @@ class OrderAdmin(ModelAdmin):
             self.message_user(request, f"Error accepting Order #{obj.id}: {exc}", level='error')
 
     @action(
-        description=_('Close Order & Send Stripe Payment Link'),
+        description=_('Close Order & Finalize Invoice'),
         permissions=['change'],
         variant=ActionVariant.SUCCESS,
     )
     def close_order_submit(self, request, obj):
-        from apps.core.payments import create_laundry_payment_link
+        from apps.core.payments import finalize_laundry_order
         try:
-            create_laundry_payment_link(obj)
+            finalize_laundry_order(obj)
             self.message_user(
                 request,
-                f"Order #{obj.id} closed and finalized (Total: ${obj.final_total_price:.2f}). Stripe payment link sent to customer and company."
+                f"Order #{obj.id} closed and finalized (Total: ${obj.final_total_price:.2f}). Final invoice email sent to customer and company."
             )
         except Exception as exc:
             self.message_user(request, f"Error closing Order #{obj.id}: {exc}", level='error')
@@ -246,20 +243,20 @@ class OrderAdmin(ModelAdmin):
         return redirect(reverse('admin:orders_order_change', args=[object_id]))
 
     @action(
-        description=_('Close Order & Send Payment Link'),
-        url_path='close-order-link',
+        description=_('Close Order & Finalize Invoice'),
+        url_path='close-order-invoice',
         permissions=['change'],
         variant=ActionVariant.SUCCESS,
     )
     def close_order_detail(self, request, object_id):
-        from apps.core.payments import create_laundry_payment_link
+        from apps.core.payments import finalize_laundry_order
         obj = self.get_object(request, object_id)
         if obj:
             try:
-                create_laundry_payment_link(obj)
+                finalize_laundry_order(obj)
                 self.message_user(
                     request,
-                    f"Order #{obj.id} closed and finalized (Total: ${obj.final_total_price:.2f}). Stripe payment link sent."
+                    f"Order #{obj.id} closed and finalized (Total: ${obj.final_total_price:.2f}). Final invoice email sent."
                 )
             except Exception as exc:
                 self.message_user(request, f"Error closing Order #{obj.id}: {exc}", level='error')
@@ -275,18 +272,18 @@ class OrderAdmin(ModelAdmin):
             count += 1
         self.message_user(request, f'{count} order(s) accepted, marked as Confirmed, and notified by email.')
 
-    @action(description=_('2. Close Order & Send Stripe Payment Link to Customer'), permissions=['change'])
+    @action(description=_('2. Close Order & Finalize Invoice to Customer'), permissions=['change'])
     def finalize_and_send_payment_link(self, request, queryset):
-        from apps.core.payments import create_laundry_payment_link
+        from apps.core.payments import finalize_laundry_order
         success_count = 0
         for order in queryset:
             try:
-                create_laundry_payment_link(order)
+                finalize_laundry_order(order)
                 success_count += 1
             except Exception as exc:
-                self.message_user(request, f"Error generating link for Order #{order.id}: {exc}", level='error')
+                self.message_user(request, f"Error finalizing Order #{order.id}: {exc}", level='error')
         if success_count > 0:
-            self.message_user(request, f"Closed {success_count} order(s) and sent Stripe payment link to customer and company.")
+            self.message_user(request, f"Closed {success_count} order(s) and sent final invoice to customer and company.")
 
     @display(description=_('Customer'))
     def customer_display(self, obj):

@@ -17,16 +17,16 @@ const baseTemplate = fs.readFileSync(templatePath, 'utf-8');
 const routes = [
   {
     path: '/',
-    title: 'GoPropertyCare — Residential Cleaning & Property Care in Denver & Boulder',
-    description: 'Professional residential cleaning, turnover care, and move-in/move-out services across Denver & Boulder, CO. Transparent sq ft pricing from $0.125/sqft, 100% insured.',
+    title: 'GoPropertyCare — Residential Cleaning & Property Care in Denver',
+    description: 'Professional residential cleaning, turnover care, and move-in/move-out services across Denver, CO. Transparent sq ft pricing from $0.125/sqft, 100% insured.',
     canonical: 'https://gopropertycare.com/',
     heading: 'Comprehensive Cleaning & Maintenance Solutions',
-    subheading: 'Top-tier residential and commercial cleaning solutions tailored to homeowners, real estate professionals, and property managers throughout Denver & Boulder.',
+    subheading: 'Top-tier residential and commercial cleaning solutions tailored to homeowners, real estate professionals, and property managers throughout Denver.',
     contentHtml: `
       <main class="w-full max-w-6xl mx-auto px-4 py-8">
         <header class="text-center max-w-3xl mx-auto space-y-4 mb-12">
           <span class="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider">
-            Denver & Boulder, Colorado • Comprehensive Solutions
+            Denver, Colorado • Comprehensive Solutions
           </span>
           <h1 class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
             Comprehensive Cleaning &amp; Maintenance Solutions
@@ -68,11 +68,11 @@ const routes = [
         </section>
 
         <section class="p-8 bg-slate-50 border border-slate-200 rounded-3xl mb-12">
-          <h2 class="text-2xl font-black text-slate-900 mb-4 text-center">Service Coverage in Denver &amp; Boulder</h2>
+          <h2 class="text-2xl font-black text-slate-900 mb-4 text-center">Service Coverage in Denver</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-slate-700 max-w-4xl mx-auto">
             <div>
               <h3 class="font-bold text-slate-900 mb-1">Free Travel Zone ($0.00):</h3>
-              <p>Denver Central, Downtown, LoDo, RiNo, Highlands, Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Boulder, Broomfield.</p>
+              <p>Denver Central, Downtown, LoDo, RiNo, Highlands, Lakewood, Englewood, Wheat Ridge, Arvada, Westminster, Broomfield.</p>
             </div>
             <div>
               <h3 class="font-bold text-slate-900 mb-1">Extended Coverage ($25.00 Travel Fee):</h3>
@@ -82,15 +82,15 @@ const routes = [
         </section>
 
         <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
-          <p>GoPropertyCare • Denver &amp; Boulder, CO • (720) 590-8632 • info@gopropertycare.com</p>
+          <p>GoPropertyCare • Denver, CO • (720) 590-8632 • info@gopropertycare.com</p>
         </footer>
       </main>
     `,
   },
   {
     path: '/about',
-    title: 'About GoPropertyCare — Trusted Home Cleaning in Denver & Boulder',
-    description: 'Meet GoPropertyCare. Fully insured professional cleaners serving Denver, Boulder, Lakewood, Aurora, and surrounding areas. Contact us at (720) 590-8632.',
+    title: 'About GoPropertyCare — Trusted Home Cleaning in Denver',
+    description: 'Meet GoPropertyCare. Fully insured professional cleaners serving Denver, Lakewood, Aurora, and surrounding areas. Contact us at (720) 590-8632.',
     canonical: 'https://gopropertycare.com/about',
     heading: 'About GoPropertyCare',
     subheading: 'Dedicated to spotless standards, strict checklists, and insured peace of mind across Colorado homes.',
@@ -99,7 +99,7 @@ const routes = [
         <header class="text-center max-w-3xl mx-auto space-y-4 mb-12">
           <h1 class="text-4xl font-black text-slate-900 tracking-tight">Your Trusted Property Care Partner</h1>
           <p class="text-lg text-slate-600 max-w-2xl mx-auto">
-            We deliver rigorous, insured, and dependable cleaning for residential properties and short-term rentals throughout Denver and Boulder.
+            We deliver rigorous, insured, and dependable cleaning for residential properties and short-term rentals throughout Denver.
           </p>
           <div class="pt-4 flex flex-wrap justify-center gap-4">
             <a href="/services" class="inline-block px-8 py-3 bg-emerald-600 text-white font-black rounded-xl shadow-md hover:bg-emerald-700 transition">
@@ -124,18 +124,18 @@ const routes = [
         </section>
 
         <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
-          <p>GoPropertyCare • Denver &amp; Boulder, CO • (720) 590-8632 • info@gopropertycare.com</p>
+          <p>GoPropertyCare • Denver, CO • (720) 590-8632 • info@gopropertycare.com</p>
         </footer>
       </main>
     `,
   },
   {
     path: '/residential',
-    title: 'Residential Cleaning Services — GoPropertyCare Denver & Boulder',
-    description: 'Detailed checklists for Standard Cleaning, Deep Cleaning, Move-In / Move-Out, and Short-Term Rental turnovers in Denver and Boulder.',
+    title: 'Residential Cleaning Services — GoPropertyCare Denver',
+    description: 'Detailed checklists for Standard Cleaning, Deep Cleaning, Move-In / Move-Out, and Short-Term Rental turnovers in Denver.',
     canonical: 'https://gopropertycare.com/residential',
     heading: 'Residential Cleaning Solutions',
-    subheading: 'Comprehensive room-by-room cleaning checklists designed for homes, lease turnovers, and 5-star Airbnb resets across Denver & Boulder.',
+    subheading: 'Comprehensive room-by-room cleaning checklists designed for homes, lease turnovers, and 5-star Airbnb resets across Denver.',
     contentHtml: `
       <main class="w-full max-w-6xl mx-auto px-4 py-8">
         <header class="text-center max-w-3xl mx-auto space-y-4 mb-12">
@@ -165,15 +165,15 @@ const routes = [
         </section>
 
         <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
-          <p>GoPropertyCare • Denver &amp; Boulder, CO • (720) 590-8632 • info@gopropertycare.com</p>
+          <p>GoPropertyCare • Denver, CO • (720) 590-8632 • info@gopropertycare.com</p>
         </footer>
       </main>
     `,
   },
   {
     path: '/commercial',
-    title: 'Commercial Cleaning & Janitorial Solutions — GoPropertyCare Denver & Boulder',
-    description: 'Dependable, insured commercial cleaning for offices, retail stores, healthcare clinics, and HOA properties across Denver & Boulder. Request a 15-min walkthrough.',
+    title: 'Commercial Cleaning & Janitorial Solutions — GoPropertyCare Denver',
+    description: 'Dependable, insured commercial cleaning for offices, retail stores, healthcare clinics, and HOA properties across Denver. Request a 15-min walkthrough.',
     canonical: 'https://gopropertycare.com/commercial',
     heading: 'Commercial Cleaning & Janitorial Solutions',
     subheading: 'Dependable commercial care for offices, retail stores, clinics, and HOA properties. Custom proposals delivered same-day after a 15-minute walkthrough.',
@@ -182,7 +182,7 @@ const routes = [
         <header class="text-center max-w-3xl mx-auto space-y-4 mb-12">
           <h1 class="text-4xl font-black text-slate-900 tracking-tight">Commercial Cleaning &amp; Janitorial Solutions</h1>
           <p class="text-lg text-slate-600 max-w-2xl mx-auto">
-            Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver &amp; Boulder.
+            Dependable, insured commercial care for offices, retail stores, healthcare clinics, and HOA properties across Denver.
           </p>
         </header>
 
@@ -206,15 +206,15 @@ const routes = [
         </section>
 
         <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
-          <p>GoPropertyCare • Denver &amp; Boulder, CO • (720) 590-8632 • info@gopropertycare.com</p>
+          <p>GoPropertyCare • Denver, CO • (720) 590-8632 • info@gopropertycare.com</p>
         </footer>
       </main>
     `,
   },
   {
     path: '/services',
-    title: 'Cleaning Services — GoPropertyCare Denver & Boulder',
-    description: 'Detailed checklists for Standard Cleaning, Deep Cleaning, Move-In / Move-Out, and Short-Term Rental turnovers in Denver and Boulder.',
+    title: 'Cleaning Services — GoPropertyCare Denver',
+    description: 'Detailed checklists for Standard Cleaning, Deep Cleaning, Move-In / Move-Out, and Short-Term Rental turnovers in Denver.',
     canonical: 'https://gopropertycare.com/services',
     heading: 'Our Specialized Cleaning Services',
     subheading: 'Comprehensive room-by-room cleaning checklists designed for homes, turnovers, and property resets.',
@@ -247,15 +247,15 @@ const routes = [
         </section>
 
         <footer class="text-center py-6 border-t border-slate-200 text-xs text-slate-500">
-          <p>GoPropertyCare • Denver &amp; Boulder, CO • (720) 590-8632 • info@gopropertycare.com</p>
+          <p>GoPropertyCare • Denver, CO • (720) 590-8632 • info@gopropertycare.com</p>
         </footer>
       </main>
     `,
   },
   {
     path: '/schedule',
-    title: 'Book Residential Cleaning — GoPropertyCare Denver & Boulder',
-    description: 'Get an instant quote and book residential cleaning online. Choose your sq ft, rooms, and schedule your appointment in Denver & Boulder.',
+    title: 'Book Residential Cleaning — GoPropertyCare Denver',
+    description: 'Get an instant quote and book residential cleaning online. Choose your sq ft, rooms, and schedule your appointment in Denver.',
     canonical: 'https://gopropertycare.com/schedule',
     heading: 'Book Your Cleaning Service',
     subheading: 'Customize property size, service tier, add-ons, and arrival slot.',
@@ -263,7 +263,7 @@ const routes = [
       <main class="w-full max-w-4xl mx-auto px-4 py-8">
         <header class="text-center space-y-3 mb-8">
           <h1 class="text-3xl font-black text-slate-900">Book Residential Cleaning</h1>
-          <p class="text-sm text-slate-600">Choose your square footage, room count, and preferred arrival window in Denver or Boulder.</p>
+          <p class="text-sm text-slate-600">Choose your square footage, room count, and preferred arrival window in Denver.</p>
         </header>
         <section class="p-8 bg-white border border-slate-200 rounded-2xl shadow-sm text-center">
           <p class="text-slate-700 mb-4">Our interactive 4-step booking flow is loading...</p>
@@ -277,7 +277,7 @@ const routes = [
   {
     path: '/login',
     title: 'Sign In — GoPropertyCare Client Portal',
-    description: 'Access your GoPropertyCare account to view cleaning reservations, invoices, and property details in Denver & Boulder.',
+    description: 'Access your GoPropertyCare account to view cleaning reservations, invoices, and property details in Denver.',
     canonical: 'https://gopropertycare.com/login',
     heading: 'Client Portal Sign In',
     subheading: 'Manage your property care reservations and service history.',
@@ -295,23 +295,23 @@ const routes = [
   },
   {
     path: '/faq',
-    title: 'Frequently Asked Questions — GoPropertyCare Denver & Boulder',
+    title: 'Frequently Asked Questions — GoPropertyCare Denver',
     description: 'Find answers about residential, commercial, and Airbnb cleaning services, pricing, insurance, supplies, policies, and 100% satisfaction guarantee.',
     canonical: 'https://gopropertycare.com/faq',
     heading: 'Frequently Asked Questions',
-    subheading: 'Everything you need to know about our cleaning and property care services in Denver & Boulder.',
+    subheading: 'Everything you need to know about our cleaning and property care services in Denver.',
     contentHtml: `
       <main class="w-full max-w-4xl mx-auto px-4 py-8">
         <header class="text-center space-y-3 mb-8">
           <span class="inline-block px-4 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider">Help &amp; Information Center</span>
           <h1 class="text-3xl sm:text-4xl font-black text-slate-900">Frequently Asked Questions</h1>
-          <p class="text-sm sm:text-base text-slate-600">Everything you need to know about our residential, turnover, and commercial cleaning services across Denver and Boulder.</p>
+          <p class="text-sm sm:text-base text-slate-600">Everything you need to know about our residential, turnover, and commercial cleaning services across Denver.</p>
         </header>
         <section class="space-y-6">
           <div class="p-6 bg-white border border-slate-200 rounded-2xl">
             <h2 class="text-xl font-bold text-slate-900 mb-3">General Questions</h2>
             <p class="text-sm text-slate-600 mb-2 font-semibold">What areas do you serve?</p>
-            <p class="text-xs text-slate-500 mb-4">We proudly serve Denver, Englewood, Wheat Ridge, Arvada, Westminster, Thornton, Broomfield, Boulder, Aurora, Centennial, Castle Rock, and Highlands Ranch.</p>
+            <p class="text-xs text-slate-500 mb-4">We proudly serve Denver, Englewood, Wheat Ridge, Arvada, Westminster, Thornton, Broomfield, Aurora, Centennial, Castle Rock, and Highlands Ranch.</p>
             <p class="text-sm text-slate-600 mb-2 font-semibold">Are you insured?</p>
             <p class="text-xs text-slate-500 mb-4">Yes, GoPropertyCare is fully insured. Your property and peace of mind are completely protected.</p>
             <p class="text-sm text-slate-600 mb-2 font-semibold">Do you offer a satisfaction guarantee?</p>

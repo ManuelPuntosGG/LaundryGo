@@ -351,7 +351,8 @@ def charge_gpc_remaining_balance(order):
 
 
 # ==============================================================================
-# LaundryGo Payments ($0 Booking -> Admin Accept -> Post-Service Close & Stripe Payment Link)
+# LaundryGo Order Lifecycle ($0 Booking -> Admin Accept -> Post-Service Finalize & Direct Invoice)
+# (Decoupled from online payment gateways; billing handled directly upon delivery)
 # ==============================================================================
 
 def accept_laundry_order(order):
@@ -369,15 +370,13 @@ def accept_laundry_order(order):
     return {"status": "confirmed", "order_id": order.id}
 
 
-def create_laundry_payment_link(order, success_url=None, cancel_url=None):
+def finalize_laundry_order(order, success_url=None, cancel_url=None):
     """
-    Closes and finalizes a LaundryGo order (status = 'delivered', payment_status = 'payment_link_sent'),
-    generating a Stripe Checkout Session / Payment Link for the total service amount
-    (quoted price of the request + optional admin surcharge) and dispatching a bilingual email
-    to the customer and a copy to the company.
+    Closes and finalizes a LaundryGo order (status = 'delivered', calculates final_total_price
+    with base amount, delivery fee, and optional admin surcharge), saving the final invoice
+    and dispatching a bilingual confirmation email to the customer and company.
+    No online payment gateway / Stripe links are used.
     """
-    client = get_stripe_client()
-
     delivery_fee = Decimal(str(order.delivery_fee or '0.00')).quantize(Decimal('0.01'))
     surcharge = Decimal(str(order.surcharge_amount or '0.00')).quantize(Decimal('0.01'))
     raw_base = Decimal(str(order.base_price or '0.00')).quantize(Decimal('0.01'))
@@ -397,107 +396,25 @@ def create_laundry_payment_link(order, success_url=None, cancel_url=None):
     order.base_price = service_base
     order.total_price = quoted_total
     order.final_total_price = final_total
+    order.stripe_payment_link_url = ''
+    order.stripe_checkout_session_id = ''
+    order.status = 'delivered'
+    order.save()
 
-    customer_email = order.customer_email or order.guest_email or 'client@thelaundrygo.com'
+    logger.info(f"Order #{order.id} closed & finalized: Base ${service_base}, Fee ${delivery_fee}, Surcharge ${surcharge}, Final Total ${final_total}.")
 
-    if not client:
-        # Mock payment link for local dev / tests
-        mock_link = f"https://checkout.stripe.com/pay/mock_session_laundry_{order.id}"
-        order.stripe_payment_link_url = mock_link
-        order.stripe_checkout_session_id = f"cs_mock_laundry_{order.id}"
-        order.payment_status = 'payment_link_sent'
-        order.status = 'delivered'
-        order.save()
-        logger.info(f"[Mock Laundry Link] Order #{order.id} closed & finalized: Final total ${final_total}. Link: {mock_link}")
-
-        # Send payment link email to customer + company copy
-        try:
-            from apps.orders.emails import send_laundry_payment_link_email
-            send_laundry_payment_link_email(order)
-        except Exception as email_err:
-            logger.warning(f"Failed to dispatch laundry payment link email for Order #{order.id}: {email_err}")
-
-        return mock_link
-
+    # Send finalized order / invoice email to customer + company copy
     try:
-        line_items = []
+        from apps.orders.emails import send_order_finalized_email
+        send_order_finalized_email(order)
+    except Exception as email_err:
+        logger.warning(f"Failed to dispatch laundry finalized order email for Order #{order.id}: {email_err}")
 
-        # 1. Base Laundry Service line item
-        service_name = order.service_rate.name if order.service_rate else "Wash & Fold Laundry Service"
-        line_items.append({
-            "price_data": {
-                "currency": "usd",
-                "unit_amount": int(service_base * 100),
-                "product_data": {
-                    "name": f"LaundryGo - {service_name}",
-                    "description": f"Order #{order.id} • Picked up {order.pickup_date}",
-                },
-            },
-            "quantity": 1,
-        })
+    return {
+        "status": "delivered",
+        "order_id": order.id,
+        "final_total_price": str(final_total),
+    }
 
-        # 2. Outer Zone Delivery Fee (if any)
-        if delivery_fee > 0:
-            line_items.append({
-                "price_data": {
-                    "currency": "usd",
-                    "unit_amount": int(delivery_fee * 100),
-                    "product_data": {
-                        "name": "Outer Delivery Zone Fee",
-                        "description": "Coverage fee for outer Denver/Boulder delivery zone",
-                    },
-                },
-                "quantity": 1,
-            })
-
-        # 3. Surcharge line item (if any)
-        if surcharge > 0:
-            surcharge_name = order.surcharge_concept.strip() if order.surcharge_concept else "Service Adjustment / Extra Weight"
-            line_items.append({
-                "price_data": {
-                    "currency": "usd",
-                    "unit_amount": int(surcharge * 100),
-                    "product_data": {
-                        "name": f"Adjustment: {surcharge_name}",
-                        "description": "Additional weighed weight, heavy stain removal, or specialty request",
-                    },
-                },
-                "quantity": 1,
-            })
-
-        frontend_domain = getattr(settings, 'FRONTEND_URL', 'https://thelaundrygo.com').rstrip('/')
-        succ_url = success_url or f"{frontend_domain}/?payment_success=true&order_id={order.id}"
-        canc_url = cancel_url or f"{frontend_domain}/?payment_cancelled=true&order_id={order.id}"
-
-        session = client.checkout.Session.create(
-            payment_method_types=["card"],
-            line_items=line_items,
-            mode="payment",
-            customer_email=customer_email,
-            success_url=succ_url,
-            cancel_url=canc_url,
-            metadata={
-                "order_id": str(order.id),
-                "brand": "laundrygo",
-                "final_total": str(final_total),
-            }
-        )
-
-        order.stripe_payment_link_url = session.url
-        order.stripe_checkout_session_id = session.id
-        order.payment_status = 'payment_link_sent'
-        order.status = 'delivered'
-        order.save()
-
-        # Send payment link email to customer + company copy
-        try:
-            from apps.orders.emails import send_laundry_payment_link_email
-            send_laundry_payment_link_email(order)
-        except Exception as email_err:
-            logger.warning(f"Failed to dispatch laundry payment link email for Order #{order.id}: {email_err}")
-
-        return session.url
-
-    except Exception as exc:
-        logger.error(f"[Stripe Checkout Session Error] Order #{order.id}: {exc}", exc_info=True)
-        raise exc
+# Backward compatibility alias
+create_laundry_payment_link = finalize_laundry_order

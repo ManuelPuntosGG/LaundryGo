@@ -43,8 +43,8 @@ export function About() {
   return (
     <div className="flex flex-col gap-10 sm:gap-14 py-4 sm:py-6 max-w-6xl mx-auto">
       <SEO
-        title={t('about.title', 'About GoPropertyCare — Trusted Home Cleaning in Denver & Boulder')}
-        description={t('about.subtitle', 'Meet GoPropertyCare. Fully insured professional cleaners serving Denver, Boulder, Lakewood, Aurora, and surrounding areas.')}
+        title={t('about.title', 'About GoPropertyCare — Trusted Home Cleaning in Denver')}
+        description={t('about.subtitle', 'Meet GoPropertyCare. Fully insured professional cleaners serving Denver, Lakewood, Aurora, and surrounding areas.')}
         canonical="https://gopropertycare.com/about"
       />
 
@@ -172,7 +172,7 @@ export function About() {
             {t('about.contactInfo.title', 'Company Details & Direct Support')}
           </h2>
           <p className="text-slate-600 text-sm sm:text-base font-medium">
-            {t('about.contactInfo.subtitle', 'Connect directly with our local Denver and Boulder management team.')}
+            {t('about.contactInfo.subtitle', 'Connect directly with our local Denver management team.')}
           </p>
         </div>
 
@@ -243,7 +243,7 @@ export function About() {
                     {t('about.contactInfo.coverageLabel', 'Service Areas')}
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-700 font-semibold mt-0.5">
-                    {t('about.contactInfo.coverageValue', 'Denver Metropolitan Area & Boulder, CO')}
+                    {t('about.contactInfo.coverageValue', 'Denver Metropolitan Area, CO')}
                   </p>
                 </div>
                 <div className="pt-2 border-t border-slate-100 flex items-start gap-2">
@@ -340,30 +340,28 @@ export function About() {
             {t('about.cta.title', 'Ready to Experience Impeccable Property Care?')}
           </h2>
           <p className="text-emerald-100 text-sm sm:text-base max-w-xl mx-auto mb-8 font-medium">
-            {t('about.cta.subtitle', 'Book your service online in minutes. Enjoy transparent rates and zero surprise fees in Denver & Boulder.')}
+            {t('about.cta.subtitle', 'Book your service online in minutes. Enjoy transparent rates and zero surprise fees in Denver.')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/residential">
-              <Button
-                variant="white"
-                size="lg"
-                className="font-black text-emerald-950 hover:bg-emerald-50 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200"
+              <button
+                type="button"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border-2 border-emerald-400/90 text-white font-black text-sm bg-emerald-900/50 hover:bg-emerald-800/80 hover:border-emerald-300 shadow-md hover:scale-102 active:scale-98 transition-all duration-200 cursor-pointer"
               >
-                <Compass className="w-5 h-5 mr-2 text-emerald-600" />
-                <span className="text-emerald-950 font-black">
+                <Compass className="w-5 h-5 mr-1 text-emerald-300" />
+                <span className="text-white font-black">
                   {t('about.contactInfo.exploreServicesBtn', 'Explore Services')}
                 </span>
-              </Button>
+              </button>
             </Link>
             <Link to="/schedule">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-2 border-emerald-400 text-white hover:bg-emerald-800/60 shadow-lg px-8 hover:scale-102 active:scale-98 transition-all duration-200"
+              <button
+                type="button"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border-2 border-emerald-400/90 text-white font-black text-sm bg-emerald-900/40 hover:bg-emerald-800/60 hover:border-emerald-300 shadow-md hover:scale-102 active:scale-98 transition-all duration-200 cursor-pointer"
               >
-                <Calendar className="w-5 h-5 mr-2 text-emerald-300" />
-                <span>{t('about.cta.scheduleBtn', 'Book Online')}</span>
-              </Button>
+                <Calendar className="w-5 h-5 mr-1 text-emerald-300" />
+                <span className="text-white font-black">{t('about.cta.scheduleBtn', 'Book Online')}</span>
+              </button>
             </Link>
           </div>
         </Card>
