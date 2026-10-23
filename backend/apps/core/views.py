@@ -74,3 +74,15 @@ class StripeWebhookView(APIView):
                     pass
 
         return Response({'status': 'success'}, status=status.HTTP_200_OK)
+
+
+class StripeConfigView(APIView):
+    """
+    Returns public Stripe publishable key for frontend Elements tokenization.
+    """
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        return Response({
+            'publishable_key': getattr(settings, 'STRIPE_PUBLISHABLE_KEY', ''),
+        }, status=status.HTTP_200_OK)

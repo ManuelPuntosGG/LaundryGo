@@ -282,6 +282,11 @@ export function Schedule() {
   const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Stripe Elements integration for live tokenization
+  const [stripePublishableKey, setStripePublishableKey] = useState<string>('');
+  const [stripeInstance, setStripeInstance] = useState<any>(null);
+  const [cardElement, setCardElement] = useState<any>(null);
+
   // Payment / Card on file state (25% Deposit + 75% Completion Hold)
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -298,6 +303,70 @@ export function Schedule() {
     if (digits.length <= 2) return digits;
     return `${digits.slice(0, 2)}/${digits.slice(2)}`;
   };
+
+  // Fetch Stripe config and initialize Stripe.js
+  useEffect(() => {
+    const fetchStripeConfig = async () => {
+      try {
+        const envKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+        let key = envKey;
+        if (!key) {
+          const res = await api.get('/stripe/config/');
+          key = res.data?.publishable_key;
+        }
+        if (key && (key.startsWith('pk_live_') || key.startsWith('pk_test_'))) {
+          setStripePublishableKey(key);
+          if (!(window as any).Stripe) {
+            const script = document.createElement('script');
+            script.src = 'https://js.stripe.com/v3/';
+            script.async = true;
+            script.onload = () => {
+              if ((window as any).Stripe) {
+                setStripeInstance((window as any).Stripe(key));
+              }
+            };
+            document.head.appendChild(script);
+          } else {
+            setStripeInstance((window as any).Stripe(key));
+          }
+        }
+      } catch (err) {
+        // Fallback to built-in form
+      }
+    };
+    fetchStripeConfig();
+  }, []);
+
+  // Mount Stripe CardElement when step 4 is active
+  useEffect(() => {
+    if (step === 4 && stripeInstance && !cardElement) {
+      const timer = setTimeout(() => {
+        const mountNode = document.getElementById('stripe-card-mount');
+        if (mountNode && !mountNode.hasChildNodes()) {
+          try {
+            const elements = stripeInstance.elements();
+            const element = elements.create('card', {
+              hidePostalCode: true,
+              style: {
+                base: {
+                  fontSize: '14px',
+                  color: '#0f172a',
+                  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                  '::placeholder': { color: '#94a3b8' },
+                },
+                invalid: { color: '#e11d48' },
+              },
+            });
+            element.mount('#stripe-card-mount');
+            setCardElement(element);
+          } catch (e) {
+            console.warn('[Stripe mount error]', e);
+          }
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [step, stripeInstance, cardElement]);
 
   // Pre-fill user data if auth loads asynchronously
   useEffect(() => {
@@ -512,10 +581,12 @@ export function Schedule() {
   const isCardCvcValid = cvcDigits.length === 3 || cvcDigits.length === 4;
 
   const isCardValid =
-    isCardNameValid &&
-    isCardNumberValid &&
-    isCardExpiryValid &&
-    isCardCvcValid;
+    (stripeInstance && cardElement)
+      ? isCardNameValid
+      : isCardNameValid &&
+        isCardNumberValid &&
+        isCardExpiryValid &&
+        isCardCvcValid;
 
   // Calendar Helpers
   const calendarLocale = i18n.language?.startsWith('es') ? 'es' : 'en';
@@ -613,6 +684,40 @@ export function Schedule() {
       ? `[STR Turnover: ${bedrooms === 0 ? 'Studio' : `${bedrooms} Beds`}, ${bathrooms} Baths • Laundry: ${selectedAddonCodes['off_site_laundry'] ? 'Off-site laundry add-on (+$' + currentOffSiteFee + ')' : 'On-site washer & dryer'} • ${t(freqOption.nameKey)}] ${specialInstructions}`.trim()
       : `[Tier ${selectedTier.tier}: ${selectedTier.label} • ${t(freqOption.nameKey)} (${freqOption.badge})] ${specialInstructions}`.trim();
 
+    let finalPaymentMethodId = `pm_card_${cardDigits.slice(-4)}`;
+
+    if (stripeInstance && cardElement) {
+      try {
+        const { paymentMethod, error } = await stripeInstance.createPaymentMethod({
+          type: 'card',
+          card: cardElement,
+          billing_details: {
+            name: cardName.trim() || `${formData.first_name} ${formData.last_name}`.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone.trim(),
+            address: {
+              line1: formData.street_address.trim(),
+              city: formData.city.trim() || 'Denver',
+              postal_code: formData.zip_code.trim(),
+              country: 'US',
+            },
+          },
+        });
+
+        if (error) {
+          setErrorMessage(error.message || t('common.error'));
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (paymentMethod?.id) {
+          finalPaymentMethodId = paymentMethod.id;
+        }
+      } catch (err: any) {
+        console.warn('[Stripe createPaymentMethod error, falling back]', err);
+      }
+    }
+
     const payload = {
       brand: 'gopropertycare',
       guest_email: formData.email.trim(),
@@ -636,7 +741,7 @@ export function Schedule() {
       time_slot: selectedTimeSlot,
       special_instructions: formattedInstructions,
       language: i18n.language?.startsWith('es') ? 'es' : 'en',
-      payment_method_id: `pm_card_${cardDigits.slice(-4)}`,
+      payment_method_id: finalPaymentMethodId,
     };
 
     try {
@@ -819,7 +924,7 @@ export function Schedule() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-3 sm:py-8 px-3.5 sm:px-6 lg:px-8 space-y-5 sm:space-y-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto pt-4 sm:pt-8 pb-8 px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 animate-fade-in">
       <SEO
         title={t('schedule.title')}
         description={t('schedule.subtitle')}
@@ -2201,119 +2306,148 @@ export function Schedule() {
             <p className="text-xs text-slate-600 font-medium leading-relaxed">
               {t('schedule.cardOnFileInfo')}
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              {/* Cardholder Name */}
-              <div className="sm:col-span-2">
-                <label htmlFor="cc-name" className="block text-[11px] font-bold text-slate-700 mb-1">
-                  {t('schedule.cardholderNameLabel')} *
-                </label>
-                <input
-                  id="cc-name"
-                  name="cc-name"
-                  type="text"
-                  autoComplete="cc-name"
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value)}
-                  onBlur={() => setTouchedFields({ ...touchedFields, cc_name: true })}
-                  placeholder={t('schedule.cardholderNamePlaceholder')}
-                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none focus:bg-white ${
-                    touchedFields.cc_name && !isCardNameValid
-                      ? 'border-rose-500 focus:border-rose-600'
-                      : 'border-slate-300 focus:border-emerald-600'
-                  }`}
-                />
-                {touchedFields.cc_name && !isCardNameValid && (
-                  <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardNameRequired')}</p>
-                )}
-              </div>
-
-              {/* Card Number */}
-              <div className="flex flex-col justify-end">
-                <label htmlFor="cc-number" className="block text-[11px] font-bold text-slate-700 mb-1">
-                  {t('schedule.cardNumber')} *
-                </label>
-                <input
-                  id="cc-number"
-                  name="cc-number"
-                  type="text"
-                  autoComplete="cc-number"
-                  inputMode="numeric"
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                  onBlur={() => setTouchedFields({ ...touchedFields, cc_number: true })}
-                  placeholder="4242 •••• •••• 4242"
-                  maxLength={19}
-                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white ${
-                    touchedFields.cc_number && !isCardNumberValid
-                      ? 'border-rose-500 focus:border-rose-600'
-                      : 'border-slate-300 focus:border-emerald-600'
-                  }`}
-                />
-                {touchedFields.cc_number && !isCardNumberValid && (
-                  <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardNumberInvalid')}</p>
-                )}
-              </div>
-
-              {/* Expiry & CVC */}
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col justify-end">
-                  <label htmlFor="cc-exp" className="block text-[11px] font-bold text-slate-700">
-                    {t('schedule.cardExpiry')} *
+            {stripePublishableKey && stripeInstance ? (
+              <div className="space-y-3 pt-1">
+                <div>
+                  <label htmlFor="cc-name" className="block text-[11px] font-bold text-slate-700 mb-1">
+                    {t('schedule.cardholderNameLabel')} *
                   </label>
-                  <span id="exp-hint" className="block text-[10px] text-slate-500 font-medium mb-1">
-                    {t('schedule.cardFormatHint')}
-                  </span>
                   <input
-                    id="cc-exp"
-                    name="cc-exp"
+                    id="cc-name"
+                    name="cc-name"
                     type="text"
-                    autoComplete="cc-exp"
-                    aria-describedby="exp-hint"
-                    inputMode="numeric"
-                    value={cardExpiry}
-                    onChange={(e) => setCardExpiry(formatCardExpiry(e.target.value))}
-                    onBlur={() => setTouchedFields({ ...touchedFields, cc_exp: true })}
-                    placeholder="MM / YY"
-                    maxLength={7}
-                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
-                      touchedFields.cc_exp && !isCardExpiryValid
+                    autoComplete="cc-name"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value)}
+                    placeholder={t('schedule.cardholderNamePlaceholder')}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none focus:bg-white focus:border-emerald-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    {t('schedule.cardNumber')} & {t('schedule.cardExpiry')} / {t('schedule.cardCvc')} *
+                  </label>
+                  <div
+                    id="stripe-card-mount"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 focus-within:border-emerald-600 focus-within:bg-white transition-all min-h-[46px]"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {/* Cardholder Name */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="cc-name" className="block text-[11px] font-bold text-slate-700 mb-1">
+                    {t('schedule.cardholderNameLabel')} *
+                  </label>
+                  <input
+                    id="cc-name"
+                    name="cc-name"
+                    type="text"
+                    autoComplete="cc-name"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value)}
+                    onBlur={() => setTouchedFields({ ...touchedFields, cc_name: true })}
+                    placeholder={t('schedule.cardholderNamePlaceholder')}
+                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none focus:bg-white ${
+                      touchedFields.cc_name && !isCardNameValid
                         ? 'border-rose-500 focus:border-rose-600'
                         : 'border-slate-300 focus:border-emerald-600'
                     }`}
                   />
-                  {touchedFields.cc_exp && !isCardExpiryValid && (
-                    <p className="mt-1 text-[11px] text-rose-600 font-semibold">
-                      {isCardExpiryPast ? t('schedule.cardExpiryPast') : t('schedule.cardExpiryInvalid')}
-                    </p>
+                  {touchedFields.cc_name && !isCardNameValid && (
+                    <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardNameRequired')}</p>
                   )}
                 </div>
+
+                {/* Card Number */}
                 <div className="flex flex-col justify-end">
-                  <label htmlFor="cc-csc" className="block text-[11px] font-bold text-slate-700 mb-1">
-                    {t('schedule.cardCvc')} *
+                  <label htmlFor="cc-number" className="block text-[11px] font-bold text-slate-700 mb-1">
+                    {t('schedule.cardNumber')} *
                   </label>
                   <input
-                    id="cc-csc"
-                    name="cc-csc"
+                    id="cc-number"
+                    name="cc-number"
                     type="text"
-                    autoComplete="cc-csc"
+                    autoComplete="cc-number"
                     inputMode="numeric"
-                    value={cardCvc}
-                    onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    onBlur={() => setTouchedFields({ ...touchedFields, cc_csc: true })}
-                    placeholder="CVC"
-                    maxLength={4}
-                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
-                      touchedFields.cc_csc && !isCardCvcValid
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                    onBlur={() => setTouchedFields({ ...touchedFields, cc_number: true })}
+                    placeholder="4242 •••• •••• 4242"
+                    maxLength={19}
+                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white ${
+                      touchedFields.cc_number && !isCardNumberValid
                         ? 'border-rose-500 focus:border-rose-600'
                         : 'border-slate-300 focus:border-emerald-600'
                     }`}
                   />
-                  {touchedFields.cc_csc && !isCardCvcValid && (
-                    <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardCvcInvalid')}</p>
+                  {touchedFields.cc_number && !isCardNumberValid && (
+                    <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardNumberInvalid')}</p>
                   )}
                 </div>
+
+                {/* Expiry & CVC */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col justify-end">
+                    <label htmlFor="cc-exp" className="block text-[11px] font-bold text-slate-700">
+                      {t('schedule.cardExpiry')} *
+                    </label>
+                    <span id="exp-hint" className="block text-[10px] text-slate-500 font-medium mb-1">
+                      {t('schedule.cardFormatHint')}
+                    </span>
+                    <input
+                      id="cc-exp"
+                      name="cc-exp"
+                      type="text"
+                      autoComplete="cc-exp"
+                      aria-describedby="exp-hint"
+                      inputMode="numeric"
+                      value={cardExpiry}
+                      onChange={(e) => setCardExpiry(formatCardExpiry(e.target.value))}
+                      onBlur={() => setTouchedFields({ ...touchedFields, cc_exp: true })}
+                      placeholder="MM / YY"
+                      maxLength={7}
+                      className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
+                        touchedFields.cc_exp && !isCardExpiryValid
+                          ? 'border-rose-500 focus:border-rose-600'
+                          : 'border-slate-300 focus:border-emerald-600'
+                      }`}
+                    />
+                    {touchedFields.cc_exp && !isCardExpiryValid && (
+                      <p className="mt-1 text-[11px] text-rose-600 font-semibold">
+                        {isCardExpiryPast ? t('schedule.cardExpiryPast') : t('schedule.cardExpiryInvalid')}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col justify-end">
+                    <label htmlFor="cc-csc" className="block text-[11px] font-bold text-slate-700 mb-1">
+                      {t('schedule.cardCvc')} *
+                    </label>
+                    <input
+                      id="cc-csc"
+                      name="cc-csc"
+                      type="text"
+                      autoComplete="cc-csc"
+                      inputMode="numeric"
+                      value={cardCvc}
+                      onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      onBlur={() => setTouchedFields({ ...touchedFields, cc_csc: true })}
+                      placeholder="CVC"
+                      maxLength={4}
+                      className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
+                        touchedFields.cc_csc && !isCardCvcValid
+                          ? 'border-rose-500 focus:border-rose-600'
+                          : 'border-slate-300 focus:border-emerald-600'
+                      }`}
+                    />
+                    {touchedFields.cc_csc && !isCardCvcValid && (
+                      <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardCvcInvalid')}</p>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Terms Agreement Checkbox */}

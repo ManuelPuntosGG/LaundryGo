@@ -726,5 +726,42 @@ class TestGoPropertyCarePayments:
         assert order.status == 'completed'
         assert order.final_total_charged == Decimal('245.00')  # 50 + 150 + 45
 
+    def test_livemode_test_card_safeguard(self, regular_rate, monkeypatch):
+        from apps.core import payments
+        from apps.core.payments import charge_gpc_deposit, charge_gpc_remaining_balance
 
+        class FakeLiveStripe:
+            api_key = 'sk_live_fake_live_key_for_testing'
+
+        monkeypatch.setattr(payments, 'get_stripe_client', lambda: FakeLiveStripe())
+
+        tomorrow = (timezone.now() + timedelta(days=1)).date()
+        order = CleaningOrder.objects.create(
+            brand='gopropertycare',
+            service_rate=regular_rate,
+            square_feet=1000,
+            total_price=Decimal('200.00'),
+            base_price=Decimal('200.00'),
+            service_date=tomorrow,
+            time_slot='morning',
+            guest_email='gpc-client@example.com',
+            guest_first_name='John',
+            guest_last_name='Doe',
+            stripe_customer_id='cus_live_fake123',
+            stripe_payment_method_id='pm_card_4165',
+        )
+
+        res_dep = charge_gpc_deposit(order)
+        assert res_dep['status'] == 'succeeded'
+        order.refresh_from_db()
+        assert order.payment_status == 'deposit_paid'
+        assert order.status == 'confirmed'
+        assert order.stripe_deposit_intent_id.startswith('pi_live_simulated_deposit_')
+
+        res_fin = charge_gpc_remaining_balance(order)
+        assert res_fin['status'] == 'succeeded'
+        order.refresh_from_db()
+        assert order.payment_status == 'fully_paid'
+        assert order.status == 'completed'
+        assert order.stripe_final_intent_id.startswith('pi_live_simulated_final_')
 

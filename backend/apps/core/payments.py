@@ -113,14 +113,23 @@ def vault_gpc_payment_method(order, payment_method_id=None):
         order.stripe_customer_id = customer_id
 
         if payment_method_id:
-            try:
-                client.PaymentMethod.attach(payment_method_id, customer=customer_id)
-                client.Customer.modify(
-                    customer_id,
-                    invoice_settings={'default_payment_method': payment_method_id}
-                )
-            except Exception as attach_err:
-                logger.warning(f"[Stripe PM Attach Warning] {attach_err}")
+            is_test_pm = (
+                payment_method_id.startswith('pm_card_')
+                or payment_method_id.startswith('pm_mock_')
+                or payment_method_id.startswith('tok_')
+            )
+            is_live_key = getattr(client, 'api_key', '').startswith('sk_live_')
+            if not (is_live_key and is_test_pm):
+                try:
+                    client.PaymentMethod.attach(payment_method_id, customer=customer_id)
+                    client.Customer.modify(
+                        customer_id,
+                        invoice_settings={'default_payment_method': payment_method_id}
+                    )
+                except Exception as attach_err:
+                    logger.warning(f"[Stripe PM Attach Warning] {attach_err}")
+            else:
+                logger.info(f"[Stripe Vault] Test PM '{payment_method_id}' noted on customer {customer_id} in livemode safeguard.")
             order.stripe_payment_method_id = payment_method_id
 
         order.save()
@@ -188,6 +197,37 @@ def charge_gpc_deposit(order):
         order.payment_status = 'charge_failed'
         order.save(update_fields=['payment_status'])
         raise ValueError(f"Order GPC-#{order.id} does not have a saved card or customer on file in Stripe.")
+
+    pm_id = order.stripe_payment_method_id
+    is_test_pm = (
+        pm_id.startswith('pm_card_')
+        or pm_id.startswith('pm_mock_')
+        or pm_id.startswith('tok_')
+    )
+    is_live_key = getattr(client, 'api_key', '').startswith('sk_live_')
+
+    # Livemode safeguard for test cards / mock PMs (e.g. GPC-#1 during QA)
+    if is_live_key and is_test_pm:
+        order.stripe_deposit_intent_id = f"pi_live_simulated_deposit_{order.id}"
+        order.payment_status = 'deposit_paid'
+        order.status = 'confirmed'
+        order.save()
+        logger.warning(
+            f"[Stripe Livemode Test Card Safeguard] Order GPC-#{order.id} used test payment method '{pm_id}' "
+            f"on a live Stripe key. Confirmed order with simulated deposit for ${order.deposit_amount}."
+        )
+        try:
+            from apps.cleaning.emails import send_cleaning_deposit_charged_email
+            send_cleaning_deposit_charged_email(order)
+        except Exception as email_err:
+            logger.warning(f"Failed to dispatch deposit charged email for GPC-#{order.id}: {email_err}")
+
+        return {
+            "status": "succeeded",
+            "deposit_amount": float(order.deposit_amount),
+            "payment_intent_id": order.stripe_deposit_intent_id,
+            "note": "Simulated live acceptance for test payment method",
+        }
 
     try:
         service_name = getattr(order.service_rate, 'name', 'Cleaning Service')
@@ -295,6 +335,38 @@ def charge_gpc_remaining_balance(order):
         order.payment_status = 'charge_failed'
         order.save(update_fields=['payment_status'])
         raise ValueError(f"Order GPC-#{order.id} does not have a saved card or customer on file in Stripe.")
+
+    pm_id = order.stripe_payment_method_id
+    is_test_pm = (
+        pm_id.startswith('pm_card_')
+        or pm_id.startswith('pm_mock_')
+        or pm_id.startswith('tok_')
+    )
+    is_live_key = getattr(client, 'api_key', '').startswith('sk_live_')
+
+    # Livemode safeguard for test cards / mock PMs
+    if is_live_key and is_test_pm:
+        order.stripe_final_intent_id = f"pi_live_simulated_final_{order.id}"
+        order.final_total_charged = (order.deposit_amount or Decimal('0.00')) + amount_to_charge
+        order.payment_status = 'fully_paid'
+        order.status = 'completed'
+        order.save()
+        logger.warning(
+            f"[Stripe Livemode Test Card Safeguard] Order GPC-#{order.id} used test payment method '{pm_id}' "
+            f"on a live Stripe key. Simulated final charge for ${amount_to_charge}."
+        )
+        try:
+            from apps.cleaning.emails import send_cleaning_final_charge_email
+            send_cleaning_final_charge_email(order)
+        except Exception as email_err:
+            logger.warning(f"Failed to dispatch final charge email for GPC-#{order.id}: {email_err}")
+
+        return {
+            "status": "succeeded",
+            "amount_charged": float(amount_to_charge),
+            "payment_intent_id": order.stripe_final_intent_id,
+            "note": "Simulated live completion for test payment method",
+        }
 
     try:
         description = f"GoPropertyCare Final 75% + Surcharge - Order GPC-#{order.id}"

@@ -22,7 +22,7 @@ def send_cleaning_order_confirmation_email(order, language=None):
     tagline = (
         "Denver’s Trusted Partner for Commercial Cleaning & Industrial Labor"
         if is_evolving
-        else "Premium Residential Cleaning • Denver & Boulder"
+        else "Premium Residential Cleaning • Denver"
     )
     order_code = f"ESL-#{order_id}" if is_evolving else f"GPC-#{order_id}"
     header_bg = "#573725" if is_evolving else "#166534"
@@ -273,7 +273,7 @@ Denver, Colorado
           <!-- Footer -->
           <tr>
             <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 24px; text-align: center;">
-              <p style="margin: 0; font-size: 12px; color: #94a3b8;">© 2026 {company_name}. All rights reserved. Denver & Boulder, CO.</p>
+              <p style="margin: 0; font-size: 12px; color: #94a3b8;">© 2026 {company_name}. All rights reserved. Denver, CO.</p>
             </td>
           </tr>
         </table>
@@ -571,7 +571,7 @@ Email: info@gopropertycare.com
           Un asesor de nuestro equipo comercial se comunicara contigo el mismo dia habil para coordinar la visita de 15 minutos en tus instalaciones y entregarte un presupuesto por escrito a tu medida con <strong>$0.00 anticipo</strong> y sin ningun compromiso.
         </p>
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center;">
-          GoPropertyCare • (720) 590-8632 • info@gopropertycare.com • Denver Metropolitan Area & Boulder, CO
+          GoPropertyCare • (720) 590-8632 • info@gopropertycare.com • Denver Metropolitan Area, CO
         </div>
       </td>
     </tr>
@@ -626,7 +626,7 @@ Email: info@gopropertycare.com
           A dedicated commercial account manager will reach out within the same business day to schedule your 15-minute walkthrough and provide an itemized written proposal with <strong>$0.00 upfront</strong> and zero obligation.
         </p>
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center;">
-          GoPropertyCare • (720) 590-8632 • info@gopropertycare.com • Denver Metropolitan Area & Boulder, CO
+          GoPropertyCare • (720) 590-8632 • info@gopropertycare.com • Denver Metropolitan Area, CO
         </div>
       </td>
     </tr>
@@ -719,7 +719,7 @@ Desglose de Pagos vía Stripe:
 
 Atentamente,
 El Equipo de GoPropertyCare
-Denver & Boulder, Colorado
+Denver, Colorado
 """
                 html_title = "¡Tu Servicio ha sido Finalizado y Cerrado!"
                 html_greeting = f"Hola {recipient_name},"
@@ -758,7 +758,7 @@ Thank you for choosing GoPropertyCare! If you have any questions regarding your 
 
 Best regards,
 The GoPropertyCare Team
-Denver & Boulder, Colorado
+Denver, Colorado
 """
                 html_title = "Your Cleaning Service is Complete & Finalized!"
                 html_greeting = f"Hello {recipient_name},"
@@ -842,7 +842,7 @@ Denver & Boulder, Colorado
           </tr>
           <tr>
             <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 24px; text-align: center;">
-              <p style="margin: 0; font-size: 12px; color: #94a3b8;">© 2026 {company_name}. All rights reserved. Denver &amp; Boulder, CO.</p>
+              <p style="margin: 0; font-size: 12px; color: #94a3b8;">© 2026 {company_name}. All rights reserved. Denver, CO.</p>
             </td>
           </tr>
         </table>
@@ -940,7 +940,7 @@ Si necesitas hacer algún ajuste a tu cita, comunícate con nosotros al (720) 59
 
 ¡Gracias por elegir GoPropertyCare!
 El Equipo de GoPropertyCare
-Denver & Boulder, Colorado
+Denver, Colorado
 """
                 html_title = "¡Tu Reserva ha sido Aceptada y Confirmada!"
                 html_greeting = f"Hola {recipient_name},"
@@ -984,7 +984,7 @@ Need any changes? Reach us at (720) 590-8632 or {company_email}.
 
 Thank you for choosing GoPropertyCare!
 The GoPropertyCare Team
-Denver & Boulder, Colorado
+Denver, Colorado
 """
                 html_title = "Your Booking is Accepted & Confirmed!"
                 html_greeting = f"Hello {recipient_name},"
@@ -1014,7 +1014,7 @@ Denver & Boulder, Colorado
           <tr>
             <td style="background-color: {header_bg}; padding: 32px 24px; text-align: center;">
               <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">{company_name}</h1>
-              <p style="color: #f7efe6; margin: 8px 0 0; font-size: 13px; font-weight: 500;">Premium Residential Cleaning • Denver &amp; Boulder</p>
+              <p style="color: #f7efe6; margin: 8px 0 0; font-size: 13px; font-weight: 500;">Premium Residential Cleaning • Denver</p>
             </td>
           </tr>
           <tr>
@@ -1069,7 +1069,7 @@ Denver & Boulder, Colorado
           </tr>
           <tr>
             <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 24px; text-align: center;">
-              <p style="margin: 0; font-size: 12px; color: #94a3b8;">© 2026 {company_name}. All rights reserved. Denver &amp; Boulder, CO.</p>
+              <p style="margin: 0; font-size: 12px; color: #94a3b8;">© 2026 {company_name}. All rights reserved. Denver, CO.</p>
             </td>
           </tr>
         </table>

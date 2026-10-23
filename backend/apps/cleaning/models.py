@@ -173,7 +173,7 @@ class CleaningOrder(TimeStampedModel):
     ]
 
     ZONE_CHOICES = [
-        ('inner', 'Denver & Boulder Metro (FREE)'),
+        ('inner', 'Denver Metro (FREE)'),
         ('outer', 'Outer Zone ($25 Fee)'),
     ]
 

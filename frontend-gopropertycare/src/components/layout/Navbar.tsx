@@ -14,8 +14,8 @@ export function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 inset-x-0 z-50 w-full pt-3 sm:pt-4 pb-2 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto bg-white/95 backdrop-blur-xl border border-emerald-100/90 rounded-2xl shadow-sm px-4 sm:px-8 h-16 sm:h-18 flex items-center justify-between transition-all">
+    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-xl border-b border-emerald-100/90 shadow-xs transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4 lg:gap-8">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0 py-1 transition-transform active:scale-95">
           <img
@@ -29,8 +29,8 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Navigation Links & Right Controls */}
-        <div className="hidden md:flex items-center gap-6 lg:gap-8">
-          <div className="flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-5 xl:gap-8 min-w-0">
+          <div className="flex items-center gap-4 xl:gap-6">
             <Link
               to="/"
               className={`text-sm font-bold transition-colors relative py-1.5 whitespace-nowrap ${
@@ -161,7 +161,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile menu button — Hamburger only */}
-        <div className="flex items-center md:hidden">
+        <div className="flex items-center lg:hidden">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2.5 rounded-xl text-slate-700 hover:text-slate-900 bg-slate-100/90 border border-slate-200/80 focus:outline-none transition-transform active:scale-95 shrink-0 cursor-pointer"
@@ -174,7 +174,8 @@ export function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden mt-2 bg-white/95 backdrop-blur-xl border border-emerald-100 rounded-2xl shadow-xl p-4 sm:p-5 animate-fade-in space-y-3">
+        <div className="lg:hidden max-w-7xl mx-auto px-4 sm:px-6 pb-4">
+          <div className="bg-white/98 backdrop-blur-xl border border-emerald-100 rounded-2xl shadow-xl p-4 sm:p-5 animate-fade-in space-y-3">
           <div className="flex flex-col gap-1.5">
             <Link
               to="/"
@@ -275,6 +276,7 @@ export function Navbar() {
             <LanguageSwitcher />
           </div>
         </div>
+      </div>
       )}
     </header>
   );
