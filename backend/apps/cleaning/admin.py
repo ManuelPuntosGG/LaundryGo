@@ -283,7 +283,7 @@ class CleaningOrderAdmin(ModelAdmin):
         }),
     )
 
-    @display(description=_('Order #'), header=True)
+    @display(description=_('Order #'))
     def order_number(self, obj):
         prefix = 'ESL' if getattr(obj, 'brand', '') == 'evolvingsolutions' else 'GPC'
         return f'{prefix}-#{obj.id}'

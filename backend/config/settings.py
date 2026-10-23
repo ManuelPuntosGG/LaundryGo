@@ -324,6 +324,12 @@ else:
     DEFAULT_FROM_EMAIL = 'LaundryGo <info@thelaundrygo.com>'
 
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@thelaundrygo.com')
+GPC_ADMIN_EMAIL = config('GPC_ADMIN_EMAIL', default='info@gopropertycare.com')
+ESL_ADMIN_EMAIL = config('ESL_ADMIN_EMAIL', default='info@evolvingsolutionsllc.com')
+
+# Optional dedicated SMTP credentials for GoPropertyCare (info@gopropertycare.com)
+GPC_EMAIL_HOST_USER = config('GPC_EMAIL_HOST_USER', default='').strip().strip('\'"')
+GPC_EMAIL_HOST_PASSWORD = config('GPC_EMAIL_HOST_PASSWORD', default='').strip().strip('\'"')
 
 # Transactional Email APIs (HTTPS Port 443 - Bypasses Render Free SMTP port blocks)
 RESEND_API_KEY = config('RESEND_API_KEY', default='').strip().strip('\'"')

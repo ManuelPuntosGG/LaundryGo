@@ -18,7 +18,7 @@ def send_cleaning_order_confirmation_email(order, language=None):
     is_evolving = brand == 'evolvingsolutions'
 
     company_name = "Evolving Solutions LLC" if is_evolving else "GoPropertyCare"
-    company_email = "info@evolvingsolutionsllc.com" if is_evolving else "info@gopropertycare.com"
+    company_email = getattr(settings, 'ESL_ADMIN_EMAIL', 'info@evolvingsolutionsllc.com') if is_evolving else getattr(settings, 'GPC_ADMIN_EMAIL', 'info@gopropertycare.com')
     tagline = (
         "Denver’s Trusted Partner for Commercial Cleaning & Industrial Labor"
         if is_evolving
@@ -287,7 +287,7 @@ Denver, Colorado
             from_email = f"{company_name} <{company_email}>"
             admin_email = getattr(settings, 'ADMIN_EMAIL', company_email)
             recipients = []
-            for addr in (recipient_email, company_email, admin_email):
+            for addr in (recipient_email, company_email):
                 clean_addr = (addr or '').strip()
                 if clean_addr and all(clean_addr.lower() != r.lower() for r in recipients):
                     recipients.append(clean_addr)
@@ -322,7 +322,7 @@ def send_cleaning_order_cancellation_email(order, language=None):
     is_evolving = brand == 'evolvingsolutions'
 
     company_name = "Evolving Solutions LLC" if is_evolving else "GoPropertyCare"
-    company_email = "info@evolvingsolutionsllc.com" if is_evolving else "info@gopropertycare.com"
+    company_email = getattr(settings, 'ESL_ADMIN_EMAIL', 'info@evolvingsolutionsllc.com') if is_evolving else getattr(settings, 'GPC_ADMIN_EMAIL', 'info@gopropertycare.com')
     order_code = f"ESL-#{order_id}" if is_evolving else f"GPC-#{order_id}"
 
     lang = language or getattr(order, 'language', 'en') or 'en'
@@ -406,7 +406,7 @@ The {company_name} Team
             from_email = f"{company_name} <{company_email}>"
             admin_email = getattr(settings, 'ADMIN_EMAIL', company_email)
             recipients = []
-            for addr in (recipient_email, company_email, admin_email):
+            for addr in (recipient_email, company_email):
                 clean_addr = (addr or '').strip()
                 if clean_addr and all(clean_addr.lower() != r.lower() for r in recipients):
                     recipients.append(clean_addr)
@@ -447,7 +447,7 @@ def send_commercial_walkthrough_inquiry_email(data):
             is_spanish = str(language).lower().startswith('es')
 
             company_name = "GoPropertyCare"
-            company_email = "info@gopropertycare.com"
+            company_email = getattr(settings, 'GPC_ADMIN_EMAIL', 'info@gopropertycare.com')
             admin_email = getattr(settings, 'ADMIN_EMAIL', company_email)
             from_email = f"{company_name} <{company_email}>"
 
@@ -516,7 +516,7 @@ Please contact the customer to confirm the 15-minute walkthrough.
                 subject=admin_subject,
                 text_content=admin_text,
                 html_content=admin_html,
-                recipients=[admin_email, company_email],
+                recipients=[company_email],
                 reply_to=email,
                 from_email=from_email,
             )
@@ -661,7 +661,7 @@ def send_cleaning_final_charge_email(order):
     order_id = order.id
     order_code = f"GPC-#{order_id}"
     company_name = "GoPropertyCare"
-    company_email = "info@gopropertycare.com"
+    company_email = getattr(settings, 'GPC_ADMIN_EMAIL', 'info@gopropertycare.com')
     header_bg = "#166534"
     accent_color = "#15803d"
     body_bg = "#f0fdf4"
@@ -855,7 +855,7 @@ Denver & Boulder, Colorado
             from_email = f"{company_name} <{company_email}>"
             admin_email = getattr(settings, 'ADMIN_EMAIL', company_email)
             recipients = []
-            for addr in (recipient_email, company_email, admin_email):
+            for addr in (recipient_email, company_email):
                 clean_addr = (addr or '').strip()
                 if clean_addr and all(clean_addr.lower() != r.lower() for r in recipients):
                     recipients.append(clean_addr)
@@ -885,7 +885,7 @@ def send_cleaning_deposit_charged_email(order):
     order_id = order.id
     order_code = f"GPC-#{order_id}"
     company_name = "GoPropertyCare"
-    company_email = "info@gopropertycare.com"
+    company_email = getattr(settings, 'GPC_ADMIN_EMAIL', 'info@gopropertycare.com')
     header_bg = "#166534"
     accent_color = "#15803d"
     body_bg = "#f0fdf4"
@@ -1082,7 +1082,7 @@ Denver & Boulder, Colorado
             from_email = f"{company_name} <{company_email}>"
             admin_email = getattr(settings, 'ADMIN_EMAIL', company_email)
             recipients = []
-            for addr in (recipient_email, company_email, admin_email):
+            for addr in (recipient_email, company_email):
                 clean_addr = (addr or '').strip()
                 if clean_addr and all(clean_addr.lower() != r.lower() for r in recipients):
                     recipients.append(clean_addr)

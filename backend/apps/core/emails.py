@@ -3,7 +3,7 @@ import logging
 import urllib.request
 import urllib.error
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +117,23 @@ def _get_fallback_from_email(active_from_email):
     return None
 
 
+def _get_smtp_connection_for_sender(sender_email):
+    """
+    Returns a dedicated SMTP connection if brand-specific SMTP credentials
+    (GPC_EMAIL_HOST_USER / GPC_EMAIL_HOST_PASSWORD) are configured for GoPropertyCare,
+    otherwise returns default connection (None).
+    """
+    gpc_user = getattr(settings, "GPC_EMAIL_HOST_USER", "")
+    gpc_pass = getattr(settings, "GPC_EMAIL_HOST_PASSWORD", "")
+    if gpc_user and gpc_pass and "gopropertycare" in (sender_email or "").lower():
+        return get_connection(
+            username=gpc_user,
+            password=gpc_pass,
+            fail_silently=False,
+        )
+    return None
+
+
 def send_mail_worker(subject, text_content, html_content, recipients, reply_to=None, from_email=None):
     """
     Background worker that dispatches emails.
@@ -137,12 +154,14 @@ def send_mail_worker(subject, text_content, html_content, recipients, reply_to=N
             if not candidate_from:
                 continue
             try:
+                conn = _get_smtp_connection_for_sender(candidate_from)
                 msg = EmailMultiAlternatives(
                     subject=subject,
                     body=text_content,
                     from_email=candidate_from,
                     to=recipients if isinstance(recipients, list) else [recipients],
                     reply_to=reply_to_list,
+                    connection=conn,
                 )
                 if html_content:
                     msg.attach_alternative(html_content, "text/html")
