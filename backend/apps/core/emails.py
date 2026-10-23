@@ -93,6 +93,30 @@ def send_via_sendgrid(api_key, from_email, recipients, subject, html_content, te
         raise RuntimeError(f"SendGrid HTTP {e.code}: {err_msg}")
 
 
+def _get_fallback_from_email(active_from_email):
+    """
+    If a brand-specific from_email (e.g. 'GoPropertyCare <info@gopropertycare.com>') is rejected
+    because the SMTP server or API key only authorizes DEFAULT_FROM_EMAIL / EMAIL_HOST_USER,
+    preserve the brand display name while using the authorized sender address.
+    """
+    default_from = getattr(settings, "DEFAULT_FROM_EMAIL", "info@thelaundrygo.com")
+    host_user = getattr(settings, "EMAIL_HOST_USER", "")
+    base_addr = default_from
+    if "<" in default_from and ">" in default_from:
+        base_addr = default_from.split("<")[1].split(">")[0].strip()
+    elif host_user and "@" in host_user:
+        base_addr = host_user.strip()
+
+    if "<" in active_from_email and ">" in active_from_email:
+        brand_name = active_from_email.split("<")[0].strip()
+        current_addr = active_from_email.split("<")[1].split(">")[0].strip()
+        if current_addr.lower() != base_addr.lower() and brand_name:
+            return f"{brand_name} <{base_addr}>"
+    elif active_from_email.strip().lower() != base_addr.lower():
+        return default_from
+    return None
+
+
 def send_mail_worker(subject, text_content, html_content, recipients, reply_to=None, from_email=None):
     """
     Background worker that dispatches emails.
@@ -101,62 +125,74 @@ def send_mail_worker(subject, text_content, html_content, recipients, reply_to=N
     Fallback 2: SendGrid REST API (HTTPS) if configured and previous options fail.
     """
     active_from_email = from_email or getattr(settings, "DEFAULT_FROM_EMAIL", "info@thelaundrygo.com")
+    fallback_from_email = _get_fallback_from_email(active_from_email)
     reply_to_list = [reply_to] if reply_to else [getattr(settings, "ADMIN_EMAIL", "info@thelaundrygo.com")]
+    resend_api_key = getattr(settings, "RESEND_API_KEY", None)
+    sendgrid_api_key = getattr(settings, "SENDGRID_API_KEY", None)
+    is_console_backend = "console" in getattr(settings, "EMAIL_BACKEND", "").lower()
 
-    # 1. Primary: Standard Django Email (SMTP / Console)
-    try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=text_content,
-            from_email=active_from_email,
-            to=recipients if isinstance(recipients, list) else [recipients],
-            reply_to=reply_to_list,
-        )
-        if html_content:
-            msg.attach_alternative(html_content, "text/html")
+    # 1. Primary: Standard Django Email (SMTP / Locmem / Console when no HTTPS API keys are set)
+    if not (is_console_backend and (resend_api_key or sendgrid_api_key)):
+        for candidate_from in [active_from_email, fallback_from_email]:
+            if not candidate_from:
+                continue
+            try:
+                msg = EmailMultiAlternatives(
+                    subject=subject,
+                    body=text_content,
+                    from_email=candidate_from,
+                    to=recipients if isinstance(recipients, list) else [recipients],
+                    reply_to=reply_to_list,
+                )
+                if html_content:
+                    msg.attach_alternative(html_content, "text/html")
 
-        sent_count = msg.send(fail_silently=False)
-        logger.info(
-            f"[EMAIL SUCCESS - SMTP] Successfully sent '{subject}' to {recipients} (delivered: {sent_count})"
-        )
-        return
-    except Exception as smtp_err:
-        logger.warning(
-            f"[EMAIL WARNING - SMTP] Primary SMTP delivery failed for '{subject}' to {recipients}: {smtp_err}. Checking fallback APIs..."
-        )
+                sent_count = msg.send(fail_silently=False)
+                logger.info(
+                    f"[EMAIL SUCCESS - SMTP] Successfully sent '{subject}' from '{candidate_from}' to {recipients} (delivered: {sent_count})"
+                )
+                return
+            except Exception as smtp_err:
+                logger.warning(
+                    f"[EMAIL WARNING - SMTP] Delivery failed from '{candidate_from}' for '{subject}' to {recipients}: {smtp_err}."
+                )
 
     # 2. Fallback: Resend REST API (if key is configured and SMTP failed)
-    resend_api_key = getattr(settings, "RESEND_API_KEY", None)
     if resend_api_key:
-        try:
-            result = send_via_resend(
-                resend_api_key,
-                active_from_email,
-                recipients,
-                subject,
-                html_content,
-                text_content,
-                reply_to,
-            )
-            logger.info(f"[EMAIL SUCCESS - RESEND FALLBACK] Sent '{subject}' to {recipients}: {result}")
-            return
-        except Exception as ex:
-            logger.error(f"[EMAIL FAILURE - RESEND FALLBACK] Failed sending to {recipients}: {ex}")
+        for candidate_from in [active_from_email, fallback_from_email]:
+            if not candidate_from:
+                continue
+            try:
+                result = send_via_resend(
+                    resend_api_key,
+                    candidate_from,
+                    recipients,
+                    subject,
+                    html_content,
+                    text_content,
+                    reply_to,
+                )
+                logger.info(f"[EMAIL SUCCESS - RESEND FALLBACK] Sent '{subject}' from '{candidate_from}' to {recipients}: {result}")
+                return
+            except Exception as ex:
+                logger.error(f"[EMAIL FAILURE - RESEND FALLBACK] Failed sending from '{candidate_from}' to {recipients}: {ex}")
 
     # 3. Fallback: SendGrid REST API (if key is configured)
-    sendgrid_api_key = getattr(settings, "SENDGRID_API_KEY", None)
     if sendgrid_api_key:
-        try:
-            result = send_via_sendgrid(
-                sendgrid_api_key,
-                active_from_email,
-                recipients,
-                subject,
-                html_content,
-                text_content,
-                reply_to,
-            )
-            logger.info(f"[EMAIL SUCCESS - SENDGRID FALLBACK] Sent '{subject}' to {recipients}: {result}")
-            return
-        except Exception as ex:
-            logger.error(f"[EMAIL FAILURE - SENDGRID FALLBACK] Failed sending to {recipients}: {ex}")
+        for candidate_from in [active_from_email, fallback_from_email]:
+            if not candidate_from:
+                continue
+            try:
+                result = send_via_sendgrid(
+                    sendgrid_api_key,
+                    candidate_from,
+                    recipients,
+                    subject,
+                    html_content,
+                    text_content,
+                    reply_to,
+                )
+                logger.info(f"[EMAIL SUCCESS - SENDGRID FALLBACK] Sent '{subject}' from '{candidate_from}' to {recipients}: {result}")
+                return
+            except Exception as ex:
+                logger.error(f"[EMAIL FAILURE - SENDGRID FALLBACK] Failed sending from '{candidate_from}' to {recipients}: {ex}")

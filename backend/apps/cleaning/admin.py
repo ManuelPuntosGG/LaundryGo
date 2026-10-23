@@ -480,7 +480,7 @@ class CleaningOrderAdmin(ModelAdmin):
                     self.message_user(request, f"Error closing GPC-#{obj.id}: {exc}", level='error')
         return redirect(reverse('admin:cleaning_cleaningorder_change', args=[object_id]))
 
-    @action(description=_('1. Accept Order & Charge 25% Deposit (GoPropertyCare)'), permissions=['change'])
+    @action(description=_('1. Accept Order & Charge 25%% Deposit (GoPropertyCare)'), permissions=['change'])
     def accept_and_charge_deposit(self, request, queryset):
         from apps.core.payments import charge_gpc_deposit
         success_count = 0
@@ -499,7 +499,7 @@ class CleaningOrderAdmin(ModelAdmin):
         if success_count > 0:
             self.message_user(request, f"Successfully accepted and charged 25% deposit for {success_count} GoPropertyCare order(s).")
 
-    @action(description=_('2. Close Order & Charge Remaining 75% (+ Surcharge)'), permissions=['change'])
+    @action(description=_('2. Close Order & Charge Remaining 75%% (+ Surcharge)'), permissions=['change'])
     def complete_and_charge_order(self, request, queryset):
         from apps.core.payments import charge_gpc_remaining_balance
         success_count = 0
