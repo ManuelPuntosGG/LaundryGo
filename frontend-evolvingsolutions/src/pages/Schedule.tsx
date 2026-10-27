@@ -289,6 +289,18 @@ export function Schedule() {
       const response = await api.post('/cleaning/orders/', payload);
       setCreatedOrderId(response.data.id);
       setIsSuccess(true);
+      navigate(`/order-success?orderId=${response.data.id}`, {
+        state: {
+          orderId: response.data.id,
+          serviceName: activeRate.name,
+          sqft,
+          selectedDate,
+          selectedTimeSlot: selectedTimeSlot === 'morning' ? '8:00 AM – 12:00 PM' : '1:00 PM – 5:00 PM',
+          address: formData.street_address,
+          city: selectedLocation.name,
+          totalPrice,
+        },
+      });
     } catch (err: unknown) {
       console.error('Failed to submit commercial work order:', err);
       const axiosErr = err as { response?: { data?: Record<string, unknown> | string } };

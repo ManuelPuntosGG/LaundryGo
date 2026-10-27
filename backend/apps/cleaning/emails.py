@@ -313,9 +313,10 @@ Denver, Colorado
     thread.start()
 
 
-def send_cleaning_order_cancellation_email(order, language=None):
+def send_cleaning_order_cancellation_email(order, language=None, refunded=False, refund_amount=None, was_unpaid=False):
     """
     Sends order cancellation email asynchronously for GoPropertyCare or Evolving Solutions LLC.
+    Supports refund notification (25% refunded), non-refundable cancellation, or $0 unpaid cancellation.
     """
     order_id = order.id
     brand = getattr(order, 'brand', 'gopropertycare') or 'gopropertycare'
@@ -339,35 +340,166 @@ def send_cleaning_order_cancellation_email(order, language=None):
     if not recipient_name:
         recipient_name = recipient_email.split('@')[0] if recipient_email else 'Customer'
 
+    # Determine refund amount representation
+    refund_val = 0.0
+    if refund_amount:
+        try:
+            refund_val = float(refund_amount)
+        except (ValueError, TypeError):
+            refund_val = 0.0
+
     def _send():
         try:
             if is_spanish:
-                subject = f"{company_name} - Cancelación de Reserva #{order_code}"
-                body_text = f"""Hola {recipient_name},
+                if refunded and refund_val > 0:
+                    subject = f"{company_name} - Cancelación y Reembolso de Reserva #{order_code}"
+                    body_text = f"""Hola {recipient_name},
 
-Tu reserva de servicio #{order_code} ({service_name}) programada para {service_date_str} ha sido cancelada exitosamente.
+Tu reserva de servicio #{order_code} ({service_name}) programada para {service_date_str} ha sido cancelada.
 
-Si no solicitaste esta cancelación o deseas reprogramar, por favor contáctanos al (720) 590-8632 o a {company_email}.
+REEMBOLSO DE ANTICIPO:
+Hemos emitido el reembolso íntegro de tu depósito del 25% por un monto de ${refund_val:.2f} USD a tu método de pago registrado. Los fondos aparecerán reflejados en tu cuenta en un plazo de 5 a 10 días hábiles dependiendo de tu banco.
+
+Si deseas reprogramar en el futuro o tienes alguna pregunta, por favor contáctanos al (720) 590-8632 o a {company_email}.
 
 Atentamente,
 El Equipo de {company_name}
 """
-                html_title = f"Reserva #{order_code} Cancelada"
+                    html_title = f"Reserva #{order_code} Cancelada (Reembolso Emitido)"
+                    html_badge_bg = "#065f46"
+                    status_box = f"""
+                    <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 18px; margin: 20px 0; text-align: left;">
+                      <div style="font-weight: 800; color: #065f46; font-size: 15px; margin-bottom: 6px;">✓ Reembolso de Anticipo Emitido (${refund_val:.2f} USD)</div>
+                      <div style="color: #047857; font-size: 13px; line-height: 1.6;">
+                        Hemos procesado el reembolso del 25% de anticipo por un monto de <strong>${refund_val:.2f} USD</strong> al método de pago original. Los fondos suelen verse reflejados en un plazo habitual de 5 a 10 días hábiles bancarios.
+                      </div>
+                    </div>
+                    """
+                elif not refunded and not was_unpaid:
+                    subject = f"{company_name} - Cancelación de Reserva #{order_code}"
+                    body_text = f"""Hola {recipient_name},
+
+Tu reserva de servicio #{order_code} ({service_name}) programada para {service_date_str} ha sido cancelada.
+
+POLÍTICA DE ANTICIPO:
+Conforme a nuestras políticas para reservas confirmadas y cuadrillas agendadas, el depósito inicial del 25% no es reembolsable.
+
+Si deseas reprogramar en el futuro o consultar otro proyecto, por favor contáctanos al (720) 590-8632 o a {company_email}.
+
+Atentamente,
+El Equipo de {company_name}
+"""
+                    html_title = f"Reserva #{order_code} Cancelada"
+                    html_badge_bg = "#dc2626"
+                    status_box = """
+                    <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 18px; margin: 20px 0; text-align: left;">
+                      <div style="font-weight: 800; color: #92400e; font-size: 15px; margin-bottom: 6px;">Aviso de Anticipo</div>
+                      <div style="color: #b45309; font-size: 13px; line-height: 1.6;">
+                        Conforme a las políticas de servicio para reservas confirmadas con cuadrilla reservada, el depósito inicial del 25% no es reembolsable.
+                      </div>
+                    </div>
+                    """
+                else:
+                    subject = f"{company_name} - Cancelación de Reserva #{order_code}"
+                    body_text = f"""Hola {recipient_name},
+
+Tu reserva de servicio #{order_code} ({service_name}) programada para {service_date_str} ha sido cancelada exitosamente.
+
+No se ha realizado ningún cobro a tu tarjeta de pago ($0.00 cobrado).
+
+Si deseas agendar una nueva fecha o solicitar otra cotización, por favor contáctanos al (720) 590-8632 o a {company_email}.
+
+Atentamente,
+El Equipo de {company_name}
+"""
+                    html_title = f"Reserva #{order_code} Cancelada"
+                    html_badge_bg = "#dc2626"
+                    status_box = """
+                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 20px 0; text-align: left;">
+                      <div style="font-weight: 800; color: #334155; font-size: 15px; margin-bottom: 6px;">Sin Cargos Realizados</div>
+                      <div style="color: #475569; font-size: 13px; line-height: 1.6;">
+                        Esta orden se encontraba pendiente de asignación, por lo que no se realizó ningún cargo a tu tarjeta de pago ($0.00 cobrado).
+                      </div>
+                    </div>
+                    """
+
                 html_p1 = f"Hola <strong>{recipient_name}</strong>,"
                 html_p2 = f"Te confirmamos que tu reserva de servicio <strong>#{order_code}</strong> ({service_name}) programada para el <strong>{service_date_str}</strong> ha sido cancelada."
                 html_p3 = f"Si deseas programar una nueva cita o consultar por otro proyecto, puedes hacerlo en cualquier momento en nuestra plataforma."
+
             else:
-                subject = f"{company_name} - Booking Cancellation #{order_code}"
-                body_text = f"""Hello {recipient_name},
+                if refunded and refund_val > 0:
+                    subject = f"{company_name} - Booking Cancellation & Refund #{order_code}"
+                    body_text = f"""Hello {recipient_name},
 
-Your service booking #{order_code} ({service_name}) scheduled for {service_date_str} has been cancelled successfully.
+Your service booking #{order_code} ({service_name}) scheduled for {service_date_str} has been cancelled.
 
-If you did not request this cancellation or would like to reschedule, please contact us at (720) 590-8632 or {company_email}.
+DEPOSIT REFUND:
+A full refund of your 25% deposit in the amount of ${refund_val:.2f} USD has been processed back to your original payment method. Depending on your bank, funds typically appear on your statement within 5–10 business days.
+
+If you have any questions or would like to reschedule in the future, please contact us at (720) 590-8632 or {company_email}.
 
 Best regards,
 The {company_name} Team
 """
-                html_title = f"Booking #{order_code} Cancelled"
+                    html_title = f"Booking #{order_code} Cancelled (Refund Processed)"
+                    html_badge_bg = "#065f46"
+                    status_box = f"""
+                    <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 18px; margin: 20px 0; text-align: left;">
+                      <div style="font-weight: 800; color: #065f46; font-size: 15px; margin-bottom: 6px;">✓ Deposit Refund Processed (${refund_val:.2f} USD)</div>
+                      <div style="color: #047857; font-size: 13px; line-height: 1.6;">
+                        We have processed a full refund of your 25% deposit (<strong>${refund_val:.2f} USD</strong>) back to your card on file. Depending on your financial institution, funds typically post within 5–10 business days.
+                      </div>
+                    </div>
+                    """
+                elif not refunded and not was_unpaid:
+                    subject = f"{company_name} - Booking Cancellation #{order_code}"
+                    body_text = f"""Hello {recipient_name},
+
+Your service booking #{order_code} ({service_name}) scheduled for {service_date_str} has been cancelled.
+
+DEPOSIT POLICY:
+In accordance with our cancellation policy for confirmed bookings and allocated crew time, the 25% initial deposit is non-refundable.
+
+If you have any questions or wish to contact our team, reach us at (720) 590-8632 or {company_email}.
+
+Best regards,
+The {company_name} Team
+"""
+                    html_title = f"Booking #{order_code} Cancelled"
+                    html_badge_bg = "#dc2626"
+                    status_box = """
+                    <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 18px; margin: 20px 0; text-align: left;">
+                      <div style="font-weight: 800; color: #92400e; font-size: 15px; margin-bottom: 6px;">Deposit Policy Notice</div>
+                      <div style="color: #b45309; font-size: 13px; line-height: 1.6;">
+                        In accordance with our cancellation policy for confirmed reservations with scheduled crews, the 25% initial deposit is non-refundable.
+                      </div>
+                    </div>
+                    """
+                else:
+                    subject = f"{company_name} - Booking Cancellation #{order_code}"
+                    body_text = f"""Hello {recipient_name},
+
+Your service booking #{order_code} ({service_name}) scheduled for {service_date_str} has been cancelled successfully.
+
+No charges were processed to your card on file ($0.00 charged).
+
+If you would like to reschedule for a different date or need assistance, please contact us at (720) 590-8632 or {company_email}.
+
+Best regards,
+The {company_name} Team
+"""
+                    html_title = f"Booking #{order_code} Cancelled"
+                    html_badge_bg = "#dc2626"
+                    status_box = """
+                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin: 20px 0; text-align: left;">
+                      <div style="font-weight: 800; color: #334155; font-size: 15px; margin-bottom: 6px;">No Charges Incurred</div>
+                      <div style="color: #475569; font-size: 13px; line-height: 1.6;">
+                        This reservation was pending confirmation, so no charge was processed to your card on file ($0.00 charged).
+                      </div>
+                    </div>
+                    """
+
                 html_p1 = f"Hello <strong>{recipient_name}</strong>,"
                 html_p2 = f"We confirm that your booking <strong>#{order_code}</strong> ({service_name}) scheduled for <strong>{service_date_str}</strong> has been cancelled."
                 html_p3 = f"If you'd like to book a new appointment or discuss site support, reach out to us anytime."
@@ -381,15 +513,16 @@ The {company_name} Team
       <td align="center">
         <table width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0;">
           <tr>
-            <td style="background-color: #dc2626; padding: 24px; text-align: center;">
+            <td style="background-color: {html_badge_bg}; padding: 24px; text-align: center;">
               <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 800;">{company_name}</h1>
             </td>
           </tr>
           <tr>
             <td style="padding: 32px 24px;">
-              <h2 style="color: #dc2626; font-size: 18px; margin-top: 0;">{html_title}</h2>
+              <h2 style="color: {html_badge_bg}; font-size: 18px; margin-top: 0;">{html_title}</h2>
               <p style="color: #374151; font-size: 15px; line-height: 1.6;">{html_p1}</p>
               <p style="color: #374151; font-size: 15px; line-height: 1.6;">{html_p2}</p>
+              {status_box}
               <p style="color: #374151; font-size: 15px; line-height: 1.6;">{html_p3}</p>
               <p style="color: #64748b; font-size: 13px; margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
                 Questions? Reach us at (720) 590-8632 or <a href="mailto:{company_email}" style="color: #2563eb;">{company_email}</a>.
@@ -404,7 +537,6 @@ The {company_name} Team
 </html>"""
 
             from_email = f"{company_name} <{company_email}>"
-            admin_email = getattr(settings, 'ADMIN_EMAIL', company_email)
             recipients = []
             for addr in (recipient_email, company_email):
                 clean_addr = (addr or '').strip()
@@ -422,7 +554,7 @@ The {company_name} Team
                 reply_to=company_email,
                 from_email=from_email,
             )
-            logger.info(f"[EMAIL SUCCESS - {company_name}] Cancellation queued for {order_code} to {recipients}")
+            logger.info(f"[EMAIL SUCCESS - {company_name}] Cancellation queued for {order_code} to {recipients} (refunded={refunded})")
 
         except Exception as e:
             logger.error(f"[EMAIL FAILURE - {company_name}] Cancellation failed for {order_code}: {e}", exc_info=True)

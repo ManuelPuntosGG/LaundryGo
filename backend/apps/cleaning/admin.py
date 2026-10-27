@@ -368,6 +368,8 @@ class CleaningOrderAdmin(ModelAdmin):
     actions = [
         'accept_and_charge_deposit',
         'complete_and_charge_order',
+        'cancel_and_refund_deposit',
+        'cancel_without_refund',
         'mark_in_progress',
         'mark_completed',
         'mark_cancelled',
@@ -375,10 +377,14 @@ class CleaningOrderAdmin(ModelAdmin):
     actions_submit_line = [
         'accept_gpc_order_submit',
         'close_gpc_order_submit',
+        'cancel_gpc_order_with_refund_submit',
+        'cancel_gpc_order_without_refund_submit',
     ]
     actions_detail = [
         'accept_gpc_order_detail',
         'close_gpc_order_detail',
+        'cancel_gpc_order_with_refund_detail',
+        'cancel_gpc_order_without_refund_detail',
     ]
 
     # Submit-line actions (Saves form changes including surcharge_amount/surcharge_concept, then runs action)
@@ -426,6 +432,45 @@ class CleaningOrderAdmin(ModelAdmin):
             )
         except Exception as exc:
             self.message_user(request, f"Error closing GPC-#{obj.id}: {exc}", level='error')
+
+    @action(
+        description=_('Cancel Order & Refund 25% Deposit'),
+        permissions=['change'],
+        variant=ActionVariant.DANGER,
+    )
+    def cancel_gpc_order_with_refund_submit(self, request, obj):
+        from apps.core.payments import refund_gpc_order
+        if obj.status == 'cancelled' and obj.payment_status == 'refunded':
+            self.message_user(request, f"Order #{obj.id} is already cancelled and refunded.", level='warning')
+            return
+        try:
+            res = refund_gpc_order(obj)
+            refund_note = f" (Refunded ${res['refund_amount']:.2f})" if res.get('refunded') else " (No charges were made)"
+            self.message_user(
+                request,
+                f"Order #{obj.id} has been cancelled{refund_note} and cancellation email sent."
+            )
+        except Exception as exc:
+            self.message_user(request, f"Error cancelling/refunding order #{obj.id}: {exc}", level='error')
+
+    @action(
+        description=_('Cancel Order Without Refund'),
+        permissions=['change'],
+        variant=ActionVariant.WARNING,
+    )
+    def cancel_gpc_order_without_refund_submit(self, request, obj):
+        from apps.core.payments import cancel_gpc_order_without_refund
+        if obj.status == 'cancelled':
+            self.message_user(request, f"Order #{obj.id} is already cancelled.", level='warning')
+            return
+        try:
+            cancel_gpc_order_without_refund(obj)
+            self.message_user(
+                request,
+                f"Order #{obj.id} has been cancelled without refund and cancellation email sent."
+            )
+        except Exception as exc:
+            self.message_user(request, f"Error cancelling order #{obj.id}: {exc}", level='error')
 
     # Detail header actions
     @action(
@@ -480,6 +525,47 @@ class CleaningOrderAdmin(ModelAdmin):
                     self.message_user(request, f"Error closing GPC-#{obj.id}: {exc}", level='error')
         return redirect(reverse('admin:cleaning_cleaningorder_change', args=[object_id]))
 
+    @action(
+        description=_('Cancel & Refund 25% Deposit'),
+        url_path='cancel-refund-deposit',
+        permissions=['change'],
+        variant=ActionVariant.DANGER,
+    )
+    def cancel_gpc_order_with_refund_detail(self, request, object_id):
+        from apps.core.payments import refund_gpc_order
+        obj = self.get_object(request, object_id)
+        if obj:
+            if obj.status == 'cancelled' and obj.payment_status == 'refunded':
+                self.message_user(request, f"Order #{obj.id} is already cancelled and refunded.", level='warning')
+            else:
+                try:
+                    res = refund_gpc_order(obj)
+                    refund_note = f" (Refunded ${res['refund_amount']:.2f})" if res.get('refunded') else " (No charges were made)"
+                    self.message_user(request, f"Order #{obj.id} has been cancelled{refund_note} and email sent.")
+                except Exception as exc:
+                    self.message_user(request, f"Error cancelling/refunding order #{obj.id}: {exc}", level='error')
+        return redirect(reverse('admin:cleaning_cleaningorder_change', args=[object_id]))
+
+    @action(
+        description=_('Cancel Without Refund'),
+        url_path='cancel-no-refund',
+        permissions=['change'],
+        variant=ActionVariant.WARNING,
+    )
+    def cancel_gpc_order_without_refund_detail(self, request, object_id):
+        from apps.core.payments import cancel_gpc_order_without_refund
+        obj = self.get_object(request, object_id)
+        if obj:
+            if obj.status == 'cancelled':
+                self.message_user(request, f"Order #{obj.id} is already cancelled.", level='warning')
+            else:
+                try:
+                    cancel_gpc_order_without_refund(obj)
+                    self.message_user(request, f"Order #{obj.id} cancelled without refund and email sent.")
+                except Exception as exc:
+                    self.message_user(request, f"Error cancelling order #{obj.id}: {exc}", level='error')
+        return redirect(reverse('admin:cleaning_cleaningorder_change', args=[object_id]))
+
     @action(description=_('1. Accept Order & Charge 25%% Deposit (GoPropertyCare)'), permissions=['change'])
     def accept_and_charge_deposit(self, request, queryset):
         from apps.core.payments import charge_gpc_deposit
@@ -511,6 +597,32 @@ class CleaningOrderAdmin(ModelAdmin):
                 self.message_user(request, f"Error processing GPC-#{order.id}: {exc}", level='error')
         if success_count > 0:
             self.message_user(request, f"Successfully charged remaining balance and closed {success_count} order(s).")
+
+    @action(description=_('3. Cancel Order & Refund 25%% Deposit'), permissions=['change'])
+    def cancel_and_refund_deposit(self, request, queryset):
+        from apps.core.payments import refund_gpc_order
+        count = 0
+        for order in queryset:
+            try:
+                refund_gpc_order(order)
+                count += 1
+            except Exception as exc:
+                self.message_user(request, f"Error cancelling order #{order.id}: {exc}", level='error')
+        if count > 0:
+            self.message_user(request, f"Successfully cancelled and processed refund for {count} order(s).")
+
+    @action(description=_('4. Cancel Order (Without Refund)'), permissions=['change'])
+    def cancel_without_refund(self, request, queryset):
+        from apps.core.payments import cancel_gpc_order_without_refund
+        count = 0
+        for order in queryset:
+            try:
+                cancel_gpc_order_without_refund(order)
+                count += 1
+            except Exception as exc:
+                self.message_user(request, f"Error cancelling order #{order.id}: {exc}", level='error')
+        if count > 0:
+            self.message_user(request, f"Successfully cancelled {count} order(s) without refund.")
 
     @action(description=_('Mark selected orders as In Progress'))
     def mark_in_progress(self, request, queryset):

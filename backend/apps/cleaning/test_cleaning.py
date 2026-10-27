@@ -765,3 +765,71 @@ class TestGoPropertyCarePayments:
         assert order.status == 'completed'
         assert order.stripe_final_intent_id.startswith('pi_live_simulated_final_')
 
+    def test_cancel_and_refund_gpc_order_after_confirmed(self, regular_rate):
+        from apps.core.payments import charge_gpc_deposit, refund_gpc_order
+
+        tomorrow = (timezone.now() + timedelta(days=1)).date()
+        order = CleaningOrder.objects.create(
+            brand='gopropertycare',
+            service_rate=regular_rate,
+            square_feet=1000,
+            total_price=Decimal('200.00'),
+            base_price=Decimal('200.00'),
+            service_date=tomorrow,
+            time_slot='morning',
+            guest_email='gpc-refund@example.com',
+            guest_first_name='Maria',
+            guest_last_name='Rodriguez',
+            stripe_customer_id='cus_mock_maria',
+            stripe_payment_method_id='pm_mock_maria',
+        )
+
+        # 1. Accept and charge deposit
+        res_dep = charge_gpc_deposit(order)
+        assert res_dep['status'] == 'succeeded'
+        order.refresh_from_db()
+        assert order.payment_status == 'deposit_paid'
+        assert order.status == 'confirmed'
+        assert order.deposit_amount == Decimal('50.00')
+
+        # 2. Cancel order with refund
+        res_ref = refund_gpc_order(order)
+        assert res_ref['status'] == 'cancelled'
+        assert res_ref['refunded'] is True
+        assert res_ref['refund_amount'] == 50.0
+        order.refresh_from_db()
+        assert order.status == 'cancelled'
+        assert order.payment_status == 'refunded'
+
+    def test_cancel_gpc_order_without_refund(self, regular_rate):
+        from apps.core.payments import charge_gpc_deposit, cancel_gpc_order_without_refund
+
+        tomorrow = (timezone.now() + timedelta(days=1)).date()
+        order = CleaningOrder.objects.create(
+            brand='gopropertycare',
+            service_rate=regular_rate,
+            square_feet=1000,
+            total_price=Decimal('200.00'),
+            base_price=Decimal('200.00'),
+            service_date=tomorrow,
+            time_slot='morning',
+            guest_email='gpc-norefund@example.com',
+            guest_first_name='Carlos',
+            guest_last_name='Gomez',
+            stripe_customer_id='cus_mock_carlos',
+            stripe_payment_method_id='pm_mock_carlos',
+        )
+
+        # 1. Accept and charge deposit
+        charge_gpc_deposit(order)
+        order.refresh_from_db()
+        assert order.payment_status == 'deposit_paid'
+        assert order.status == 'confirmed'
+
+        # 2. Cancel without refund
+        res_cancel = cancel_gpc_order_without_refund(order)
+        assert res_cancel['status'] == 'cancelled'
+        assert res_cancel['refunded'] is False
+        order.refresh_from_db()
+        assert order.status == 'cancelled'
+        assert order.payment_status == 'deposit_paid'

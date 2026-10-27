@@ -7,6 +7,7 @@ interface SEOProps {
   description?: string;
   canonical?: string;
   ogImage?: string;
+  noIndex?: boolean;
 }
 
 export function SEO({
@@ -14,6 +15,7 @@ export function SEO({
   description,
   canonical,
   ogImage = 'https://gopropertycare.com/logo.png',
+  noIndex = false,
 }: SEOProps) {
   const location = useLocation();
   const { i18n } = useTranslation();
@@ -54,6 +56,13 @@ export function SEO({
       element.setAttribute('content', content);
     };
 
+    // Update robots tag
+    if (noIndex) {
+      setMetaTag('name', 'robots', 'noindex, nofollow');
+    } else {
+      setMetaTag('name', 'robots', 'index, follow');
+    }
+
     // Update standard description
     setMetaTag('name', 'description', pageDescription);
 
@@ -77,7 +86,7 @@ export function SEO({
       document.head.appendChild(canonicalElement);
     }
     canonicalElement.setAttribute('href', pageCanonical);
-  }, [title, description, canonical, ogImage, location.pathname, currentLang]);
+  }, [title, description, canonical, ogImage, noIndex, location.pathname, currentLang]);
 
   return null;
 }

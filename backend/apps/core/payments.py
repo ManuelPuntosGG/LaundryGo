@@ -423,6 +423,87 @@ def charge_gpc_remaining_balance(order):
 
 
 # ==============================================================================
+# GoPropertyCare Post-Confirmation Cancellation & Refund Handling
+# ==============================================================================
+
+def refund_gpc_order(order):
+    """
+    Cancels a GoPropertyCare or cleaning order and refunds the 25% deposit via Stripe if previously charged.
+    Dispatches a bilingual cancellation email confirming the refund.
+    """
+    client = get_stripe_client()
+    deposit_amount = order.deposit_amount or 0
+    from decimal import Decimal
+    if not isinstance(deposit_amount, Decimal):
+        deposit_amount = Decimal(str(deposit_amount))
+    was_deposit_paid = order.payment_status in ('deposit_paid', 'fully_paid')
+
+    if was_deposit_paid and order.brand == 'gopropertycare' and deposit_amount > 0:
+        intent_id = order.stripe_deposit_intent_id
+        if client and intent_id and not intent_id.startswith('pi_mock_') and not intent_id.startswith('pi_live_simulated_'):
+            try:
+                client.Refund.create(payment_intent=intent_id)
+                logger.info(f"[Stripe Refund] Successfully refunded deposit for order GPC-#{order.id} (Intent: {intent_id})")
+            except Exception as exc:
+                logger.error(f"[Stripe Refund Error] Failed to refund GPC-#{order.id}: {exc}", exc_info=True)
+                raise exc
+        else:
+            logger.info(f"[Mock Refund] Simulated refund of ${deposit_amount} for order GPC-#{order.id}")
+
+        order.payment_status = 'refunded'
+
+    order.status = 'cancelled'
+    order.save()
+
+    # Dispatch email
+    try:
+        from apps.cleaning.emails import send_cleaning_order_cancellation_email
+        send_cleaning_order_cancellation_email(
+            order,
+            refunded=was_deposit_paid,
+            refund_amount=deposit_amount if was_deposit_paid else None,
+            was_unpaid=(not was_deposit_paid)
+        )
+    except Exception as email_err:
+        logger.warning(f"Failed to dispatch cancellation email for #{order.id}: {email_err}")
+
+    return {
+        "status": "cancelled",
+        "refunded": was_deposit_paid,
+        "refund_amount": float(deposit_amount) if was_deposit_paid else 0.0,
+        "order_id": order.id,
+    }
+
+
+def cancel_gpc_order_without_refund(order):
+    """
+    Cancels a GoPropertyCare or cleaning order WITHOUT refunding the 25% deposit.
+    Dispatches a bilingual cancellation email noting the cancellation according to policy.
+    """
+    was_deposit_paid = order.payment_status in ('deposit_paid', 'fully_paid')
+    order.status = 'cancelled'
+    order.save()
+
+    # Dispatch email
+    try:
+        from apps.cleaning.emails import send_cleaning_order_cancellation_email
+        send_cleaning_order_cancellation_email(
+            order,
+            refunded=False,
+            refund_amount=None,
+            was_unpaid=(not was_deposit_paid)
+        )
+    except Exception as email_err:
+        logger.warning(f"Failed to dispatch cancellation email for #{order.id}: {email_err}")
+
+    return {
+        "status": "cancelled",
+        "refunded": False,
+        "order_id": order.id,
+    }
+
+
+# ==============================================================================
 # LaundryGo Order Lifecycle ($0 Booking -> Admin Accept -> Post-Service Finalize & Direct Invoice)
 # (Decoupled from online payment gateways; billing handled directly upon delivery)
 # ==============================================================================

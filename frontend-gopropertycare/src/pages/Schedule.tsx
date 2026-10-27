@@ -748,6 +748,21 @@ export function Schedule() {
       const response = await api.post('/cleaning/orders/', payload);
       setCreatedOrderId(response.data.id);
       setIsSuccess(true);
+      navigate(`/order-success?orderId=${response.data.id}`, {
+        state: {
+          orderId: response.data.id,
+          serviceType,
+          selectedTier,
+          freqOption,
+          selectedDate,
+          selectedTimeSlot,
+          formData,
+          depositAmount,
+          remainingBalance,
+          totalPrice,
+          customQuoteSubmitted: false,
+        },
+      });
     } catch (err: unknown) {
       console.error('Failed to submit cleaning reservation:', err);
       const axiosErr = err as { response?: { data?: Record<string, unknown> | string } };
@@ -810,6 +825,18 @@ export function Schedule() {
       setCreatedOrderId(response.data.id);
       setCustomQuoteSubmitted(true);
       setIsSuccess(true);
+      navigate(`/order-success?orderId=${response.data.id}&type=custom_quote`, {
+        state: {
+          orderId: response.data.id,
+          serviceType,
+          selectedTier,
+          freqOption,
+          selectedDate,
+          selectedTimeSlot,
+          formData,
+          customQuoteSubmitted: true,
+        },
+      });
     } catch (err: unknown) {
       console.error('Failed to submit custom quote lead:', err);
       setErrorMessage(t('common.error'));

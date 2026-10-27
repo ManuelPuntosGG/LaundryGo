@@ -275,6 +275,20 @@ const routes = [
     `,
   },
   {
+    path: '/order-success',
+    title: 'Booking Confirmed — GoPropertyCare Denver',
+    description: 'Your GoPropertyCare cleaning booking request has been received.',
+    canonical: 'https://gopropertycare.com/order-success',
+    heading: 'Booking Request Received',
+    subheading: 'We have received your service reservation request.',
+    contentHtml: `
+      <main class="w-full max-w-2xl mx-auto px-4 py-12 text-center">
+        <h1 class="text-3xl font-black text-slate-900 mb-4">Booking Request Received</h1>
+        <p class="text-slate-600">Your reservation details are loading...</p>
+      </main>
+    `,
+  },
+  {
     path: '/login',
     title: 'Sign In — GoPropertyCare Client Portal',
     description: 'Access your GoPropertyCare account to view cleaning reservations, invoices, and property details in Denver.',

@@ -10,6 +10,7 @@ import { ScrollToTop } from '@/components/layout/ScrollToTop';
 const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })));
 const About = lazy(() => import('@/pages/About').then((m) => ({ default: m.About })));
 const Schedule = lazy(() => import('@/pages/Schedule').then((m) => ({ default: m.Schedule })));
+const OrderSuccess = lazy(() => import('@/pages/OrderSuccess').then((m) => ({ default: m.OrderSuccess })));
 const Auth = lazy(() => import('@/pages/Auth').then((m) => ({ default: m.Auth })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
 
@@ -34,6 +35,8 @@ function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/schedule" element={<Schedule />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
+        <Route path="/schedule/success" element={<Navigate to="/order-success" replace />} />
         <Route path="/login" element={<Auth />} />
         <Route
           path="/dashboard"

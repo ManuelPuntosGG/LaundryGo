@@ -13,6 +13,7 @@ const Commercial = lazy(() => import('@/pages/Commercial').then((m) => ({ defaul
 const About = lazy(() => import('@/pages/About').then((m) => ({ default: m.About })));
 const FAQ = lazy(() => import('@/pages/FAQ').then((m) => ({ default: m.FAQ })));
 const Schedule = lazy(() => import('@/pages/Schedule').then((m) => ({ default: m.Schedule })));
+const OrderSuccess = lazy(() => import('@/pages/OrderSuccess').then((m) => ({ default: m.OrderSuccess })));
 const Auth = lazy(() => import('@/pages/Auth').then((m) => ({ default: m.Auth })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
 
@@ -41,6 +42,8 @@ function AppRoutes() {
         <Route path="/about" element={<About />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/schedule" element={<Schedule />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
+        <Route path="/schedule/success" element={<Navigate to="/order-success" replace />} />
         <Route path="/login" element={<Auth />} />
         <Route
           path="/dashboard"
