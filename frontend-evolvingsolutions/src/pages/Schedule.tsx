@@ -1,5 +1,5 @@
 import { useState, useEffect, useId } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   HardHat,
@@ -51,7 +51,7 @@ export function Schedule() {
   const sqftSliderId = useId();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthContext();
+  const { user } = useAuthContext();
 
   const [step, setStep] = useState<Step>(1);
   const [rates, setRates] = useState<CleaningServiceRate[]>(DEFAULT_COMMERCIAL_RATES);
@@ -290,6 +290,7 @@ export function Schedule() {
       setCreatedOrderId(response.data.id);
       setIsSuccess(true);
       navigate(`/order-success?orderId=${response.data.id}`, {
+        replace: true,
         state: {
           orderId: response.data.id,
           serviceName: activeRate.name,
@@ -320,68 +321,20 @@ export function Schedule() {
 
   if (isSuccess && createdOrderId) {
     return (
-      <div className="max-w-2xl mx-auto py-8 sm:py-12 animate-scale-in">
-        <Card className="p-8 sm:p-10 border-[#815133] bg-white text-center space-y-6 shadow-xl">
-          <div className="w-16 h-16 rounded-2xl bg-[#f7efe6] text-[#815133] flex items-center justify-center mx-auto shadow-sm">
-            <CheckCircle2 className="w-10 h-10" />
-          </div>
-
-          <div className="space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-black text-stone-950">
-              {t('schedule.step4.successTitle')}
-            </h2>
-            <p className="text-stone-600 text-sm sm:text-base font-medium max-w-md mx-auto">
-              {t('schedule.step4.successMsg')}
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#fdfaf6] border border-[#e0c3a7] text-center space-y-1 max-w-xs mx-auto">
-            <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">
-              {t('schedule.step4.orderId')}
-            </span>
-            <div className="text-3xl font-black text-[#815133] tracking-tight">
-              ESL-#{createdOrderId}
-            </div>
-          </div>
-
-          <div className="text-left bg-white border border-stone-200 rounded-2xl p-5 space-y-3">
-            <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider">
-              {t('schedule.step4.nextSteps')}
-            </h4>
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-[#f7efe6] text-[#815133] text-xs font-black flex items-center justify-center shrink-0 mt-0.5">
-                1
-              </div>
-              <p className="text-xs sm:text-sm text-stone-700 font-medium">
-                {t('schedule.step4.nextStep1')}
-              </p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-[#f7efe6] text-[#815133] text-xs font-black flex items-center justify-center shrink-0 mt-0.5">
-                2
-              </div>
-              <p className="text-xs sm:text-sm text-stone-700 font-medium">
-                {t('schedule.step4.nextStep2')}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-            {isAuthenticated ? (
-              <Button size="md" onClick={() => navigate('/dashboard')}>
-                {t('nav.dashboard')}
-              </Button>
-            ) : (
-              <Button size="md" onClick={() => navigate('/login')}>
-                {t('auth.loginButton')}
-              </Button>
-            )}
-            <Button variant="outline" size="md" onClick={() => navigate('/')}>
-              {t('nav.home')}
-            </Button>
-          </div>
-        </Card>
-      </div>
+      <Navigate
+        to={`/order-success?orderId=${createdOrderId}`}
+        replace
+        state={{
+          orderId: createdOrderId,
+          serviceName: activeRate.name,
+          sqft,
+          selectedDate,
+          selectedTimeSlot: selectedTimeSlot === 'morning' ? '8:00 AM – 12:00 PM' : '1:00 PM – 5:00 PM',
+          address: formData.street_address,
+          city: selectedLocation.name,
+          totalPrice,
+        }}
+      />
     );
   }
 

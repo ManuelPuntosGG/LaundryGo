@@ -187,12 +187,12 @@ class Command(BaseCommand):
             },
         ]
 
-        # Clean obsolete GoPropertyCare rates and add-ons
+        # Clean obsolete GoPropertyCare rates and add-ons safely without breaking foreign keys
         active_gpc_rates = [r['service_type'] for r in rates_data if r['brand'] == 'gopropertycare']
-        CleaningServiceRate.objects.filter(brand='gopropertycare').exclude(service_type__in=active_gpc_rates).delete()
+        CleaningServiceRate.objects.filter(brand='gopropertycare').exclude(service_type__in=active_gpc_rates).update(is_active=False)
 
         active_gpc_addons = [a['code'] for a in addons_data if a['brand'] == 'gopropertycare']
-        CleaningAddon.objects.filter(brand='gopropertycare').exclude(code__in=active_gpc_addons).delete()
+        CleaningAddon.objects.filter(brand='gopropertycare').exclude(code__in=active_gpc_addons).update(is_active=False)
 
         # Seed Service Rates
         for rate in rates_data:

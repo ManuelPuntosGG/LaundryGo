@@ -93,10 +93,19 @@ def send_cleaning_order_confirmation_email(order, language=None):
                     html_title = f"¡Tu Solicitud en {company_name} ha sido Registrada!"
                     html_intro = f"Hemos recibido tu pedido en {company_name}. Nuestro equipo profesional estará listo en la fecha y franja acordada."
                 else:
-                    subject = f"{company_name} - Solicitud de Reserva Recibida #{order_code}"
-                    intro_p = f"¡Hemos recibido tu solicitud de reserva en {company_name}! Nuestro equipo verificará la disponibilidad de personal para la fecha seleccionada. Tu tarjeta ha quedado registrada con seguridad ($0.00 cobrado hoy); el depósito del 25% (${order.deposit_amount:.2f}) se procesará únicamente cuando tu reserva sea aceptada por nuestro equipo."
-                    html_title = "¡Hemos Recibido tu Solicitud de Reserva!"
-                    html_intro = f"Tu solicitud ha sido recibida con éxito. Verificaremos la disponibilidad de equipo en tu zona y confirmaremos tu cita en breve. Tu método de pago está resguardado con cifrado Stripe y no se realizará ningún cargo ($0.00 hoy) hasta que nuestro administrador confirme la cita."
+                    is_custom_inquiry = total_price <= Decimal('0.00') or sqft >= 6100 or 'CUSTOM QUOTE' in str(special_instructions).upper()
+                    if is_custom_inquiry:
+                        subject = f"{company_name} - Solicitud de Cotización Personalizada Recibida #{order_code}"
+                        intro_p = f"¡Hemos recibido tu solicitud de cotización personalizada en {company_name}! Nuestro equipo de operaciones revisará las dimensiones y requerimientos de tu propiedad y te enviará una propuesta formal por escrito sin costo ni compromiso ($0.00 anticipo)."
+                        html_title = "¡Hemos Recibido tu Solicitud de Cotización!"
+                        html_intro = f"Tu solicitud para una cotización personalizada ha sido recibida con éxito. Nuestro equipo revisará los requerimientos de tu propiedad y te contactará en menos de 24 horas con una propuesta a medida ($0.00 cobrado hoy)."
+                        financial_txt = "• Total Estimado: Cotización Personalizada a Medida ($0.00 Anticipo)\n• Estado: En evaluación (propuesta por escrito en < 24 hrs)\n• Cobrado Hoy: $0.00\n"
+                    else:
+                        subject = f"{company_name} - Solicitud de Reserva Recibida #{order_code}"
+                        intro_p = f"¡Hemos recibido tu solicitud de reserva en {company_name}! Nuestro equipo verificará la disponibilidad de personal para la fecha seleccionada. Tu tarjeta ha quedado registrada con seguridad ($0.00 cobrado hoy); el depósito del 25% (${order.deposit_amount:.2f}) se procesará únicamente cuando tu reserva sea aceptada por nuestro equipo."
+                        html_title = "¡Hemos Recibido tu Solicitud de Reserva!"
+                        html_intro = f"Tu solicitud ha sido recibida con éxito. Verificaremos la disponibilidad de equipo en tu zona y confirmaremos tu cita en breve. Tu método de pago está resguardado con cifrado Stripe y no se realizará ningún cargo ($0.00 hoy) hasta que nuestro administrador confirme la cita."
+                        financial_txt = f"• Total Estimado: ${total_price:.2f}\n• Depósito Inicial (25% al ser aceptada): ${order.deposit_amount:.2f}\n• Saldo Restante (75% al finalizar): ${order.remaining_balance:.2f}\n• Cobrado Hoy: $0.00\n"
 
                 body_text = f"""¡Hola {recipient_name}!
 
@@ -114,8 +123,7 @@ Detalles de tu Reserva:
 • Zona: {zone_label} (Recargo: ${delivery_fee:.2f})
 • Recargos / Add-ons:{addons_text}
 -----------------------------------------
-• Total Estimado: ${total_price:.2f}
-{f'• Depósito Inicial (25% al ser aceptada): ${order.deposit_amount:.2f}\n• Saldo Restante (75% al finalizar): ${order.remaining_balance:.2f}\n• Cobrado Hoy: $0.00\n' if not is_evolving else ''}=========================================
+{financial_txt if not is_evolving else f'• Total Estimado: ${total_price:.2f}\n'}=========================================
 
 Instrucciones Especiales / Acceso:
 {special_instructions or 'Ninguna especificada.'}
@@ -147,10 +155,19 @@ Denver, Colorado
                     html_title = f"Your Booking with {company_name} is Registered!"
                     html_intro = f"We have received your service request. Our vetted, insured crew will arrive ready to deliver high standards for your project."
                 else:
-                    subject = f"{company_name} - Booking Request Received #{order_code}"
-                    intro_p = f"We have received your booking request at {company_name}! Our operations team is verifying crew availability and will confirm your appointment shortly. Your card is safely on file ($0.00 charged today); your 25% deposit (${order.deposit_amount:.2f}) will only be processed once our team accepts and confirms your order."
-                    html_title = "We Received Your Booking Request!"
-                    html_intro = f"We have received your booking request. Our team is verifying crew availability for your requested date. Your card has been safely vaulted on file via Stripe encryption and no charge was made ($0.00 charged today) until our administrator confirms your appointment."
+                    is_custom_inquiry = total_price <= Decimal('0.00') or sqft >= 6100 or 'CUSTOM QUOTE' in str(special_instructions).upper()
+                    if is_custom_inquiry:
+                        subject = f"{company_name} - Custom Quote Request Received #{order_code}"
+                        intro_p = f"We have received your custom quote request at {company_name}! Our operations team will review your property specifications and deliver a tailored proposal with no upfront cost or obligation ($0.00 charged today)."
+                        html_title = "We Received Your Custom Quote Request!"
+                        html_intro = f"Your inquiry for a customized quote has been registered successfully. Our team will review your property requirements and contact you within 24 hours with a comprehensive written proposal ($0.00 charged today)."
+                        financial_txt = "• Estimated Total: Custom Tailored Proposal ($0.00 Upfront)\n• Status: Proposal in preparation (< 24 hrs delivery)\n• Charged Today: $0.00\n"
+                    else:
+                        subject = f"{company_name} - Booking Request Received #{order_code}"
+                        intro_p = f"We have received your booking request at {company_name}! Our operations team is verifying crew availability and will confirm your appointment shortly. Your card is safely on file ($0.00 charged today); your 25% deposit (${order.deposit_amount:.2f}) will only be processed once our team accepts and confirms your order."
+                        html_title = "We Received Your Booking Request!"
+                        html_intro = f"We have received your booking request. Our team is verifying crew availability for your requested date. Your card has been safely vaulted on file via Stripe encryption and no charge was made ($0.00 charged today) until our administrator confirms your appointment."
+                        financial_txt = f"• Estimated Total: ${total_price:.2f}\n• Initial 25% Deposit (Upon Approval): ${order.deposit_amount:.2f}\n• Remaining 75% Balance (Upon Completion): ${order.remaining_balance:.2f}\n• Charged Today: $0.00\n"
 
                 body_text = f"""Hello {recipient_name}!
 
@@ -168,8 +185,7 @@ Booking Details:
 • Zone: {zone_label} (Fee: ${delivery_fee:.2f})
 • Add-ons & Surcharges:{addons_text}
 -----------------------------------------
-• Estimated Total: ${total_price:.2f}
-{f'• Initial 25% Deposit (Upon Approval): ${order.deposit_amount:.2f}\n• Remaining 75% Balance (Upon Completion): ${order.remaining_balance:.2f}\n• Charged Today: $0.00\n' if not is_evolving else ''}=========================================
+{financial_txt if not is_evolving else f'• Estimated Total: ${total_price:.2f}\n'}=========================================
 
 Access & Special Instructions:
 {special_instructions or 'None provided.'}

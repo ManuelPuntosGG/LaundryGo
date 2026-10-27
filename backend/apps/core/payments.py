@@ -77,8 +77,12 @@ def vault_gpc_payment_method(order, payment_method_id=None):
     client = get_stripe_client()
 
     # Calculate 25% deposit amount and 75% remaining balance
-    if not order.deposit_amount or order.deposit_amount <= 0:
-        total = order.total_price or Decimal('99.00')
+    if order.total_price is not None and order.total_price <= Decimal('0.00'):
+        order.deposit_amount = Decimal('0.00')
+        order.remaining_balance = Decimal('0.00')
+        order.save(update_fields=['deposit_amount', 'remaining_balance'])
+    elif not order.deposit_amount or order.deposit_amount <= 0:
+        total = order.total_price if order.total_price is not None else Decimal('99.00')
         order.deposit_amount = (total * Decimal('0.25')).quantize(Decimal('0.01'))
         order.remaining_balance = total - order.deposit_amount
         order.save(update_fields=['deposit_amount', 'remaining_balance'])

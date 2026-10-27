@@ -254,7 +254,17 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         today = now_local.date()
         if value < today:
             raise serializers.ValidationError("Service date cannot be in the past.")
-        if value == today and now_local.hour >= 12:
+
+        raw_sqft = self.initial_data.get('square_feet') if hasattr(self, 'initial_data') and isinstance(self.initial_data, dict) else None
+        try:
+            sqft_int = int(raw_sqft) if raw_sqft is not None else 0
+        except (ValueError, TypeError):
+            sqft_int = 0
+
+        special_inst = str(self.initial_data.get('special_instructions', '')).upper() if hasattr(self, 'initial_data') and isinstance(self.initial_data, dict) else ''
+        is_custom_inquiry = sqft_int >= 6100 or 'CUSTOM QUOTE' in special_inst
+
+        if not is_custom_inquiry and value == today and now_local.hour >= 12:
             raise serializers.ValidationError(
                 "Same-day bookings are only available before 12:00 PM. Please choose tomorrow or a future date."
             )
@@ -296,7 +306,11 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         now_local = timezone.localtime(timezone.now())
         today = now_local.date()
 
-        if service_date == today and time_slot:
+        sqft_val = data.get('square_feet') or 0
+        special_inst = str(data.get('special_instructions', '')).upper()
+        is_custom_inquiry = sqft_val >= 6100 or 'CUSTOM QUOTE' in special_inst
+
+        if not is_custom_inquiry and service_date == today and time_slot:
             parsed_time = None
             clean_ts = str(time_slot).strip().upper()
             for fmt in ('%I:%M %p', '%I:%M%p', '%H:%M', '%I %p', '%I%p'):
@@ -435,9 +449,13 @@ class CleaningOrderCreateSerializer(serializers.ModelSerializer):
         )
 
         # Calculate 25% deposit and 75% remaining balance
-        deposit_val = (order.total_price * Decimal('0.25')).quantize(Decimal('0.01'))
-        order.deposit_amount = deposit_val
-        order.remaining_balance = order.total_price - deposit_val
+        if order.total_price > Decimal('0.00'):
+            deposit_val = (order.total_price * Decimal('0.25')).quantize(Decimal('0.01'))
+            order.deposit_amount = deposit_val
+            order.remaining_balance = order.total_price - deposit_val
+        else:
+            order.deposit_amount = Decimal('0.00')
+            order.remaining_balance = Decimal('0.00')
         order.save(update_fields=['deposit_amount', 'remaining_balance'])
 
         if order.brand == 'gopropertycare':
