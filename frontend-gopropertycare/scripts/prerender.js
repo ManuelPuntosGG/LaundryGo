@@ -17,8 +17,8 @@ const baseTemplate = fs.readFileSync(templatePath, 'utf-8');
 const routes = [
   {
     path: '/',
-    title: 'GoPropertyCare — Residential Cleaning & Property Care in Denver',
-    description: 'Professional residential cleaning, turnover care, and move-in/move-out services across Denver, CO. Transparent sq ft pricing from $0.125/sqft, 100% insured.',
+    title: 'House Cleaning Service in Denver, CO | GoPropertyCare',
+    description: 'Professional house cleaning in Denver. Standard, deep, and move-in/move-out cleaning by a trusted local team. Get your free quote today!',
     canonical: 'https://gopropertycare.com/',
     heading: 'Comprehensive Cleaning & Maintenance Solutions',
     subheading: 'Top-tier residential and commercial cleaning solutions tailored to homeowners, real estate professionals, and property managers throughout Denver.',

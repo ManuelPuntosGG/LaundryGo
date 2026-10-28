@@ -100,8 +100,12 @@ export function Home() {
   return (
     <div className="flex flex-col gap-16 sm:gap-24 py-4 sm:py-6">
       <SEO
-        title={t('home.hero.title')}
-        description={t('home.hero.subtitle')}
+        title={i18n.language?.startsWith('es') ? 'Servicio de Limpieza de Casas en Denver, CO' : 'House Cleaning Service in Denver, CO'}
+        description={
+          i18n.language?.startsWith('es')
+            ? 'Servicio profesional de limpieza de casas en Denver. Limpieza estándar, profunda y para mudanzas por un equipo local de confianza. ¡Obtén tu cotización gratis hoy!'
+            : 'Professional house cleaning in Denver. Standard, deep, and move-in/move-out cleaning by a trusted local team. Get your free quote today!'
+        }
         canonical="https://gopropertycare.com/"
       />
       {/* Hero Section */}
