@@ -408,6 +408,21 @@ for (const route of routes) {
     `<div id="root">${route.contentHtml}</div>`
   );
 
+  // Inject Google Ads Purchase Conversion snippet for /order-success page
+  if (route.path === '/order-success') {
+    const conversionSnippet = `    <!-- Event snippet for Purchase conversion page -->
+    <script>
+      if (typeof gtag === 'function') {
+        gtag('event', 'conversion', {
+          'send_to': 'AW-18431065578/3WXZCOGXwqkdEOr7ztRE',
+          'transaction_id': ''
+        });
+      }
+    </script>
+  </head>`;
+    html = html.replace('</head>', conversionSnippet);
+  }
+
   // Target output file
   const outPath =
     route.path === '/'

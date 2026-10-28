@@ -39,14 +39,29 @@ export function OrderSuccess() {
   const orderId = state.orderId || searchParams.get('orderId') || searchParams.get('id');
   const customQuoteSubmitted = state.customQuoteSubmitted || searchParams.get('type') === 'custom_quote';
 
-  // Push Google Ads conversion event to dataLayer if configured
+  // Push Google Ads conversion event to dataLayer and gtag
   useEffect(() => {
-    if (orderId && typeof window !== 'undefined') {
-      const win = window as unknown as { dataLayer?: Array<Record<string, unknown>> };
+    if (typeof window !== 'undefined') {
+      const win = window as unknown as {
+        dataLayer?: Array<Record<string, unknown>>;
+        gtag?: (...args: unknown[]) => void;
+      };
+
+      // Push to dataLayer for GTM / analytics
       if (win.dataLayer) {
         win.dataLayer.push({
           event: customQuoteSubmitted ? 'gpc_conversion_custom_quote' : 'gpc_conversion_order_success',
-          order_id: `GPC-#${orderId}`,
+          order_id: orderId ? `GPC-#${orderId}` : '',
+          value: state.totalPrice || 0,
+          currency: 'USD',
+        });
+      }
+
+      // Google Ads Purchase Conversion Event (AW-18431065578)
+      if (typeof win.gtag === 'function') {
+        win.gtag('event', 'conversion', {
+          send_to: 'AW-18431065578/3WXZCOGXwqkdEOr7ztRE',
+          transaction_id: orderId ? `GPC-#${orderId}` : '',
           value: state.totalPrice || 0,
           currency: 'USD',
         });
