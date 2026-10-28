@@ -72,6 +72,7 @@ class OrderAdmin(ModelAdmin):
         'status_badge',
         'payment_status_badge',
         'total_price_display',
+        'coupon_badge',
         'customer_display',
         'service_rate_display',
         'pickup_schedule_display',
@@ -92,7 +93,7 @@ class OrderAdmin(ModelAdmin):
         'street_address',
         'zip_code',
     )
-    readonly_fields = ('created_at', 'updated_at', 'final_total_price')
+    readonly_fields = ('created_at', 'updated_at', 'final_total_price', 'coupon_code', 'discount_percentage', 'discount_amount')
     date_hierarchy = 'pickup_date'
     ordering = ('-created_at',)
     actions = [
@@ -138,6 +139,7 @@ class OrderAdmin(ModelAdmin):
             'fields': (
                 'payment_status',
                 ('base_price', 'total_price'),
+                ('coupon_code', 'discount_percentage', 'discount_amount'),
                 ('surcharge_amount', 'surcharge_concept'),
                 'final_total_price',
             ),
@@ -193,6 +195,20 @@ class OrderAdmin(ModelAdmin):
             else (float(obj.total_price or 0) + float(obj.surcharge_amount or 0))
         )
         return f"${total:.2f}"
+
+    @display(
+        description=_('Coupon'),
+        label={
+            True: 'success',
+            False: 'secondary',
+        }
+    )
+    def coupon_badge(self, obj):
+        if obj.coupon_code:
+            return True, f"{obj.coupon_code} (-${obj.discount_amount:.2f})"
+        return False, '-'
+
+
 
     # Submit-line actions (Saves form changes including surcharge_amount/surcharge_concept, then runs action)
     @action(

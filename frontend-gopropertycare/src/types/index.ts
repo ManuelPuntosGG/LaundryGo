@@ -77,6 +77,9 @@ export interface CleaningOrder {
   remaining_balance?: string | number;
   surcharge_amount?: string | number;
   surcharge_concept?: string;
+  coupon_code?: string;
+  discount_percentage?: number;
+  discount_amount?: string | number;
   final_total_charged?: string | number;
   payment_status?: 'unpaid' | 'deposit_paid' | 'fully_paid' | 'refunded' | 'failed';
   status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
@@ -95,4 +98,20 @@ export interface DenverLocation {
   name: string;
   zone: 'inner' | 'outer';
   fee: number;
+}
+
+export interface CouponValidationResponse {
+  valid: boolean;
+  code: string;
+  brand: string;
+  discount_percentage: number;
+  description?: string;
+  message?: string;
+  error?: string;
+}
+
+export interface AppliedCoupon {
+  code: string;
+  discount_percentage: number;
+  discount_amount: number;
 }

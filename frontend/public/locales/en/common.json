@@ -235,6 +235,26 @@
       "terms": "You must agree to the Service Terms & Conditions to proceed.",
       "selectRate": "Please choose your preferred turnaround speed.",
       "cutoffNotice": "Same-day express delivery is available for orders placed before 12:00 PM today. Please choose Next-day or Standard delivery."
+    },
+    "coupons": {
+      "title": "Discount Coupon",
+      "haveCoupon": "Have a discount coupon?",
+      "loginPrompt": "Sign in or create an account to redeem your coupon code.",
+      "loginButton": "Log In / Register",
+      "placeholder": "ENTER CODE (e.g. SAVE20)",
+      "apply": "Apply",
+      "applied": "Coupon applied successfully!",
+      "discountRow": "Coupon Discount",
+      "remove": "Remove",
+      "enterCodeError": "Please enter a 6-character coupon code.",
+      "invalidLengthError": "Coupon code must be exactly 6 characters (letters and numbers).",
+      "invalidError": "Invalid, expired, or unavailable coupon code.",
+      "notFoundError": "Coupon code not found or inactive for LaundryGo.",
+      "validateFailedError": "Unable to validate coupon. Please try again.",
+      "quickAuthHeaderBadge": "Exclusive Coupons & Discounts",
+      "loginToApplyTitle": "Sign in to Apply Coupon",
+      "registerToApplyTitle": "Create Account & Save",
+      "quickAuthSubtitle": "Discounts are linked to your profile so they can be securely applied."
     }
   },
   "auth": {

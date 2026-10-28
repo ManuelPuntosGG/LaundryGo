@@ -816,7 +816,27 @@
     "cardExpiryPast": "This card expiration date is in the past",
     "cardCvcInvalid": "Enter a valid 3 or 4-digit security code (CVC)",
     "serviceMoveInOut": "Move-In / Move-Out Clean",
-    "serviceMoveInOutDesc": "Comprehensive turnover for deposits, sales & vacant inspections"
+    "serviceMoveInOutDesc": "Comprehensive turnover for deposits, sales & vacant inspections",
+    "coupons": {
+      "title": "Discount Coupon",
+      "haveCoupon": "Have a discount coupon?",
+      "loginPrompt": "Sign in or create an account to redeem your coupon code.",
+      "loginButton": "Log In / Register",
+      "placeholder": "ENTER CODE (e.g. SAVE20)",
+      "apply": "Apply",
+      "applied": "Coupon applied successfully!",
+      "discountRow": "Coupon Discount",
+      "remove": "Remove",
+      "enterCodeError": "Please enter a 6-character coupon code.",
+      "invalidLengthError": "Coupon code must be exactly 6 characters (letters and numbers).",
+      "invalidError": "Invalid, expired, or unavailable coupon code.",
+      "notFoundError": "Coupon code not found or inactive for GoPropertyCare.",
+      "validateFailedError": "Unable to validate coupon. Please try again.",
+      "quickAuthHeaderBadge": "Exclusive Coupons & Discounts",
+      "loginToApplyTitle": "Sign in to Apply Coupon",
+      "registerToApplyTitle": "Create Account & Save",
+      "quickAuthSubtitle": "Discounts are linked to your profile so they can be securely applied."
+    }
   },
   "auth": {
     "loginTitle": "Welcome Back to GoPropertyCare",

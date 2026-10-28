@@ -272,6 +272,30 @@ class CleaningOrder(TimeStampedModel):
         blank=True,
         help_text='Reason or description for surcharge'
     )
+    # Coupon & Discount Tracking
+    coupon = models.ForeignKey(
+        'coupons.Coupon',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='cleaning_orders',
+        help_text='Discount coupon applied to this order'
+    )
+    coupon_code = models.CharField(
+        max_length=6,
+        blank=True,
+        help_text='Snapshot of the 6-character coupon code used'
+    )
+    discount_percentage = models.PositiveSmallIntegerField(
+        default=0,
+        help_text='Coupon discount percentage applied'
+    )
+    discount_amount = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0.00,
+        help_text='Dollar amount deducted by the coupon'
+    )
     final_total_charged = models.DecimalField(
         max_digits=8,
         decimal_places=2,

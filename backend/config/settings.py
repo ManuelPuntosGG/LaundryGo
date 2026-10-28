@@ -1,467 +1,484 @@
-import os
-import socket
-from pathlib import Path
-from datetime import timedelta
-from decouple import config
-import dj_database_url
-
-# Force IPv4 socket resolution globally on cloud containers (Render/Linux)
-# Prevents [Errno 101] Network is unreachable when DNS returns IPv6 addresses without IPv6 gateway route
-_orig_getaddrinfo = socket.getaddrinfo
-
-def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
-    if family == 0 or family == socket.AF_UNSPEC:
-        family = socket.AF_INET
-    return _orig_getaddrinfo(host, port, family, type, proto, flags)
-
-socket.getaddrinfo = _ipv4_only_getaddrinfo
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
-
-# Allowed Hosts
-allowed_hosts_env = config(
-    'ALLOWED_HOSTS',
-    default='.onrender.com,.thelaundrygo.com,thelaundrygo.com,.gopropertycare.com,gopropertycare.com,.evolvingsolutionsllc.com,evolvingsolutionsllc.com,.evolvingsolutions.com,evolvingsolutions.com,localhost,127.0.0.1'
-)
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',') if host.strip()]
-
-# Render external hostname auto-detection
-RENDER_EXTERNAL_HOSTNAME = config('RENDER_EXTERNAL_HOSTNAME', default=None)
-if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-# Ensure essential production domains are always included
-for default_host in (
-    '.thelaundrygo.com', 'thelaundrygo.com',
-    '.gopropertycare.com', 'gopropertycare.com',
-    '.evolvingsolutionsllc.com', 'evolvingsolutionsllc.com',
-    '.evolvingsolutions.com', 'evolvingsolutions.com',
-    '.onrender.com',
-):
-    if default_host not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(default_host)
-
-INSTALLED_APPS = [
-    'unfold',
-    'unfold.contrib.filters',
-    'unfold.contrib.forms',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    # Third party
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-    'corsheaders',
-    'django_filters',
-    # Local
-    'apps.core',
-    'apps.users',
-    'apps.orders',
-    'apps.cleaning',
-]
-
-MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'apps.core.middleware.PermissionsPolicyMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-ROOT_URLCONF = 'config.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = 'config.wsgi.application'
-
-# Database Configuration (Supports Render DATABASE_URL, local PostgreSQL or SQLite)
-DATABASE_URL = config('DATABASE_URL', default=None)
-
-if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
-else:
-    DB_ENGINE = config('DB_ENGINE', default='sqlite')
-    if DB_ENGINE == 'postgresql':
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': config('DB_NAME', default='laundrygo_db'),
-                'USER': config('DB_USER', default='postgres'),
-                'PASSWORD': config('DB_PASSWORD', default='postgres'),
-                'HOST': config('DB_HOST', default='localhost'),
-                'PORT': config('DB_PORT', default='5432'),
-            }
-        }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
-
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'America/Denver'
-USE_I18N = True
-USE_TZ = True
-
-LANGUAGES = [
-    ('en', 'English'),
-    ('es', 'Spanish'),
-]
-
-LOCALE_PATHS = [
-    BASE_DIR / 'locale',
-]
-
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# WhiteNoise storage configuration for compressed static assets
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-AUTH_USER_MODEL = 'users.User'
-
-# REST Framework
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter',
-    ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
-    'DEFAULT_THROTTLE_CLASSES': (
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-    ),
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/minute',
-        'user': '300/minute',
-    },
-}
-
-# JWT
-_raw_jwt_key = config('JWT_SECRET_KEY', default='django-insecure-jwt-secret-key-minimum-32-chars-for-sha256-compliance')
-if len(_raw_jwt_key.strip()) < 32:
-    _raw_jwt_key = (_raw_jwt_key.strip() + "-padding-minimum-32-bytes-for-sha256-compliance")[:64]
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'UPDATE_LAST_LOGIN': True,
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': _raw_jwt_key,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
-
-# CORS & CSRF Configuration
-FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
-
-cors_origins_env = config('CORS_ALLOWED_ORIGINS', default='')
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(',') if origin.strip()]
-if not CORS_ALLOWED_ORIGINS:
-    CORS_ALLOWED_ORIGINS = [
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://localhost:5175',
-        'http://localhost:3000',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:5174',
-        'http://127.0.0.1:5175',
-    ]
-
-if FRONTEND_URL and FRONTEND_URL not in CORS_ALLOWED_ORIGINS:
-    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
-
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https:\/\/.*\.thelaundrygo\.com$",
-    r"^https:\/\/thelaundrygo\.com$",
-    r"^https:\/\/.*\.gopropertycare\.com$",
-    r"^https:\/\/gopropertycare\.com$",
-    r"^https:\/\/.*\.evolvingsolutions.*$",
-    r"^https:\/\/evolvingsolutions.*$",
-    r"^https:\/\/.*\.onrender\.com$",
-    r"^http:\/\/localhost:\d+$",
-    r"^http:\/\/127\.0\.0\.1:\d+$",
-]
-
-# Allow all origins in development, but strictly enforce whitelist in production with credentials
-CORS_ALLOW_ALL_ORIGINS = DEBUG
-CORS_ALLOW_CREDENTIALS = True
-
-csrf_origins_env = config('CSRF_TRUSTED_ORIGINS', default='')
-CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_env.split(',') if origin.strip()]
-if not CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS = [
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://localhost:5175',
-        'http://localhost:3000',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:5174',
-        'http://127.0.0.1:5175',
-        'https://*.onrender.com',
-        'https://*.thelaundrygo.com',
-        'https://thelaundrygo.com',
-        'https://*.gopropertycare.com',
-        'https://gopropertycare.com',
-        'https://*.evolvingsolutions.com',
-        'https://evolvingsolutions.com',
-        'https://*.evolvingsolutionsllc.com',
-        'https://evolvingsolutionsllc.com',
-    ]
-
-for trusted_domain in (
-    'https://*.onrender.com',
-    'https://*.thelaundrygo.com',
-    'https://thelaundrygo.com',
-    'https://*.gopropertycare.com',
-    'https://gopropertycare.com',
-    'https://*.evolvingsolutions.com',
-    'https://evolvingsolutions.com',
-    'https://*.evolvingsolutionsllc.com',
-    'https://evolvingsolutionsllc.com',
-):
-    if trusted_domain not in CSRF_TRUSTED_ORIGINS:
-        CSRF_TRUSTED_ORIGINS.append(trusted_domain)
-
-# Production SSL & Security Settings
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-if not DEBUG:
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    X_FRAME_OPTIONS = 'SAMEORIGIN'
-
-# Email Configuration
-raw_email_user = config('EMAIL_HOST_USER', default='').strip().strip('\'"')
-raw_email_pass = config('EMAIL_HOST_PASSWORD', default='').strip().strip('\'"')
-
-if raw_email_user and raw_email_pass:
-    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-else:
-    # If no SMTP credentials provided, log emails to console to prevent socket timeout hangs
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_HOST_USER = raw_email_user
-EMAIL_HOST_PASSWORD = raw_email_pass
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=(EMAIL_PORT == 587), cast=bool)
-EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=(EMAIL_PORT == 465), cast=bool)
-EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=15, cast=int)
-
-# Default From: If using personal Gmail, From address should match authenticated user to avoid SMTP 550
-configured_from = config('DEFAULT_FROM_EMAIL', default='').strip().strip('\'"')
-if configured_from:
-    DEFAULT_FROM_EMAIL = configured_from
-elif raw_email_user and '@' in raw_email_user:
-    DEFAULT_FROM_EMAIL = f'LaundryGo <{raw_email_user}>'
-else:
-    DEFAULT_FROM_EMAIL = 'LaundryGo <info@thelaundrygo.com>'
-
-ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@thelaundrygo.com')
-GPC_ADMIN_EMAIL = config('GPC_ADMIN_EMAIL', default='info@gopropertycare.com')
-ESL_ADMIN_EMAIL = config('ESL_ADMIN_EMAIL', default='info@evolvingsolutionsllc.com')
-
-# Optional dedicated SMTP credentials for GoPropertyCare (info@gopropertycare.com)
-GPC_EMAIL_HOST_USER = config('GPC_EMAIL_HOST_USER', default='').strip().strip('\'"')
-GPC_EMAIL_HOST_PASSWORD = config('GPC_EMAIL_HOST_PASSWORD', default='').strip().strip('\'"')
-
-# Transactional Email APIs (HTTPS Port 443 - Bypasses Render Free SMTP port blocks)
-RESEND_API_KEY = config('RESEND_API_KEY', default='').strip().strip('\'"')
-SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='').strip().strip('\'"')
-
-# Stripe Payment Gateway Configuration
-STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='').strip().strip('\'"')
-STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='').strip().strip('\'"')
-STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='').strip().strip('\'"')
-
-# Django Unfold Configuration
-from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy as _
-
-UNFOLD = {
-    "SITE_TITLE": "LaundryGo Admin",
-    "SITE_HEADER": "LaundryGo Operations",
-    "SITE_SUBHEADER": "Pickup & Delivery Operations Panel",
-    "SITE_URL": "/",
-    "THEME": "light",
-    "BORDER_RADIUS": "12px",
-    "COLORS": {
-        "primary": {
-            "50": "239 246 255",
-            "100": "219 234 254",
-            "200": "191 219 254",
-            "300": "147 197 253",
-            "400": "96 165 250",
-            "500": "59 130 246",
-            "600": "37 99 235",
-            "700": "29 78 216",
-            "800": "30 64 175",
-            "900": "30 58 138",
-            "950": "23 37 84",
-        },
-    },
-    "SIDEBAR": {
-        "show_search": True,
-        "show_all_applications": False,
-        "navigation": [
-            {
-                "title": _("LaundryGo Operations"),
-                "separator": True,
-                "items": [
-                    {
-                        "title": _("Laundry Orders"),
-                        "icon": "local_laundry_service",
-                        "link": reverse_lazy("admin:orders_order_changelist"),
-                    },
-                    {
-                        "title": _("Recurring Schedules"),
-                        "icon": "event_repeat",
-                        "link": reverse_lazy("admin:orders_recurringschedule_changelist"),
-                    },
-                    {
-                        "title": _("Per-Pound Rates"),
-                        "icon": "sell",
-                        "link": reverse_lazy("admin:orders_servicerate_changelist"),
-                    },
-                ],
-            },
-            {
-                "title": _("GoPropertyCare Operations"),
-                "separator": True,
-                "items": [
-                    {
-                        "title": _("Cleaning Reservations"),
-                        "icon": "cleaning_services",
-                        "link": reverse_lazy("admin:cleaning_cleaningorder_changelist"),
-                    },
-                    {
-                        "title": _("Pricing Tiers"),
-                        "icon": "price_change",
-                        "link": reverse_lazy("admin:cleaning_cleaningpricingtier_changelist"),
-                    },
-                    {
-                        "title": _("Rates per Sq Ft"),
-                        "icon": "square_foot",
-                        "link": reverse_lazy("admin:cleaning_cleaningservicerate_changelist"),
-                    },
-                    {
-                        "title": _("Difficulty Add-ons"),
-                        "icon": "tune",
-                        "link": reverse_lazy("admin:cleaning_cleaningaddon_changelist"),
-                    },
-                ],
-            },
-            {
-                "title": _("User & Access Management"),
-                "separator": True,
-                "items": [
-                    {
-                        "title": _("Customers & Staff"),
-                        "icon": "group",
-                        "link": reverse_lazy("admin:users_user_changelist"),
-                    },
-                ],
-            },
-        ],
-    },
-}
-
-# Production Logging: Outputs to stdout/console for Render Log Viewer
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[{asctime}] {levelname} {name}: {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-    },
-}
+import os
+import socket
+from pathlib import Path
+from datetime import timedelta
+from decouple import config
+import dj_database_url
+
+# Force IPv4 socket resolution globally on cloud containers (Render/Linux)
+# Prevents [Errno 101] Network is unreachable when DNS returns IPv6 addresses without IPv6 gateway route
+_orig_getaddrinfo = socket.getaddrinfo
+
+def _ipv4_only_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    if family == 0 or family == socket.AF_UNSPEC:
+        family = socket.AF_INET
+    return _orig_getaddrinfo(host, port, family, type, proto, flags)
+
+socket.getaddrinfo = _ipv4_only_getaddrinfo
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
+DEBUG = config('DEBUG', default=True, cast=bool)
+
+# Allowed Hosts
+allowed_hosts_env = config(
+    'ALLOWED_HOSTS',
+    default='.onrender.com,.thelaundrygo.com,thelaundrygo.com,.gopropertycare.com,gopropertycare.com,.evolvingsolutionsllc.com,evolvingsolutionsllc.com,.evolvingsolutions.com,evolvingsolutions.com,localhost,127.0.0.1'
+)
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',') if host.strip()]
+
+# Render external hostname auto-detection
+RENDER_EXTERNAL_HOSTNAME = config('RENDER_EXTERNAL_HOSTNAME', default=None)
+if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# Ensure essential production domains are always included
+for default_host in (
+    '.thelaundrygo.com', 'thelaundrygo.com',
+    '.gopropertycare.com', 'gopropertycare.com',
+    '.evolvingsolutionsllc.com', 'evolvingsolutionsllc.com',
+    '.evolvingsolutions.com', 'evolvingsolutions.com',
+    '.onrender.com', 'testserver',
+):
+    if default_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(default_host)
+
+INSTALLED_APPS = [
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Third party
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
+    'django_filters',
+    # Local
+    'apps.core',
+    'apps.users',
+    'apps.orders',
+    'apps.cleaning',
+    'apps.coupons',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'apps.core.middleware.PermissionsPolicyMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'config.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'config.wsgi.application'
+
+# Database Configuration (Supports Render DATABASE_URL, local PostgreSQL or SQLite)
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    DB_ENGINE = config('DB_ENGINE', default='sqlite')
+    if DB_ENGINE == 'postgresql':
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': config('DB_NAME', default='laundrygo_db'),
+                'USER': config('DB_USER', default='postgres'),
+                'PASSWORD': config('DB_PASSWORD', default='postgres'),
+                'HOST': config('DB_HOST', default='localhost'),
+                'PORT': config('DB_PORT', default='5432'),
+            }
+        }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'America/Denver'
+USE_I18N = True
+USE_TZ = True
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Spanish'),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# WhiteNoise storage configuration for compressed static assets
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
+
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/minute',
+        'user': '300/minute',
+    },
+}
+
+# JWT
+_raw_jwt_key = config('JWT_SECRET_KEY', default='django-insecure-jwt-secret-key-minimum-32-chars-for-sha256-compliance')
+if len(_raw_jwt_key.strip()) < 32:
+    _raw_jwt_key = (_raw_jwt_key.strip() + "-padding-minimum-32-bytes-for-sha256-compliance")[:64]
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': _raw_jwt_key,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# CORS & CSRF Configuration
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
+
+cors_origins_env = config('CORS_ALLOWED_ORIGINS', default='')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(',') if origin.strip()]
+if not CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS = [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+        'http://localhost:3000',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://127.0.0.1:5175',
+    ]
+
+if FRONTEND_URL and FRONTEND_URL not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/.*\.thelaundrygo\.com$",
+    r"^https:\/\/thelaundrygo\.com$",
+    r"^https:\/\/.*\.gopropertycare\.com$",
+    r"^https:\/\/gopropertycare\.com$",
+    r"^https:\/\/.*\.evolvingsolutions.*$",
+    r"^https:\/\/evolvingsolutions.*$",
+    r"^https:\/\/.*\.onrender\.com$",
+    r"^http:\/\/localhost:\d+$",
+    r"^http:\/\/127\.0\.0\.1:\d+$",
+]
+
+# Allow all origins in development, but strictly enforce whitelist in production with credentials
+CORS_ALLOW_ALL_ORIGINS = DEBUG
+CORS_ALLOW_CREDENTIALS = True
+
+csrf_origins_env = config('CSRF_TRUSTED_ORIGINS', default='')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_env.split(',') if origin.strip()]
+if not CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS = [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+        'http://localhost:3000',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://127.0.0.1:5175',
+        'https://*.onrender.com',
+        'https://*.thelaundrygo.com',
+        'https://thelaundrygo.com',
+        'https://*.gopropertycare.com',
+        'https://gopropertycare.com',
+        'https://*.evolvingsolutions.com',
+        'https://evolvingsolutions.com',
+        'https://*.evolvingsolutionsllc.com',
+        'https://evolvingsolutionsllc.com',
+    ]
+
+for trusted_domain in (
+    'https://*.onrender.com',
+    'https://*.thelaundrygo.com',
+    'https://thelaundrygo.com',
+    'https://*.gopropertycare.com',
+    'https://gopropertycare.com',
+    'https://*.evolvingsolutions.com',
+    'https://evolvingsolutions.com',
+    'https://*.evolvingsolutionsllc.com',
+    'https://evolvingsolutionsllc.com',
+):
+    if trusted_domain not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(trusted_domain)
+
+# Production SSL & Security Settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# Email Configuration
+raw_email_user = config('EMAIL_HOST_USER', default='').strip().strip('\'"')
+raw_email_pass = config('EMAIL_HOST_PASSWORD', default='').strip().strip('\'"')
+
+if raw_email_user and raw_email_pass:
+    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+else:
+    # If no SMTP credentials provided, log emails to console to prevent socket timeout hangs
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_HOST_USER = raw_email_user
+EMAIL_HOST_PASSWORD = raw_email_pass
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=(EMAIL_PORT == 587), cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=(EMAIL_PORT == 465), cast=bool)
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=15, cast=int)
+
+# Default From: If using personal Gmail, From address should match authenticated user to avoid SMTP 550
+configured_from = config('DEFAULT_FROM_EMAIL', default='').strip().strip('\'"')
+if configured_from:
+    DEFAULT_FROM_EMAIL = configured_from
+elif raw_email_user and '@' in raw_email_user:
+    DEFAULT_FROM_EMAIL = f'LaundryGo <{raw_email_user}>'
+else:
+    DEFAULT_FROM_EMAIL = 'LaundryGo <info@thelaundrygo.com>'
+
+ADMIN_EMAIL = config('ADMIN_EMAIL', default='info@thelaundrygo.com')
+GPC_ADMIN_EMAIL = config('GPC_ADMIN_EMAIL', default='info@gopropertycare.com')
+ESL_ADMIN_EMAIL = config('ESL_ADMIN_EMAIL', default='info@evolvingsolutionsllc.com')
+
+# Optional dedicated SMTP credentials for GoPropertyCare (info@gopropertycare.com)
+GPC_EMAIL_HOST_USER = config('GPC_EMAIL_HOST_USER', default='').strip().strip('\'"')
+GPC_EMAIL_HOST_PASSWORD = config('GPC_EMAIL_HOST_PASSWORD', default='').strip().strip('\'"')
+
+# Transactional Email APIs (HTTPS Port 443 - Bypasses Render Free SMTP port blocks)
+RESEND_API_KEY = config('RESEND_API_KEY', default='').strip().strip('\'"')
+SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='').strip().strip('\'"')
+
+# Stripe Payment Gateway Configuration
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='').strip().strip('\'"')
+STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='').strip().strip('\'"')
+STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='').strip().strip('\'"')
+
+# Django Unfold Configuration
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
+UNFOLD = {
+    "SITE_TITLE": "LaundryGo Admin",
+    "SITE_HEADER": "LaundryGo Operations",
+    "SITE_SUBHEADER": "Pickup & Delivery Operations Panel",
+    "SITE_URL": "/",
+    "THEME": "light",
+    "BORDER_RADIUS": "12px",
+    "COLORS": {
+        "primary": {
+            "50": "239 246 255",
+            "100": "219 234 254",
+            "200": "191 219 254",
+            "300": "147 197 253",
+            "400": "96 165 250",
+            "500": "59 130 246",
+            "600": "37 99 235",
+            "700": "29 78 216",
+            "800": "30 64 175",
+            "900": "30 58 138",
+            "950": "23 37 84",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": _("LaundryGo Operations"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Laundry Orders"),
+                        "icon": "local_laundry_service",
+                        "link": reverse_lazy("admin:orders_order_changelist"),
+                    },
+                    {
+                        "title": _("Recurring Schedules"),
+                        "icon": "event_repeat",
+                        "link": reverse_lazy("admin:orders_recurringschedule_changelist"),
+                    },
+                    {
+                        "title": _("Per-Pound Rates"),
+                        "icon": "sell",
+                        "link": reverse_lazy("admin:orders_servicerate_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("GoPropertyCare Operations"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Cleaning Reservations"),
+                        "icon": "cleaning_services",
+                        "link": reverse_lazy("admin:cleaning_cleaningorder_changelist"),
+                    },
+                    {
+                        "title": _("Pricing Tiers"),
+                        "icon": "price_change",
+                        "link": reverse_lazy("admin:cleaning_cleaningpricingtier_changelist"),
+                    },
+                    {
+                        "title": _("Rates per Sq Ft"),
+                        "icon": "square_foot",
+                        "link": reverse_lazy("admin:cleaning_cleaningservicerate_changelist"),
+                    },
+                    {
+                        "title": _("Difficulty Add-ons"),
+                        "icon": "tune",
+                        "link": reverse_lazy("admin:cleaning_cleaningaddon_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Promotions and Discounts"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("All Coupons"),
+                        "icon": "local_offer",
+                        "link": reverse_lazy("admin:coupons_coupon_changelist"),
+                    },
+                    {
+                        "title": _("Coupon Redemptions"),
+                        "icon": "receipt_long",
+                        "link": reverse_lazy("admin:coupons_couponusage_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("User & Access Management"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Customers & Staff"),
+                        "icon": "group",
+                        "link": reverse_lazy("admin:users_user_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
+}
+
+# Production Logging: Outputs to stdout/console for Render Log Viewer
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}

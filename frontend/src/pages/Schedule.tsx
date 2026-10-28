@@ -21,6 +21,9 @@ import {
   Package,
   RefreshCw,
   CreditCard,
+  Tag,
+  LogIn,
+  X,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -28,7 +31,8 @@ import { Input } from '@/components/ui/Input';
 import { SEO } from '@/components/common/SEO';
 import { useAuthContext } from '@/providers/AuthProvider';
 import api from '@/api';
-import type { ServiceRate, AvailableDate } from '@/types';
+import type { ServiceRate, AvailableDate, AppliedCoupon, CouponValidationResponse } from '@/types';
+import { QuickAuthModal } from '@/components/common/QuickAuthModal';
 import { DENVER_LOCATIONS } from '@/constants/locations';
 import {
   CHECKBOX_ADDONS,
@@ -149,6 +153,13 @@ export function Schedule() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Coupon state & Quick Auth Modal
+  const [couponCodeInput, setCouponCodeInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+  const [isQuickAuthOpen, setIsQuickAuthOpen] = useState(false);
 
   // Read pre-filled state if coming from "Reorder" action on Dashboard
   useEffect(() => {
@@ -449,6 +460,67 @@ export function Schedule() {
     }
   };
 
+  const estimatedLbs = 20;
+  const currentRatePerLb = Number(currentServiceRate?.rate_per_lb || 2.25);
+  const estimatedLaundryBase = Math.max(40, Math.round(currentRatePerLb * estimatedLbs * 100) / 100);
+  const estimatedSubtotal = estimatedLaundryBase + addonsSubtotal + (selectedLocation.fee || 0);
+  const couponDiscountAmount = appliedCoupon
+    ? Math.round(((estimatedSubtotal * appliedCoupon.discount_percentage) / 100) * 100) / 100
+    : 0;
+  const estimatedTotal = Math.max(0, Math.round((estimatedSubtotal - couponDiscountAmount) * 100) / 100);
+
+  const handleApplyCoupon = async () => {
+    const sanitized = couponCodeInput.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!sanitized) {
+      setCouponError(t('schedule.coupons.enterCodeError'));
+      return;
+    }
+    if (sanitized.length !== 6) {
+      setCouponError(t('schedule.coupons.invalidLengthError'));
+      return;
+    }
+    if (!isAuthenticated) {
+      setIsQuickAuthOpen(true);
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponError('');
+
+    try {
+      const res = await api.post<CouponValidationResponse>('/coupons/validate/', {
+        code: sanitized,
+        brand: 'laundrygo',
+      });
+
+      if (res.data && res.data.valid) {
+        setAppliedCoupon({
+          code: res.data.code,
+          discount_percentage: res.data.discount_percentage,
+          discount_amount: 0,
+        });
+        setCouponCodeInput('');
+      } else {
+        setCouponError(res.data.message || t('schedule.coupons.invalidError'));
+      }
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        (err.response?.status === 404
+          ? t('schedule.coupons.notFoundError')
+          : t('schedule.coupons.validateFailedError'));
+      setCouponError(msg);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError('');
+  };
+
   const handleSubmit = async () => {
     if (!validateCurrentStep(4)) return;
 
@@ -497,6 +569,7 @@ export function Schedule() {
         delivery_fee: selectedLocation.fee,
         addons_subtotal: addonsSubtotal,
         language: i18n.language?.startsWith('es') ? 'es' : 'en',
+        ...(appliedCoupon ? { coupon_code: appliedCoupon.code } : {}),
       });
 
       if (res.data && res.data.id) {
@@ -1422,6 +1495,98 @@ export function Schedule() {
                   </div>
                 </div>
 
+                {/* Promo & Coupon Code Section */}
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Tag className="w-4 h-4 text-blue-600 shrink-0" />
+                      <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider">
+                        {t('schedule.coupons.title')}
+                      </h3>
+                    </div>
+                    {appliedCoupon && (
+                      <span className="text-[11px] font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full">
+                        {appliedCoupon.discount_percentage}% OFF
+                      </span>
+                    )}
+                  </div>
+
+                  {!isAuthenticated ? (
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs">
+                      <div>
+                        <p className="font-bold text-blue-950">{t('schedule.coupons.haveCoupon')}</p>
+                        <p className="text-blue-800 text-[11px] mt-0.5">{t('schedule.coupons.loginPrompt')}</p>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => setIsQuickAuthOpen(true)}
+                        className="font-bold bg-blue-600 hover:bg-blue-700 text-white shrink-0 cursor-pointer shadow-xs"
+                      >
+                        <LogIn className="w-3.5 h-3.5 mr-1.5" />
+                        {t('schedule.coupons.loginButton')}
+                      </Button>
+                    </div>
+                  ) : appliedCoupon ? (
+                    <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-300 rounded-xl text-xs">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+                        <div>
+                          <span className="font-extrabold text-blue-950 font-mono tracking-wider mr-2">
+                            {appliedCoupon.code}
+                          </span>
+                          <span className="text-blue-700 font-semibold">
+                            (-{appliedCoupon.discount_percentage}% = -${couponDiscountAmount.toFixed(2)})
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveCoupon}
+                        className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer hover:underline"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        <span>{t('schedule.coupons.remove')}</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          value={couponCodeInput}
+                          maxLength={6}
+                          onChange={(e) => {
+                            const clean = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+                            setCouponCodeInput(clean);
+                            if (couponError) setCouponError('');
+                          }}
+                          placeholder={t('schedule.coupons.placeholder')}
+                          className="text-xs font-mono font-bold tracking-wider uppercase"
+                        />
+                        <Button
+                          type="button"
+                          onClick={handleApplyCoupon}
+                          disabled={couponLoading || couponCodeInput.length !== 6}
+                          className="font-bold px-5 bg-blue-600 hover:bg-blue-700 text-white shrink-0 cursor-pointer disabled:opacity-50"
+                        >
+                          {couponLoading ? (
+                            <span className="animate-spin inline-block mr-1">⌛</span>
+                          ) : (
+                            t('schedule.coupons.apply')
+                          )}
+                        </Button>
+                      </div>
+                      {couponError && (
+                        <p className="text-xs text-rose-600 font-medium flex items-center gap-1">
+                          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                          <span>{couponError}</span>
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 {/* 4-Step Approval & Payment Workflow Card */}
                 <div className="rounded-2xl bg-blue-50/70 border border-blue-200/90 p-4 sm:p-5 space-y-3.5">
                   <div className="flex items-center gap-2 text-blue-950">
@@ -1567,6 +1732,23 @@ export function Schedule() {
                   <span className="font-extrabold text-blue-700">+${addonsSubtotal.toFixed(2)}</span>
                 </div>
               )}
+
+              {/* Coupon Discount Row */}
+              {appliedCoupon && couponDiscountAmount > 0 && (
+                <div className="flex justify-between items-center pt-1 border-t border-blue-100 text-blue-800 font-bold">
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <span>{t('schedule.coupons.discountRow')} ({appliedCoupon.code}):</span>
+                  </span>
+                  <span className="tabular-nums">-${couponDiscountAmount.toFixed(2)}</span>
+                </div>
+              )}
+
+              {/* Estimated Total */}
+              <div className="flex justify-between items-center pt-2 border-t-2 border-blue-200 text-slate-900 font-extrabold text-sm">
+                <span>{t('schedule.totalDue', 'Estimated Total')}:</span>
+                <span className="tabular-nums text-blue-700">${estimatedTotal.toFixed(2)}</span>
+              </div>
             </div>
 
             {/* Recurring 7.5% Note */}
@@ -1591,6 +1773,11 @@ export function Schedule() {
           </Card>
         </div>
       </div>
+
+      <QuickAuthModal
+        isOpen={isQuickAuthOpen}
+        onClose={() => setIsQuickAuthOpen(false)}
+      />
 
       {/* Sticky Mobile Floating Action Bar */}
       <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 p-3 px-4 flex items-center justify-between lg:hidden shadow-lg animate-fade-in">

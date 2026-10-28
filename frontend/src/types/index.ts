@@ -49,6 +49,9 @@ export interface Order {
   total_price?: string | number;
   surcharge_amount?: string | number;
   surcharge_concept?: string;
+  coupon_code?: string;
+  discount_percentage?: number;
+  discount_amount?: string | number;
   final_total_price?: string | number;
   payment_status?: 'unpaid' | 'payment_link_sent' | 'paid' | 'refunded' | 'failed';
   stripe_payment_link_url?: string;
@@ -76,4 +79,20 @@ export interface AvailableDate {
   gofurther_available: boolean;
   day_name?: string;
   formatted_date?: string;
+}
+
+export interface CouponValidationResponse {
+  valid: boolean;
+  code: string;
+  brand: string;
+  discount_percentage: number;
+  description?: string;
+  message?: string;
+  error?: string;
+}
+
+export interface AppliedCoupon {
+  code: string;
+  discount_percentage: number;
+  discount_amount: number;
 }

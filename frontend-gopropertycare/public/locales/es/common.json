@@ -816,7 +816,27 @@
     "cardExpiryPast": "La fecha de vencimiento de esta tarjeta ya expiró",
     "cardCvcInvalid": "Ingresa un código de seguridad (CVC) válido de 3 o 4 dígitos",
     "serviceMoveInOut": "Limpieza Mudanza (Move-In / Move-Out)",
-    "serviceMoveInOutDesc": "Desinfección exhaustiva para mudanzas, inspecciones y entrega de depósitos"
+    "serviceMoveInOutDesc": "Desinfección exhaustiva para mudanzas, inspecciones y entrega de depósitos",
+    "coupons": {
+      "title": "Cupón de Descuento",
+      "haveCoupon": "¿Tienes un cupón de descuento?",
+      "loginPrompt": "Inicia sesión o regístrate para canjear tu código de cupón.",
+      "loginButton": "Iniciar Sesión / Registrarse",
+      "placeholder": "INTRODUCE CÓDIGO (ej. SAVE20)",
+      "apply": "Aplicar",
+      "applied": "¡Cupón aplicado con éxito!",
+      "discountRow": "Descuento por Cupón",
+      "remove": "Eliminar",
+      "enterCodeError": "Por favor ingresa un código de cupón de 6 caracteres.",
+      "invalidLengthError": "El código debe contener exactamente 6 caracteres alfanuméricos.",
+      "invalidError": "Cupón inválido, expirado o no disponible.",
+      "notFoundError": "Cupón no encontrado o inactivo para GoPropertyCare.",
+      "validateFailedError": "No se pudo validar el cupón. Intenta nuevamente.",
+      "quickAuthHeaderBadge": "Cupones y Descuentos Exclusivos",
+      "loginToApplyTitle": "Inicia sesión para aplicar tu cupón",
+      "registerToApplyTitle": "Crea tu cuenta y ahorra",
+      "quickAuthSubtitle": "Los descuentos se asocian a tu perfil para aplicarse de forma segura."
+    }
   },
   "auth": {
     "loginTitle": "Bienvenido a GoPropertyCare",
