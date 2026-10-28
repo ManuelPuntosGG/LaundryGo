@@ -1521,21 +1521,21 @@ export function Schedule() {
                         type="button"
                         size="sm"
                         onClick={() => setIsQuickAuthOpen(true)}
-                        className="font-bold bg-blue-600 hover:bg-blue-700 text-white shrink-0 cursor-pointer shadow-xs"
+                        className="w-full sm:w-auto font-bold bg-blue-600 hover:bg-blue-700 text-white shrink-0 cursor-pointer shadow-xs min-h-[40px] justify-center"
                       >
-                        <LogIn className="w-3.5 h-3.5 mr-1.5" />
-                        {t('schedule.coupons.loginButton')}
+                        <LogIn className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                        <span>{t('schedule.coupons.loginButton')}</span>
                       </Button>
                     </div>
                   ) : appliedCoupon ? (
-                    <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-300 rounded-xl text-xs">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 p-3 bg-blue-50 border border-blue-300 rounded-xl text-xs">
+                      <div className="flex items-center gap-2 min-w-0">
                         <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
-                        <div>
+                        <div className="min-w-0">
                           <span className="font-extrabold text-blue-950 font-mono tracking-wider mr-2">
                             {appliedCoupon.code}
                           </span>
-                          <span className="text-blue-700 font-semibold">
+                          <span className="text-blue-700 font-semibold text-[11px] sm:text-xs">
                             (-{appliedCoupon.discount_percentage}% = -${couponDiscountAmount.toFixed(2)})
                           </span>
                         </div>
@@ -1543,15 +1543,15 @@ export function Schedule() {
                       <button
                         type="button"
                         onClick={handleRemoveCoupon}
-                        className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer hover:underline"
+                        className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer hover:underline self-end sm:self-auto shrink-0"
                       >
-                        <X className="w-3.5 h-3.5" />
+                        <X className="w-3.5 h-3.5 shrink-0" />
                         <span>{t('schedule.coupons.remove')}</span>
                       </button>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           type="text"
                           value={couponCodeInput}
@@ -1562,13 +1562,13 @@ export function Schedule() {
                             if (couponError) setCouponError('');
                           }}
                           placeholder={t('schedule.coupons.placeholder')}
-                          className="text-xs font-mono font-bold tracking-wider uppercase"
+                          className="w-full text-xs font-mono font-bold tracking-wider uppercase min-h-[42px]"
                         />
                         <Button
                           type="button"
                           onClick={handleApplyCoupon}
                           disabled={couponLoading || couponCodeInput.length !== 6}
-                          className="font-bold px-5 bg-blue-600 hover:bg-blue-700 text-white shrink-0 cursor-pointer disabled:opacity-50"
+                          className="w-full sm:w-auto font-bold px-6 bg-blue-600 hover:bg-blue-700 text-white shrink-0 cursor-pointer disabled:opacity-50 min-h-[42px] justify-center"
                         >
                           {couponLoading ? (
                             <span className="animate-spin inline-block mr-1">⌛</span>

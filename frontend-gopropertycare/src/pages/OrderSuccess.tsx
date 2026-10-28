@@ -81,7 +81,7 @@ export function OrderSuccess() {
         noIndex={true}
       />
 
-      <Card className="p-6 sm:p-10 text-center border-emerald-200/90 shadow-xl space-y-6 bg-white rounded-2xl">
+      <Card className="p-4 sm:p-10 text-center border-emerald-200/90 shadow-xl space-y-5 sm:space-y-6 bg-white rounded-2xl">
         <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner animate-pop-in">
           {customQuoteSubmitted ? <FileText className="w-9 h-9" /> : <CheckCircle2 className="w-9 h-9" />}
         </div>
@@ -165,11 +165,11 @@ export function OrderSuccess() {
 
           {customQuoteSubmitted ? (
             <div className="pt-3 border-t border-slate-200 space-y-2">
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-600 font-semibold">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center text-xs gap-1.5">
+                <span className="text-slate-600 font-semibold min-w-0">
                   {i18n.language?.startsWith('es') ? 'Evaluación y Presupuesto por Escrito:' : 'Walkthrough & Custom Proposal:'}
                 </span>
-                <span className="font-bold text-emerald-800 text-sm sm:text-base tabular-nums">
+                <span className="font-bold text-emerald-800 text-sm sm:text-base tabular-nums shrink-0">
                   $0.00{' '}
                   <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                     {i18n.language?.startsWith('es') ? '100% Gratuito' : '100% Free'}
@@ -191,9 +191,9 @@ export function OrderSuccess() {
             </div>
           ) : (
             <div className="pt-3 border-t border-slate-200 space-y-2">
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-600 font-semibold">{t('schedule.depositDueToday')} (25%):</span>
-                <span className="font-bold text-amber-800 text-sm sm:text-base tabular-nums">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center text-xs gap-1.5">
+                <span className="text-slate-600 font-semibold min-w-0">{t('schedule.depositDueToday')} (25%):</span>
+                <span className="font-bold text-amber-800 text-sm sm:text-base tabular-nums shrink-0">
                   ${(state.depositAmount ?? 0).toFixed(2)}{' '}
                   <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                     ({t('schedule.depositPendingApprovalBadge')})

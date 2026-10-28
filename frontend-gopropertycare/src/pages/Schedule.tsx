@@ -4285,1029 +4285,515 @@ export function Schedule() {
       {/* STEP 4: Review, Sticky Cost Breakdown & Confirm */}
 
       {step === 4 && (
-
-        <Card key="step-4" className="p-4 sm:p-8 space-y-5 sm:space-y-8 animate-fade-in-up">
-
+        <Card key="step-4" className="p-3.5 sm:p-8 space-y-4 sm:space-y-6 animate-fade-in-up">
           <div className="border-b border-slate-100 pb-3">
-
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
-
               {t('schedule.step4Title')}
-
             </h2>
-
             <p className="text-xs text-slate-600 font-medium mt-0.5">
-
               {t('schedule.step4Subtitle')}
-
             </p>
-
           </div>
-
-
 
           {errorMessage && (
-
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-center gap-2 font-medium">
-
+            <div className="p-3.5 sm:p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-
-              <span>{errorMessage}</span>
-
+              <span className="min-w-0 break-words">{errorMessage}</span>
             </div>
-
           )}
 
-
-
           {/* Summary Details Grid */}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-6">
             {/* Service & Schedule */}
-
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2.5 text-xs">
-
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-5 space-y-2.5 text-xs overflow-hidden">
               <h3 className="font-black text-slate-900 text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
-
-                <Home className="w-4 h-4 text-emerald-600" />
-
+                <Home className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{t('schedule.serviceDetails')}</span>
-
               </h3>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.serviceTypeLabel')}:</span>
-
-                <span className="font-bold text-slate-900 text-right">
-
+                <span className="font-bold text-slate-900 text-right min-w-0 break-words">
                   {serviceType === 'standard'
-
                     ? t('schedule.serviceStandard')
-
                     : serviceType === 'deep'
-
                     ? t('schedule.serviceDeep')
-
                     : serviceType === 'move_in_out'
-
                     ? t('schedule.serviceMoveInOut')
-
                     : t('schedule.serviceStr')}
-
                 </span>
-
               </div>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.dimensions')}:</span>
-
-                <span className="font-bold text-slate-900 text-right">
-
+                <span className="font-bold text-slate-900 text-right min-w-0 break-words">
                   {isSTR
-
                     ? `${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')} • ${selectedAddonCodes['off_site_laundry'] ? (i18n.language?.startsWith('es') ? 'Lavandería externa (Add-on)' : 'Off-site laundry (Add-on)') : (i18n.language?.startsWith('es') ? 'Lavado en propiedad' : 'On-site laundry')}`
-
                     : `${selectedTier.label} • ${bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`}, ${bathrooms} ${t('schedule.baths')}`}
-
                 </span>
-
               </div>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.frequencyTitle')}:</span>
-
-                <span className="font-bold text-slate-900 text-right">
-
+                <span className="font-bold text-slate-900 text-right min-w-0 break-words">
                   {t(freqOption.nameKey)}
-
                 </span>
-
               </div>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.scheduledDate')}:</span>
-
-                <span className="font-bold text-slate-900 text-right tabular-nums">{selectedDate}</span>
-
+                <span className="font-bold text-slate-900 text-right tabular-nums shrink-0">{selectedDate}</span>
               </div>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.timeSlotLabel')}:</span>
-
-                <span className="font-bold text-slate-900 text-right tabular-nums">{selectedTimeSlot}</span>
-
+                <span className="font-bold text-slate-900 text-right tabular-nums shrink-0">{selectedTimeSlot}</span>
               </div>
-
             </div>
-
-
 
             {/* Address, Contact & Access */}
-
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-2.5 text-xs">
-
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-5 space-y-2.5 text-xs overflow-hidden">
               <h3 className="font-black text-slate-900 text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
-
-                <MapPin className="w-4 h-4 text-emerald-600" />
-
+                <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{t('schedule.locationContact')}</span>
-
               </h3>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.client')}:</span>
-
-                <span className="font-bold text-slate-900 text-right truncate">{formData.first_name} {formData.last_name}</span>
-
+                <span className="font-bold text-slate-900 text-right min-w-0 truncate">{formData.first_name} {formData.last_name}</span>
               </div>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('auth.phone')}:</span>
-
-                <span className="font-bold text-slate-900 text-right tabular-nums">{formData.phone}</span>
-
+                <span className="font-bold text-slate-900 text-right tabular-nums shrink-0">{formData.phone}</span>
               </div>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.addressLabel')}:</span>
-
-                <span className="font-bold text-slate-900 text-right">{formData.street_address}, {formData.city || 'Denver'}</span>
-
+                <span className="font-bold text-slate-900 text-right min-w-0 break-words">{formData.street_address}, {formData.city || 'Denver'}</span>
               </div>
-
-              <div className="flex justify-between items-start gap-2">
-
+              <div className="flex justify-between items-start gap-2 min-w-0">
                 <span className="text-slate-600 font-semibold shrink-0">{t('schedule.accessMethod')}:</span>
-
-                <span className="font-bold text-slate-900 text-right">
-
+                <span className="font-bold text-slate-900 text-right min-w-0 break-words">
                   {entryMethod === 'someone_home'
-
                     ? t('schedule.entry_someone_home')
-
                     : entryMethod === 'keypad'
-
                     ? t('schedule.entry_keypad')
-
                     : entryMethod === 'lockbox'
-
                     ? t('schedule.entry_lockbox')
-
                     : entryMethod === 'unlocked'
-
                     ? t('schedule.entry_unlocked')
-
                     : t('schedule.entry_other')}
-
                 </span>
-
               </div>
-
               {entryNotes && (
-
-                <div className="flex justify-between items-start gap-2">
-
+                <div className="flex justify-between items-start gap-2 min-w-0">
                   <span className="text-slate-600 font-semibold shrink-0">{t('schedule.accessNote')}:</span>
-
-                  <span className="font-medium text-slate-900 text-right max-w-[200px] truncate">{entryNotes}</span>
-
+                  <span className="font-medium text-slate-900 text-right min-w-0 break-words">{entryNotes}</span>
                 </div>
-
               )}
-
             </div>
-
           </div>
-
-
 
           {/* Promo & Coupon Code Section */}
-
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-
-            <div className="flex items-center justify-between">
-
-              <div className="flex items-center gap-2">
-
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-5 space-y-3">
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
                 <Tag className="w-4 h-4 text-emerald-600 shrink-0" />
-
-                <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider">
-
+                <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider truncate">
                   {t('schedule.coupons.title')}
-
                 </h3>
-
               </div>
-
               {appliedCoupon && (
-
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0">
                   {appliedCoupon.discount_percentage}% OFF
-
                 </span>
-
               )}
-
             </div>
-
-
 
             {!isAuthenticated ? (
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-xs">
-
-                <div>
-
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-xs">
+                <div className="min-w-0">
                   <p className="font-bold text-emerald-950">{t('schedule.coupons.haveCoupon')}</p>
-
                   <p className="text-emerald-800 text-[11px] mt-0.5">{t('schedule.coupons.loginPrompt')}</p>
-
                 </div>
-
                 <Button
-
                   type="button"
-
                   size="sm"
-
                   onClick={() => setIsQuickAuthOpen(true)}
-
-                  className="font-bold bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 cursor-pointer shadow-xs"
-
+                  className="w-full sm:w-auto font-bold bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 cursor-pointer shadow-xs min-h-[40px] justify-center"
                 >
-
-                  <LogIn className="w-3.5 h-3.5 mr-1.5" />
-
-                  {t('schedule.coupons.loginButton')}
-
+                  <LogIn className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                  <span>{t('schedule.coupons.loginButton')}</span>
                 </Button>
-
               </div>
-
             ) : appliedCoupon ? (
-
-              <div className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs">
-
-                <div className="flex items-center gap-2">
-
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs">
+                <div className="flex items-center gap-2 min-w-0">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-
-                  <div>
-
+                  <div className="min-w-0">
                     <span className="font-extrabold text-emerald-950 font-mono tracking-wider mr-2">
-
                       {appliedCoupon.code}
-
                     </span>
-
-                    <span className="text-emerald-700 font-semibold">
-
+                    <span className="text-emerald-700 font-semibold text-[11px] sm:text-xs">
                       (-{appliedCoupon.discount_percentage}% = -${couponDiscountAmount.toFixed(2)})
-
                     </span>
-
                   </div>
-
                 </div>
-
                 <button
-
                   type="button"
-
                   onClick={handleRemoveCoupon}
-
-                  className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer hover:underline"
-
+                  className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer hover:underline self-end sm:self-auto shrink-0"
                 >
-
-                  <X className="w-3.5 h-3.5" />
-
+                  <X className="w-3.5 h-3.5 shrink-0" />
                   <span>{t('schedule.coupons.remove')}</span>
-
                 </button>
-
               </div>
-
             ) : (
-
               <div className="space-y-2">
-
-                <div className="flex gap-2">
-
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
-
                     type="text"
-
                     value={couponCodeInput}
-
                     maxLength={6}
-
                     onChange={(e) => {
-
                       const clean = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
-
                       setCouponCodeInput(clean);
-
                       if (couponError) setCouponError('');
-
                     }}
-
                     placeholder={t('schedule.coupons.placeholder')}
-
-                    className="text-xs font-mono font-bold tracking-wider uppercase"
-
+                    className="w-full text-xs font-mono font-bold tracking-wider uppercase min-h-[42px]"
                   />
-
                   <Button
-
                     type="button"
-
                     onClick={handleApplyCoupon}
-
                     disabled={couponLoading || couponCodeInput.length !== 6}
-
-                    className="font-bold px-5 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 cursor-pointer disabled:opacity-50"
-
+                    className="w-full sm:w-auto font-bold px-6 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 cursor-pointer disabled:opacity-50 min-h-[42px] justify-center"
                   >
-
                     {couponLoading ? (
-
                       <span className="animate-spin inline-block mr-1">⌛</span>
-
                     ) : (
-
                       t('schedule.coupons.apply')
-
                     )}
-
                   </Button>
-
                 </div>
-
                 {couponError && (
-
                   <p className="text-xs text-rose-600 font-medium flex items-center gap-1">
-
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-
                     <span>{couponError}</span>
-
                   </p>
-
                 )}
-
               </div>
-
             )}
-
           </div>
-
-
 
           {/* Dynamic Sticky Cost Breakdown Card */}
-
-          <div className="bg-white border-2 border-emerald-200/90 rounded-2xl p-4 sm:p-6 space-y-3 shadow-2xs">
-
+          <div className="bg-white border-2 border-emerald-200/90 rounded-2xl p-3.5 sm:p-6 space-y-3 shadow-2xs">
             <h3 className="font-black text-emerald-950 text-xs sm:text-sm uppercase tracking-wider flex items-center justify-between">
-
               <span>{t('schedule.costBreakdown')}</span>
-
             </h3>
 
-
-
             {/* Base Turnover or Tier Price */}
-
             {isSTR ? (
-
               <>
-
-                <div className="flex justify-between text-slate-700 text-xs font-medium">
-
-                  <span>
-
+                <div className="flex justify-between items-start text-slate-700 text-xs font-medium gap-2">
+                  <span className="min-w-0 pr-1">
                     {t('schedule.baseTierPrice')} ({bedrooms === 0 ? t('schedule.studio') : `${bedrooms} ${t('schedule.beds')}`} • {t('schedule.strIncludedBaths')} {strCalc.includedBathrooms} {t('schedule.baths')}):
-
                   </span>
-
-                  <span className="font-bold text-slate-900 tabular-nums">${strCalc.basePrice.toFixed(2)}</span>
-
+                  <span className="font-bold text-slate-900 tabular-nums shrink-0">${strCalc.basePrice.toFixed(2)}</span>
                 </div>
-
-
 
                 {strCalc.extraBathrooms > 0 && (
-
-                  <div className="flex justify-between text-slate-700 text-xs font-medium">
-
-                    <span>
-
+                  <div className="flex justify-between items-start text-slate-700 text-xs font-medium gap-2">
+                    <span className="min-w-0 pr-1">
                       {t('schedule.extraBathFee')} ({strCalc.extraBathrooms} x ${STR_EXTRA_BATHROOM_PRICE}):
-
                     </span>
-
-                    <span className="font-bold text-slate-900 tabular-nums">+${strCalc.extraBathroomFee.toFixed(2)}</span>
-
+                    <span className="font-bold text-slate-900 tabular-nums shrink-0">+${strCalc.extraBathroomFee.toFixed(2)}</span>
                   </div>
-
                 )}
-
               </>
-
             ) : (
-
-              <div className="flex justify-between text-slate-700 text-xs font-medium">
-
-                <span>{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
-
-                <span className="font-bold text-slate-900 tabular-nums">${baseTierPrice.toFixed(2)}</span>
-
+              <div className="flex justify-between items-start text-slate-700 text-xs font-medium gap-2">
+                <span className="min-w-0 pr-1">{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
+                <span className="font-bold text-slate-900 tabular-nums shrink-0">${baseTierPrice.toFixed(2)}</span>
               </div>
-
             )}
-
-
 
             {/* Recurring Frequency Discount */}
-
             {discountPercent > 0 && (
-
-              <div className="flex justify-between text-emerald-800 text-xs font-bold bg-emerald-50/80 p-2 rounded-xl">
-
-                <span>{t('schedule.frequencyDiscount')} ({t(freqOption.nameKey)}):</span>
-
-                <span className="tabular-nums">-${frequencyDiscount.toFixed(2)}</span>
-
+              <div className="flex justify-between items-center text-emerald-800 text-xs font-bold bg-emerald-50/80 p-2 sm:p-2.5 rounded-xl gap-2">
+                <span className="min-w-0 pr-1">{t('schedule.frequencyDiscount')} ({t(freqOption.nameKey)}):</span>
+                <span className="tabular-nums shrink-0">-${frequencyDiscount.toFixed(2)}</span>
               </div>
-
             )}
-
-
 
             {/* Off-Site Laundry Add-on (for STR when selected) */}
-
             {isSTR && isOffSiteSelected && (
-
-              <div className="flex justify-between text-slate-700 text-xs font-medium">
-
-                <span>{t('schedule.offSiteLaundryAddonTitle')}:</span>
-
-                <span className="font-bold text-slate-900 tabular-nums">+${currentOffSiteFee.toFixed(2)}</span>
-
+              <div className="flex justify-between items-start text-slate-700 text-xs font-medium gap-2">
+                <span className="min-w-0 pr-1">{t('schedule.offSiteLaundryAddonTitle')}:</span>
+                <span className="font-bold text-slate-900 tabular-nums shrink-0">+${currentOffSiteFee.toFixed(2)}</span>
               </div>
-
             )}
-
-
 
             {/* Other Addons for STR */}
-
             {isSTR && regularAddonsTotal > 0 && (
-
-              <div className="flex justify-between text-slate-700 text-xs font-medium">
-
-                <span>{t('schedule.addonsFee')}:</span>
-
-                <span className="font-bold text-slate-900 tabular-nums">+${regularAddonsTotal.toFixed(2)}</span>
-
+              <div className="flex justify-between items-start text-slate-700 text-xs font-medium gap-2">
+                <span className="min-w-0 pr-1">{t('schedule.addonsFee')}:</span>
+                <span className="font-bold text-slate-900 tabular-nums shrink-0">+${regularAddonsTotal.toFixed(2)}</span>
               </div>
-
             )}
-
-
 
             {/* Addons for non-STR */}
-
             {!isSTR && addonsTotal > 0 && (
-
-              <div className="flex justify-between text-slate-700 text-xs font-medium">
-
-                <span>{t('schedule.addonsFee')}:</span>
-
-                <span className="font-bold text-slate-900 tabular-nums">+${addonsTotal.toFixed(2)}</span>
-
+              <div className="flex justify-between items-start text-slate-700 text-xs font-medium gap-2">
+                <span className="min-w-0 pr-1">{t('schedule.addonsFee')}:</span>
+                <span className="font-bold text-slate-900 tabular-nums shrink-0">+${addonsTotal.toFixed(2)}</span>
               </div>
-
             )}
-
-
 
             {/* Coupon Discount Row */}
-
             {appliedCoupon && couponDiscountAmount > 0 && (
-
-              <div className="flex justify-between text-emerald-800 text-xs font-bold bg-emerald-50 border border-emerald-300 p-2.5 rounded-xl">
-
-                <span className="flex items-center gap-1.5">
-
+              <div className="flex justify-between items-center text-emerald-800 text-xs font-bold bg-emerald-50 border border-emerald-300 p-2.5 rounded-xl gap-2">
+                <span className="flex items-center gap-1.5 min-w-0 pr-1">
                   <Tag className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-
-                  <span>{t('schedule.coupons.discountRow')} ({appliedCoupon.code} -{appliedCoupon.discount_percentage}%):</span>
-
+                  <span className="truncate">{t('schedule.coupons.discountRow')} ({appliedCoupon.code} -{appliedCoupon.discount_percentage}%):</span>
                 </span>
-
-                <span className="tabular-nums">-${couponDiscountAmount.toFixed(2)}</span>
-
+                <span className="tabular-nums shrink-0">-${couponDiscountAmount.toFixed(2)}</span>
               </div>
-
             )}
-
-
 
             {/* Total Estimated Service Quote */}
-
-            <div className="pt-3 border-t-2 border-emerald-100 flex justify-between items-baseline">
-
-              <div>
-
-                <span className="font-black text-slate-900 text-sm sm:text-base">{t('schedule.totalEstimatedQuote')}:</span>
-
+            <div className="pt-3 border-t-2 border-emerald-100 flex justify-between items-baseline gap-2">
+              <div className="min-w-0">
+                <span className="font-black text-slate-900 text-sm sm:text-base block">{t('schedule.totalEstimatedQuote')}:</span>
                 {discountPercent > 0 && (
-
-                  <span className="text-[11px] text-emerald-700 font-bold block">
-
+                  <span className="text-[11px] text-emerald-700 font-bold block mt-0.5">
                     Includes {discountPercent}% recurring discount
-
                   </span>
-
                 )}
-
               </div>
-
-              <span className="font-bold text-slate-700 text-base sm:text-lg tabular-nums">${totalPrice.toFixed(2)}</span>
-
+              <span className="font-bold text-slate-700 text-base sm:text-lg tabular-nums shrink-0">${totalPrice.toFixed(2)}</span>
             </div>
-
-
 
             {/* 25% Deposit Due Today vs 75% Balance Upon Completion Breakdown */}
-
-            <div className="bg-emerald-50/90 border-2 border-emerald-300/80 rounded-2xl p-4 sm:p-5 space-y-3">
-
-              <div className="flex justify-between items-baseline">
-
-                <div>
-
+            <div className="bg-emerald-50/90 border-2 border-emerald-300/80 rounded-2xl p-3.5 sm:p-5 space-y-3">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-baseline gap-2">
+                <div className="min-w-0">
                   <span className="font-black text-emerald-950 text-sm sm:text-base block">{t('schedule.depositDueToday')} (25%):</span>
-
-                  <span className="text-[11px] text-emerald-700 font-semibold">{t('schedule.depositChargedNow')}</span>
-
+                  <span className="text-[11px] text-emerald-700 font-semibold block">{t('schedule.depositChargedNow')}</span>
                 </div>
-
-                <span className="font-black text-2xl sm:text-3xl text-emerald-700 tabular-nums">${depositAmount.toFixed(2)}</span>
-
+                <span className="font-black text-2xl sm:text-3xl text-emerald-700 tabular-nums shrink-0">${depositAmount.toFixed(2)}</span>
               </div>
-
-              <div className="flex justify-between items-center pt-2.5 border-t border-emerald-200 text-xs text-slate-600 font-medium">
-
-                <div>
-
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center pt-2.5 border-t border-emerald-200 text-xs text-slate-600 font-medium gap-2">
+                <div className="min-w-0">
                   <span className="font-bold text-slate-800 block">{t('schedule.balanceDueUponCompletion')} (75%):</span>
-
-                  <span className="text-[11px] text-slate-500">{t('schedule.balanceDueUponCompletionHelp')}</span>
-
+                  <span className="text-[11px] text-slate-500 block">{t('schedule.balanceDueUponCompletionHelp')}</span>
                 </div>
-
-                <span className="font-bold text-slate-900 text-sm sm:text-base tabular-nums">${remainingBalance.toFixed(2)}</span>
-
+                <span className="font-bold text-slate-900 text-sm sm:text-base tabular-nums shrink-0">${remainingBalance.toFixed(2)}</span>
               </div>
-
               <div className="flex justify-between items-center pt-2 border-t border-emerald-200/60 text-xs">
-
                 <span className="font-extrabold text-emerald-900">{t('schedule.dueTodayLabel')}</span>
-
                 <span className="font-black text-base text-emerald-800 tabular-nums">$0.00</span>
-
               </div>
-
             </div>
-
-
 
             {/* Estimated Price Transparency Notice */}
-
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-xs font-medium flex items-center gap-2">
-
               <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-
-              <span>{t('schedule.estimatedPriceNotice')}</span>
-
+              <span className="min-w-0">{t('schedule.estimatedPriceNotice')}</span>
             </div>
-
           </div>
-
-
 
           {/* Card on File Section (Stripe 256-bit Secure Vault) */}
-
-          <div className="bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs">
-
-            <div className="flex items-center justify-between">
-
+          <div className="bg-white border-2 border-slate-200 rounded-2xl p-3.5 sm:p-5 space-y-3 shadow-2xs">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-2">
-
-                <CreditCard className="w-4 h-4 text-emerald-600" />
-
-                {t('schedule.paymentMethodTitle')}
-
+                <CreditCard className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{t('schedule.paymentMethodTitle')}</span>
               </span>
-
-              <div className="flex items-center gap-1.5 text-[11px] text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-
+              <div className="flex items-center gap-1.5 text-[11px] text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 shrink-0">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>Stripe 256-bit SSL</span>
-
               </div>
-
             </div>
-
             <p className="text-xs text-slate-600 font-medium leading-relaxed">
-
               {t('schedule.cardOnFileInfo')}
-
             </p>
-
             {stripePublishableKey && stripeInstance ? (
-
               <div className="space-y-3 pt-1">
-
                 <div>
-
                   <label htmlFor="cc-name" className="block text-[11px] font-bold text-slate-700 mb-1">
-
                     {t('schedule.cardholderNameLabel')} *
-
                   </label>
-
                   <input
-
                     id="cc-name"
-
                     name="cc-name"
-
                     type="text"
-
                     autoComplete="cc-name"
-
                     value={cardName}
-
                     onChange={(e) => setCardName(e.target.value)}
-
                     placeholder={t('schedule.cardholderNamePlaceholder')}
-
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none focus:bg-white focus:border-emerald-600"
-
                   />
-
                 </div>
-
                 <div>
-
                   <label className="block text-[11px] font-bold text-slate-700 mb-1">
-
-                    {t('schedule.cardNumber')} & {t('schedule.cardExpiry')} / {t('schedule.cardCvc')} *
-
+                    {t('schedule.cardNumber')} &amp; {t('schedule.cardExpiry')} / {t('schedule.cardCvc')} *
                   </label>
-
                   <div
-
                     id="stripe-card-mount"
-
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-3 focus-within:border-emerald-600 focus-within:bg-white transition-all min-h-[46px]"
-
                   />
-
                 </div>
-
               </div>
-
             ) : (
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-
                 {/* Cardholder Name */}
-
                 <div className="sm:col-span-2">
-
                   <label htmlFor="cc-name" className="block text-[11px] font-bold text-slate-700 mb-1">
-
                     {t('schedule.cardholderNameLabel')} *
-
                   </label>
-
                   <input
-
                     id="cc-name"
-
                     name="cc-name"
-
                     type="text"
-
                     autoComplete="cc-name"
-
                     value={cardName}
-
                     onChange={(e) => setCardName(e.target.value)}
-
                     onBlur={() => setTouchedFields({ ...touchedFields, cc_name: true })}
-
                     placeholder={t('schedule.cardholderNamePlaceholder')}
-
-                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none focus:bg-white ${
-
+                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2.5 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none focus:bg-white ${
                       touchedFields.cc_name && !isCardNameValid
-
                         ? 'border-rose-500 focus:border-rose-600'
-
                         : 'border-slate-300 focus:border-emerald-600'
-
                     }`}
-
                   />
-
                   {touchedFields.cc_name && !isCardNameValid && (
-
                     <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardNameRequired')}</p>
-
                   )}
-
                 </div>
-
-
 
                 {/* Card Number */}
-
                 <div className="flex flex-col justify-end">
-
                   <label htmlFor="cc-number" className="block text-[11px] font-bold text-slate-700 mb-1">
-
                     {t('schedule.cardNumber')} *
-
                   </label>
-
                   <input
-
                     id="cc-number"
-
                     name="cc-number"
-
                     type="text"
-
                     autoComplete="cc-number"
-
                     inputMode="numeric"
-
                     value={cardNumber}
-
                     onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-
                     onBlur={() => setTouchedFields({ ...touchedFields, cc_number: true })}
-
                     placeholder="4242 •••• •••• 4242"
-
                     maxLength={19}
-
-                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white ${
-
+                    className={`w-full bg-slate-50 border rounded-xl px-3 py-2.5 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white ${
                       touchedFields.cc_number && !isCardNumberValid
-
                         ? 'border-rose-500 focus:border-rose-600'
-
                         : 'border-slate-300 focus:border-emerald-600'
-
                     }`}
-
                   />
-
                   {touchedFields.cc_number && !isCardNumberValid && (
-
                     <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardNumberInvalid')}</p>
-
                   )}
-
                 </div>
-
-
 
                 {/* Expiry & CVC */}
-
                 <div className="grid grid-cols-2 gap-2">
-
                   <div className="flex flex-col justify-end">
-
                     <label htmlFor="cc-exp" className="block text-[11px] font-bold text-slate-700">
-
                       {t('schedule.cardExpiry')} *
-
                     </label>
-
-                    <span id="exp-hint" className="block text-[10px] text-slate-500 font-medium mb-1">
-
+                    <span id="exp-hint" className="block text-[10px] text-slate-500 font-medium mb-1 truncate">
                       {t('schedule.cardFormatHint')}
-
                     </span>
-
                     <input
-
                       id="cc-exp"
-
                       name="cc-exp"
-
                       type="text"
-
                       autoComplete="cc-exp"
-
                       aria-describedby="exp-hint"
-
                       inputMode="numeric"
-
                       value={cardExpiry}
-
                       onChange={(e) => setCardExpiry(formatCardExpiry(e.target.value))}
-
                       onBlur={() => setTouchedFields({ ...touchedFields, cc_exp: true })}
-
                       placeholder="MM / YY"
-
                       maxLength={7}
-
-                      className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
-
+                      className={`w-full bg-slate-50 border rounded-xl px-2.5 py-2.5 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
                         touchedFields.cc_exp && !isCardExpiryValid
-
                           ? 'border-rose-500 focus:border-rose-600'
-
                           : 'border-slate-300 focus:border-emerald-600'
-
                       }`}
-
                     />
-
                     {touchedFields.cc_exp && !isCardExpiryValid && (
-
                       <p className="mt-1 text-[11px] text-rose-600 font-semibold">
-
                         {isCardExpiryPast ? t('schedule.cardExpiryPast') : t('schedule.cardExpiryInvalid')}
-
                       </p>
-
                     )}
-
                   </div>
-
                   <div className="flex flex-col justify-end">
-
                     <label htmlFor="cc-csc" className="block text-[11px] font-bold text-slate-700 mb-1">
-
                       {t('schedule.cardCvc')} *
-
                     </label>
-
                     <input
-
                       id="cc-csc"
-
                       name="cc-csc"
-
                       type="text"
-
                       autoComplete="cc-csc"
-
                       inputMode="numeric"
-
                       value={cardCvc}
-
                       onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
-
                       onBlur={() => setTouchedFields({ ...touchedFields, cc_csc: true })}
-
                       placeholder="CVC"
-
                       maxLength={4}
-
-                      className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
-
+                      className={`w-full bg-slate-50 border rounded-xl px-2.5 py-2.5 text-xs sm:text-sm text-slate-900 font-mono tabular-nums font-medium focus:outline-none focus:bg-white text-center ${
                         touchedFields.cc_csc && !isCardCvcValid
-
                           ? 'border-rose-500 focus:border-rose-600'
-
                           : 'border-slate-300 focus:border-emerald-600'
-
                       }`}
-
                     />
-
                     {touchedFields.cc_csc && !isCardCvcValid && (
-
                       <p className="mt-1 text-[11px] text-rose-600 font-semibold">{t('schedule.cardCvcInvalid')}</p>
-
                     )}
-
                   </div>
-
                 </div>
-
               </div>
-
             )}
-
           </div>
-
-
 
           {/* Terms Agreement Checkbox */}
-
           <div className="flex items-start gap-3 bg-white p-3.5 border border-slate-200 rounded-xl shadow-2xs">
-
             <input
-
               type="checkbox"
-
               id="agree-terms"
-
               checked={agreedToTerms}
-
               onChange={(e) => setAgreedToTerms(e.target.checked)}
-
-              className="w-4 h-4 accent-emerald-600 rounded mt-0.5 cursor-pointer"
-
+              className="w-4 h-4 accent-emerald-600 rounded mt-0.5 cursor-pointer shrink-0"
             />
-
-            <label htmlFor="agree-terms" className="text-xs text-slate-700 cursor-pointer font-medium leading-relaxed">
-
+            <label htmlFor="agree-terms" className="text-xs text-slate-700 cursor-pointer font-medium leading-relaxed select-none min-w-0">
               {t('schedule.termsAgree')}
-
             </label>
-
           </div>
-
-
 
           {/* Controls */}
-
-          <div className="flex items-center justify-between gap-2.5 sm:gap-4 pt-4 border-t border-slate-100">
-
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
             <Button
-
               variant="outline"
-
               size="md"
-
               onClick={() => setStep(3)}
-
-              className="shrink-0 px-3.5 sm:px-5 min-h-[44px] text-xs sm:text-sm hover:scale-102 active:scale-98 transition-all duration-200"
-
+              className="w-full sm:w-auto px-4 sm:px-5 min-h-[46px] text-xs sm:text-sm font-bold hover:scale-102 active:scale-98 transition-all duration-200 justify-center"
             >
-
-              <ChevronLeft className="w-4 h-4 mr-1" />
-
+              <ChevronLeft className="w-4 h-4 mr-1 shrink-0" />
               <span>{t('schedule.back')}</span>
-
             </Button>
-
             <Button
-
               size="md"
-
               disabled={!agreedToTerms || !isCardValid || isSubmitting}
-
               onClick={handleSubmitBooking}
-
-              className="flex-1 sm:flex-initial sm:px-8 min-h-[44px] text-xs sm:text-sm font-black shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200 tabular-nums"
-
+              className="w-full sm:w-auto sm:px-8 min-h-[48px] text-xs sm:text-sm font-black shadow-md hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-200 justify-center py-3"
             >
-
-              <CreditCard className="w-4 h-4 mr-1.5 shrink-0" />
-
-              <span className="truncate">
-
-                {isSubmitting
-
-                  ? t('schedule.submitting')
-
-                  : `${t('schedule.payDepositAndBook')} • 25% ($${depositAmount.toFixed(2)}) ${i18n.language?.startsWith('es') ? 'al confirmar' : 'upon approval'}`}
-
+              <CreditCard className="w-4 h-4 mr-2 shrink-0" />
+              <span className="text-center font-black">
+                {isSubmitting ? t('schedule.submitting') : t('schedule.payDepositAndBook')}
               </span>
-
             </Button>
-
           </div>
-
         </Card>
-
-      )}
-
+      )}\n
       <QuickAuthModal
 
         isOpen={isQuickAuthOpen}

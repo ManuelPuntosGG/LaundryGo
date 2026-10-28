@@ -268,7 +268,7 @@ export function QuickAuthModal({ isOpen, onClose, onSuccess }: QuickAuthModalPro
             </form>
           ) : (
             <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     {t('auth.firstName', 'First Name')}
@@ -333,7 +333,7 @@ export function QuickAuthModal({ isOpen, onClose, onSuccess }: QuickAuthModalPro
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     {t('auth.password', 'Password')}
