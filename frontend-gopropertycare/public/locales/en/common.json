@@ -591,19 +591,19 @@
   "cleaningAddons": {
     "oven": {
       "name": "Oven Cleaning",
-      "description": "Deep oven interior cleaning and degreasing (+$60)."
+      "description": "Deep oven interior cleaning and degreasing."
     },
     "inside_fridge": {
       "name": "Inside Fridge Cleaning",
-      "description": "Complete sanitization of interior shelves, compartments, and drawers (+$50)."
+      "description": "Complete sanitization of interior shelves, compartments, and drawers."
     },
     "blinds": {
       "name": "Blinds Cleaning",
-      "description": "Detailed dusting and wipe-down of blinds across the home (+$40)."
+      "description": "Detailed dusting and wipe-down of blinds across the home."
     },
     "inside_windows": {
       "name": "Inside Windows Cleaning",
-      "description": "Hand washing and streak-free polishing of interior window panes (+$35)."
+      "description": "Hand washing and streak-free polishing of interior window panes."
     },
     "off_site_laundry": {
       "name": "Off-Site Laundry Service",
@@ -611,27 +611,27 @@
     },
     "pets": {
       "name": "Pets (Hair & Odors)",
-      "description": "Deep vacuuming, lint roll, and pet odor neutralizing treatment (+$20)."
+      "description": "Deep vacuuming, lint roll, and pet odor neutralizing treatment."
     },
     "hot_tub": {
       "name": "Hot Tub / Jacuzzi Surface Clean",
-      "description": "Surface wipe-down, sanitization and cover cleaning without chemicals (+$25)."
+      "description": "Surface wipe-down, sanitization and cover cleaning without chemicals."
     },
     "patio_grill": {
       "name": "Patio, Balcony or Grill Clean",
-      "description": "Outdoor furniture wiped, swept, and grill grates cleaned (+$20)."
+      "description": "Outdoor furniture wiped, swept, and grill grates cleaned."
     },
     "str_pets": {
       "name": "Pets (Hair & Odors)",
-      "description": "Deep vacuuming, lint roll, and pet odor neutralizing treatment (+$20)."
+      "description": "Deep vacuuming, lint roll, and pet odor neutralizing treatment."
     },
     "str_hot_tub": {
       "name": "Hot Tub / Jacuzzi Surface Clean",
-      "description": "Surface wipe-down, sanitization and cover cleaning without chemicals (+$25)."
+      "description": "Surface wipe-down, sanitization and cover cleaning without chemicals."
     },
     "str_patio_grill": {
       "name": "Patio, Balcony or Grill Clean",
-      "description": "Outdoor furniture wiped, swept, and grill grates cleaned (+$20)."
+      "description": "Outdoor furniture wiped, swept, and grill grates cleaned."
     }
   },
   "schedule": {

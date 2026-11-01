@@ -591,19 +591,19 @@
   "cleaningAddons": {
     "oven": {
       "name": "Interior de Horno",
-      "description": "Limpieza profunda y desengrasado térmico del interior de horno (+$60)."
+      "description": "Limpieza profunda y desengrasado térmico del interior de horno."
     },
     "inside_fridge": {
       "name": "Interior de Refrigerador",
-      "description": "Desinfección integral y limpieza de compartimentos interiores de refrigerador (+$50)."
+      "description": "Desinfección integral y limpieza de compartimentos interiores de refrigerador."
     },
     "blinds": {
       "name": "Limpieza de Persianas",
-      "description": "Desempolvado y limpieza detallada de persianas en todo el inmueble (+$40)."
+      "description": "Desempolvado y limpieza detallada de persianas en todo el inmueble."
     },
     "inside_windows": {
       "name": "Vidrios Interiores",
-      "description": "Lavado a mano y pulido sin marcas de vidrios interiores y marcos (+$35)."
+      "description": "Lavado a mano y pulido sin marcas de vidrios interiores y marcos."
     },
     "off_site_laundry": {
       "name": "Lavandería Fuera de la Propiedad",
@@ -611,27 +611,27 @@
     },
     "pets": {
       "name": "Mascotas (Pelo y Olores)",
-      "description": "Aspirado intensivo, rodillo antipelo y tratamiento desodorizante (+$20)."
+      "description": "Aspirado intensivo, rodillo antipelo y tratamiento desodorizante."
     },
     "hot_tub": {
       "name": "Jacuzzi / Tina de Hidromasaje",
-      "description": "Limpieza de superficies y tapa del jacuzzi sin químicos (+$25)."
+      "description": "Limpieza de superficies y tapa del jacuzzi sin químicos."
     },
     "patio_grill": {
       "name": "Patio, Balcón o Parrilla",
-      "description": "Limpieza de mobiliario exterior, barrido y desengrase de parrilla (+$20)."
+      "description": "Limpieza de mobiliario exterior, barrido y desengrase de parrilla."
     },
     "str_pets": {
       "name": "Mascotas (Pelo y Olores)",
-      "description": "Aspirado intensivo, rodillo antipelo y tratamiento desodorizante (+$20)."
+      "description": "Aspirado intensivo, rodillo antipelo y tratamiento desodorizante."
     },
     "str_hot_tub": {
       "name": "Jacuzzi / Tina de Hidromasaje",
-      "description": "Limpieza de superficies y tapa del jacuzzi sin químicos (+$25)."
+      "description": "Limpieza de superficies y tapa del jacuzzi sin químicos."
     },
     "str_patio_grill": {
       "name": "Patio, Balcón o Parrilla",
-      "description": "Limpieza de mobiliario exterior, barrido y desengrase de parrilla (+$20)."
+      "description": "Limpieza de mobiliario exterior, barrido y desengrase de parrilla."
     }
   },
   "schedule": {
