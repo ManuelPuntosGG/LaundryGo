@@ -2,6 +2,7 @@ from django.urls import path
 from .views import (
     CleaningServiceRateListView,
     CleaningPricingTierListView,
+    CleaningSTRPricingTierListView,
     CleaningAddonListView,
     CleaningOrderListCreateView,
     CleaningOrderDetailView,
@@ -13,6 +14,7 @@ from .views import (
 urlpatterns = [
     path('rates/', CleaningServiceRateListView.as_view(), name='cleaning-rates-list'),
     path('tiers/', CleaningPricingTierListView.as_view(), name='cleaning-tiers-list'),
+    path('str-tiers/', CleaningSTRPricingTierListView.as_view(), name='cleaning-str-tiers-list'),
     path('addons/', CleaningAddonListView.as_view(), name='cleaning-addons-list'),
     path('orders/', CleaningOrderListCreateView.as_view(), name='cleaning-orders-list-create'),
     path('orders/<int:pk>/', CleaningOrderDetailView.as_view(), name='cleaning-order-detail'),

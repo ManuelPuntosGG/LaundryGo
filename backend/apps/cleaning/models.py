@@ -37,13 +37,28 @@ class CleaningServiceRate(TimeStampedModel):
     rate_per_sqft = models.DecimalField(
         max_digits=7,
         decimal_places=3,
-        help_text='Rate per square foot (e.g. 0.125 for $0.125/sqft)'
+        default=0.000,
+        help_text='Rate per square foot (used for Evolving Solutions LLC; GoPropertyCare uses Tiers)'
     )
     min_order_amount = models.DecimalField(
         max_digits=6,
         decimal_places=2,
         default=99.00,
         help_text='Minimum service fee threshold in USD'
+    )
+    discount_percentage = models.PositiveIntegerField(
+        default=0,
+        help_text='Promotional limited-time discount percentage (0 to 90%) for this service'
+    )
+    is_discount_active = models.BooleanField(
+        default=False,
+        help_text='Enable/disable limited-time discount badge and price reduction on the frontend'
+    )
+    discount_label = models.CharField(
+        max_length=60,
+        blank=True,
+        default='',
+        help_text='Optional custom promotional badge text (leave blank for automatic bilingual "Limited Time" badge)'
     )
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
@@ -92,7 +107,13 @@ class CleaningPricingTier(TimeStampedModel):
         max_digits=7,
         decimal_places=2,
         default=0.00,
-        help_text='Deep / Move-In / Move-Out cleaning flat price'
+        help_text='Deep cleaning flat price'
+    )
+    move_in_out_price = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        help_text='Move-In / Move-Out cleaning flat price'
     )
     str_on_site_price = models.DecimalField(
         max_digits=7,
@@ -124,7 +145,68 @@ class CleaningPricingTier(TimeStampedModel):
         ]
 
     def __str__(self):
-        return f'Tier {self.tier_number} ({self.label}) [{self.get_brand_display()}] - Std: ${self.standard_price}'
+        return f'Tier {self.tier_number} ({self.label}) [{self.get_brand_display()}] - Std: ${self.standard_price}, Deep: ${self.deep_price}, Move-In/Out: ${self.move_in_out_price}'
+
+
+class CleaningSTRPricingTier(TimeStampedModel):
+    brand = models.CharField(
+        max_length=30,
+        choices=BRAND_CHOICES,
+        default='gopropertycare',
+        help_text='Brand using this STR pricing tier'
+    )
+    bedrooms = models.PositiveIntegerField(
+        help_text='Bedroom count (0 = Studio, 1 to 5 = 1-5 Bedrooms, 6 = 6+ Bedrooms Custom Quote)'
+    )
+    label = models.CharField(
+        max_length=100,
+        help_text='Display label, e.g. "Studio", "1 Bed", "2 Beds"'
+    )
+    max_sqft_hint = models.PositiveIntegerField(
+        default=800,
+        help_text='Approximate max square footage hint for this bedroom count'
+    )
+    included_bathrooms = models.PositiveIntegerField(
+        default=1,
+        help_text='Number of bathrooms included in base price'
+    )
+    base_price = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        default=0.00,
+        help_text='Base turnover flat price in USD'
+    )
+    extra_bathroom_price = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=25.00,
+        help_text='Additional fee per extra bathroom above included_bathrooms'
+    )
+    external_laundry_fee = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=45.00,
+        help_text='Add-on fee for off-site laundry service for this bedroom tier'
+    )
+    is_custom_quote = models.BooleanField(
+        default=False,
+        help_text='Whether this tier triggers a custom quote (e.g. 6+ bedrooms)'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text='Whether this STR tier is currently active'
+    )
+
+    class Meta:
+        verbose_name = 'STR Pricing Tier (By Bedrooms)'
+        verbose_name_plural = 'STR Pricing Tiers (By Bedrooms)'
+        ordering = ['brand', 'bedrooms']
+        constraints = [
+            models.UniqueConstraint(fields=['brand', 'bedrooms'], name='unique_str_tier_per_brand')
+        ]
+
+    def __str__(self):
+        return f'STR {self.label} ({self.bedrooms} Beds) - Base: ${self.base_price} (+${self.external_laundry_fee} Off-Site Laundry)'
 
 
 class CleaningAddon(TimeStampedModel):

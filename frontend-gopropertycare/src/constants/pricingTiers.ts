@@ -5,6 +5,7 @@ export interface PricingTier {
   maxSqft: number;
   standardPrice: number;
   deepPrice: number;
+  moveInOutPrice?: number;
   strOnSitePrice: number;
   strOffSitePrice: number;
   sqftEquivalent: string;
@@ -41,8 +42,9 @@ export const getTierPrice = (tier: PricingTier, type: CleaningServiceTierType): 
     case 'standard':
       return tier.standardPrice;
     case 'deep':
-    case 'move_in_out':
       return tier.deepPrice;
+    case 'move_in_out':
+      return tier.moveInOutPrice !== undefined && tier.moveInOutPrice > 0 ? tier.moveInOutPrice : tier.deepPrice;
     case 'str_on_site':
       return tier.strOnSitePrice;
     case 'str_off_site':

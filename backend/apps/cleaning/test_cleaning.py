@@ -833,3 +833,173 @@ class TestGoPropertyCarePayments:
         order.refresh_from_db()
         assert order.status == 'cancelled'
         assert order.payment_status == 'deposit_paid'
+
+
+    def test_independent_move_in_out_tier_price_and_str_tiers(self, api_client, db):
+        from apps.cleaning.models import CleaningPricingTier, CleaningSTRPricingTier
+
+        deep_rate = CleaningServiceRate.objects.create(
+            name='Deep Residential Cleaning',
+            service_type='deep',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.200'),
+            min_order_amount=Decimal('99.00'),
+            is_active=True,
+        )
+        move_in_rate = CleaningServiceRate.objects.create(
+            name='Move-In / Move-Out Cleaning',
+            service_type='move_in_out',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.200'),
+            min_order_amount=Decimal('99.00'),
+            is_active=True,
+        )
+        CleaningPricingTier.objects.create(
+            brand='gopropertycare',
+            tier_number=0,
+            label='500 - 999 sq ft',
+            min_sqft=500,
+            max_sqft=999,
+            standard_price=Decimal('155.00'),
+            deep_price=Decimal('235.00'),
+            move_in_out_price=Decimal('299.00'),
+            is_active=True,
+        )
+
+        future_date = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
+        base_payload = {
+            'street_address': '400 MoveIn St',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'square_feet': 750,
+            'frequency': 'one_time',
+            'bedrooms': 1,
+            'bathrooms': 1,
+            'is_occupied': False,
+            'entry_method': 'lockbox',
+            'service_date': future_date,
+            'time_slot': '09:00 AM',
+            'guest_email': 'movein@example.com',
+            'guest_first_name': 'Alice',
+            'guest_last_name': 'Smith',
+            'guest_phone': '303-555-1212',
+            'brand': 'gopropertycare',
+        }
+
+        # Deep uses deep_price ($235.00)
+        resp_deep = api_client.post('/api/v1/cleaning/orders/', {**base_payload, 'service_rate_id': deep_rate.id}, format='json')
+        assert resp_deep.status_code == 201
+        assert Decimal(str(resp_deep.json()['base_price'])) == Decimal('235.00')
+
+        # Move-In/Out uses move_in_out_price ($299.00)
+        resp_move = api_client.post('/api/v1/cleaning/orders/', {**base_payload, 'service_rate_id': move_in_rate.id}, format='json')
+        assert resp_move.status_code == 201
+        assert Decimal(str(resp_move.json()['base_price'])) == Decimal('299.00')
+
+        # STR Tier DB override test
+        str_rate = CleaningServiceRate.objects.create(
+            name='Short Term Rentals (Laundry on site)',
+            service_type='str_on_site',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.170'),
+            min_order_amount=Decimal('99.00'),
+            is_active=True,
+        )
+        CleaningSTRPricingTier.objects.create(
+            brand='gopropertycare',
+            bedrooms=2,
+            label='2 Bedrooms',
+            base_price=Decimal('165.00'),
+            included_bathrooms=Decimal('2.0'),
+            extra_bathroom_price=Decimal('30.00'),
+            external_laundry_fee=Decimal('75.00'),
+            is_active=True,
+        )
+        str_tiers_resp = api_client.get('/api/v1/cleaning/str-tiers/?brand=gopropertycare')
+        assert str_tiers_resp.status_code == 200
+        str_data = str_tiers_resp.json()
+        str_list = str_data if isinstance(str_data, list) else str_data.get('results', [])
+        assert len(str_list) == 1
+        assert Decimal(str(str_list[0]['base_price'])) == Decimal('165.00')
+
+        resp_str = api_client.post(
+            '/api/v1/cleaning/orders/',
+            {**base_payload, 'service_rate_id': str_rate.id, 'bedrooms': 2, 'bathrooms': 3},
+            format='json',
+        )
+        assert resp_str.status_code == 201
+        # 165 base + 1 extra bath * 30 = 195.00
+        assert Decimal(str(resp_str.json()['base_price'])) == Decimal('195.00')
+
+    def test_service_promotional_discount_active_vs_inactive(self, api_client, db):
+        from apps.cleaning.models import CleaningPricingTier
+
+        CleaningPricingTier.objects.create(
+            brand='gopropertycare',
+            tier_number=0,
+            label='500 - 999 sq ft',
+            min_sqft=500,
+            max_sqft=999,
+            standard_price=Decimal('200.00'),
+            deep_price=Decimal('300.00'),
+            move_in_out_price=Decimal('300.00'),
+            is_active=True,
+        )
+        promo_rate = CleaningServiceRate.objects.create(
+            name='Basic Residential Cleaning',
+            service_type='residential',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.125'),
+            min_order_amount=Decimal('99.00'),
+            discount_percentage=20,
+            is_discount_active=True,
+            discount_label='Spring Flash Sale',
+            is_active=True,
+        )
+
+        # Verify GET /api/v1/cleaning/rates/ exposes promo fields
+        rates_resp = api_client.get('/api/v1/cleaning/rates/?brand=gopropertycare')
+        assert rates_resp.status_code == 200
+        rates_data = rates_resp.json()
+        rates_list = rates_data if isinstance(rates_data, list) else rates_data.get('results', [])
+        rate_item = rates_list[0]
+        assert rate_item['discount_percentage'] == 20
+        assert rate_item['is_discount_active'] is True
+        assert rate_item['discount_label'] == 'Spring Flash Sale'
+
+        future_date = (timezone.localtime(timezone.now()).date() + timedelta(days=2)).isoformat()
+        payload = {
+            'street_address': '500 Promo Ave',
+            'city': 'Denver',
+            'zip_code': '80202',
+            'delivery_zone': 'inner',
+            'service_rate_id': promo_rate.id,
+            'square_feet': 750,
+            'frequency': 'one_time',
+            'bedrooms': 2,
+            'bathrooms': 1,
+            'is_occupied': True,
+            'entry_method': 'someone_home',
+            'service_date': future_date,
+            'time_slot': '09:00 AM',
+            'guest_email': 'promo@example.com',
+            'guest_first_name': 'Promo',
+            'guest_last_name': 'User',
+            'guest_phone': '303-555-7777',
+            'brand': 'gopropertycare',
+        }
+
+        # With is_discount_active=True (20% off $200.00 -> $160.00)
+        resp_active = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+        assert resp_active.status_code == 201
+        assert Decimal(str(resp_active.json()['base_price'])) == Decimal('160.00')
+        assert Decimal(str(resp_active.json()['total_price'])) == Decimal('160.00')
+
+        # Disable promo in admin -> full $200.00 charged
+        promo_rate.is_discount_active = False
+        promo_rate.save()
+        resp_inactive = api_client.post('/api/v1/cleaning/orders/', payload, format='json')
+        assert resp_inactive.status_code == 201
+        assert Decimal(str(resp_inactive.json()['base_price'])) == Decimal('200.00')
+        assert Decimal(str(resp_inactive.json()['total_price'])) == Decimal('200.00')

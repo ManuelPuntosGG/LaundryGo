@@ -5,10 +5,11 @@ from django.utils import timezone
 from django.db import transaction
 from datetime import timedelta
 from django.db.models import Q
-from .models import CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
+from .models import CleaningServiceRate, CleaningPricingTier, CleaningSTRPricingTier, CleaningAddon, CleaningOrder
 from .serializers import (
     CleaningServiceRateSerializer,
     CleaningPricingTierSerializer,
+    CleaningSTRPricingTierSerializer,
     CleaningAddonSerializer,
     CleaningOrderSerializer,
     CleaningOrderCreateSerializer,
@@ -23,9 +24,23 @@ from .emails import (
 class CleaningPricingTierListView(generics.ListAPIView):
     serializer_class = CleaningPricingTierSerializer
     permission_classes = (permissions.AllowAny,)
+    pagination_class = None
 
     def get_queryset(self):
         qs = CleaningPricingTier.objects.filter(is_active=True).order_by('tier_number')
+        brand = self.request.query_params.get('brand')
+        if brand:
+            qs = qs.filter(brand=brand)
+        return qs
+
+
+class CleaningSTRPricingTierListView(generics.ListAPIView):
+    serializer_class = CleaningSTRPricingTierSerializer
+    permission_classes = (permissions.AllowAny,)
+    pagination_class = None
+
+    def get_queryset(self):
+        qs = CleaningSTRPricingTier.objects.filter(is_active=True).order_by('bedrooms')
         brand = self.request.query_params.get('brand')
         if brand:
             qs = qs.filter(brand=brand)

@@ -1,10 +1,15 @@
 from decimal import Decimal
 from django.core.management.base import BaseCommand
-from apps.cleaning.models import CleaningServiceRate, CleaningPricingTier, CleaningAddon
+from apps.cleaning.models import (
+    CleaningServiceRate,
+    CleaningPricingTier,
+    CleaningSTRPricingTier,
+    CleaningAddon,
+)
 
 
 class Command(BaseCommand):
-    help = 'Seeds initial GoPropertyCare and Evolving Solutions cleaning rates and add-ons'
+    help = 'Seeds initial GoPropertyCare and Evolving Solutions cleaning rates, tiers, STR tiers and add-ons'
 
     def handle(self, *args, **kwargs):
         rates_data = [
@@ -85,7 +90,7 @@ class Command(BaseCommand):
         ]
 
         addons_data = [
-            # GoPropertyCare Add-ons (Only 4 priced add-ons as specified by client)
+            # GoPropertyCare Add-ons
             {
                 'code': 'oven',
                 'name': 'Oven Cleaning',
@@ -194,46 +199,51 @@ class Command(BaseCommand):
         active_gpc_addons = [a['code'] for a in addons_data if a['brand'] == 'gopropertycare']
         CleaningAddon.objects.filter(brand='gopropertycare').exclude(code__in=active_gpc_addons).update(is_active=False)
 
-        # Seed Service Rates
+        # Seed Service Rates (preserve admin-configured discounts)
         for rate in rates_data:
-            obj, created = CleaningServiceRate.objects.update_or_create(
+            obj, created = CleaningServiceRate.objects.get_or_create(
                 service_type=rate['service_type'],
                 brand=rate['brand'],
                 defaults=rate
             )
-            status = 'Created' if created else 'Updated'
-            self.stdout.write(self.style.SUCCESS(f'{status} Cleaning Rate: {obj.name} [{obj.brand}] (${obj.rate_per_sqft}/sqft, min ${obj.min_order_amount})'))
+            if not created:
+                obj.name = rate['name']
+                obj.description = rate['description']
+                obj.is_active = True
+                obj.save(update_fields=['name', 'description', 'is_active'])
+            status = 'Created' if created else 'Verified'
+            self.stdout.write(self.style.SUCCESS(f'{status} Cleaning Rate: {obj.name} [{obj.brand}]'))
 
-        # Seed Add-ons
+        # Seed Add-ons (preserve admin-configured prices if already created)
         for addon in addons_data:
-            obj, created = CleaningAddon.objects.update_or_create(
+            obj, created = CleaningAddon.objects.get_or_create(
                 code=addon['code'],
                 brand=addon['brand'],
                 defaults=addon
             )
-            status = 'Created' if created else 'Updated'
+            status = 'Created' if created else 'Verified'
             self.stdout.write(self.style.SUCCESS(f'{status} Cleaning Addon: {obj.name} [{obj.brand}] (+${obj.price})'))
 
         # Seed GoPropertyCare Pricing Tiers (18 tiers: Tier 0 to Tier 16 + Custom Quote)
         tiers_data = [
-            {'tier_number': 0, 'label': '500 – 999 sq ft', 'min_sqft': 500, 'max_sqft': 999, 'standard_price': Decimal('155.00'), 'deep_price': Decimal('235.00'), 'str_on_site_price': Decimal('205.00'), 'str_off_site_price': Decimal('270.00'), 'is_custom_quote': False},
-            {'tier_number': 1, 'label': '1,000 – 1,299 sq ft', 'min_sqft': 1000, 'max_sqft': 1299, 'standard_price': Decimal('175.00'), 'deep_price': Decimal('270.00'), 'str_on_site_price': Decimal('230.00'), 'str_off_site_price': Decimal('310.00'), 'is_custom_quote': False},
-            {'tier_number': 2, 'label': '1,300 – 1,599 sq ft', 'min_sqft': 1300, 'max_sqft': 1599, 'standard_price': Decimal('190.00'), 'deep_price': Decimal('295.00'), 'str_on_site_price': Decimal('255.00'), 'str_off_site_price': Decimal('340.00'), 'is_custom_quote': False},
-            {'tier_number': 3, 'label': '1,600 – 1,899 sq ft', 'min_sqft': 1600, 'max_sqft': 1899, 'standard_price': Decimal('200.00'), 'deep_price': Decimal('320.00'), 'str_on_site_price': Decimal('270.00'), 'str_off_site_price': Decimal('370.00'), 'is_custom_quote': False},
-            {'tier_number': 4, 'label': '1,900 – 2,199 sq ft', 'min_sqft': 1900, 'max_sqft': 2199, 'standard_price': Decimal('215.00'), 'deep_price': Decimal('360.00'), 'str_on_site_price': Decimal('300.00'), 'str_off_site_price': Decimal('420.00'), 'is_custom_quote': False},
-            {'tier_number': 5, 'label': '2,200 – 2,499 sq ft', 'min_sqft': 2200, 'max_sqft': 2499, 'standard_price': Decimal('230.00'), 'deep_price': Decimal('410.00'), 'str_on_site_price': Decimal('340.00'), 'str_off_site_price': Decimal('480.00'), 'is_custom_quote': False},
-            {'tier_number': 6, 'label': '2,500 – 2,799 sq ft', 'min_sqft': 2500, 'max_sqft': 2799, 'standard_price': Decimal('250.00'), 'deep_price': Decimal('460.00'), 'str_on_site_price': Decimal('375.00'), 'str_off_site_price': Decimal('545.00'), 'is_custom_quote': False},
-            {'tier_number': 7, 'label': '2,800 – 3,099 sq ft', 'min_sqft': 2800, 'max_sqft': 3099, 'standard_price': Decimal('270.00'), 'deep_price': Decimal('505.00'), 'str_on_site_price': Decimal('410.00'), 'str_off_site_price': Decimal('600.00'), 'is_custom_quote': False},
-            {'tier_number': 8, 'label': '3,100 – 3,399 sq ft', 'min_sqft': 3100, 'max_sqft': 3399, 'standard_price': Decimal('295.00'), 'deep_price': Decimal('550.00'), 'str_on_site_price': Decimal('450.00'), 'str_off_site_price': Decimal('650.00'), 'is_custom_quote': False},
-            {'tier_number': 9, 'label': '3,400 – 3,699 sq ft', 'min_sqft': 3400, 'max_sqft': 3699, 'standard_price': Decimal('315.00'), 'deep_price': Decimal('590.00'), 'str_on_site_price': Decimal('480.00'), 'str_off_site_price': Decimal('700.00'), 'is_custom_quote': False},
-            {'tier_number': 10, 'label': '3,700 – 3,999 sq ft', 'min_sqft': 3700, 'max_sqft': 3999, 'standard_price': Decimal('335.00'), 'deep_price': Decimal('640.00'), 'str_on_site_price': Decimal('520.00'), 'str_off_site_price': Decimal('760.00'), 'is_custom_quote': False},
-            {'tier_number': 11, 'label': '4,000 – 4,299 sq ft', 'min_sqft': 4000, 'max_sqft': 4299, 'standard_price': Decimal('355.00'), 'deep_price': Decimal('695.00'), 'str_on_site_price': Decimal('560.00'), 'str_off_site_price': Decimal('830.00'), 'is_custom_quote': False},
-            {'tier_number': 12, 'label': '4,300 – 4,599 sq ft', 'min_sqft': 4300, 'max_sqft': 4599, 'standard_price': Decimal('385.00'), 'deep_price': Decimal('740.00'), 'str_on_site_price': Decimal('600.00'), 'str_off_site_price': Decimal('880.00'), 'is_custom_quote': False},
-            {'tier_number': 13, 'label': '4,600 – 4,899 sq ft', 'min_sqft': 4600, 'max_sqft': 4899, 'standard_price': Decimal('410.00'), 'deep_price': Decimal('785.00'), 'str_on_site_price': Decimal('635.00'), 'str_off_site_price': Decimal('935.00'), 'is_custom_quote': False},
-            {'tier_number': 14, 'label': '4,900 – 5,299 sq ft', 'min_sqft': 4900, 'max_sqft': 5299, 'standard_price': Decimal('435.00'), 'deep_price': Decimal('820.00'), 'str_on_site_price': Decimal('665.00'), 'str_off_site_price': Decimal('975.00'), 'is_custom_quote': False},
-            {'tier_number': 15, 'label': '5,300 – 5,699 sq ft', 'min_sqft': 5300, 'max_sqft': 5699, 'standard_price': Decimal('455.00'), 'deep_price': Decimal('850.00'), 'str_on_site_price': Decimal('690.00'), 'str_off_site_price': Decimal('1010.00'), 'is_custom_quote': False},
-            {'tier_number': 16, 'label': '5,700 – 6,099 sq ft', 'min_sqft': 5700, 'max_sqft': 6099, 'standard_price': Decimal('480.00'), 'deep_price': Decimal('890.00'), 'str_on_site_price': Decimal('725.00'), 'str_off_site_price': Decimal('1055.00'), 'is_custom_quote': False},
-            {'tier_number': 17, 'label': '6,100+ sq ft', 'min_sqft': 6100, 'max_sqft': 99999, 'standard_price': Decimal('0.00'), 'deep_price': Decimal('0.00'), 'str_on_site_price': Decimal('0.00'), 'str_off_site_price': Decimal('0.00'), 'is_custom_quote': True},
+            {'tier_number': 0, 'label': '500 – 999 sq ft', 'min_sqft': 500, 'max_sqft': 999, 'standard_price': Decimal('155.00'), 'deep_price': Decimal('235.00'), 'move_in_out_price': Decimal('235.00'), 'str_on_site_price': Decimal('205.00'), 'str_off_site_price': Decimal('270.00'), 'is_custom_quote': False},
+            {'tier_number': 1, 'label': '1,000 – 1,299 sq ft', 'min_sqft': 1000, 'max_sqft': 1299, 'standard_price': Decimal('175.00'), 'deep_price': Decimal('270.00'), 'move_in_out_price': Decimal('270.00'), 'str_on_site_price': Decimal('230.00'), 'str_off_site_price': Decimal('310.00'), 'is_custom_quote': False},
+            {'tier_number': 2, 'label': '1,300 – 1,599 sq ft', 'min_sqft': 1300, 'max_sqft': 1599, 'standard_price': Decimal('190.00'), 'deep_price': Decimal('295.00'), 'move_in_out_price': Decimal('295.00'), 'str_on_site_price': Decimal('255.00'), 'str_off_site_price': Decimal('340.00'), 'is_custom_quote': False},
+            {'tier_number': 3, 'label': '1,600 – 1,899 sq ft', 'min_sqft': 1600, 'max_sqft': 1899, 'standard_price': Decimal('200.00'), 'deep_price': Decimal('320.00'), 'move_in_out_price': Decimal('320.00'), 'str_on_site_price': Decimal('270.00'), 'str_off_site_price': Decimal('370.00'), 'is_custom_quote': False},
+            {'tier_number': 4, 'label': '1,900 – 2,199 sq ft', 'min_sqft': 1900, 'max_sqft': 2199, 'standard_price': Decimal('215.00'), 'deep_price': Decimal('360.00'), 'move_in_out_price': Decimal('360.00'), 'str_on_site_price': Decimal('300.00'), 'str_off_site_price': Decimal('420.00'), 'is_custom_quote': False},
+            {'tier_number': 5, 'label': '2,200 – 2,499 sq ft', 'min_sqft': 2200, 'max_sqft': 2499, 'standard_price': Decimal('230.00'), 'deep_price': Decimal('410.00'), 'move_in_out_price': Decimal('410.00'), 'str_on_site_price': Decimal('340.00'), 'str_off_site_price': Decimal('480.00'), 'is_custom_quote': False},
+            {'tier_number': 6, 'label': '2,500 – 2,799 sq ft', 'min_sqft': 2500, 'max_sqft': 2799, 'standard_price': Decimal('250.00'), 'deep_price': Decimal('460.00'), 'move_in_out_price': Decimal('460.00'), 'str_on_site_price': Decimal('375.00'), 'str_off_site_price': Decimal('545.00'), 'is_custom_quote': False},
+            {'tier_number': 7, 'label': '2,800 – 3,099 sq ft', 'min_sqft': 2800, 'max_sqft': 3099, 'standard_price': Decimal('270.00'), 'deep_price': Decimal('505.00'), 'move_in_out_price': Decimal('505.00'), 'str_on_site_price': Decimal('410.00'), 'str_off_site_price': Decimal('600.00'), 'is_custom_quote': False},
+            {'tier_number': 8, 'label': '3,100 – 3,399 sq ft', 'min_sqft': 3100, 'max_sqft': 3399, 'standard_price': Decimal('295.00'), 'deep_price': Decimal('550.00'), 'move_in_out_price': Decimal('550.00'), 'str_on_site_price': Decimal('450.00'), 'str_off_site_price': Decimal('650.00'), 'is_custom_quote': False},
+            {'tier_number': 9, 'label': '3,400 – 3,699 sq ft', 'min_sqft': 3400, 'max_sqft': 3699, 'standard_price': Decimal('315.00'), 'deep_price': Decimal('590.00'), 'move_in_out_price': Decimal('590.00'), 'str_on_site_price': Decimal('480.00'), 'str_off_site_price': Decimal('700.00'), 'is_custom_quote': False},
+            {'tier_number': 10, 'label': '3,700 – 3,999 sq ft', 'min_sqft': 3700, 'max_sqft': 3999, 'standard_price': Decimal('335.00'), 'deep_price': Decimal('640.00'), 'move_in_out_price': Decimal('640.00'), 'str_on_site_price': Decimal('520.00'), 'str_off_site_price': Decimal('760.00'), 'is_custom_quote': False},
+            {'tier_number': 11, 'label': '4,000 – 4,299 sq ft', 'min_sqft': 4000, 'max_sqft': 4299, 'standard_price': Decimal('355.00'), 'deep_price': Decimal('695.00'), 'move_in_out_price': Decimal('695.00'), 'str_on_site_price': Decimal('560.00'), 'str_off_site_price': Decimal('830.00'), 'is_custom_quote': False},
+            {'tier_number': 12, 'label': '4,300 – 4,599 sq ft', 'min_sqft': 4300, 'max_sqft': 4599, 'standard_price': Decimal('385.00'), 'deep_price': Decimal('740.00'), 'move_in_out_price': Decimal('740.00'), 'str_on_site_price': Decimal('600.00'), 'str_off_site_price': Decimal('880.00'), 'is_custom_quote': False},
+            {'tier_number': 13, 'label': '4,600 – 4,899 sq ft', 'min_sqft': 4600, 'max_sqft': 4899, 'standard_price': Decimal('410.00'), 'deep_price': Decimal('785.00'), 'move_in_out_price': Decimal('785.00'), 'str_on_site_price': Decimal('635.00'), 'str_off_site_price': Decimal('935.00'), 'is_custom_quote': False},
+            {'tier_number': 14, 'label': '4,900 – 5,299 sq ft', 'min_sqft': 4900, 'max_sqft': 5299, 'standard_price': Decimal('435.00'), 'deep_price': Decimal('820.00'), 'move_in_out_price': Decimal('820.00'), 'str_on_site_price': Decimal('665.00'), 'str_off_site_price': Decimal('975.00'), 'is_custom_quote': False},
+            {'tier_number': 15, 'label': '5,300 – 5,699 sq ft', 'min_sqft': 5300, 'max_sqft': 5699, 'standard_price': Decimal('455.00'), 'deep_price': Decimal('850.00'), 'move_in_out_price': Decimal('850.00'), 'str_on_site_price': Decimal('690.00'), 'str_off_site_price': Decimal('1010.00'), 'is_custom_quote': False},
+            {'tier_number': 16, 'label': '5,700 – 6,099 sq ft', 'min_sqft': 5700, 'max_sqft': 6099, 'standard_price': Decimal('480.00'), 'deep_price': Decimal('890.00'), 'move_in_out_price': Decimal('890.00'), 'str_on_site_price': Decimal('725.00'), 'str_off_site_price': Decimal('1055.00'), 'is_custom_quote': False},
+            {'tier_number': 17, 'label': '6,100+ sq ft', 'min_sqft': 6100, 'max_sqft': 99999, 'standard_price': Decimal('0.00'), 'deep_price': Decimal('0.00'), 'move_in_out_price': Decimal('0.00'), 'str_on_site_price': Decimal('0.00'), 'str_off_site_price': Decimal('0.00'), 'is_custom_quote': True},
         ]
 
         active_tier_numbers = [t['tier_number'] for t in tiers_data]
@@ -243,7 +253,7 @@ class Command(BaseCommand):
             t_num = tier['tier_number']
             brand = 'gopropertycare'
             tier_copy = dict(tier)
-            obj, created = CleaningPricingTier.objects.update_or_create(
+            obj, created = CleaningPricingTier.objects.get_or_create(
                 brand=brand,
                 tier_number=t_num,
                 defaults={
@@ -251,7 +261,34 @@ class Command(BaseCommand):
                     **tier_copy,
                 }
             )
-            status = 'Created' if created else 'Updated'
-            self.stdout.write(self.style.SUCCESS(f'{status} Pricing Tier {obj.tier_number}: {obj.label} (Std: ${obj.standard_price}, Deep: ${obj.deep_price})'))
+            if not created and obj.move_in_out_price == Decimal('0.00') and not obj.is_custom_quote:
+                obj.move_in_out_price = tier_copy['move_in_out_price']
+                obj.save(update_fields=['move_in_out_price'])
+            status = 'Created' if created else 'Verified'
+            self.stdout.write(self.style.SUCCESS(f'{status} Pricing Tier {obj.tier_number}: {obj.label} (Std: ${obj.standard_price}, Deep: ${obj.deep_price}, MoveIn/Out: ${obj.move_in_out_price})'))
 
-        self.stdout.write(self.style.SUCCESS('Successfully seeded all GoPropertyCare and Evolving Solutions rates, add-ons and pricing tiers!'))
+        # Seed GoPropertyCare STR Bedroom Pricing Tiers (Studio/0 to 6+ Beds Custom Quote)
+        str_tiers_data = [
+            {'bedrooms': 0, 'label': 'Studio', 'base_price': Decimal('90.00'), 'included_bathrooms': Decimal('1.0'), 'extra_bathroom_price': Decimal('25.00'), 'external_laundry_fee': Decimal('45.00'), 'is_custom_quote': False},
+            {'bedrooms': 1, 'label': '1 Bedroom', 'base_price': Decimal('90.00'), 'included_bathrooms': Decimal('1.0'), 'extra_bathroom_price': Decimal('25.00'), 'external_laundry_fee': Decimal('45.00'), 'is_custom_quote': False},
+            {'bedrooms': 2, 'label': '2 Bedrooms', 'base_price': Decimal('135.00'), 'included_bathrooms': Decimal('2.0'), 'extra_bathroom_price': Decimal('25.00'), 'external_laundry_fee': Decimal('70.00'), 'is_custom_quote': False},
+            {'bedrooms': 3, 'label': '3 Bedrooms', 'base_price': Decimal('185.00'), 'included_bathrooms': Decimal('2.0'), 'extra_bathroom_price': Decimal('25.00'), 'external_laundry_fee': Decimal('95.00'), 'is_custom_quote': False},
+            {'bedrooms': 4, 'label': '4 Bedrooms', 'base_price': Decimal('255.00'), 'included_bathrooms': Decimal('3.0'), 'extra_bathroom_price': Decimal('25.00'), 'external_laundry_fee': Decimal('120.00'), 'is_custom_quote': False},
+            {'bedrooms': 5, 'label': '5 Bedrooms', 'base_price': Decimal('330.00'), 'included_bathrooms': Decimal('4.0'), 'extra_bathroom_price': Decimal('25.00'), 'external_laundry_fee': Decimal('145.00'), 'is_custom_quote': False},
+            {'bedrooms': 6, 'label': '6+ Bedrooms (Custom Quote)', 'base_price': Decimal('0.00'), 'included_bathrooms': Decimal('4.0'), 'extra_bathroom_price': Decimal('25.00'), 'external_laundry_fee': Decimal('0.00'), 'is_custom_quote': True},
+        ]
+
+        for str_tier in str_tiers_data:
+            brand = 'gopropertycare'
+            obj, created = CleaningSTRPricingTier.objects.get_or_create(
+                brand=brand,
+                bedrooms=str_tier['bedrooms'],
+                defaults={
+                    'brand': brand,
+                    **str_tier,
+                }
+            )
+            status = 'Created' if created else 'Verified'
+            self.stdout.write(self.style.SUCCESS(f'{status} STR Tier {obj.bedrooms} Beds ({obj.label}): ${obj.base_price} (Incl. {obj.included_bathrooms} baths, +${obj.extra_bathroom_price}/extra bath, Laundry: +${obj.external_laundry_fee})'))
+
+        self.stdout.write(self.style.SUCCESS('Successfully seeded all GoPropertyCare and Evolving Solutions rates, add-ons, residential tiers and STR tiers!'))

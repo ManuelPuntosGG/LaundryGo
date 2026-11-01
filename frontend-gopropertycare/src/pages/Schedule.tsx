@@ -122,6 +122,8 @@ import {
 
   getSTRTierByBedrooms,
 
+  type STRTier,
+
 } from '@/constants/strPricing';
 
 
@@ -387,6 +389,7 @@ export function Schedule() {
   // Step 1: Tier-Based Sizing, Service Type & Frequency
 
   const [pricingTiers, setPricingTiers] = useState<PricingTier[]>(PRICING_TIERS);
+  const [strTiers, setStrTiers] = useState<STRTier[]>(STR_TIERS);
 
   const [selectedTier, setSelectedTier] = useState<PricingTier>(() => {
 
@@ -846,117 +849,96 @@ export function Schedule() {
 
       try {
 
-        const [ratesRes, addonsRes, datesRes, tiersRes] = await Promise.all([
-
+        const [ratesRes, addonsRes, datesRes, tiersRes, strTiersRes] = await Promise.all([
           api.get('/cleaning/rates/?brand=gopropertycare').catch(() => null),
-
           api.get('/cleaning/addons/?brand=gopropertycare').catch(() => null),
-
           api.get('/cleaning/schedule/available-dates/').catch(() => null),
-
           api.get('/cleaning/tiers/?brand=gopropertycare').catch(() => null),
-
+          api.get('/cleaning/str-tiers/?brand=gopropertycare').catch(() => null),
         ]);
-
-
 
         if (!isMounted) return;
 
-
-
         if (ratesRes?.data) {
-
           const list: CleaningServiceRate[] = Array.isArray(ratesRes.data)
-
             ? ratesRes.data
-
             : (ratesRes.data as { results?: CleaningServiceRate[] })?.results || [];
-
           if (list.length > 0) {
-
             setRates(list);
-
           }
-
         }
-
-
 
         if (addonsRes?.data) {
-
           const list: CleaningAddon[] = Array.isArray(addonsRes.data)
-
             ? addonsRes.data
-
             : (addonsRes.data as { results?: CleaningAddon[] })?.results || [];
-
           if (list.length > 0) {
-
             setAddons(list);
-
           }
-
         }
 
-
-
-        if (tiersRes?.data && Array.isArray(tiersRes.data) && tiersRes.data.length > 0) {
-
+        const tiersList = Array.isArray(tiersRes?.data)
+          ? tiersRes.data
+          : (tiersRes?.data as { results?: unknown[] })?.results || [];
+        if (tiersList.length > 0) {
           interface BackendTier {
-
             tier_number: number;
-
             label: string;
-
             min_sqft: number;
-
             max_sqft: number;
-
             standard_price: number | string;
-
             deep_price: number | string;
-
+            move_in_out_price?: number | string;
             str_on_site_price: number | string;
-
             str_off_site_price: number | string;
-
             is_custom_quote: boolean;
-
           }
-
-          const mapped: PricingTier[] = (tiersRes.data as BackendTier[]).map((t) => ({
-
+          const mapped: PricingTier[] = (tiersList as BackendTier[]).map((t) => ({
             tier: t.tier_number,
-
             label: t.label,
-
             minSqft: t.min_sqft,
-
             maxSqft: t.max_sqft,
-
             standardPrice: Number(t.standard_price),
-
             deepPrice: Number(t.deep_price),
-
+            moveInOutPrice: Number(t.move_in_out_price ?? t.deep_price),
             strOnSitePrice: Number(t.str_on_site_price),
-
             strOffSitePrice: Number(t.str_off_site_price),
-
             sqftEquivalent: t.label,
-
             propertyHint: t.label,
-
             isCustomQuote: t.is_custom_quote,
-
           }));
-
           setPricingTiers(mapped);
-
           setSelectedTier((prev) => mapped.find((m) => m.tier === prev.tier) || prev);
-
         }
 
-
+        const strTiersList = Array.isArray(strTiersRes?.data)
+          ? strTiersRes.data
+          : (strTiersRes?.data as { results?: unknown[] })?.results || [];
+        if (strTiersList.length > 0) {
+          interface BackendSTRTier {
+            bedrooms: number;
+            label: string;
+            base_price: number | string;
+            included_bathrooms: number | string;
+            extra_bathroom_price: number | string;
+            external_laundry_fee: number | string;
+            is_custom_quote: boolean;
+          }
+          const mappedStr: STRTier[] = (strTiersList as BackendSTRTier[]).map((s) => {
+            const defaultMatch = STR_TIERS.find((st) => st.bedrooms === s.bedrooms);
+            return {
+              bedrooms: s.bedrooms,
+              labelKey: s.bedrooms === 0 ? 'schedule.studio' : (defaultMatch?.labelKey || s.label || `${s.bedrooms} Beds`),
+              maxSqftHint: defaultMatch?.maxSqftHint || (s.bedrooms >= 6 ? 99999 : 1500),
+              includedBathrooms: Number(s.included_bathrooms),
+              basePrice: Number(s.base_price),
+              extraBathroomPrice: Number(s.extra_bathroom_price ?? STR_EXTRA_BATHROOM_PRICE),
+              externalLaundryFee: Number(s.external_laundry_fee),
+              isCustomQuote: s.is_custom_quote,
+            };
+          });
+          setStrTiers(mappedStr);
+        }
 
         if (datesRes?.data && Array.isArray(datesRes.data) && datesRes.data.length > 0) {
 
@@ -992,95 +974,79 @@ export function Schedule() {
 
 
 
-  // Determine active service rate for backend mapping
-
-  const activeRate =
-
-    rates.find((r) => {
-
-      if (isSTR) {
-
-        return r.service_type === 'str_on_site' || r.service_type === 'short_term_rental';
-
-      }
-
-      if (serviceType === 'move_in_out') return r.service_type === 'move_in_out' || r.service_type === 'deep';
-
-      if (serviceType === 'deep') return r.service_type === 'deep' || r.service_type === 'move_in_out';
-
-      return r.service_type === 'residential' || r.service_type === 'regular';
-
-    }) || rates[0];
-
-
-
-  // STR Price Calculations
-
-  const strTier = getSTRTierByBedrooms(bedrooms);
-
-  const extraBathrooms = Math.max(0, Math.floor(bathrooms - strTier.includedBathrooms));
-
-  const extraBathroomFee = extraBathrooms * STR_EXTRA_BATHROOM_PRICE;
-
-  const currentOffSiteFee = strTier.externalLaundryFee;
-
-  const isOffSiteSelected = isSTR && !!selectedAddonCodes['off_site_laundry'];
-
-
-
-  const strCalc = {
-
-    basePrice: strTier.basePrice,
-
-    extraBathrooms,
-
-    extraBathroomFee,
-
-    externalLaundryFee: currentOffSiteFee,
-
-    totalBeforeAddons: strTier.basePrice + extraBathroomFee,
-
-    isCustomQuote: strTier.isCustomQuote || false,
-
-    includedBathrooms: strTier.includedBathrooms,
-
-    maxSqftHint: strTier.maxSqftHint,
-
+  // Determine service rate for each card & active selection
+  const getRateForCard = (cardType: CleaningServiceTierType): CleaningServiceRate | undefined => {
+    if (cardType === 'str_on_site' || cardType === 'str_off_site') {
+      return rates.find((r) => r.service_type === 'str_on_site' || r.service_type === 'short_term_rental');
+    }
+    if (cardType === 'move_in_out') {
+      return rates.find((r) => r.service_type === 'move_in_out') || rates.find((r) => r.service_type === 'deep');
+    }
+    if (cardType === 'deep') {
+      return rates.find((r) => r.service_type === 'deep') || rates.find((r) => r.service_type === 'move_in_out');
+    }
+    return rates.find((r) => r.service_type === 'residential' || r.service_type === 'regular');
   };
 
+  const activeRate = getRateForCard(serviceType) || rates[0];
 
+  const getCardPromoInfo = (cardType: CleaningServiceTierType, rawPrice: number) => {
+    const rate = getRateForCard(cardType);
+    const isActive = Boolean(rate?.is_discount_active && (rate?.discount_percentage ?? 0) > 0);
+    const pct = isActive ? Number(rate?.discount_percentage || 0) : 0;
+    const discountAmt = isActive ? Math.round(((rawPrice * pct) / 100) * 100) / 100 : 0;
+    const finalPrice = Math.max(0, Math.round((rawPrice - discountAmt) * 100) / 100);
+    const badgeLabel =
+      rate?.discount_label?.trim() ||
+      (i18n.language?.startsWith('es') ? 'Tiempo Limitado' : 'Limited Time');
+    return { isActive, pct, discountAmt, finalPrice, badgeLabel };
+  };
 
-  // Pricing calculations based on Tier matrix & recurring frequency discounts
+  // STR Price Calculations
+  const strTier = getSTRTierByBedrooms(bedrooms, strTiers);
+  const activeExtraBathPrice = strTier.extraBathroomPrice ?? STR_EXTRA_BATHROOM_PRICE;
+  const extraBathrooms = Math.max(0, Math.floor(bathrooms - strTier.includedBathrooms));
+  const extraBathroomFee = extraBathrooms * activeExtraBathPrice;
+  const currentOffSiteFee = strTier.externalLaundryFee;
+  const isOffSiteSelected = isSTR && !!selectedAddonCodes['off_site_laundry'];
 
+  const strCalc = {
+    basePrice: strTier.basePrice,
+    extraBathrooms,
+    extraBathroomFee,
+    externalLaundryFee: currentOffSiteFee,
+    totalBeforeAddons: strTier.basePrice + extraBathroomFee,
+    isCustomQuote: strTier.isCustomQuote || false,
+    includedBathrooms: strTier.includedBathrooms,
+    maxSqftHint: strTier.maxSqftHint,
+  };
+
+  // Pricing calculations based on Tier matrix, Service Promo Discounts & recurring frequency discounts
   const isCustomQuote = isSTR
-
     ? strCalc.isCustomQuote
-
     : selectedTier.isCustomQuote === true;
 
-
-
-  const baseTierPrice = isSTR
-
+  const rawBaseTierPrice = isSTR
     ? strCalc.totalBeforeAddons
-
     : getTierPrice(selectedTier, serviceType);
 
+  const activePromo = getCardPromoInfo(serviceType, rawBaseTierPrice);
+  const servicePromoPercent = activePromo.pct;
+  const servicePromoDiscount = activePromo.discountAmt;
+  const baseTierPrice = activePromo.finalPrice;
 
+  const standardCardPromo = getCardPromoInfo('standard', getTierPrice(selectedTier, 'standard'));
+  const deepCardPromo = getCardPromoInfo('deep', getTierPrice(selectedTier, 'deep'));
+  const moveInOutRawPrice = getTierPrice(selectedTier, 'move_in_out');
+  const moveInOutCardPromo = getCardPromoInfo('move_in_out', moveInOutRawPrice);
+  const strCardPromo = getCardPromoInfo('str_on_site', strCalc.totalBeforeAddons);
 
   const availableFrequencies = getServiceFrequencies(serviceType);
-
   const freqOption =
-
     availableFrequencies.find((f) => f.id === frequency) || availableFrequencies[0];
-
   const discountPercent = freqOption.discountPercent;
-
   const frequencyDiscount = Math.round(((baseTierPrice * discountPercent) / 100) * 100) / 100;
-
-  const discountedBasePrice = Math.max(0, baseTierPrice - frequencyDiscount);
-
-
+  const discountedBasePrice = Math.max(0, Math.round((baseTierPrice - frequencyDiscount) * 100) / 100);
 
   const regularAddonsTotal = addons.reduce((sum, item) => {
 
@@ -2128,317 +2094,213 @@ export function Schedule() {
 
 
 
-          {/* Service Type Selection Cards (4 services: Standard, Deep, STR On-Site, STR Off-Site) */}
-
+          {/* Service Type Selection Cards (4 services: Standard, Deep, Move-In/Out, STR) */}
           <div className="space-y-3">
-
             <label className="block text-sm font-extrabold text-slate-900">
-
               {t('schedule.serviceTypeLabel')}
-
             </label>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-
               {/* Standard Clean */}
-
               <div
-
                 onClick={() => setServiceType('standard')}
-
                 className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-
                   serviceType === 'standard'
-
                     ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-
                     : 'border-slate-200 bg-white hover:border-slate-300'
-
                 }`}
-
               >
-
                 <div className="space-y-1.5">
-
-                  <div className="flex items-center justify-between">
-
-                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
-
-                      {t('schedule.serviceStandard')}
-
-                    </h3>
-
-                    <div
-
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-
-                        serviceType === 'standard'
-
-                          ? 'border-emerald-600 bg-emerald-600 text-white'
-
-                          : 'border-slate-300'
-
-                      }`}
-
-                    >
-
-                      {serviceType === 'standard' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-
+                  {standardCardPromo.isActive && (
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-[10px] font-black uppercase tracking-wider w-fit shadow-2xs">
+                      <Flame className="w-3 h-3 text-amber-600 shrink-0" />
+                      <span>{standardCardPromo.pct}% OFF • {standardCardPromo.badgeLabel}</span>
                     </div>
-
+                  )}
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceStandard')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        serviceType === 'standard'
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {serviceType === 'standard' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
                   </div>
-
                   <p className="text-xs text-slate-600 font-medium">
-
                     {t('schedule.serviceStandardDesc')}
-
                   </p>
-
                 </div>
-
-
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-
-                  <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
-
-                    ${selectedTier.standardPrice.toFixed(2)}
-
-                  </span>
-
+                  <div className="flex items-baseline gap-1.5">
+                    {standardCardPromo.isActive && (
+                      <span className="text-xs font-bold text-slate-400 line-through tabular-nums">
+                        ${selectedTier.standardPrice.toFixed(2)}
+                      </span>
+                    )}
+                    <span className={`text-base sm:text-lg font-black tabular-nums ${standardCardPromo.isActive ? 'text-emerald-700' : 'text-slate-900'}`}>
+                      ${standardCardPromo.finalPrice.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-
               </div>
-
-
 
               {/* Deep Clean */}
-
               <div
-
                 onClick={() => setServiceType('deep')}
-
                 className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-
                   serviceType === 'deep'
-
                     ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-
                     : 'border-slate-200 bg-white hover:border-slate-300'
-
                 }`}
-
               >
-
                 <div className="space-y-1.5">
-
-                  <div className="flex items-center justify-between">
-
-                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
-
-                      {t('schedule.serviceDeep')}
-
-                    </h3>
-
-                    <div
-
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-
-                        serviceType === 'deep'
-
-                          ? 'border-emerald-600 bg-emerald-600 text-white'
-
-                          : 'border-slate-300'
-
-                      }`}
-
-                    >
-
-                      {serviceType === 'deep' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-
+                  {deepCardPromo.isActive && (
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-[10px] font-black uppercase tracking-wider w-fit shadow-2xs">
+                      <Flame className="w-3 h-3 text-amber-600 shrink-0" />
+                      <span>{deepCardPromo.pct}% OFF • {deepCardPromo.badgeLabel}</span>
                     </div>
-
+                  )}
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceDeep')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        serviceType === 'deep'
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {serviceType === 'deep' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
                   </div>
-
                   <p className="text-xs text-slate-600 font-medium">
-
                     {t('schedule.serviceDeepDesc')}
-
                   </p>
-
                 </div>
-
-
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-
-                  <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
-
-                    ${selectedTier.deepPrice.toFixed(2)}
-
-                  </span>
-
+                  <div className="flex items-baseline gap-1.5">
+                    {deepCardPromo.isActive && (
+                      <span className="text-xs font-bold text-slate-400 line-through tabular-nums">
+                        ${selectedTier.deepPrice.toFixed(2)}
+                      </span>
+                    )}
+                    <span className={`text-base sm:text-lg font-black tabular-nums ${deepCardPromo.isActive ? 'text-emerald-700' : 'text-slate-900'}`}>
+                      ${deepCardPromo.finalPrice.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-
               </div>
-
-
 
               {/* Move-In / Move-Out Clean */}
-
               <div
-
                 onClick={() => setServiceType('move_in_out')}
-
                 className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-
                   serviceType === 'move_in_out'
-
                     ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-
                     : 'border-slate-200 bg-white hover:border-slate-300'
-
                 }`}
-
               >
-
                 <div className="space-y-1.5">
-
-                  <div className="flex items-center justify-between">
-
-                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
-
-                      {t('schedule.serviceMoveInOut')}
-
-                    </h3>
-
-                    <div
-
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-
-                        serviceType === 'move_in_out'
-
-                          ? 'border-emerald-600 bg-emerald-600 text-white'
-
-                          : 'border-slate-300'
-
-                      }`}
-
-                    >
-
-                      {serviceType === 'move_in_out' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-
+                  {moveInOutCardPromo.isActive && (
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-[10px] font-black uppercase tracking-wider w-fit shadow-2xs">
+                      <Flame className="w-3 h-3 text-amber-600 shrink-0" />
+                      <span>{moveInOutCardPromo.pct}% OFF • {moveInOutCardPromo.badgeLabel}</span>
                     </div>
-
+                  )}
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceMoveInOut')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        serviceType === 'move_in_out'
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {serviceType === 'move_in_out' && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
                   </div>
-
                   <p className="text-xs text-slate-600 font-medium">
-
                     {t('schedule.serviceMoveInOutDesc')}
-
                   </p>
-
                 </div>
-
-
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-
-                  <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
-
-                    ${selectedTier.deepPrice.toFixed(2)}
-
-                  </span>
-
+                  <div className="flex items-baseline gap-1.5">
+                    {moveInOutCardPromo.isActive && (
+                      <span className="text-xs font-bold text-slate-400 line-through tabular-nums">
+                        ${moveInOutRawPrice.toFixed(2)}
+                      </span>
+                    )}
+                    <span className={`text-base sm:text-lg font-black tabular-nums ${moveInOutCardPromo.isActive ? 'text-emerald-700' : 'text-slate-900'}`}>
+                      ${moveInOutCardPromo.finalPrice.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-
               </div>
-
-
 
               {/* Short-Term Rental Clean */}
-
               <div
-
                 onClick={() => setServiceType('str_on_site')}
-
                 className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between hover:border-emerald-500 hover:shadow-xs active:scale-99 ${
-
                   isSTR
-
                     ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/20'
-
                     : 'border-slate-200 bg-white hover:border-slate-300'
-
                 }`}
-
               >
-
                 <div className="space-y-1.5">
-
-                  <div className="flex items-center justify-between">
-
-                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
-
-                      {t('schedule.serviceStr')}
-
-                    </h3>
-
-                    <div
-
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-
-                        isSTR
-
-                          ? 'border-emerald-600 bg-emerald-600 text-white'
-
-                          : 'border-slate-300'
-
-                      }`}
-
-                    >
-
-                      {isSTR && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-
+                  {strCardPromo.isActive && (
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-[10px] font-black uppercase tracking-wider w-fit shadow-2xs">
+                      <Flame className="w-3 h-3 text-amber-600 shrink-0" />
+                      <span>{strCardPromo.pct}% OFF • {strCardPromo.badgeLabel}</span>
                     </div>
-
+                  )}
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                      {t('schedule.serviceStr')}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        isSTR
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-slate-300'
+                      }`}
+                    >
+                      {isSTR && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                    </div>
                   </div>
-
                   <p className="text-xs text-slate-600 font-medium">
-
                     {t('schedule.serviceStrDesc')}
-
                   </p>
-
                 </div>
-
-
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-
                   <span className="text-[11px] text-slate-500 font-bold">{t('schedule.baseTierPrice')}</span>
-
-                  <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums">
-
-                    ${strCalc.totalBeforeAddons.toFixed(2)}
-
-                  </span>
-
+                  <div className="flex items-baseline gap-1.5">
+                    {strCardPromo.isActive && (
+                      <span className="text-xs font-bold text-slate-400 line-through tabular-nums">
+                        ${strCalc.totalBeforeAddons.toFixed(2)}
+                      </span>
+                    )}
+                    <span className={`text-base sm:text-lg font-black tabular-nums ${strCardPromo.isActive ? 'text-emerald-700' : 'text-slate-900'}`}>
+                      ${strCardPromo.finalPrice.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-
               </div>
-
             </div>
-
           </div>
-
-
 
           {/* Sizing & Consultative Details */}
 
@@ -2860,7 +2722,7 @@ export function Schedule() {
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
 
-                      {STR_TIERS.map((tier) => {
+                      {strTiers.map((tier) => {
 
                         const isSelected = bedrooms === tier.bedrooms;
 
@@ -3450,14 +3312,10 @@ export function Schedule() {
 
                       )}
 
-                      {discountPercent > 0 && (
-
+                      {(discountPercent > 0 || servicePromoPercent > 0) && (
                         <span className="text-xs text-slate-400 line-through tabular-nums">
-
-                          ${(baseTierPrice + addonsTotal).toFixed(2)}
-
+                          ${(rawBaseTierPrice + addonsTotal).toFixed(2)}
                         </span>
-
                       )}
 
                     </div>
@@ -4498,7 +4356,7 @@ export function Schedule() {
                 {strCalc.extraBathrooms > 0 && (
                   <div className="flex justify-between items-start text-slate-700 text-xs font-medium gap-2">
                     <span className="min-w-0 pr-1">
-                      {t('schedule.extraBathFee')} ({strCalc.extraBathrooms} x ${STR_EXTRA_BATHROOM_PRICE}):
+                      {t('schedule.extraBathFee')} ({strCalc.extraBathrooms} x ${activeExtraBathPrice}):
                     </span>
                     <span className="font-bold text-slate-900 tabular-nums shrink-0">+${strCalc.extraBathroomFee.toFixed(2)}</span>
                   </div>
@@ -4507,7 +4365,20 @@ export function Schedule() {
             ) : (
               <div className="flex justify-between items-start text-slate-700 text-xs font-medium gap-2">
                 <span className="min-w-0 pr-1">{t('schedule.baseTierPrice')} ({selectedTier.label}):</span>
-                <span className="font-bold text-slate-900 tabular-nums shrink-0">${baseTierPrice.toFixed(2)}</span>
+                <span className="font-bold text-slate-900 tabular-nums shrink-0">${rawBaseTierPrice.toFixed(2)}</span>
+              </div>
+            )}
+
+            {/* Per-Service Limited-Time Promotional Discount */}
+            {servicePromoDiscount > 0 && (
+              <div className="flex justify-between items-center text-amber-900 text-xs font-bold bg-amber-50 border border-amber-200 p-2 sm:p-2.5 rounded-xl gap-2">
+                <span className="flex items-center gap-1.5 min-w-0 pr-1">
+                  <Flame className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span className="truncate">
+                    {activePromo.badgeLabel} (-{servicePromoPercent}%):
+                  </span>
+                </span>
+                <span className="tabular-nums shrink-0">-${servicePromoDiscount.toFixed(2)}</span>
               </div>
             )}
 

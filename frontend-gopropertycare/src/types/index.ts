@@ -32,6 +32,9 @@ export interface CleaningServiceRate {
   service_type: CleaningServiceType;
   rate_per_sqft: string | number;
   min_order_amount: string | number;
+  discount_percentage?: number;
+  is_discount_active?: boolean;
+  discount_label?: string;
   description: string;
   is_active: boolean;
 }

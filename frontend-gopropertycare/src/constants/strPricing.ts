@@ -4,6 +4,7 @@ export interface STRTier {
   maxSqftHint: number;
   includedBathrooms: number;
   basePrice: number;
+  extraBathroomPrice?: number;
   externalLaundryFee: number;
   isCustomQuote?: boolean;
 }
@@ -79,10 +80,10 @@ export const STR_TIERS: STRTier[] = [
 
 export const STR_EXTRA_BATHROOM_PRICE = 25;
 
-export const getSTRTierByBedrooms = (bedrooms: number): STRTier => {
-  if (bedrooms >= 6) return STR_TIERS[STR_TIERS.length - 1];
-  const found = STR_TIERS.find((t) => t.bedrooms === bedrooms);
-  return found || STR_TIERS[1]; // default 1 Bed
+export const getSTRTierByBedrooms = (bedrooms: number, tiers: STRTier[] = STR_TIERS): STRTier => {
+  if (bedrooms >= 6) return tiers[tiers.length - 1] || STR_TIERS[STR_TIERS.length - 1];
+  const found = tiers.find((t) => t.bedrooms === bedrooms);
+  return found || tiers[1] || STR_TIERS[1]; // default 1 Bed
 };
 
 export const calculateSTRPrice = ({
