@@ -1003,3 +1003,245 @@ class TestGoPropertyCarePayments:
         assert resp_inactive.status_code == 201
         assert Decimal(str(resp_inactive.json()['base_price'])) == Decimal('200.00')
         assert Decimal(str(resp_inactive.json()['total_price'])) == Decimal('200.00')
+
+
+@pytest.mark.django_db
+class TestGPCServiceChecklistsAndEmails:
+    """
+    Test suite verifying that GoPropertyCare emails properly integrate official service checklists,
+    room-by-room items, notes, preparation guidelines, and 24-hour rescheduling policy in both English and Spanish.
+    """
+
+    @pytest.fixture
+    def gpc_rates(self):
+        standard = CleaningServiceRate.objects.create(
+            name='Standard Residential Cleaning',
+            service_type='residential',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.125'),
+            min_order_amount=Decimal('99.00'),
+            is_active=True,
+        )
+        deep = CleaningServiceRate.objects.create(
+            name='Deep Cleaning Service',
+            service_type='deep',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.160'),
+            min_order_amount=Decimal('99.00'),
+            is_active=True,
+        )
+        move_in = CleaningServiceRate.objects.create(
+            name='Move-In / Move-Out Cleaning',
+            service_type='move_in_out',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.200'),
+            min_order_amount=Decimal('99.00'),
+            is_active=True,
+        )
+        str_rate = CleaningServiceRate.objects.create(
+            name='Short-Term Rental (Airbnb / VRBO) Turnover',
+            service_type='str_on_site',
+            brand='gopropertycare',
+            rate_per_sqft=Decimal('0.170'),
+            min_order_amount=Decimal('99.00'),
+            is_active=True,
+        )
+        return {
+            'standard': standard,
+            'deep': deep,
+            'move_in': move_in,
+            'str': str_rate,
+        }
+
+    def test_render_gpc_email_sections_standard_en_and_es(self, gpc_rates):
+        from apps.cleaning.checklists import render_gpc_email_sections
+        order = CleaningOrder(
+            brand='gopropertycare',
+            service_rate=gpc_rates['standard'],
+            square_feet=1200,
+            special_instructions='Front door code 1234',
+        )
+
+        # English
+        txt_en, html_en = render_gpc_email_sections(order, is_spanish=False)
+        assert 'STANDARD CLEANING CHECKLIST' in txt_en
+        assert 'Entryway' in txt_en
+        assert 'Living, Family & TV Rooms' in txt_en
+        assert 'Dining Room' in txt_en
+        assert 'Kitchen' in txt_en
+        assert 'Home Office' in txt_en
+        assert 'Laundry Room' in txt_en
+        assert 'Bedrooms' in txt_en
+        assert 'Bathrooms' in txt_en
+        assert 'trash bins*' in txt_en.lower() or 'trash' in txt_en.lower()
+        assert 'HOW TO PREPARE FOR YOUR CLEANING' in txt_en
+        assert 'Standard Cleaning Preparation' in txt_en
+        assert '(720) 590-8632' in txt_en
+        assert 'OFFICIAL QUALITY STANDARD' in html_en
+        assert 'Standard Cleaning Checklist' in html_en
+        assert 'PREPARATION GUIDELINES' in html_en
+
+        # Spanish
+        txt_es, html_es = render_gpc_email_sections(order, is_spanish=True)
+        assert 'LIMPIEZA RESIDENCIAL EST' in txt_es
+        assert 'Entrada / Recibidor' in txt_es
+        assert 'Sala de Estar, Familiar y TV' in txt_es
+        assert 'Comedor' in txt_es
+        assert 'Cocina' in txt_es
+        assert 'Oficina en Casa' in txt_es
+        assert 'Cuarto de Lavado' in txt_es
+        assert 'Dormitorios' in txt_es
+        assert 'CÓMO PREPARARTE PARA TU LIMPIEZA' in txt_es
+        assert 'Preparación para Limpieza Estándar' in txt_es
+        assert '(720) 590-8632' in txt_es
+        assert 'ESTÁNDAR OFICIAL DE CALIDAD' in html_es
+        assert 'GUÍA DE PREPARACIÓN' in html_es
+
+    def test_render_gpc_email_sections_deep_en_and_es(self, gpc_rates):
+        from apps.cleaning.checklists import render_gpc_email_sections
+        order = CleaningOrder(
+            brand='gopropertycare',
+            service_rate=gpc_rates['deep'],
+            square_feet=1800,
+        )
+        txt_en, html_en = render_gpc_email_sections(order, is_spanish=False)
+        assert 'DEEP CLEANING CHECKLIST' in txt_en
+        assert 'Deep Cleaning Preparation' in txt_en
+        assert 'Deep Cleaning Checklist' in html_en
+
+        txt_es, html_es = render_gpc_email_sections(order, is_spanish=True)
+        assert 'CHECKLIST DE LIMPIEZA PROFUNDA' in txt_es
+        assert 'Preparación para Limpieza Profunda' in txt_es
+
+    def test_render_gpc_email_sections_move_in_out(self, gpc_rates):
+        from apps.cleaning.checklists import render_gpc_email_sections
+        order = CleaningOrder(
+            brand='gopropertycare',
+            service_rate=gpc_rates['move_in'],
+            square_feet=2200,
+        )
+        txt_en, html_en = render_gpc_email_sections(order, is_spanish=False)
+        assert 'MOVE-IN / MOVE-OUT CLEANING CHECKLIST' in txt_en
+        assert 'A thorough clean of an empty home' in txt_en
+        assert 'Move-In / Move-Out Preparation' in txt_en
+
+        txt_es, html_es = render_gpc_email_sections(order, is_spanish=True)
+        assert 'ENTRADA / SALIDA' in txt_es.upper()
+        assert 'Preparación para Limpieza de Entrada / Salida (Mudanza)' in txt_es
+
+    def test_render_gpc_email_sections_str_turnover(self, gpc_rates):
+        from apps.cleaning.checklists import render_gpc_email_sections
+        order = CleaningOrder(
+            brand='gopropertycare',
+            service_rate=gpc_rates['str'],
+            square_feet=1100,
+        )
+        txt_en, html_en = render_gpc_email_sections(order, is_spanish=False)
+        assert 'SHORT-TERM RENTAL TURNOVER CHECKLIST' in txt_en
+        assert 'Short-Term Rental Preparation' in txt_en
+        assert 'linens' in txt_en.lower()
+
+        txt_es, html_es = render_gpc_email_sections(order, is_spanish=True)
+        assert 'ROTACIÓN DE ALQUILER TEMPORAL' in txt_es.upper()
+        assert 'Preparación para Rotación de Alquiler Temporal' in txt_es
+
+    def test_send_cleaning_order_confirmation_email_gpc(self, gpc_rates):
+        from unittest.mock import patch, MagicMock
+        from apps.cleaning.emails import send_cleaning_order_confirmation_email
+
+        order = CleaningOrder.objects.create(
+            brand='gopropertycare',
+            service_rate=gpc_rates['standard'],
+            square_feet=1000,
+            base_price=Decimal('160.00'),
+            total_price=Decimal('160.00'),
+            deposit_amount=Decimal('40.00'),
+            remaining_balance=Decimal('120.00'),
+            street_address='123 Test St',
+            city='Denver',
+            zip_code='80202',
+            delivery_zone='inner',
+            service_date=timezone.now().date() + timedelta(days=2),
+            time_slot='09:00 AM',
+            guest_email='customer@example.com',
+            guest_first_name='John',
+            guest_last_name='Doe',
+            language='en',
+        )
+
+        with patch('threading.Thread', side_effect=lambda target, **kw: MagicMock(start=target)):
+            with patch('apps.cleaning.emails.send_mail_worker') as mock_send:
+                send_cleaning_order_confirmation_email(order, language='en')
+
+                assert mock_send.called
+                kwargs = mock_send.call_args[1]
+                assert 'STANDARD CLEANING CHECKLIST' in kwargs['text_content']
+                assert 'HOW TO PREPARE FOR YOUR CLEANING' in kwargs['text_content']
+                assert 'OFFICIAL QUALITY STANDARD' in kwargs['html_content']
+                assert 'PREPARATION GUIDELINES' in kwargs['html_content']
+
+    def test_evolving_solutions_confirmation_excludes_residential_checklists(self, commercial_rate):
+        from unittest.mock import patch, MagicMock
+        from apps.cleaning.emails import send_cleaning_order_confirmation_email
+
+        order = CleaningOrder.objects.create(
+            brand='evolvingsolutions',
+            service_rate=commercial_rate,
+            square_feet=2000,
+            base_price=Decimal('360.00'),
+            total_price=Decimal('360.00'),
+            street_address='456 Warehouse Rd',
+            city='Denver',
+            zip_code='80216',
+            delivery_zone='inner',
+            service_date=timezone.now().date() + timedelta(days=2),
+            time_slot='09:00 AM',
+            guest_email='esl@example.com',
+            guest_first_name='Esl',
+            guest_last_name='Client',
+            language='en',
+        )
+
+        with patch('threading.Thread', side_effect=lambda target, **kw: MagicMock(start=target)):
+            with patch('apps.cleaning.emails.send_mail_worker') as mock_send:
+                send_cleaning_order_confirmation_email(order, language='en')
+
+                assert mock_send.called
+                kwargs = mock_send.call_args[1]
+                assert 'OFFICIAL QUALITY STANDARD' not in kwargs['html_content']
+                assert 'STANDARD CLEANING CHECKLIST' not in kwargs['text_content']
+
+    def test_send_cleaning_deposit_charged_email_gpc(self, gpc_rates):
+        from unittest.mock import patch, MagicMock
+        from apps.cleaning.emails import send_cleaning_deposit_charged_email
+
+        order = CleaningOrder.objects.create(
+            brand='gopropertycare',
+            service_rate=gpc_rates['deep'],
+            square_feet=1500,
+            base_price=Decimal('250.00'),
+            total_price=Decimal('250.00'),
+            deposit_amount=Decimal('62.50'),
+            remaining_balance=Decimal('187.50'),
+            street_address='789 Elm St',
+            city='Denver',
+            zip_code='80202',
+            delivery_zone='inner',
+            service_date=timezone.now().date() + timedelta(days=3),
+            time_slot='01:00 PM',
+            guest_email='deepclean@example.com',
+            guest_first_name='Jane',
+            guest_last_name='Smith',
+            language='es',
+        )
+
+        with patch('threading.Thread', side_effect=lambda target, **kw: MagicMock(start=target)):
+            with patch('apps.cleaning.emails.send_mail_worker') as mock_send:
+                send_cleaning_deposit_charged_email(order)
+
+                assert mock_send.called
+                kwargs = mock_send.call_args[1]
+                assert 'CHECKLIST DE LIMPIEZA PROFUNDA' in kwargs['text_content']
+                assert 'CÓMO PREPARARTE PARA TU LIMPIEZA' in kwargs['text_content']
+                assert 'ESTÁNDAR OFICIAL DE CALIDAD' in kwargs['html_content']
+                assert 'GUÍA DE PREPARACIÓN' in kwargs['html_content']

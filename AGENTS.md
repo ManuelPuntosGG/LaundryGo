@@ -112,37 +112,16 @@ LaundryGo/
 
 │   │   ├── orders/                 # Tarifas por libra, órdenes de lavandería, suscripciones y emails (LaundryGo)
 
-│   │   ├── cleaning/               # Tarifas $/sqft, niveles escalados, add-ons, órdenes y emails (GPC & ESL)
-
-│   │   └── coupons/                # Cupones de descuento (6 caracteres A-Z0-9), validación, canje 1x por usuario y Unfold Admin
-
-│   │       ├── models.py           # Coupon, CouponUsage (UniqueConstraint por usuario y marca)
-
-│   │       ├── serializers.py      # CouponSerializer, CouponValidateRequestSerializer
-
-│   │       ├── views.py            # Endpoint público autenticado /api/v1/coupons/validate/
-
-│   │       ├── admin.py            # Django Unfold CouponAdmin (edición rápida is_active, usages inline)
-
-│   │       ├── urls.py             # Enrutador /api/v1/coupons/...
-
-│   │       └── test_coupons.py     # Suite de 15 pruebas pytest de validación, canje y recálculos financieros
-
-│   │       ├── models.py           # CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
-
-│   │       ├── serializers.py      # Cálculo en vivo de base (tiers sqft y matriz STR habitaciones), addons y delivery fee
-
-│   │       ├── views.py            # Endpoints públicos y protegidos (/rates/, /tiers/, /addons/, /orders/, walkthrough-inquiry, etc.)
-
-│   │       ├── emails.py           # Notificaciones transaccionales bilingües adaptativas por marca (GPC / ESL)
-
-│   │       ├── admin.py            # Integración con Django Unfold (list_editable para edición en vivo de tiers y acciones de pago)
-
-│   │       ├── urls.py             # Enrutador /api/v1/cleaning/...
-
-│   │       ├── test_cleaning.py    # Suite de pruebas pytest para GoPropertyCare y Evolving Solutions (25 tests)
-
-│   │       └── management/commands/seed_cleaning_rates.py # Pobla tarifas, add-ons y los 18 tiers de metraje
+│   │   ├── cleaning/               # Tarifas $/sqft, niveles escalados, add-ons, órdenes, checklists y emails (GPC & ESL)
+│   │   │   ├── models.py           # CleaningServiceRate, CleaningPricingTier, CleaningAddon, CleaningOrder
+│   │   │   ├── serializers.py      # Cálculo en vivo de base (tiers sqft y matriz STR habitaciones), addons y delivery fee
+│   │   │   ├── views.py            # Endpoints públicos y protegidos (/rates/, /tiers/, /addons/, /orders/, walkthrough-inquiry, etc.)
+│   │   │   ├── checklists.py       # Checklists oficiales habitación por habitación, notas de servicio y guías de preparación bilingües (PDF 6 páginas)
+│   │   │   ├── emails.py           # Notificaciones transaccionales bilingües con checklists y preparación embebidos (GPC / ESL)
+│   │   │   ├── admin.py            # Integración con Django Unfold (list_editable para edición en vivo de tiers y acciones de pago)
+│   │   │   ├── urls.py             # Enrutador /api/v1/cleaning/...
+│   │   │   ├── test_cleaning.py    # Suite de pruebas pytest para GoPropertyCare y Evolving Solutions (34 tests)
+│   │   │   └── management/commands/seed_cleaning_rates.py # Pobla tarifas, add-ons y los 18 tiers de metraje
 
 │   ├── config/                     # Configuración global Django (settings, urls, wsgi)
 
@@ -464,11 +443,37 @@ LaundryGo/
 
   - Si `brand == 'gopropertycare'`: Emite notificaciones de solicitud recibida con membrete verde (`#16a34a`), remitente `GoPropertyCare <info@gopropertycare.com>`, referencia `GPC-#{id}`, indicando que el pedido está en revisión ($0.00 cobrado hoy) y que el depósito del 25% solo se debitará tras la confirmación de la disponibilidad de cuadrilla.
 
-  - `send_cleaning_deposit_charged_email`: Emite confirmación oficial cuando el administrador acepta la orden en el panel, confirmando el débito del 25% y desglosando el 75% restante pendiente al finalizar.
+  - `send_cleaning_deposit_charged_email`: Emite confirmación oficial cuando el administrador acepta la orden en el panel, confirmando el débito del 25% y desglosando el 75% restante pendiente al finalizar. Incorpora el checklist del servicio y la guía de preparación completa.
 
   - `send_cleaning_final_charge_email`: Emite recibo final detallado bilingüe desglosando base, add-ons, tarifa de zona, depósito previo (25%), cargo final (75%), sobrecargo aplicado con su concepto, y total neto facturado.
 
   - `send_cleaning_order_cancellation_email`: Emite notificación de cancelación adaptada a si el anticipo fue reembolsado, no reembolsado por políticas, o si la reserva aún no había sido cobrada ($0 upfront).
+
+- **Módulo Oficial de Checklists y Guías de Preparación (`apps.cleaning.checklists`)**:
+
+  - Basado íntegramente en las especificaciones del documento oficial corporativo de 6 páginas (`GoPropertyCare_Service_Checklists.pdf`).
+
+  - **Matriz de Checklists por Servicio (`GPC_CHECKLISTS`)**: 100% bilingüe (Inglés y Español) desglosando habitación por habitación:
+    - *Standard Cleaning* (8 áreas: Entrada, Sala/TV, Comedor, Cocina, Oficina, Lavandería, Dormitorios, Baños) + notas sobre bolsas de basura aportadas por el cliente y alféizares/rieles como extra.
+    - *Deep Cleaning* (8 áreas: Mismas zonas con limpieza intensiva, desinfección a fondo de zócalos, desengrasado y pulido minucioso) + notas de rieles y bolsas.
+    - *Move-In / Move-Out* (7 áreas: Reinicio integral de vivienda vacía, interior de gabinetes y cajones, desinfección de puertas, marcos y zócalos).
+    - *Short-Term Rental (STR) Turnover* (5 áreas: Cocina, Baños, Dormitorios, Sala/Comedor, General de la unidad, preparado de ropa de cama y toallas calidad hotel 5 estrellas).
+
+  - **Notas Importantes de Servicio (`GPC_PLEASE_NOTE`)**:
+    - *Pisos*: Aspirado y trapeado únicamente (fregado mecánico, decapado o encerado requieren cotización previa).
+    - *Persianas*: Sacudido con plumero y limpieza superficial (lavado por inmersión cotizado aparte; exención por fragilidad de persianas antiguas).
+    - *Radiadores*: Desengrasado y aspirado de áreas accesibles sin compromiso de desmontaje técnico.
+
+  - **Guía "Cómo Prepararte para tu Limpieza" (`GPC_PREPARATION`)**:
+    - *Consejos Generales*: Despeje de objetos/juguetes/ropa, resguardo de mascotas en habitaciones cerradas o transportadoras, instrucciones claras de acceso (cerradura inteligente, lockbox, llaves, estacionamiento), guardado de objetos de valor, comunicación de prioridades o zonas restringidas, indicación de superficies especiales (mármol, madera o piedra natural), y verificación de suministros activos de agua y electricidad.
+    - *Pautas Específicas del Servicio*: Despeje de encimeras para Standard; vaciado de refrigerador si se contrató el add-on para Deep; desocupación total de muebles y cajas para Move-In/Move-Out; revisión de tecleras y reposición de toallas/sábanas en closet del propietario para STR.
+    - *Política de Reprogramación*: Aviso con mínimo 24 horas de anticipación llamando o enviando mensaje de texto al `(720) 590-8632` o escribiendo a `info@gopropertycare.com`.
+
+  - **Funciones de Renderizado**:
+    - `resolve_gpc_service_key(order)`: Resuelve de forma determinista el tipo de servicio (`standard`, `deep`, `move_in_out`, `str_turnover`) a partir de la tasa, nombre del servicio e instrucciones especiales.
+    - `render_gpc_email_sections(order, is_spanish)`: Genera tanto el bloque de texto plano formateado como dos tarjetas HTML con CSS en línea responsivo, integradas sin fisuras tanto en el correo de confirmación de reserva inicial (`send_cleaning_order_confirmation_email`) como en la notificación de depósito cobrado (`send_cleaning_deposit_charged_email`).
+
+
 
 
 

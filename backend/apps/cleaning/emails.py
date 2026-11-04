@@ -3,6 +3,7 @@ import threading
 from decimal import Decimal
 from django.conf import settings
 from apps.core.emails import send_mail_worker
+from apps.cleaning.checklists import render_gpc_email_sections
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +87,11 @@ def send_cleaning_order_confirmation_email(order, language=None):
                 addons_html = "<p style='color: #6b7280; font-style: italic; margin: 4px 0;'>Ninguno / None</p>"
                 addons_text = " None"
 
+            if not is_evolving:
+                gpc_text, gpc_html = render_gpc_email_sections(order, is_spanish=is_spanish)
+            else:
+                gpc_text, gpc_html = "", ""
+
             if is_spanish:
                 if is_evolving:
                     subject = f"{company_name} - Confirmación de Reserva de Servicio #{order_code}"
@@ -129,7 +135,7 @@ Instrucciones Especiales / Acceso:
 {special_instructions or 'Ninguna especificada.'}
 
 Nuestro equipo profesional llegará puntual en la franja acordada con todos los equipos e insumos necesarios bajo estrictos estándares de seguridad.
-
+{gpc_text}
 Si necesitas modificar tu cita, comunícate con nosotros al (720) 590-8632 o a {company_email}.
 
 ¡Gracias por elegir {company_name}!
@@ -191,7 +197,7 @@ Access & Special Instructions:
 {special_instructions or 'None provided.'}
 
 Our professional team will arrive punctually during the selected window with all required commercial equipment and safety protocols.
-
+{gpc_text}
 Need changes? Contact us at (720) 590-8632 or {company_email}.
 
 Thank you for trusting {company_name}!
@@ -282,6 +288,8 @@ Denver, Colorado
                 <p style="margin: 0; font-size: 13px; color: {accent_color}; font-weight: 600;">{lbl_notes}:</p>
                 <p style="margin: 4px 0 0; font-size: 14px; color: #374151;">{special_instructions}</p>
               </div>''' if special_instructions else ''}
+
+              {gpc_html}
 
               <p style="color: #6b7280; font-size: 13px; line-height: 1.5; text-align: center; margin-top: 24px;">{lbl_footer}</p>
             </td>
@@ -1060,6 +1068,8 @@ def send_cleaning_deposit_charged_email(order):
 
     def _send():
         try:
+            gpc_text, gpc_html = render_gpc_email_sections(order, is_spanish=is_spanish)
+
             if is_spanish:
                 subject = f"GoPropertyCare - ¡Reserva Aceptada y Confirmada! #{order_code}"
                 body_text = f"""¡Hola {recipient_name}!
@@ -1083,7 +1093,7 @@ Detalles de tu Cita Confirmada:
 =========================================
 
 Nuestro equipo llegará puntual con todos los suministros y equipos profesionales necesarios.
-
+{gpc_text}
 Si necesitas hacer algún ajuste a tu cita, comunícate con nosotros al (720) 590-8632 o a {company_email}.
 
 ¡Gracias por elegir GoPropertyCare!
@@ -1127,7 +1137,7 @@ Confirmed Appointment Details:
 =========================================
 
 Our insured professional crew will arrive punctually with all required supplies and equipment.
-
+{gpc_text}
 Need any changes? Reach us at (720) 590-8632 or {company_email}.
 
 Thank you for choosing GoPropertyCare!
@@ -1210,8 +1220,10 @@ Denver, Colorado
                 </tr>
               </table>
 
+              {gpc_html}
+
               <p style="color: #6b7280; font-size: 13px; line-height: 1.5; text-align: center; margin-top: 24px;">
-                Questions or adjustments? Reach us at (720) 590-8632 or {company_email}.
+                {'¿Preguntas o cambios? Comunícate con nosotros al (720) 590-8632 o a ' + company_email if is_spanish else f'Questions or adjustments? Reach us at (720) 590-8632 or {company_email}.'}
               </p>
             </td>
           </tr>
