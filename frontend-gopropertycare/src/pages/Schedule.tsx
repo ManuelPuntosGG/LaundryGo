@@ -384,6 +384,15 @@ export function Schedule() {
 
   const [step, setStep] = useState<Step>(1);
 
+  // Automatically scroll viewport to top when moving between steps (especially on mobile)
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+  }, [step]);
+
   const [rates, setRates] = useState<CleaningServiceRate[]>(DEFAULT_CLEANING_RATES);
 
   const [addons, setAddons] = useState<CleaningAddon[]>(PROPERTY_ADDONS);

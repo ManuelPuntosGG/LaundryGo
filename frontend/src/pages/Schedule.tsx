@@ -181,6 +181,15 @@ export function Schedule() {
     };
   }, [step, isSuccess, setScheduleStep]);
 
+  // Automatically scroll viewport to top when moving between steps or completing order (essential for mobile UX)
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+  }, [step, isSuccess]);
+
   // Capitalize helper
   const formatCapitalized = (str: string) => {
     return str.replace(/\b[a-z]/g, (char) => char.toUpperCase());

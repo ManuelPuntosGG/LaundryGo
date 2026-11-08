@@ -26,6 +26,8 @@ import { Button } from '@/components/ui/Button';
 import api from '@/api';
 import type { CleaningServiceRate } from '@/types';
 import { DEFAULT_CLEANING_RATES } from '@/constants/cleaningServices';
+import { PRICING_TIERS, type PricingTier } from '@/constants/pricingTiers';
+import { STR_TIERS, type STRTier } from '@/constants/strPricing';
 import { SERVICE_AREAS } from '@/constants/locations';
 import { SEO } from '@/components/common/SEO';
 
@@ -33,20 +35,93 @@ export function Home() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [rates, setRates] = useState<CleaningServiceRate[]>(DEFAULT_CLEANING_RATES);
+  const [pricingTiers, setPricingTiers] = useState<PricingTier[]>(PRICING_TIERS);
+  const [strTiers, setStrTiers] = useState<STRTier[]>(STR_TIERS);
 
   useEffect(() => {
-    const fetchRates = async () => {
+    let isMounted = true;
+    const fetchHomeData = async () => {
       try {
-        const response = await api.get('/cleaning/rates/?brand=gopropertycare');
-        const list = Array.isArray(response.data) ? response.data : response.data?.results || [];
-        if (list.length > 0) {
-          setRates(list);
+        const [ratesRes, tiersRes, strTiersRes] = await Promise.all([
+          api.get('/cleaning/rates/?brand=gopropertycare').catch(() => null),
+          api.get('/cleaning/tiers/?brand=gopropertycare').catch(() => null),
+          api.get('/cleaning/str-tiers/?brand=gopropertycare').catch(() => null),
+        ]);
+
+        if (!isMounted) return;
+
+        if (ratesRes?.data) {
+          const list = Array.isArray(ratesRes.data) ? ratesRes.data : ratesRes.data?.results || [];
+          if (list.length > 0) setRates(list);
+        }
+
+        const tiersList = Array.isArray(tiersRes?.data)
+          ? tiersRes.data
+          : (tiersRes?.data as { results?: unknown[] })?.results || [];
+        if (tiersList.length > 0) {
+          interface BackendTier {
+            tier_number: number;
+            label: string;
+            min_sqft: number;
+            max_sqft: number;
+            standard_price: number | string;
+            deep_price: number | string;
+            move_in_out_price?: number | string;
+            str_on_site_price: number | string;
+            str_off_site_price: number | string;
+            is_custom_quote: boolean;
+          }
+          const mapped: PricingTier[] = (tiersList as BackendTier[]).map((tierItem) => ({
+            tier: tierItem.tier_number,
+            label: tierItem.label,
+            minSqft: tierItem.min_sqft,
+            maxSqft: tierItem.max_sqft,
+            standardPrice: Number(tierItem.standard_price),
+            deepPrice: Number(tierItem.deep_price),
+            moveInOutPrice: Number(tierItem.move_in_out_price ?? tierItem.deep_price),
+            strOnSitePrice: Number(tierItem.str_on_site_price),
+            strOffSitePrice: Number(tierItem.str_off_site_price),
+            sqftEquivalent: tierItem.label,
+            propertyHint: tierItem.label,
+            isCustomQuote: tierItem.is_custom_quote,
+          }));
+          setPricingTiers(mapped);
+        }
+
+        const strList = Array.isArray(strTiersRes?.data)
+          ? strTiersRes.data
+          : (strTiersRes?.data as { results?: unknown[] })?.results || [];
+        if (strList.length > 0) {
+          interface BackendSTRTier {
+            bedrooms: number;
+            label: string;
+            base_price: number | string;
+            included_bathrooms: number | string;
+            extra_bathroom_price: number | string;
+            external_laundry_fee: number | string;
+            is_custom_quote: boolean;
+          }
+          const mappedStr: STRTier[] = (strList as BackendSTRTier[]).map((s) => ({
+            bedrooms: s.bedrooms,
+            labelKey: s.bedrooms === 0 ? 'schedule.studio' : `${s.bedrooms} Beds`,
+            maxSqftHint: 1000,
+            includedBathrooms: Number(s.included_bathrooms),
+            basePrice: Number(s.base_price),
+            extraBathroomPrice: Number(s.extra_bathroom_price),
+            externalLaundryFee: Number(s.external_laundry_fee),
+            isCustomQuote: s.is_custom_quote,
+          }));
+          setStrTiers(mappedStr);
         }
       } catch (err) {
-        console.warn('Using fallback cleaning rates:', err);
+        console.warn('Using fallback cleaning data for home:', err);
       }
     };
-    fetchRates();
+
+    fetchHomeData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const getServiceIcon = (serviceType: string) => {
@@ -70,20 +145,40 @@ export function Home() {
     }
   };
 
-  const getStartingPriceBadge = (serviceType: string) => {
+  const getStartingPriceBadge = (serviceType: string): string | null => {
+    const prefix = t('home.pricing.startingAt', 'Starting at');
+
     switch (serviceType) {
       case 'residential':
-      case 'regular':
-        return t('home.pricing.startingAt155', 'Starting at $155');
+      case 'regular': {
+        const lowestStandard = pricingTiers
+          .filter((tierItem) => !tierItem.isCustomQuote && tierItem.standardPrice > 0)
+          .reduce((min, tierItem) => (tierItem.standardPrice < min ? tierItem.standardPrice : min), pricingTiers[0]?.standardPrice || 155);
+        return `${prefix} $${Math.round(lowestStandard)}`;
+      }
+
       case 'move_in_out':
-      case 'deep':
-        return t('home.pricing.startingAt235', 'Starting at $235');
+      case 'deep': {
+        const lowestMoveInOut = pricingTiers
+          .filter((tierItem) => !tierItem.isCustomQuote && ((tierItem.moveInOutPrice && tierItem.moveInOutPrice > 0) || tierItem.deepPrice > 0))
+          .reduce((min, tierItem) => {
+            const price = tierItem.moveInOutPrice && tierItem.moveInOutPrice > 0 ? tierItem.moveInOutPrice : tierItem.deepPrice;
+            return price < min ? price : min;
+          }, pricingTiers[0]?.deepPrice || 235);
+        return `${prefix} $${Math.round(lowestMoveInOut)}`;
+      }
+
       case 'str_on_site':
-      case 'short_term_rental':
-        return t('home.pricing.startingAt90', 'Starting at $90');
+      case 'short_term_rental': {
+        const lowestSTR = strTiers
+          .filter((s) => !s.isCustomQuote && s.basePrice > 0)
+          .reduce((min, s) => (s.basePrice < min ? s.basePrice : min), strTiers[0]?.basePrice || 90);
+        return `${prefix} $${Math.round(lowestSTR)}`;
+      }
+
       case 'commercial':
-        return t('home.pricing.freeWalkthrough', 'Free Walkthrough ($0)');
       default:
+        // Free walkthrough badge removed per user request
         return null;
     }
   };
