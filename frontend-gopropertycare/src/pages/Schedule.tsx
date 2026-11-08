@@ -70,6 +70,10 @@ import {
 
   LogIn,
 
+  Plus,
+
+  Minus,
+
   type LucideIcon,
 
 } from 'lucide-react';
@@ -103,6 +107,8 @@ import {
   getServiceFrequencies,
 
   getTierBySqft,
+
+  getSuggestedTierByRooms,
 
   getTierPrice,
 
@@ -445,7 +451,11 @@ export function Schedule() {
 
 
 
-  const [frequency, setFrequency] = useState<ServiceFrequency>('biweekly'); // Default "Most Popular"
+  const [frequency, setFrequency] = useState<ServiceFrequency>('one_time'); // Default One-Time Service
+  const [isFrequencyOpen, setIsFrequencyOpen] = useState(false);
+  const [isAddonsOpen, setIsAddonsOpen] = useState(false);
+  const [isTierAutoSuggested, setIsTierAutoSuggested] = useState(false);
+  const [showCouponSection, setShowCouponSection] = useState(false);
 
 
 
@@ -2576,6 +2586,113 @@ export function Schedule() {
 
             <>
 
+              {/* Residential: Bedrooms & Bathrooms Stepper (Above Property Size) */}
+              {!isSTR && (
+                <div className="bg-slate-50 border-2 border-slate-200/90 rounded-2xl p-4 sm:p-5 space-y-3.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                      <Home className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>{t('schedule.propertyDetailsTitle', 'Habitaciones y Baños')}</span>
+                    </h3>
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      {t('schedule.roomsAutoSuggestHint', 'Ajusta tus habitaciones para sugerir el tamaño ideal')}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {/* Bedrooms Stepper */}
+                    <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-2xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                          <Bed className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-slate-800 block">{t('schedule.bedroomsLabel', 'Habitaciones')}</span>
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            {bedrooms} {bedrooms === 1 ? (i18n.language?.startsWith('es') ? 'recámara' : 'bedroom') : (i18n.language?.startsWith('es') ? 'recámaras' : 'bedrooms')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          disabled={bedrooms <= 1}
+                          onClick={() => {
+                            const next = Math.max(1, bedrooms - 1);
+                            setBedrooms(next);
+                            setSelectedTier(getSuggestedTierByRooms(next, bathrooms, pricingTiers));
+                            setIsTierAutoSuggested(true);
+                          }}
+                          className="w-8 h-8 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-slate-700 font-black transition-all cursor-pointer active:scale-95"
+                          aria-label="Decrease bedrooms"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="w-5 text-center text-sm font-black text-slate-900 tabular-nums">{bedrooms}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = bedrooms + 1;
+                            setBedrooms(next);
+                            setSelectedTier(getSuggestedTierByRooms(next, bathrooms, pricingTiers));
+                            setIsTierAutoSuggested(true);
+                          }}
+                          className="w-8 h-8 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                          aria-label="Increase bedrooms"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Bathrooms Stepper */}
+                    <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-2xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                          <Bath className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-slate-800 block">{t('schedule.bathroomsLabel', 'Baños')}</span>
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            {bathrooms} {bathrooms === 1 ? (i18n.language?.startsWith('es') ? 'baño' : 'bathroom') : (i18n.language?.startsWith('es') ? 'baños' : 'bathrooms')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          disabled={bathrooms <= 1}
+                          onClick={() => {
+                            const next = Math.max(1, bathrooms - 1);
+                            setBathrooms(next);
+                            setSelectedTier(getSuggestedTierByRooms(bedrooms, next, pricingTiers));
+                            setIsTierAutoSuggested(true);
+                          }}
+                          className="w-8 h-8 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-slate-700 font-black transition-all cursor-pointer active:scale-95"
+                          aria-label="Decrease bathrooms"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="w-5 text-center text-sm font-black text-slate-900 tabular-nums">{bathrooms}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = bathrooms + 1;
+                            setBathrooms(next);
+                            setSelectedTier(getSuggestedTierByRooms(bedrooms, next, pricingTiers));
+                            setIsTierAutoSuggested(true);
+                          }}
+                          className="w-8 h-8 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                          aria-label="Increase bathrooms"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Residential: Property Size Dropdown (Tiers 1 to 19) */}
 
               {!isSTR && (
@@ -2590,11 +2707,16 @@ export function Schedule() {
 
                     </label>
 
-                    <span className="text-xs text-slate-500 font-bold self-start sm:self-auto tabular-nums">
-
-                      {selectedTier.label}
-
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {isTierAutoSuggested && (
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-2 py-0.5 rounded-full">
+                          {i18n.language?.startsWith('es') ? 'Sugerido por habitaciones' : 'Suggested by rooms'}
+                        </span>
+                      )}
+                      <span className="text-xs text-slate-500 font-bold self-start sm:self-auto tabular-nums">
+                        {selectedTier.label}
+                      </span>
+                    </div>
 
                   </div>
 
@@ -2614,7 +2736,10 @@ export function Schedule() {
 
                         const found = pricingTiers.find((t) => t.tier === tNum);
 
-                        if (found) setSelectedTier(found);
+                        if (found) {
+                          setSelectedTier(found);
+                          setIsTierAutoSuggested(false);
+                        }
 
                       }}
 
@@ -2886,462 +3011,276 @@ export function Schedule() {
 
 
 
-              {/* Service Frequency Selection Tabs */}
-
-              <div className="space-y-3 pt-2">
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-
-                  <label className="block text-sm font-extrabold text-slate-900">
-
-                    {t('schedule.frequencyTitle')}
-
-                  </label>
-
-                  <span className="text-xs text-slate-500 font-medium">
-
-                    {t('schedule.frequencySubtitle')}
-
-                  </span>
-
-                </div>
-
-
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-
-                  {availableFrequencies.map((freq) => {
-
-                    const isSelected = frequency === freq.id;
-
-                    const freqDisc = Math.round(((baseTierPrice * freq.discountPercent) / 100) * 100) / 100;
-
-                    const freqNet = baseTierPrice - freqDisc;
-
-
-
-                    return (
-
-                      <button
-
-                        key={freq.id}
-
-                        type="button"
-
-                        onClick={() => setFrequency(freq.id)}
-
-                        className={`p-3 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between relative hover:scale-101 active:scale-98 ${
-
-                          isSelected
-
-                            ? 'border-emerald-600 bg-emerald-50/90 shadow-sm ring-2 ring-emerald-600/20'
-
-                            : 'border-slate-200 bg-white hover:border-slate-300'
-
-                        }`}
-
-                      >
-
-                        <div>
-
-                          <h4 className="font-black text-slate-900 text-xs sm:text-sm leading-snug">
-
-                            {t(freq.nameKey)}
-
-                          </h4>
-
-                        </div>
-
-
-
-                        <div className="pt-2 mt-2 border-t border-slate-100/80">
-
-                          <span className="text-xs font-black text-slate-900 block tabular-nums">
-
-                            ${freqNet.toFixed(2)}
-
-                          </span>
-
-                          {freq.discountPercent > 0 && (
-
-                            <span className="text-[10px] text-emerald-700 font-bold block tabular-nums">
-
-                              -{freq.discountPercent}% saved
-
-                            </span>
-
-                          )}
-
-                        </div>
-
-                      </button>
-
-                    );
-
-                  })}
-
-                </div>
-
-              </div>
-
-
-
-              {/* Consultative Details (Bedrooms, Bathrooms for Residential) */}
-
-              {!isSTR && (
-
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
-
-                    <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-
-                      <Home className="w-4 h-4 text-emerald-600 shrink-0" />
-
-                      <span>{t('schedule.propertyDetailsTitle')}</span>
-
-                    </h3>
-
-                  </div>
-
-
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                    {/* Bedrooms */}
-
-                    <div className="space-y-1.5">
-
-                      <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-
-                        <Bed className="w-3.5 h-3.5 text-emerald-600" />
-
-                        <span>{t('schedule.bedroomsLabel')}</span>
-
-                      </label>
-
-                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-
-                        {[0, 1, 2, 3, 4, 5].map((num) => (
-
-                          <button
-
-                            key={num}
-
-                            type="button"
-
-                            onClick={() => setBedrooms(num)}
-
-                            className={`min-h-[40px] py-1.5 px-1 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center tabular-nums ${
-
-                              bedrooms === num
-
-                                ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
-
-                                : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
-
-                            }`}
-
-                          >
-
-                            {num === 0 ? t('schedule.studio') : num === 5 ? '5+' : num}
-
-                          </button>
-
-                        ))}
-
-                      </div>
-
-                    </div>
-
-
-
-                    {/* Bathrooms */}
-
-                    <div className="space-y-1.5">
-
-                      <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-
-                        <Bath className="w-3.5 h-3.5 text-emerald-600" />
-
-                        <span>{t('schedule.bathroomsLabel')}</span>
-
-                      </label>
-
-                      <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
-
-                        {[1, 1.5, 2, 2.5, 3, 3.5, 4].map((num) => (
-
-                          <button
-
-                            key={num}
-
-                            type="button"
-
-                            onClick={() => setBathrooms(num)}
-
-                            className={`min-h-[40px] py-1.5 px-0.5 rounded-xl text-xs font-black border transition-all cursor-pointer touch-manipulation flex items-center justify-center tabular-nums ${
-
-                              bathrooms === num
-
-                                ? 'border-emerald-600 bg-emerald-600 text-white shadow-2xs'
-
-                                : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
-
-                            } ${num === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
-
-                          >
-
-                            {num === 4 ? '4+' : num}
-
-                          </button>
-
-                        ))}
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              )}
-
-
-
-              {/* Priced Add-ons (Integral in Step 1) */}
-
-              <div className="space-y-3 pt-3 border-t border-slate-100">
-
-                <div>
-
-                  <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-
-                    <span>{t('schedule.addonsTitle')}</span>
-
-                  </label>
-
-                  <p className="text-xs text-slate-600 font-medium">
-
-                    {t('schedule.addonsSubtitle')}
-
-                  </p>
-
-                </div>
-
-
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-                  {[...addons]
-
-                    .filter((addon) => {
-
-                      if (addon.code === 'off_site_laundry') return isSTR;
-
-                      return true;
-
-                    })
-
-                    .sort((a, b) => {
-
-                      if (isSTR) {
-
-                        const strCodes = ['off_site_laundry', 'pets', 'hot_tub', 'patio_grill'];
-
-                        const aIsStr = strCodes.includes(a.code);
-
-                        const bIsStr = strCodes.includes(b.code);
-
-                        if (aIsStr && !bIsStr) return -1;
-
-                        if (!aIsStr && bIsStr) return 1;
-
-                      }
-
-                      return 0;
-
-                    })
-
-                    .map((addon) => {
-
-                    const isChecked = !!selectedAddonCodes[addon.code];
-
-                    const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
-
-                    const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
-
-                    const displayPrice = addon.code === 'off_site_laundry' ? currentOffSiteFee : Number(addon.price);
-
-                    const AddonIcon = ADDON_ICONS[addon.code] || Check;
-
-
-
-                    return (
-
-                      <div
-
-                        key={addon.code}
-
-                        onClick={() => {
-
-                          const nextVal = !isChecked;
-
-                          setSelectedAddonCodes({
-
-                            ...selectedAddonCodes,
-
-                            [addon.code]: nextVal,
-
-                          });
-
-                        }}
-
-                        className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
-
-                          isChecked
-
-                            ? 'border-emerald-600 bg-emerald-50/60 shadow-xs ring-2 ring-emerald-600/20'
-
-                            : 'border-slate-200 bg-white hover:border-slate-300'
-
-                        }`}
-
-                      >
-
-                        <div
-
-                          className={`w-5 h-5 rounded-md border mt-0.5 flex items-center justify-center shrink-0 transition-all duration-200 ${
-
-                            isChecked
-
-                              ? 'border-emerald-600 bg-emerald-600 text-white scale-105'
-
-                              : 'border-slate-300 bg-white'
-
-                          }`}
-
-                        >
-
-                          {isChecked && <Check className="w-3.5 h-3.5 animate-pop-in" />}
-
-                        </div>
-
-                        <div className="flex-1 text-xs">
-
-                          <div className="flex items-center justify-between">
-
-                            <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-
-                              <AddonIcon className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
-
-                              <span>{localizedName}</span>
-
-                            </span>
-
-                            <span className="font-black text-emerald-700 text-xs sm:text-sm tabular-nums">+${displayPrice.toFixed(2)}</span>
-
-                          </div>
-
-                          <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
-
-                          {addon.code === 'off_site_laundry' && (
-
-                            <p className="text-[11px] font-semibold mt-1 text-slate-500 tabular-nums">
-
-                              {isChecked
-
-                                ? (i18n.language?.startsWith('es')
-
-                                    ? `✓ Tarifa escalada para ${bedrooms === 0 ? 'Studio' : `${bedrooms} hab`}: +$${currentOffSiteFee.toFixed(2)}`
-
-                                    : `✓ Scaled fee for ${bedrooms === 0 ? 'Studio' : `${bedrooms} bed(s)`}: +$${currentOffSiteFee.toFixed(2)}`)
-
-                                : (i18n.language?.startsWith('es')
-
-                                    ? '✓ Por defecto: Lavado de sábanas en la unidad ($0.00 adicional)'
-
-                                    : '✓ Default: On-site washer & dryer linen laundering ($0.00 extra)')}
-
-                            </p>
-
-                          )}
-
-                        </div>
-
-                      </div>
-
-                    );
-
-                  })}
-
-                </div>
-
-              </div>
-
-
-
-              {/* Step 1 Running Summary & Next Button */}
-
-              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-
-                <div className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 flex items-center justify-between sm:justify-start gap-4">
-
-                  <div>
-
-                    <span className="text-[11px] text-slate-500 font-semibold block">{t('schedule.totalDue')}</span>
-
-                    <div className="flex items-baseline gap-1.5">
-
-                      <span className="text-lg sm:text-xl font-black text-slate-900 tabular-nums">
-
-                        ${totalPrice.toFixed(2)}
-
+              {/* Service Frequency Selection (Collapsible, Default One-Time) */}
+              <div className="border-2 border-slate-200/90 rounded-2xl bg-slate-50/70 overflow-hidden transition-all shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setIsFrequencyOpen(!isFrequencyOpen)}
+                  className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-slate-100/70 transition-colors focus:outline-none"
+                >
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-extrabold text-slate-900">
+                        {t('schedule.frequencyTitle', 'Frecuencia del Servicio')}
                       </span>
-
-                      {addonsTotal > 0 && (
-
-                        <span className="text-xs text-slate-500 font-medium tabular-nums">
-
-                          (${discountedBasePrice.toFixed(2)} base + ${addonsTotal.toFixed(2)} extras)
-
+                      {frequency !== 'one_time' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          {t(freqOption.nameKey)} ({freqOption.badge})
                         </span>
-
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200/80 text-slate-700">
+                          {i18n.language?.startsWith('es') ? 'Servicio Único' : 'One-Time Clean'}
+                        </span>
                       )}
+                    </div>
+                    <p className="text-xs text-slate-600 font-medium">
+                      {frequency !== 'one_time'
+                        ? (i18n.language?.startsWith('es')
+                            ? `Descuento recurrente del ${freqOption.discountPercent}% aplicado sobre el servicio base`
+                            : `${freqOption.discountPercent}% recurring discount applied on base service`)
+                        : (i18n.language?.startsWith('es')
+                            ? 'Opcional: Ahorra hasta 15% con limpiezas recurrentes (semanal, quincenal, mensual)'
+                            : 'Optional: Save up to 15% with recurring cleanings (weekly, biweekly, monthly)')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 ml-3">
+                    <span className="text-xs font-bold text-emerald-700 hidden sm:inline">
+                      {isFrequencyOpen ? (i18n.language?.startsWith('es') ? 'Ocultar' : 'Hide') : (i18n.language?.startsWith('es') ? 'Ver opciones' : 'View options')}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
+                        isFrequencyOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </div>
+                </button>
 
+                {isFrequencyOpen && (
+                  <div className="p-4 sm:p-5 pt-0 border-t border-slate-200/60 bg-white space-y-3 animate-fade-in">
+                    <div className="flex items-center justify-between text-xs text-slate-500 font-medium pt-3">
+                      <span>{i18n.language?.startsWith('es') ? 'Selecciona una frecuencia recurrente o desmarca para servicio único:' : 'Select a recurring frequency or deselect for one-time clean:'}</span>
+                      {frequency !== 'one_time' && (
+                        <button
+                          type="button"
+                          onClick={() => setFrequency('one_time')}
+                          className="text-xs text-emerald-700 hover:text-emerald-900 font-bold underline cursor-pointer"
+                        >
+                          {i18n.language?.startsWith('es') ? 'Dejar como servicio único' : 'Set as one-time'}
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      {availableFrequencies
+                        .filter((f) => f.id !== 'one_time')
+                        .map((freq) => {
+                          const isSelected = frequency === freq.id;
+                          const freqDisc = Math.round(((baseTierPrice * freq.discountPercent) / 100) * 100) / 100;
+                          const freqNet = baseTierPrice - freqDisc;
+
+                          return (
+                            <button
+                              key={freq.id}
+                              type="button"
+                              onClick={() => {
+                                if (frequency === freq.id) {
+                                  setFrequency('one_time');
+                                } else {
+                                  setFrequency(freq.id);
+                                }
+                              }}
+                              className={`p-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between relative hover:scale-101 active:scale-98 ${
+                                isSelected
+                                  ? 'border-emerald-600 bg-emerald-50/90 shadow-sm ring-2 ring-emerald-600/20'
+                                  : 'border-slate-200 bg-white hover:border-slate-300'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-1">
+                                <h4 className="font-black text-slate-900 text-xs sm:text-sm leading-snug">
+                                  {t(freq.nameKey)}
+                                </h4>
+                                {isSelected && (
+                                  <div className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                                    <Check className="w-3 h-3" />
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between">
+                                <span className="text-xs font-black text-slate-900 tabular-nums">
+                                  ${freqNet.toFixed(2)}
+                                </span>
+                                {freq.discountPercent > 0 && (
+                                  <span className="text-[10px] text-emerald-700 font-black tabular-nums bg-emerald-50 px-1.5 py-0.5 rounded">
+                                    {freq.badge}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+
+
+              {/* Priced Add-ons (Collapsible in Step 1) */}
+              <div className="border-2 border-slate-200/90 rounded-2xl bg-slate-50/70 overflow-hidden transition-all shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setIsAddonsOpen(!isAddonsOpen)}
+                  className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-slate-100/70 transition-colors focus:outline-none"
+                >
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>{t('schedule.addonsTitle')}</span>
+                      </span>
+                      {addonsTotal > 0 ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          +${addonsTotal.toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200/80 text-slate-700">
+                          {i18n.language?.startsWith('es') ? 'Opcional' : 'Optional'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-600 font-medium">
+                      {addonsTotal > 0
+                        ? (i18n.language?.startsWith('es')
+                            ? `Extras seleccionados sumando +$${addonsTotal.toFixed(2)}`
+                            : `Selected extras adding +$${addonsTotal.toFixed(2)}`)
+                        : t('schedule.addonsSubtitle')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 ml-3">
+                    <span className="text-xs font-bold text-emerald-700 hidden sm:inline">
+                      {isAddonsOpen ? (i18n.language?.startsWith('es') ? 'Ocultar' : 'Hide') : (i18n.language?.startsWith('es') ? 'Ver extras' : 'View add-ons')}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
+                        isAddonsOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </div>
+                </button>
+
+                {isAddonsOpen && (
+                  <div className="p-4 sm:p-5 pt-0 border-t border-slate-200/60 bg-white space-y-3 animate-fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
+                      {[...addons]
+                        .filter((addon) => {
+                          if (addon.code === 'off_site_laundry') return isSTR;
+                          return true;
+                        })
+                        .sort((a, b) => {
+                          if (isSTR) {
+                            const strCodes = ['off_site_laundry', 'pets', 'hot_tub', 'patio_grill'];
+                            const aIsStr = strCodes.includes(a.code);
+                            const bIsStr = strCodes.includes(b.code);
+                            if (aIsStr && !bIsStr) return -1;
+                            if (!aIsStr && bIsStr) return 1;
+                          }
+                          return 0;
+                        })
+                        .map((addon) => {
+                        const isChecked = !!selectedAddonCodes[addon.code];
+                        const localizedName = t(`cleaningAddons.${addon.code}.name`, { defaultValue: addon.name });
+                        const localizedDesc = t(`cleaningAddons.${addon.code}.description`, { defaultValue: addon.description });
+                        const displayPrice = addon.code === 'off_site_laundry' ? currentOffSiteFee : Number(addon.price);
+                        const AddonIcon = ADDON_ICONS[addon.code] || Check;
+
+                        return (
+                          <div
+                            key={addon.code}
+                            onClick={() => {
+                              const nextVal = !isChecked;
+                              setSelectedAddonCodes({
+                                ...selectedAddonCodes,
+                                [addon.code]: nextVal,
+                              });
+                            }}
+                            className={`p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-xs active:scale-99 ${
+                              isChecked
+                                ? 'border-emerald-600 bg-emerald-50/60 shadow-xs ring-2 ring-emerald-600/20'
+                                : 'border-slate-200 bg-white hover:border-slate-300'
+                            }`}
+                          >
+                            <div
+                              className={`w-5 h-5 rounded-md border mt-0.5 flex items-center justify-center shrink-0 transition-all duration-200 ${
+                                isChecked
+                                  ? 'border-emerald-600 bg-emerald-600 text-white scale-105'
+                                  : 'border-slate-300 bg-white'
+                              }`}
+                            >
+                              {isChecked && <Check className="w-3.5 h-3.5 animate-pop-in" />}
+                            </div>
+
+                            <div className="flex-1 text-xs">
+                              <div className="flex items-center justify-between">
+                                <span className="font-black text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                                  <AddonIcon className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                                  <span>{localizedName}</span>
+                                </span>
+                                <span className="font-black text-emerald-700 text-xs sm:text-sm tabular-nums">+${displayPrice.toFixed(2)}</span>
+                              </div>
+
+                              <p className="text-slate-600 text-[11px] sm:text-xs font-medium mt-0.5 leading-relaxed">{localizedDesc}</p>
+
+                              {addon.code === 'off_site_laundry' && (
+                                <p className="text-[11px] font-semibold mt-1 text-slate-500 tabular-nums">
+                                  {isChecked
+                                    ? (i18n.language?.startsWith('es')
+                                        ? `✓ Tarifa escalada para ${bedrooms === 0 ? 'Studio' : `${bedrooms} hab`}: +$${currentOffSiteFee.toFixed(2)}`
+                                        : `✓ Scaled fee for ${bedrooms === 0 ? 'Studio' : `${bedrooms} bed(s)`}: +$${currentOffSiteFee.toFixed(2)}`)
+                                    : (i18n.language?.startsWith('es')
+                                        ? '✓ Por defecto: Lavado de sábanas en la unidad ($0.00 adicional)'
+                                        : '✓ Default: On-site washer & dryer linen laundering ($0.00 extra)')}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Step 1 Running Summary & Next Button (Sticky on mobile) */}
+              <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 sticky bottom-0 z-20 bg-white/95 backdrop-blur-md -mx-4 px-4 py-3 sm:static sm:mx-0 sm:px-0 sm:py-0 sm:bg-transparent shadow-lg sm:shadow-none rounded-b-2xl sm:rounded-none">
+                <div className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 flex items-center justify-between sm:justify-start gap-4">
+                  <div>
+                    <span className="text-[11px] text-slate-500 font-semibold block">{t('schedule.totalDue')}</span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-lg sm:text-xl font-black text-slate-900 tabular-nums">
+                        ${totalPrice.toFixed(2)}
+                      </span>
+                      {addonsTotal > 0 && (
+                        <span className="text-xs text-slate-500 font-medium tabular-nums">
+                          (${discountedBasePrice.toFixed(2)} base + ${addonsTotal.toFixed(2)} extras)
+                        </span>
+                      )}
                       {(discountPercent > 0 || servicePromoPercent > 0) && (
                         <span className="text-xs text-slate-400 line-through tabular-nums">
                           ${(rawBaseTierPrice + addonsTotal).toFixed(2)}
                         </span>
                       )}
-
                     </div>
-
                   </div>
-
                 </div>
 
-
-
                 <Button
-
                   size="md"
-
                   onClick={() => setStep(2)}
-
                   className="w-full sm:w-auto min-h-[44px] px-6 text-xs sm:text-sm font-extrabold hover:scale-102 active:scale-98 transition-all duration-200 shadow-sm"
-
                 >
-
                   <span>{t('schedule.step2')}</span>
-
                   <ChevronRight className="w-4 h-4 ml-1" />
-
                 </Button>
-
               </div>
 
             </>
@@ -3563,32 +3502,50 @@ export function Schedule() {
 
 
           {/* Time Picker */}
-
           <div className="space-y-4 max-w-lg mx-auto">
-
             <div className="flex items-center justify-between">
-
               <label className="block text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-
                 <Clock className="w-4 h-4 text-emerald-600" />
-
                 <span>{t('schedule.timeSlotLabel')}</span>
-
               </label>
-
               {isDateToday && (
-
                 <span className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md font-bold">
-
                   {t('schedule.min3hNotice')}
-
                 </span>
-
               )}
-
             </div>
 
-
+            {/* Quick 3 Time Slots */}
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { slot: '09:00 AM', label: i18n.language?.startsWith('es') ? 'Mañana' : 'Morning' },
+                { slot: '12:00 PM', label: i18n.language?.startsWith('es') ? 'Mediodía' : 'Midday' },
+                { slot: '03:00 PM', label: i18n.language?.startsWith('es') ? 'Tarde' : 'Afternoon' },
+              ].map(({ slot, label }) => {
+                const isSelected = selectedTimeSlot === slot;
+                const isDisabled = isDateToday && !isTimeSlotValidForToday(slot);
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    disabled={isDisabled}
+                    onClick={() => setSelectedTimeSlot(slot)}
+                    className={`py-2.5 px-2 rounded-xl text-xs font-bold border transition-all text-center flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+                      isSelected
+                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs ring-2 ring-emerald-600/20 font-black'
+                        : isDisabled
+                        ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
+                        : 'bg-white border-slate-200 text-slate-800 hover:border-emerald-500 hover:bg-emerald-50/50'
+                    }`}
+                  >
+                    <span className="font-extrabold text-xs sm:text-sm">{slot}</span>
+                    <span className={`text-[10px] ${isSelected ? 'text-emerald-100 font-semibold' : 'text-slate-500'}`}>
+                      {label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
             {/* Custom Time Selector & Validation */}
 
@@ -4246,96 +4203,117 @@ export function Schedule() {
           </div>
 
           {/* Promo & Coupon Code Section */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-5 space-y-3">
-            <div className="flex items-center justify-between gap-2 min-w-0">
-              <div className="flex items-center gap-2 min-w-0">
-                <Tag className="w-4 h-4 text-emerald-600 shrink-0" />
-                <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider truncate">
-                  {t('schedule.coupons.title')}
-                </h3>
-              </div>
-              {appliedCoupon && (
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0">
-                  {appliedCoupon.discount_percentage}% OFF
-                </span>
-              )}
+          {!showCouponSection && !appliedCoupon ? (
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={() => setShowCouponSection(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer py-1 px-2.5 rounded-lg hover:bg-emerald-50 transition-colors"
+              >
+                <Tag className="w-3.5 h-3.5" />
+                <span>{i18n.language?.startsWith('es') ? '¿Tienes un cupón de descuento?' : 'Have a promo coupon code?'}</span>
+              </button>
             </div>
-
-            {!isAuthenticated ? (
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-xs">
-                <div className="min-w-0">
-                  <p className="font-bold text-emerald-950">{t('schedule.coupons.haveCoupon')}</p>
-                  <p className="text-emerald-800 text-[11px] mt-0.5">{t('schedule.coupons.loginPrompt')}</p>
-                </div>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => setIsQuickAuthOpen(true)}
-                  className="w-full sm:w-auto font-bold bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 cursor-pointer shadow-xs min-h-[40px] justify-center"
-                >
-                  <LogIn className="w-3.5 h-3.5 mr-1.5 shrink-0" />
-                  <span>{t('schedule.coupons.loginButton')}</span>
-                </Button>
-              </div>
-            ) : appliedCoupon ? (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs">
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-5 space-y-3 animate-fade-in">
+              <div className="flex items-center justify-between gap-2 min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <div className="min-w-0">
-                    <span className="font-extrabold text-emerald-950 font-mono tracking-wider mr-2">
-                      {appliedCoupon.code}
-                    </span>
-                    <span className="text-emerald-700 font-semibold text-[11px] sm:text-xs">
-                      (-{appliedCoupon.discount_percentage}% = -${couponDiscountAmount.toFixed(2)})
-                    </span>
-                  </div>
+                  <Tag className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider truncate">
+                    {t('schedule.coupons.title')}
+                  </h3>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleRemoveCoupon}
-                  className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer hover:underline self-end sm:self-auto shrink-0"
-                >
-                  <X className="w-3.5 h-3.5 shrink-0" />
-                  <span>{t('schedule.coupons.remove')}</span>
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Input
-                    type="text"
-                    value={couponCodeInput}
-                    maxLength={6}
-                    onChange={(e) => {
-                      const clean = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
-                      setCouponCodeInput(clean);
-                      if (couponError) setCouponError('');
-                    }}
-                    placeholder={t('schedule.coupons.placeholder')}
-                    className="w-full text-xs font-mono font-bold tracking-wider uppercase min-h-[42px]"
-                  />
-                  <Button
+                {appliedCoupon ? (
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0">
+                    {appliedCoupon.discount_percentage}% OFF
+                  </span>
+                ) : (
+                  <button
                     type="button"
-                    onClick={handleApplyCoupon}
-                    disabled={couponLoading || couponCodeInput.length !== 6}
-                    className="w-full sm:w-auto font-bold px-6 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 cursor-pointer disabled:opacity-50 min-h-[42px] justify-center"
+                    onClick={() => setShowCouponSection(false)}
+                    className="text-[11px] font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
-                    {couponLoading ? (
-                      <span className="animate-spin inline-block mr-1">⌛</span>
-                    ) : (
-                      t('schedule.coupons.apply')
-                    )}
-                  </Button>
-                </div>
-                {couponError && (
-                  <p className="text-xs text-rose-600 font-medium flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                    <span>{couponError}</span>
-                  </p>
+                    {i18n.language?.startsWith('es') ? 'Ocultar' : 'Hide'}
+                  </button>
                 )}
               </div>
-            )}
-          </div>
+
+              {!isAuthenticated ? (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-xs">
+                  <div className="min-w-0">
+                    <p className="font-bold text-emerald-950">{t('schedule.coupons.haveCoupon')}</p>
+                    <p className="text-emerald-800 text-[11px] mt-0.5">{t('schedule.coupons.loginPrompt')}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => setIsQuickAuthOpen(true)}
+                    className="w-full sm:w-auto font-bold bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 cursor-pointer shadow-xs min-h-[40px] justify-center"
+                  >
+                    <LogIn className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                    <span>{t('schedule.coupons.loginButton')}</span>
+                  </Button>
+                </div>
+              ) : appliedCoupon ? (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div className="min-w-0">
+                      <span className="font-extrabold text-emerald-950 font-mono tracking-wider mr-2">
+                        {appliedCoupon.code}
+                      </span>
+                      <span className="text-emerald-700 font-semibold text-[11px] sm:text-xs">
+                        (-{appliedCoupon.discount_percentage}% = -${couponDiscountAmount.toFixed(2)})
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer hover:underline self-end sm:self-auto shrink-0"
+                  >
+                    <X className="w-3.5 h-3.5 shrink-0" />
+                    <span>{t('schedule.coupons.remove')}</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      type="text"
+                      value={couponCodeInput}
+                      maxLength={6}
+                      onChange={(e) => {
+                        const clean = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+                        setCouponCodeInput(clean);
+                        if (couponError) setCouponError('');
+                      }}
+                      placeholder={t('schedule.coupons.placeholder')}
+                      className="w-full text-xs font-mono font-bold tracking-wider uppercase min-h-[42px]"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading || couponCodeInput.length !== 6}
+                      className="w-full sm:w-auto font-bold px-6 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 cursor-pointer disabled:opacity-50 min-h-[42px] justify-center"
+                    >
+                      {couponLoading ? (
+                        <span className="animate-spin inline-block mr-1">⌛</span>
+                      ) : (
+                        t('schedule.coupons.apply')
+                      )}
+                    </Button>
+                  </div>
+                  {couponError && (
+                    <p className="text-xs text-rose-600 font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{couponError}</span>
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Dynamic Sticky Cost Breakdown Card */}
           <div className="bg-white border-2 border-emerald-200/90 rounded-2xl p-3.5 sm:p-6 space-y-3 shadow-2xs">
@@ -4438,25 +4416,77 @@ export function Schedule() {
               <span className="font-bold text-slate-700 text-base sm:text-lg tabular-nums shrink-0">${totalPrice.toFixed(2)}</span>
             </div>
 
-            {/* 25% Deposit Due Today vs 75% Balance Upon Completion Breakdown */}
-            <div className="bg-emerald-50/90 border-2 border-emerald-300/80 rounded-2xl p-3.5 sm:p-5 space-y-3">
-              <div className="flex flex-wrap sm:flex-nowrap justify-between items-baseline gap-2">
-                <div className="min-w-0">
-                  <span className="font-black text-emerald-950 text-sm sm:text-base block">{t('schedule.depositDueToday')} (25%):</span>
-                  <span className="text-[11px] text-emerald-700 font-semibold block">{t('schedule.depositChargedNow')}</span>
+            {/* Transparent 3-Phase Payment Schedule */}
+            <div className="bg-emerald-50/90 border-2 border-emerald-300/80 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xs">
+              {/* Highlight: $0.00 charged today */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-emerald-200/80">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-emerald-950 text-sm sm:text-base">
+                      {i18n.language?.startsWith('es') ? 'A Pagar Hoy al Agendar:' : 'Due Today to Reserve:'}
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white px-2 py-0.5 rounded-full">
+                      {i18n.language?.startsWith('es') ? '$0 Anticipo' : '$0 Upfront'}
+                    </span>
+                  </div>
+                  <span className="text-xs text-emerald-800 font-medium block mt-0.5">
+                    {i18n.language?.startsWith('es')
+                      ? 'Tu tarjeta queda registrada de forma segura para apartar tu turno.'
+                      : 'Your card is safely saved to hold your appointment time.'}
+                  </span>
                 </div>
-                <span className="font-black text-2xl sm:text-3xl text-emerald-700 tabular-nums shrink-0">${depositAmount.toFixed(2)}</span>
-              </div>
-              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center pt-2.5 border-t border-emerald-200 text-xs text-slate-600 font-medium gap-2">
-                <div className="min-w-0">
-                  <span className="font-bold text-slate-800 block">{t('schedule.balanceDueUponCompletion')} (75%):</span>
-                  <span className="text-[11px] text-slate-500 block">{t('schedule.balanceDueUponCompletionHelp')}</span>
+                <div className="text-left sm:text-right">
+                  <span className="font-black text-3xl sm:text-4xl text-emerald-700 tabular-nums leading-none">
+                    $0.00
+                  </span>
                 </div>
-                <span className="font-bold text-slate-900 text-sm sm:text-base tabular-nums shrink-0">${remainingBalance.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between items-center pt-2 border-t border-emerald-200/60 text-xs">
-                <span className="font-extrabold text-emerald-900">{t('schedule.dueTodayLabel')}</span>
-                <span className="font-black text-base text-emerald-800 tabular-nums">$0.00</span>
+
+              {/* Step by step timeline */}
+              <div className="space-y-2.5 text-xs">
+                {/* Step 1: Deposit */}
+                <div className="bg-white/80 border border-emerald-200/80 rounded-xl p-3 flex items-start justify-between gap-3">
+                  <div className="space-y-0.5 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-black text-[11px] flex items-center justify-center shrink-0">
+                        1
+                      </span>
+                      <span className="font-extrabold text-slate-900">
+                        {t('schedule.depositDueToday')} (25%):
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 pl-6.5">
+                      {i18n.language?.startsWith('es')
+                        ? 'Se cobra ÚNICAMENTE cuando nuestro administrador verifique disponibilidad de cuadrilla y apruebe tu orden. Si no hay cupo, se cancela sin ningún costo.'
+                        : 'Charged ONLY once our operations team confirms crew availability and officially accepts your order. If no slot is available, cancelled at $0 cost.'}
+                    </p>
+                  </div>
+                  <span className="font-black text-sm sm:text-base text-slate-900 tabular-nums shrink-0 pt-0.5">
+                    ${depositAmount.toFixed(2)}
+                  </span>
+                </div>
+
+                {/* Step 2: Completion Balance */}
+                <div className="bg-white/80 border border-emerald-200/80 rounded-xl p-3 flex items-start justify-between gap-3">
+                  <div className="space-y-0.5 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0">
+                        2
+                      </span>
+                      <span className="font-extrabold text-slate-900">
+                        {t('schedule.balanceDueUponCompletion')} (75%):
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 pl-6.5">
+                      {i18n.language?.startsWith('es')
+                        ? 'Se debitará automáticamente una vez que el equipo termine la limpieza a tu entera satisfacción.'
+                        : 'Debited automatically only after our crew finishes the cleaning to your full satisfaction.'}
+                    </p>
+                  </div>
+                  <span className="font-black text-sm sm:text-base text-slate-900 tabular-nums shrink-0 pt-0.5">
+                    ${remainingBalance.toFixed(2)}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -4664,7 +4694,8 @@ export function Schedule() {
             </Button>
           </div>
         </Card>
-      )}\n
+      )}
+
       <QuickAuthModal
 
         isOpen={isQuickAuthOpen}

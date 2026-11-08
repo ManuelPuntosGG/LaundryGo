@@ -15,6 +15,7 @@
     "about": "About Us",
     "faq": "FAQ",
     "schedule": "Book Service",
+    "bookShort": "Book Now",
     "login": "Login",
     "register": "Register",
     "dashboard": "My Account",
@@ -31,7 +32,7 @@
     "hero": {
       "title": "Professional Cleaning & Maintenance Solutions",
       "subtitle": "Top-tier residential and commercial cleaning solutions tailored to homeowners, real estate professionals, and property managers throughout the Denver metropolitan area.",
-      "cta": "Schedule My Service",
+      "cta": "Book Now",
       "secondaryCta": "Estimate Price"
     },
     "letter": {

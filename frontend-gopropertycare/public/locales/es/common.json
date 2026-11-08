@@ -15,6 +15,7 @@
     "about": "Nosotros",
     "faq": "FAQ",
     "schedule": "Agendar Servicio",
+    "bookShort": "Agendar",
     "login": "Iniciar Sesión",
     "register": "Registrarse",
     "dashboard": "Mi Cuenta",
@@ -31,7 +32,7 @@
     "hero": {
       "title": "Soluciones Integrales de Limpieza y Mantenimiento",
       "subtitle": "Limpieza residencial y comercial de primer nivel, diseñada a la medida de propietarios, profesionales del sector inmobiliario y administradores en toda el área metropolitana de Denver.",
-      "cta": "Agendar mi Servicio",
+      "cta": "Reservar Ahora",
       "secondaryCta": "Calcular mi Estimado"
     },
     "letter": {

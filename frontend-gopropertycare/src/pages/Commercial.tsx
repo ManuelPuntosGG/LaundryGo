@@ -160,30 +160,6 @@ export function Commercial() {
 
       {/* COMMERCIAL SECTION */}
       <section className="space-y-8 sm:space-y-10 animate-fade-in">
-        {/* Walkthrough Announcement Banner (Top CTA) */}
-        <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30">
-              <Building2 className="w-3.5 h-3.5" />
-              <span>{t('commercialPage.badge', 'Custom Quotes & Tailored Operations')}</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white">
-              {t('commercialPage.title', 'Commercial Cleaning & Janitorial Solutions')}
-            </h2>
-            <p className="text-xs sm:text-sm text-emerald-100 font-medium leading-relaxed">
-              {t('commercialPage.subtitle')}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setIsWalkthroughModalOpen(true)}
-            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-emerald-400/90 text-white font-black text-sm bg-emerald-900/50 hover:bg-emerald-800/80 hover:border-emerald-300 shadow-lg hover:scale-102 transition-transform cursor-pointer shrink-0"
-          >
-            <Calendar className="w-4 h-4 mr-1 text-emerald-300" />
-            <span className="text-white font-black">{t('commercialPage.requestWalkthroughBtn', 'Get a Quote')}</span>
-          </button>
-        </div>
-
         {/* 4 Commercial Cards (Simplified without redundant card buttons) */}
         <div className="space-y-8 sm:space-y-10">
           {commercialCards.map((card) => {

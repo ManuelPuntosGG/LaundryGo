@@ -113,3 +113,18 @@ export const getTierBySqft = (sqft: number): PricingTier => {
   const match = PRICING_TIERS.find((t) => sqft >= t.minSqft && sqft <= t.maxSqft);
   return match || PRICING_TIERS[0]; // Defaults to Tier 0 (500 - 999 sq ft)
 };
+
+export const getSuggestedTierByRooms = (
+  bedrooms: number,
+  bathrooms: number,
+  tiers: PricingTier[] = PRICING_TIERS
+): PricingTier => {
+  const safeBeds = Math.max(0, bedrooms);
+  const safeBaths = Math.max(1, bathrooms);
+  const estimatedSqft = 450 + safeBeds * 350 + safeBaths * 150;
+
+  if (estimatedSqft >= 6100) return tiers[tiers.length - 1] || PRICING_TIERS[PRICING_TIERS.length - 1];
+  if (estimatedSqft < 500) return tiers[0] || PRICING_TIERS[0];
+  const match = tiers.find((t) => estimatedSqft >= t.minSqft && estimatedSqft <= t.maxSqft);
+  return match || tiers[0] || PRICING_TIERS[0];
+};

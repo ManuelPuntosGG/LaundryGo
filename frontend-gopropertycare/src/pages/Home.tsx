@@ -70,6 +70,24 @@ export function Home() {
     }
   };
 
+  const getStartingPriceBadge = (serviceType: string) => {
+    switch (serviceType) {
+      case 'residential':
+      case 'regular':
+        return t('home.pricing.startingAt155', 'Starting at $155');
+      case 'move_in_out':
+      case 'deep':
+        return t('home.pricing.startingAt235', 'Starting at $235');
+      case 'str_on_site':
+      case 'short_term_rental':
+        return t('home.pricing.startingAt90', 'Starting at $90');
+      case 'commercial':
+        return t('home.pricing.freeWalkthrough', 'Free Walkthrough ($0)');
+      default:
+        return null;
+    }
+  };
+
   const steps = [
     {
       step: '01',
@@ -120,16 +138,22 @@ export function Home() {
           {t('home.hero.subtitle')}
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md animate-fade-in-up delay-150">
+        <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full justify-center max-w-lg animate-fade-in-up delay-150">
           <Button
             size="lg"
-            className="w-full sm:w-auto shadow-md hover:shadow-lg hover:shadow-emerald-600/25 transition-all duration-300 hover:scale-102 active:scale-98"
+            className="w-full sm:w-auto shadow-md hover:shadow-lg hover:shadow-emerald-600/25 transition-all duration-300 hover:scale-102 active:scale-98 px-8"
             onClick={() => navigate('/schedule')}
           >
             <Calendar className="w-5 h-5 mr-2" />
             {t('home.hero.cta')}
           </Button>
-
+          <a
+            href="tel:7205908632"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-emerald-600/80 text-emerald-900 bg-white hover:bg-emerald-50 font-black text-sm shadow-2xs hover:shadow-md transition-all duration-300 hover:scale-102 active:scale-98"
+          >
+            <Phone className="w-4.5 h-4.5 text-emerald-600" />
+            <span>(720) 590-8632</span>
+          </a>
         </div>
 
         {/* Social Proof Pills */}
@@ -286,8 +310,15 @@ export function Home() {
                 className="flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 group border-slate-200 hover:border-emerald-400 p-6"
               >
                 <div className="space-y-4">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                    <Icon className="w-5 h-5" />
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    {getStartingPriceBadge(rate.service_type) && (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-emerald-50 border border-emerald-200/90 text-emerald-800 shadow-2xs">
+                        {getStartingPriceBadge(rate.service_type)}
+                      </span>
+                    )}
                   </div>
 
                   <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-950 transition-colors">
