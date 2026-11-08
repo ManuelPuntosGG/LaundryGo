@@ -186,7 +186,19 @@
         ]
       },
       "bookNow": "Book This Service",
-      "minNotice": "Upfront flat rate based on your property size tier. Verified dimensions and selected extras applied at booking."
+      "minNotice": "Upfront flat rate based on your property size tier. Verified dimensions and selected extras applied at booking.",
+      "commercial": {
+        "name": "Commercial Cleaning & Walkthrough",
+        "tagline": "15-Minute On-Site Assessment",
+        "description": "15-minute on-site walkthrough for offices, retail, medical clinics, and HOAs with same-business-day custom written proposal.",
+        "features": [
+          "15-minute on-site assessment with zero obligation",
+          "Custom, itemized written proposal delivered same business day",
+          "Flexible operations tailored to your schedule (evenings & weekends)",
+          "100% fully insured, background-checked personnel",
+          "$0 upfront deposit required to schedule your walkthrough"
+        ]
+      }
     },
     "coverage": {
       "title": "Service Areas in Denver",
@@ -690,7 +702,7 @@
     "frequencyDiscount": "Frequency Discount",
     "baseTierPrice": "Base Cleaning Service",
     "selectTier": "Select Specialized Service",
-    "propertyDetailsTitle": "Property & Inquiry Details",
+    "propertyDetailsTitle": "Bedrooms & Bathrooms",
     "bedroomsLabel": "Bedrooms",
     "bathroomsLabel": "Bathrooms",
     "occupancyLabel": "Occupancy Status",
@@ -837,7 +849,8 @@
       "loginToApplyTitle": "Sign in to Apply Coupon",
       "registerToApplyTitle": "Create Account & Save",
       "quickAuthSubtitle": "Discounts are linked to your profile so they can be securely applied."
-    }
+    },
+    "roomsAutoSuggestHint": "Adjust bedrooms to suggest recommended property size"
   },
   "auth": {
     "loginTitle": "Welcome Back to GoPropertyCare",
@@ -856,7 +869,20 @@
     "dontHaveAccount": "Don't have an account? Sign up",
     "alreadyHaveAccount": "Already have an account? Sign in",
     "loginSuccess": "Successfully signed in!",
-    "registerSuccess": "Account created successfully!"
+    "registerSuccess": "Account created successfully!",
+    "login": "Log In",
+    "register": "Sign Up",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "noAccount": "Don't have an account?",
+    "registerNow": "Sign up for free",
+    "errors": {
+      "allFieldsRequired": "Please fill in all required fields.",
+      "invalidCredentials": "Invalid email or password. Please try again.",
+      "passwordsMismatch": "Passwords do not match.",
+      "passwordLength": "Password must be at least 8 characters long."
+    }
   },
   "dashboard": {
     "title": "My Account",
@@ -906,7 +932,8 @@
     "cancelModalDesc": "Are you sure you want to cancel this reservation? If you cancel more than 24 hours before your appointment, no cancellation fee applies.",
     "cancelModalConfirm": "Yes, Cancel Booking",
     "cancelModalKeep": "Keep Booking",
-    "cancelSuccessBanner": "Your booking has been cancelled."
+    "cancelSuccessBanner": "Your booking has been cancelled.",
+    "defaultCleaningService": "Cleaning Service"
   },
   "footer": {
     "description": "Comprehensive cleaning solutions for residential, commercial, post-construction, and short-term rental turnovers in Denver.",
@@ -1216,6 +1243,8 @@
     "error": "An error occurred. Please try again.",
     "save": "Save Changes",
     "cancel": "Cancel",
-    "required": "Required"
+    "required": "Required",
+    "optional": "Optional",
+    "close": "Close"
   }
 }

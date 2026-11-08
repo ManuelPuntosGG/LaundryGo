@@ -2041,7 +2041,7 @@ export function Schedule() {
 
                     }`}
 
-                    aria-label={`Step ${s}`}
+                    aria-label={i18n.language?.startsWith('es') ? `Paso ${s}` : `Step ${s}`}
 
                   >
 
@@ -2601,10 +2601,10 @@ export function Schedule() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                     <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
                       <Home className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{t('schedule.propertyDetailsTitle', 'Habitaciones y Baños')}</span>
+                      <span>{t('schedule.propertyDetailsTitle', i18n.language?.startsWith('es') ? 'Habitaciones y Baños' : 'Bedrooms & Bathrooms')}</span>
                     </h3>
                     <span className="text-[11px] text-slate-500 font-medium">
-                      {t('schedule.roomsAutoSuggestHint', 'Ajusta tus habitaciones para sugerir el tamaño ideal')}
+                      {t('schedule.roomsAutoSuggestHint', i18n.language?.startsWith('es') ? 'Ajusta tus habitaciones para sugerir el tamaño ideal' : 'Adjust bedrooms to suggest recommended property size')}
                     </span>
                   </div>
 
@@ -2616,7 +2616,7 @@ export function Schedule() {
                           <Bed className="w-4 h-4" />
                         </div>
                         <div>
-                          <span className="text-xs font-bold text-slate-800 block">{t('schedule.bedroomsLabel', 'Habitaciones')}</span>
+                          <span className="text-xs font-bold text-slate-800 block">{t('schedule.bedroomsLabel', i18n.language?.startsWith('es') ? 'Habitaciones' : 'Bedrooms')}</span>
                           <span className="text-[11px] text-slate-500 font-medium">
                             {bedrooms} {bedrooms === 1 ? (i18n.language?.startsWith('es') ? 'recámara' : 'bedroom') : (i18n.language?.startsWith('es') ? 'recámaras' : 'bedrooms')}
                           </span>
@@ -2633,7 +2633,7 @@ export function Schedule() {
                             setIsTierAutoSuggested(true);
                           }}
                           className="w-8 h-8 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-slate-700 font-black transition-all cursor-pointer active:scale-95"
-                          aria-label="Decrease bedrooms"
+                          aria-label={i18n.language?.startsWith('es') ? 'Disminuir habitaciones' : 'Decrease bedrooms'}
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
@@ -2647,7 +2647,7 @@ export function Schedule() {
                             setIsTierAutoSuggested(true);
                           }}
                           className="w-8 h-8 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black flex items-center justify-center transition-all cursor-pointer active:scale-95"
-                          aria-label="Increase bedrooms"
+                          aria-label={i18n.language?.startsWith('es') ? 'Aumentar habitaciones' : 'Increase bedrooms'}
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
@@ -2661,7 +2661,7 @@ export function Schedule() {
                           <Bath className="w-4 h-4" />
                         </div>
                         <div>
-                          <span className="text-xs font-bold text-slate-800 block">{t('schedule.bathroomsLabel', 'Baños')}</span>
+                          <span className="text-xs font-bold text-slate-800 block">{t('schedule.bathroomsLabel', i18n.language?.startsWith('es') ? 'Baños' : 'Bathrooms')}</span>
                           <span className="text-[11px] text-slate-500 font-medium">
                             {bathrooms} {bathrooms === 1 ? (i18n.language?.startsWith('es') ? 'baño' : 'bathroom') : (i18n.language?.startsWith('es') ? 'baños' : 'bathrooms')}
                           </span>
@@ -2678,7 +2678,7 @@ export function Schedule() {
                             setIsTierAutoSuggested(true);
                           }}
                           className="w-8 h-8 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-slate-700 font-black transition-all cursor-pointer active:scale-95"
-                          aria-label="Decrease bathrooms"
+                          aria-label={i18n.language?.startsWith('es') ? 'Disminuir baños' : 'Decrease bathrooms'}
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
@@ -2692,7 +2692,7 @@ export function Schedule() {
                             setIsTierAutoSuggested(true);
                           }}
                           className="w-8 h-8 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-black flex items-center justify-center transition-all cursor-pointer active:scale-95"
-                          aria-label="Increase bathrooms"
+                          aria-label={i18n.language?.startsWith('es') ? 'Aumentar baños' : 'Increase bathrooms'}
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
@@ -2886,7 +2886,11 @@ export function Schedule() {
 
                               <span className="text-xs sm:text-sm font-black text-slate-900 block truncate">
 
-                                {tier.bedrooms === 0 ? t('schedule.studio') : tier.labelKey}
+                                {tier.bedrooms === 0
+                                  ? t('schedule.studio')
+                                  : i18n.language?.startsWith('es')
+                                    ? (tier.bedrooms >= 6 ? '6+ Hab' : `${tier.bedrooms} ${tier.bedrooms === 1 ? 'Hab' : 'Habs'}`)
+                                    : tier.labelKey}
 
                               </span>
 
@@ -2906,7 +2910,9 @@ export function Schedule() {
 
                               <span className="text-xs font-black text-emerald-800 tabular-nums">
 
-                                {tier.isCustomQuote ? 'Custom' : `$${tier.basePrice}`}
+                                {tier.isCustomQuote
+                                  ? (i18n.language?.startsWith('es') ? 'A Medida' : 'Custom')
+                                  : `$${tier.basePrice}`}
 
                               </span>
 
@@ -3034,7 +3040,7 @@ export function Schedule() {
                       </span>
                       {frequency !== 'one_time' ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                          {t(freqOption.nameKey)} ({freqOption.badge})
+                          {t(freqOption.nameKey)} ({i18n.language?.startsWith('es') ? (freqOption.discountPercent > 0 ? `-${freqOption.discountPercent}% Dto` : 'Precio Regular') : freqOption.badge})
                         </span>
                       ) : (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-200/80 text-slate-700">
@@ -3120,7 +3126,7 @@ export function Schedule() {
                                 </span>
                                 {freq.discountPercent > 0 && (
                                   <span className="text-[10px] text-emerald-700 font-black tabular-nums bg-emerald-50 px-1.5 py-0.5 rounded">
-                                    {freq.badge}
+                                    {i18n.language?.startsWith('es') ? (freq.discountPercent > 0 ? `-${freq.discountPercent}%` : 'Regular') : freq.badge}
                                   </span>
                                 )}
                               </div>
@@ -3370,7 +3376,9 @@ export function Schedule() {
 
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
 
-                  aria-label="Previous Month"
+                  title={i18n.language?.startsWith('es') ? 'Mes Anterior' : 'Previous Month'}
+
+                  aria-label={i18n.language?.startsWith('es') ? 'Mes Anterior' : 'Previous Month'}
 
                 >
 
@@ -3394,7 +3402,9 @@ export function Schedule() {
 
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:scale-105 active:scale-95 transition-all cursor-pointer"
 
-                  aria-label="Next Month"
+                  title={i18n.language?.startsWith('es') ? 'Mes Siguiente' : 'Next Month'}
+
+                  aria-label={i18n.language?.startsWith('es') ? 'Mes Siguiente' : 'Next Month'}
 
                 >
 
@@ -4418,7 +4428,9 @@ export function Schedule() {
                 <span className="font-black text-slate-900 text-sm sm:text-base block">{t('schedule.totalEstimatedQuote')}:</span>
                 {discountPercent > 0 && (
                   <span className="text-[11px] text-emerald-700 font-bold block mt-0.5">
-                    Includes {discountPercent}% recurring discount
+                    {i18n.language?.startsWith('es')
+                      ? `Incluye ${discountPercent}% de descuento recurrente`
+                      : `Includes ${discountPercent}% recurring discount`}
                   </span>
                 )}
               </div>

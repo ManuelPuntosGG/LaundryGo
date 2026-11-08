@@ -6,7 +6,7 @@ import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { useAuthContext } from '@/providers/AuthProvider';
 
 export function Navbar() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -122,7 +122,7 @@ export function Navbar() {
           <button
             className="text-slate-700 hover:text-slate-900 p-2.5 rounded-xl bg-slate-100 border border-slate-200 focus:outline-none transition-transform active:scale-95 shrink-0"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={i18n.language?.startsWith('es') ? 'Alternar menú' : 'Toggle menu'}
           >
             {isMobileMenuOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
           </button>

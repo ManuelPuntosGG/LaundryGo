@@ -109,7 +109,7 @@
         ]
       },
       "move_in_out": {
-        "name": "Move-In / Move-Out Cleaning",
+        "name": "Limpieza de Entrada / Salida (Move-In / Move-Out)",
         "tagline": "Devolución de Depósitos y Transiciones",
         "description": "Desinfección profunda y detallada para garantizar la devolución de depósitos de alquiler, transiciones fluidas de inquilinos y presentaciones listas para venta.",
         "features": [
@@ -145,8 +145,8 @@
         ]
       },
       "short_term_rental": {
-        "name": "Short-Term Rentals Turnover",
-        "tagline": "Turnover Rápido Calidad 5 Estrellas",
+        "name": "Rotación de Alquiler Vacacional (Airbnb / VRBO)",
+        "tagline": "Rotación Rápida Calidad 5 Estrellas",
         "description": "Preparación rápida entre huéspedes: cambio y lavado de ropa de cama/toallas, reabastecimiento de insumos y desinfección.",
         "features": [
           "Preparación rápida y puntual en ventana entre huéspedes",
@@ -156,7 +156,7 @@
         ]
       },
       "regular": {
-        "name": "Residential Cleaning",
+        "name": "Limpieza Residencial",
         "tagline": "Mantenimiento Continuo del Hogar",
         "description": "Mantenimiento de hogar personalizado adaptado a su estilo de vida.",
         "features": [
@@ -176,7 +176,7 @@
         ]
       },
       "moveInOut": {
-        "name": "Move-In / Move-Out Cleaning",
+        "name": "Limpieza de Entrada / Salida (Move-In / Move-Out)",
         "tagline": "Lista para Mudanza e Inspección",
         "description": "Desinfección profunda para garantizar la devolución de depósitos de alquiler.",
         "features": [
@@ -186,7 +186,19 @@
         ]
       },
       "bookNow": "Reservar este Servicio",
-      "minNotice": "Tarifa fija por tier según el tamaño del inmueble. Las dimensiones y cuidados especiales se confirman en tu reserva."
+      "minNotice": "Tarifa fija por tier según el tamaño del inmueble. Las dimensiones y cuidados especiales se confirman en tu reserva.",
+      "commercial": {
+        "name": "Walkthrough y Limpieza Comercial",
+        "tagline": "Evaluación Presencial de 15 Minutos",
+        "description": "Visita presencial de evaluación de 15 minutos para oficinas, retail, clínicas y comunidades HOA con entrega de propuesta detallada el mismo día hábil.",
+        "features": [
+          "Recorrido de 15 minutos en tus instalaciones sin compromiso",
+          "Propuesta personalizada y detallada por escrito el mismo día hábil",
+          "Horarios adaptados a tu operación (noches y fines de semana)",
+          "Personal 100% asegurado (Insured) y de máxima confianza",
+          "$0 anticipo requerido para solicitar tu cotización"
+        ]
+      }
     },
     "coverage": {
       "title": "Zonas de Cobertura en Denver",
@@ -636,7 +648,7 @@
     }
   },
   "schedule": {
-    "strTurnoverTitle": "Short-Term Rental Turnover (Airbnb / Vrbo)",
+    "strTurnoverTitle": "Rotación de Alquiler Vacacional (Airbnb / VRBO)",
     "strTurnoverHelp": "Cotizado directamente por habitaciones y baños con servicio de sábanas y reporte de daños.",
     "washerDryerQuestion": "¿Hay lavadora y secadora en la propiedad?",
     "washerDryerHelp": "Define si el lavado de ropa de cama se realiza en el inmueble o requiere lavandería externa.",
@@ -690,7 +702,7 @@
     "frequencyDiscount": "Descuento por Frecuencia",
     "baseTierPrice": "Servicio Base de Limpieza",
     "selectTier": "Selecciona el Servicio Especializado",
-    "propertyDetailsTitle": "Detalles del Inmueble y Consulta",
+    "propertyDetailsTitle": "Habitaciones y Baños",
     "bedroomsLabel": "Habitaciones",
     "bathroomsLabel": "Baños",
     "occupancyLabel": "Estado de Ocupación",
@@ -837,7 +849,8 @@
       "loginToApplyTitle": "Inicia sesión para aplicar tu cupón",
       "registerToApplyTitle": "Crea tu cuenta y ahorra",
       "quickAuthSubtitle": "Los descuentos se asocian a tu perfil para aplicarse de forma segura."
-    }
+    },
+    "roomsAutoSuggestHint": "Ajusta tus habitaciones para sugerir el tamaño ideal"
   },
   "auth": {
     "loginTitle": "Bienvenido a GoPropertyCare",
@@ -856,7 +869,20 @@
     "dontHaveAccount": "¿No tienes cuenta? Regístrate",
     "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión",
     "loginSuccess": "¡Sesión iniciada con éxito!",
-    "registerSuccess": "¡Cuenta creada exitosamente!"
+    "registerSuccess": "¡Cuenta creada exitosamente!",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "noAccount": "¿No tienes una cuenta?",
+    "registerNow": "Regístrate gratis",
+    "errors": {
+      "allFieldsRequired": "Por favor completa todos los campos obligatorios.",
+      "invalidCredentials": "Correo o contraseña incorrectos. Por favor intenta de nuevo.",
+      "passwordsMismatch": "Las contraseñas no coinciden.",
+      "passwordLength": "La contraseña debe tener al menos 8 caracteres."
+    }
   },
   "dashboard": {
     "title": "Mi Cuenta",
@@ -906,7 +932,8 @@
     "cancelModalDesc": "¿Estás seguro de que deseas cancelar esta reservación? Si cancelas con más de 24 horas de anticipación a tu cita, no se aplicará ningún cargo.",
     "cancelModalConfirm": "Sí, Cancelar Reserva",
     "cancelModalKeep": "Conservar Reserva",
-    "cancelSuccessBanner": "Tu reservación ha sido cancelada."
+    "cancelSuccessBanner": "Tu reservación ha sido cancelada.",
+    "defaultCleaningService": "Servicio de Limpieza"
   },
   "footer": {
     "description": "Soluciones integrales de limpieza residencial, comercial, post-construcción y turnovers de alquiler vacacional en Denver.",
@@ -1216,6 +1243,8 @@
     "error": "Ocurrió un error. Por favor intenta de nuevo.",
     "save": "Guardar Cambios",
     "cancel": "Cancelar",
-    "required": "Requerido"
+    "required": "Requerido",
+    "optional": "Opcional",
+    "close": "Cerrar"
   }
 }

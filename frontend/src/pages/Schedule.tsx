@@ -809,8 +809,8 @@ export function Schedule() {
                             disabled={isPrevMonthDisabled()}
                             onClick={handlePrevMonth}
                             className="p-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-white hover:border-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
-                            title="Previous Month"
-                            aria-label="Previous Month"
+                            title={i18n.language?.startsWith('es') ? 'Mes Anterior' : 'Previous Month'}
+                            aria-label={i18n.language?.startsWith('es') ? 'Mes Anterior' : 'Previous Month'}
                           >
                             <ChevronLeft className="w-4 h-4" />
                           </button>
@@ -818,8 +818,8 @@ export function Schedule() {
                             type="button"
                             onClick={handleNextMonth}
                             className="p-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-white hover:border-slate-300 transition-all cursor-pointer"
-                            title="Next Month"
-                            aria-label="Next Month"
+                            title={i18n.language?.startsWith('es') ? 'Mes Siguiente' : 'Next Month'}
+                            aria-label={i18n.language?.startsWith('es') ? 'Mes Siguiente' : 'Next Month'}
                           >
                             <ChevronRight className="w-4 h-4" />
                           </button>
@@ -881,7 +881,7 @@ export function Schedule() {
                             type="button"
                             disabled={!isAvailable}
                             onClick={() => setSelectedDate(cell.dateStr)}
-                            aria-label={`Date ${cell.dateStr} ${isAvailable ? 'available' : 'unavailable'}`}
+                            aria-label={i18n.language?.startsWith('es') ? `Fecha ${cell.dateStr} ${isAvailable ? 'disponible' : 'no disponible'}` : `Date ${cell.dateStr} ${isAvailable ? 'available' : 'unavailable'}`}
                             className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex flex-col items-center justify-center relative mx-auto ${
                               isSelected
                                 ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-2'
@@ -1357,7 +1357,7 @@ export function Schedule() {
                                 type="button"
                                 disabled={qty === 0}
                                 onClick={() => handleBeddingQtyChange(item.id, -1)}
-                                aria-label={`Decrease ${item.name}`}
+                                aria-label={i18n.language?.startsWith('es') ? `Disminuir ${item.name}` : `Decrease ${item.name}`}
                                 className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                                   qty === 0
                                     ? 'text-slate-300 cursor-not-allowed'
@@ -1372,7 +1372,7 @@ export function Schedule() {
                               <button
                                 type="button"
                                 onClick={() => handleBeddingQtyChange(item.id, 1)}
-                                aria-label={`Increase ${item.name}`}
+                                aria-label={i18n.language?.startsWith('es') ? `Aumentar ${item.name}` : `Increase ${item.name}`}
                                 className="w-9 h-9 rounded-lg flex items-center justify-center text-blue-600 hover:bg-blue-50 active:scale-95 transition-all cursor-pointer"
                               >
                                 <Plus className="w-4 h-4" />
